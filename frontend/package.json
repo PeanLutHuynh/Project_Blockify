@@ -1,0 +1,34 @@
+{
+  "name": "project-blockify-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Project Blockify LEGO E-commerce Platform",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=3000 --open=public",
+    "build": "npm run copy-files && npm run minify",
+    "copy-files": "mkdir -p dist && cp -r public/* dist/",
+    "minify": "echo 'Frontend build complete - files copied to dist/'",
+    "lint": "eslint public/js --ext .js",
+    "lint:fix": "eslint public/js --ext .js --fix",
+    "format": "prettier --write \"public/**/*.{js,html,css}\"",
+    "test": "echo 'Frontend tests not implemented yet'"
+  },
+  "keywords": [
+    "html",
+    "css",
+    "javascript",
+    "bootstrap",
+    "frontend"
+  ],
+  "author": "Project Blockify Team",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "eslint": "^8.47.0",
+    "prettier": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
