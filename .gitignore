@@ -6,9 +6,9 @@ yarn-error.log*
 package-lock.json
 yarn.lock
 
-# Production builds
-/dist/
-/build/
+# Production builds (but not source files)
+/backend/dist/
+/frontend/dist/
 *.tgz
 *.tar.gz
 
@@ -72,7 +72,9 @@ dist
 
 # Gatsby files
 .cache/
-public
+# Gatsby public build output is ignored, but not our frontend/public source
+/.cache/
+.gatsby/
 
 # Storybook build outputs
 .out

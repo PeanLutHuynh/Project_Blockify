@@ -1,0 +1,127 @@
+/* Project Blockify Custom Styles */
+
+:root {
+  --lego-red: #dc3545;
+  --lego-blue: #0d6efd;
+  --lego-yellow: #ffc107;
+  --lego-green: #198754;
+  --lego-orange: #fd7e14;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, var(--lego-blue), var(--lego-red));
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+}
+
+.feature-icon {
+  transition: transform 0.3s ease;
+}
+
+.feature-icon:hover {
+  transform: translateY(-5px);
+}
+
+.btn-lego {
+  background: linear-gradient(45deg, var(--lego-red), var(--lego-yellow));
+  border: none;
+  color: white;
+  font-weight: 600;
+}
+
+.btn-lego:hover {
+  background: linear-gradient(45deg, var(--lego-yellow), var(--lego-red));
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-lego-outline {
+  border: 2px solid var(--lego-red);
+  color: var(--lego-red);
+  font-weight: 600;
+}
+
+.btn-lego-outline:hover {
+  background-color: var(--lego-red);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+  border-radius: 15px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.toast-container {
+  z-index: 1060;
+}
+
+footer {
+  margin-top: auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .hero-section {
+    text-align: center;
+    padding: 3rem 0;
+  }
+  
+  .display-4 {
+    font-size: 2rem;
+  }
+  
+  .btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+/* Loading animation */
+.spinner-lego {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--lego-yellow);
+  border-top: 4px solid var(--lego-red);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Skip link for accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--lego-blue);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 0 0 8px 8px;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 0;
+}
