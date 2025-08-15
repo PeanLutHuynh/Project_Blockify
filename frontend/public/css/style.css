@@ -1,0 +1,341 @@
+:root {
+  --primary-color: #dc3545;
+  --secondary-color: #ffc107;
+  --success-color: #28a745;
+  --info-color: #17a2b8;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+  --lego-red: #dc3545;
+  --lego-yellow: #ffc107;
+  --lego-blue: #007bff;
+  --lego-green: #28a745;
+}
+
+/* Custom Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Fredoka+One:wght@400&display=swap');
+
+/* Global Styles */
+body {
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
+  color: var(--dark-color);
+}
+
+.font-fredoka {
+  font-family: 'Fredoka One', cursive;
+}
+
+/* Header Styles */
+.navbar-brand {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.8rem;
+  color: var(--lego-red) !important;
+}
+
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, var(--lego-red), var(--lego-yellow));
+  color: white;
+  padding: 100px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('/images/lego-pattern.png') repeat;
+  opacity: 0.1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Product Cards */
+.product-card {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.product-image {
+  height: 250px;
+  object-fit: cover;
+  border-radius: 15px 15px 0 0;
+}
+
+.product-title {
+  font-weight: 500;
+  color: var(--dark-color);
+  text-decoration: none;
+}
+
+.product-title:hover {
+  color: var(--lego-red);
+  text-decoration: none;
+}
+
+.product-price {
+  font-weight: 700;
+  color: var(--lego-red);
+  font-size: 1.2rem;
+}
+
+.product-sale-price {
+  color: var(--success-color);
+  text-decoration: line-through;
+  font-size: 0.9rem;
+}
+
+/* Buttons */
+.btn-lego {
+  background: var(--lego-red);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  font-weight: 500;
+  padding: 10px 25px;
+  transition: all 0.3s ease;
+}
+
+.btn-lego:hover {
+  background: #c82333;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn-lego-outline {
+  border: 2px solid var(--lego-red);
+  color: var(--lego-red);
+  background: transparent;
+  border-radius: 25px;
+  font-weight: 500;
+  padding: 8px 25px;
+  transition: all 0.3s ease;
+}
+
+.btn-lego-outline:hover {
+  background: var(--lego-red);
+  color: white;
+}
+
+/* Category Cards */
+.category-card {
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.category-card:hover {
+  transform: scale(1.05);
+  text-decoration: none;
+}
+
+.category-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-title {
+  color: white;
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+/* Cart Badge */
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--lego-red);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Loading Spinner */
+.spinner-lego {
+  border: 4px solid var(--light-color);
+  border-top: 4px solid var(--lego-red);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Footer */
+.footer {
+  background: var(--dark-color);
+  color: white;
+  padding: 50px 0 20px;
+}
+
+.footer h5 {
+  color: var(--lego-yellow);
+  font-weight: 700;
+}
+
+.footer a {
+  color: #ccc;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer a:hover {
+  color: var(--lego-yellow);
+  text-decoration: none;
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 60px 0;
+  }
+  
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+  
+  .hero-section p {
+    font-size: 1rem;
+  }
+  
+  .navbar-brand {
+    font-size: 1.5rem;
+  }
+}
+
+/* Admin Panel Styles */
+.admin-sidebar {
+  background: var(--dark-color);
+  min-height: 100vh;
+  color: white;
+}
+
+.admin-sidebar .nav-link {
+  color: #ccc;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  transition: all 0.3s ease;
+}
+
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+  background: var(--lego-red);
+  color: white;
+}
+
+.admin-main {
+  margin-left: 250px;
+  padding: 20px;
+}
+
+@media (max-width: 992px) {
+  .admin-main {
+    margin-left: 0;
+  }
+  
+  .admin-sidebar {
+    position: fixed;
+    left: -250px;
+    width: 250px;
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+  
+  .admin-sidebar.show {
+    left: 0;
+  }
+}
+
+/* Form Styles */
+.form-control:focus {
+  border-color: var(--lego-red);
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-lego {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Alerts */
+.alert-lego {
+  border-radius: 10px;
+  border: none;
+  font-weight: 500;
+}
+
+/* Pagination */
+.pagination .page-link {
+  color: var(--lego-red);
+  border-color: #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--lego-red);
+  border-color: var(--lego-red);
+}
+
+.pagination .page-link:hover {
+  color: #c82333;
+  background-color: #e9ecef;
+}
+
+/* Breadcrumb */
+.breadcrumb-lego {
+  background: transparent;
+  padding: 10px 0;
+}
+
+.breadcrumb-lego .breadcrumb-item + .breadcrumb-item::before {
+  content: "🧱";
+}

@@ -1,0 +1,37 @@
+{
+  "name": "project-blockify",
+  "version": "1.0.0",
+  "description": "LEGO E-commerce Platform Template - Academic Project",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "cd backend && npm run dev",
+    "frontend:dev": "cd frontend && npm start",
+    "build": "npm run backend:build && npm run frontend:build",
+    "backend:build": "cd backend && npm run build",
+    "frontend:build": "cd frontend && npm run build",
+    "test": "npm run backend:test",
+    "backend:test": "cd backend && npm test",
+    "setup": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": [
+    "lego",
+    "ecommerce",
+    "typescript",
+    "nodejs",
+    "express",
+    "supabase",
+    "bootstrap",
+    "mvc",
+    "academic"
+  ],
+  "author": "Project Blockify Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

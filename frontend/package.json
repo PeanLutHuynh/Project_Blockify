@@ -1,0 +1,15 @@
+{
+  "name": "blockify-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Project Blockify LEGO E-commerce Platform",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=3001 --host=localhost --entry-file=views/pages/index.html",
+    "build": "echo 'Frontend build completed'",
+    "dev": "live-server --port=3001 --host=localhost --entry-file=views/pages/index.html --watch=views,public"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "dependencies": {}
+}

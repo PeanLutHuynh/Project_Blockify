@@ -1,0 +1,244 @@
+/* Mobile First Responsive Design */
+
+/* Extra Small devices (phones, 576px and down) */
+@media (max-width: 575.98px) {
+  .container-fluid {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  
+  .hero-section h1 {
+    font-size: 1.8rem;
+  }
+  
+  .hero-section p {
+    font-size: 0.9rem;
+  }
+  
+  .product-card {
+    margin-bottom: 20px;
+  }
+  
+  .navbar-toggler {
+    border: none;
+  }
+  
+  .navbar-brand {
+    font-size: 1.3rem;
+  }
+  
+  .btn-lego {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .category-card {
+    height: 150px;
+  }
+  
+  .category-title {
+    font-size: 1.2rem;
+  }
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .hero-section {
+    padding: 70px 0;
+  }
+  
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .hero-section {
+    padding: 80px 0;
+  }
+  
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  
+  .admin-sidebar {
+    width: 200px;
+  }
+  
+  .admin-main {
+    margin-left: 200px;
+  }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+  }
+  
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+  }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+  }
+  
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 30px;
+  }
+  
+  .container-xl {
+    max-width: 1400px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .navbar,
+  .footer,
+  .btn,
+  .pagination {
+    display: none !important;
+  }
+  
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+  
+  .product-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  
+  .hero-section {
+    background: none !important;
+    color: black !important;
+    padding: 20px 0;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bs-body-bg: #1a1a1a;
+    --bs-body-color: #e0e0e0;
+  }
+  
+  .navbar-light {
+    background-color: #2d2d2d !important;
+  }
+  
+  .navbar-light .navbar-brand,
+  .navbar-light .nav-link {
+    color: #e0e0e0 !important;
+  }
+  
+  .product-card {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+  }
+  
+  .form-control {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+  }
+  
+  .form-control:focus {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --primary-color: #000000;
+    --secondary-color: #ffffff;
+    --lego-red: #000000;
+  }
+  
+  .btn-lego {
+    background: #000000;
+    color: #ffffff;
+    border: 2px solid #000000;
+  }
+  
+  .btn-lego:hover {
+    background: #ffffff;
+    color: #000000;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .product-card:hover {
+    transform: none;
+  }
+  
+  .category-card:hover {
+    transform: none;
+  }
+}
+
+/* Focus States for Accessibility */
+.btn:focus,
+.form-control:focus,
+.nav-link:focus {
+  outline: 2px solid var(--lego-red);
+  outline-offset: 2px;
+}
+
+/* Skip Link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--lego-red);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 9999;
+}
+
+.skip-link:focus {
+  top: 6px;
+}

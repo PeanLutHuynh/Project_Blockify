@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Project Blockify - Premium LEGO and Toy E-commerce Platform. Build Your Dreams, One Brick at a Time.">
+    <meta name="keywords" content="LEGO, toys, blocks, building sets, e-commerce, premium">
+    <meta name="author" content="Project Blockify Team">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/responsive.css" rel="stylesheet">
+    
+    <title>Home - Project Blockify | Premium LEGO & Toy Store</title>
+</head>
+<body>
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Navigation Header -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+        <div class="container">
+            <!-- Brand Logo -->
+            <a class="navbar-brand font-fredoka" href="index.html">
+                <i class="bi bi-box-seam text-danger me-2"></i>
+                Blockify
+            </a>
+            
+            <!-- Mobile Menu Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Navigation Menu -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">
+                            <i class="bi bi-house me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="products.html">
+                            <i class="bi bi-grid me-1"></i>Products
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-tags me-1"></i>Categories
+                        </a>
+                        <ul class="dropdown-menu" id="categoriesDropdown">
+                            <li><a class="dropdown-item" href="products.html?category=building-sets">🏗️ Building Sets</a></li>
+                            <li><a class="dropdown-item" href="products.html?category=collectibles">⭐ Collectibles</a></li>
+                            <li><a class="dropdown-item" href="products.html?category=accessories">🔧 Accessories</a></li>
+                            <li><a class="dropdown-item" href="products.html?category=minifigures">👤 Minifigures</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="blog.html">
+                            <i class="bi bi-journal-text me-1"></i>Blog
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contact.html">
+                            <i class="bi bi-envelope me-1"></i>Contact
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Search Form -->
+                <form class="d-flex me-3" id="searchForm">
+                    <div class="input-group">
+                        <input class="form-control" type="search" placeholder="Search LEGO sets..." id="searchInput">
+                        <button class="btn btn-lego-outline" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- User Actions -->
+                <ul class="navbar-nav">
+                    <!-- Cart Icon -->
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="cart.html" id="cartIcon">
+                            <i class="bi bi-basket2 fs-5"></i>
+                            <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+                        </a>
+                    </li>
+                    
+                    <!-- Authentication Links -->
+                    <li class="nav-item dropdown" data-auth="logged-in" style="display: none;">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span data-user-name>Account</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="profile.html">
+                                <i class="bi bi-person me-2"></i>Profile
+                            </a></li>
+                            <li><a class="dropdown-item" href="orders.html">
+                                <i class="bi bi-receipt me-2"></i>My Orders
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()">
+                                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                            </a></li>
+                        </ul>
+                    </li>
+                    
+                    <li class="nav-item" data-auth="logged-out">
+                        <a class="nav-link" href="login.html">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item" data-auth="logged-out">
+                        <a class="nav-link" href="register.html">
+                            <i class="bi bi-person-plus me-1"></i>Register
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-content text-center">
+                    <h1 class="display-4 fw-bold mb-4 font-fredoka">
+                        Build Your Dreams, One Brick at a Time! 🧱
+                    </h1>
+                    <p class="lead mb-5">
+                        Discover premium LEGO sets, collectibles, and building toys. 
+                        From beginner-friendly sets to expert challenges - we have everything for builders of all ages.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="products.html" class="btn btn-lego btn-lg me-3">
+                            <i class="bi bi-grid me-2"></i>Shop Now
+                        </a>
+                        <a href="products.html?featured=true" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-star me-2"></i>Featured Sets
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Categories -->
+        <section class="py-5">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="font-fredoka">🎯 Shop by Category</h2>
+                    <p class="lead text-muted">Explore our wide range of LEGO categories and themes</p>
+                </div>
+                <div class="row" id="categoriesContainer">
+                    <!-- Categories will be loaded dynamically via AJAX -->
+                    <div class="col-md-3 mb-3">
+                        <a href="products.html?category=building-sets" class="category-card"
+                           style="background-image: linear-gradient(45deg, #dc3545, #ffc107);">
+                            <div class="category-overlay">
+                                <h5 class="category-title">🏗️ Building Sets</h5>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="products.html?category=collectibles" class="category-card"
+                           style="background-image: linear-gradient(45deg, #007bff, #28a745);">
+                            <div class="category-overlay">
+                                <h5 class="category-title">⭐ Collectibles</h5>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="products.html?category=accessories" class="category-card"
+                           style="background-image: linear-gradient(45deg, #17a2b8, #ffc107);">
+                            <div class="category-overlay">
+                                <h5 class="category-title">🔧 Accessories</h5>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="products.html?category=minifigures" class="category-card"
+                           style="background-image: linear-gradient(45deg, #6f42c1, #dc3545);">
+                            <div class="category-overlay">
+                                <h5 class="category-title">👤 Minifigures</h5>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Products -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="font-fredoka">⭐ Featured Products</h2>
+                    <p class="lead text-muted">Hand-picked favorites from our collection</p>
+                </div>
+                <div class="row" id="featuredProducts">
+                    <!-- Featured products will be loaded dynamically via AJAX -->
+                    <!-- Loading placeholder -->
+                    <div class="col-12 text-center">
+                        <div class="spinner-lego mx-auto"></div>
+                        <p class="mt-3 text-muted">Loading featured products...</p>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="products.html" class="btn btn-lego-outline">
+                        <i class="bi bi-arrow-right me-2"></i>View All Products
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-5">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="font-fredoka">🚀 Why Choose Blockify?</h2>
+                    <p class="lead text-muted">Your trusted partner in building adventures</p>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="text-center">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-shield-check text-success" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5>Authentic Products</h5>
+                            <p class="text-muted">100% genuine LEGO sets with official warranty and quality guarantee.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="text-center">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-truck text-primary" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5>Fast Shipping</h5>
+                            <p class="text-muted">Free shipping on orders over $50. Express delivery available worldwide.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="text-center">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-headset text-info" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5>Expert Support</h5>
+                            <p class="text-muted">Our LEGO experts are here to help you find the perfect set for any builder.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="text-center">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-arrow-clockwise text-warning" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5>Easy Returns</h5>
+                            <p class="text-muted">30-day return policy with hassle-free exchanges and refunds.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section class="py-5 bg-dark text-light">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h3 class="font-fredoka mb-3">📧 Stay Updated!</h3>
+                        <p class="mb-0">Get the latest news about new releases, exclusive deals, and building tips delivered to your inbox.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <form class="d-flex" id="homeNewsletterForm">
+                            <input type="email" class="form-control me-3" placeholder="Enter your email address" required>
+                            <button type="submit" class="btn btn-warning text-dark">
+                                <i class="bi bi-envelope me-2"></i>Subscribe
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-light mt-5">
+        <div class="container">
+            <div class="row py-5">
+                <!-- Company Info -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="font-fredoka mb-3">
+                        <i class="bi bi-box-seam text-warning me-2"></i>
+                        Blockify
+                    </h5>
+                    <p class="mb-3">
+                        Your premier destination for LEGO sets, building toys, and collectibles. 
+                        Building dreams, one brick at a time.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="text-light me-3" aria-label="Facebook">
+                            <i class="bi bi-facebook fs-5"></i>
+                        </a>
+                        <a href="#" class="text-light me-3" aria-label="Twitter">
+                            <i class="bi bi-twitter fs-5"></i>
+                        </a>
+                        <a href="#" class="text-light me-3" aria-label="Instagram">
+                            <i class="bi bi-instagram fs-5"></i>
+                        </a>
+                        <a href="#" class="text-light" aria-label="YouTube">
+                            <i class="bi bi-youtube fs-5"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="text-warning mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="index.html">Home</a></li>
+                        <li class="mb-2"><a href="products.html">Products</a></li>
+                        <li class="mb-2"><a href="blog.html">Blog</a></li>
+                        <li class="mb-2"><a href="contact.html">Contact</a></li>
+                        <li class="mb-2"><a href="about.html">About Us</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Categories -->
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="text-warning mb-3">Categories</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="products.html?category=building-sets">Building Sets</a></li>
+                        <li class="mb-2"><a href="products.html?category=collectibles">Collectibles</a></li>
+                        <li class="mb-2"><a href="products.html?category=accessories">Accessories</a></li>
+                        <li class="mb-2"><a href="products.html?category=minifigures">Minifigures</a></li>
+                        <li class="mb-2"><a href="products.html?featured=true">Featured</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Customer Support -->
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="text-warning mb-3">Support</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="faq.html">FAQ</a></li>
+                        <li class="mb-2"><a href="shipping.html">Shipping Info</a></li>
+                        <li class="mb-2"><a href="returns.html">Returns</a></li>
+                        <li class="mb-2"><a href="privacy.html">Privacy Policy</a></li>
+                        <li class="mb-2"><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="col-lg-2 col-md-12 mb-4">
+                    <h5 class="text-warning mb-3">Contact</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-telephone me-2"></i>
+                            <a href="tel:+1234567890">+1 (234) 567-890</a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-envelope me-2"></i>
+                            <a href="mailto:info@blockify.com">info@blockify.com</a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            123 LEGO Street<br>
+                            Brick City, BC 12345
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Copyright -->
+            <div class="row py-3 border-top border-secondary">
+                <div class="col-md-6">
+                    <p class="mb-0 text-muted">
+                        © 2025 Project Blockify. All rights reserved.
+                        <span class="d-block d-md-inline">Academic Project - Not for Commercial Use</span>
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0 text-muted">
+                        Built with ❤️ using Bootstrap, TypeScript & Supabase
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JavaScript Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="/js/main.js"></script>
+    
+</body>
+</html>

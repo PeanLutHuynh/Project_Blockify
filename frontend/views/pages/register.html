@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Register for Project Blockify - Join our LEGO community">
+    <title>Register - Project Blockify</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/responsive.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Navigation (minimal) -->
+    <nav class="navbar navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand font-fredoka" href="index.html">
+                <i class="bi bi-box-seam text-danger me-2"></i>
+                Blockify
+            </a>
+            <a href="index.html" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Home
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="form-lego mt-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-plus text-danger" style="font-size: 3rem;"></i>
+                        <h2 class="font-fredoka mt-3">Join the Blockify Family! 🧱</h2>
+                        <p class="text-muted">Create your account and start your building adventure</p>
+                    </div>
+
+                    <!-- Registration Form -->
+                    <form class="ajax-form" 
+                          data-url="/api/auth/register" 
+                          data-method="POST"
+                          data-on-success="register"
+                          id="registerForm"
+                          novalidate>
+                        
+                        <!-- Full Name Field -->
+                        <div class="mb-3">
+                            <label for="full_name" class="form-label">
+                                <i class="bi bi-person me-2"></i>Full Name
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="full_name" 
+                                   name="full_name" 
+                                   placeholder="Enter your full name"
+                                   required
+                                   minlength="2">
+                            <div class="invalid-feedback">
+                                Please provide your full name (at least 2 characters).
+                            </div>
+                        </div>
+
+                        <!-- Email Field -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                <i class="bi bi-envelope me-2"></i>Email Address
+                            </label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="email" 
+                                   name="email" 
+                                   placeholder="Enter your email"
+                                   required>
+                            <div class="invalid-feedback">
+                                Please provide a valid email address.
+                            </div>
+                        </div>
+
+                        <!-- Phone Field (Optional) -->
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">
+                                <i class="bi bi-telephone me-2"></i>Phone Number
+                                <small class="text-muted">(Optional)</small>
+                            </label>
+                            <input type="tel" 
+                                   class="form-control" 
+                                   id="phone" 
+                                   name="phone" 
+                                   placeholder="Enter your phone number">
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="bi bi-lock me-2"></i>Password
+                            </label>
+                            <div class="input-group">
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="password" 
+                                       name="password" 
+                                       placeholder="Create a strong password"
+                                       required
+                                       minlength="8">
+                                <button class="btn btn-outline-secondary" 
+                                        type="button" 
+                                        id="togglePassword">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                Password must be at least 8 characters with uppercase, lowercase, and number.
+                            </div>
+                            <div class="invalid-feedback">
+                                Password must be at least 8 characters long and contain uppercase, lowercase, and number.
+                            </div>
+                        </div>
+
+                        <!-- Confirm Password Field -->
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">
+                                <i class="bi bi-lock-fill me-2"></i>Confirm Password
+                            </label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="confirmPassword" 
+                                   name="confirm_password" 
+                                   placeholder="Re-enter your password"
+                                   required>
+                            <div class="invalid-feedback">
+                                Passwords do not match.
+                            </div>
+                        </div>
+
+                        <!-- Terms and Conditions -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="agreeTerms"
+                                       name="agree_terms"
+                                       required>
+                                <label class="form-check-label" for="agreeTerms">
+                                    I agree to the 
+                                    <a href="terms.html" target="_blank" class="text-decoration-none">
+                                        Terms of Service
+                                    </a> 
+                                    and 
+                                    <a href="privacy.html" target="_blank" class="text-decoration-none">
+                                        Privacy Policy
+                                    </a>
+                                </label>
+                                <div class="invalid-feedback">
+                                    You must agree to the terms and conditions.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Newsletter Subscription -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="newsletter"
+                                       name="newsletter"
+                                       checked>
+                                <label class="form-check-label" for="newsletter">
+                                    Subscribe to our newsletter for exclusive deals and new releases
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-lego w-100 mb-3">
+                            <i class="bi bi-person-plus me-2"></i>
+                            Create Account
+                        </button>
+
+                        <!-- Demo Notice -->
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Demo Mode:</strong> This is a demonstration. No real account will be created.
+                        </div>
+                    </form>
+
+                    <!-- Social Registration (Optional) -->
+                    <div class="text-center mb-3">
+                        <span class="text-muted">Or register with</span>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100" disabled>
+                                <i class="bi bi-google me-2"></i>Google
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-dark w-100" disabled>
+                                <i class="bi bi-facebook me-2"></i>Facebook
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Login Link -->
+                    <div class="text-center">
+                        <p class="mb-0">
+                            Already have an account? 
+                            <a href="login.html" class="text-decoration-none fw-bold">
+                                Login here
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Benefits Section -->
+                <div class="row mt-4">
+                    <div class="col-4 text-center">
+                        <i class="bi bi-gift text-warning fs-2"></i>
+                        <small class="d-block text-muted">Welcome Bonus</small>
+                    </div>
+                    <div class="col-4 text-center">
+                        <i class="bi bi-truck text-success fs-2"></i>
+                        <small class="d-block text-muted">Free Shipping</small>
+                    </div>
+                    <div class="col-4 text-center">
+                        <i class="bi bi-star text-primary fs-2"></i>
+                        <small class="d-block text-muted">Exclusive Access</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="/js/main.js"></script>
+    
+    <!-- Page-specific JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle password visibility
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordField = document.getElementById('password');
+            
+            togglePassword.addEventListener('click', function() {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                
+                const icon = this.querySelector('i');
+                icon.className = type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+            });
+
+            // Password validation
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+
+            function validatePassword() {
+                const value = password.value;
+                const hasUpperCase = /[A-Z]/.test(value);
+                const hasLowerCase = /[a-z]/.test(value);
+                const hasNumbers = /\d/.test(value);
+                const hasValidLength = value.length >= 8;
+
+                const isValid = hasUpperCase && hasLowerCase && hasNumbers && hasValidLength;
+                
+                if (value && !isValid) {
+                    password.setCustomValidity('Password must contain uppercase, lowercase, and number');
+                } else {
+                    password.setCustomValidity('');
+                }
+                
+                validatePasswordMatch();
+            }
+
+            function validatePasswordMatch() {
+                if (confirmPassword.value && password.value !== confirmPassword.value) {
+                    confirmPassword.setCustomValidity('Passwords do not match');
+                } else {
+                    confirmPassword.setCustomValidity('');
+                }
+            }
+
+            password.addEventListener('input', validatePassword);
+            confirmPassword.addEventListener('input', validatePasswordMatch);
+
+            // Form validation enhancement
+            const form = document.getElementById('registerForm');
+            form.addEventListener('submit', function(event) {
+                validatePassword();
+                validatePasswordMatch();
+                
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+
+            // Auto-focus on full name field
+            document.getElementById('full_name').focus();
+        });
+    </script>
+</body>
+</html>

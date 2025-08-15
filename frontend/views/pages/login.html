@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Login to Project Blockify - Access your LEGO collection and orders">
+    <title>Login - Project Blockify</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/responsive.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Navigation (minimal) -->
+    <nav class="navbar navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand font-fredoka" href="index.html">
+                <i class="bi bi-box-seam text-danger me-2"></i>
+                Blockify
+            </a>
+            <a href="index.html" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Home
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="form-lego mt-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-box-arrow-in-right text-danger" style="font-size: 3rem;"></i>
+                        <h2 class="font-fredoka mt-3">Welcome Back! 🧱</h2>
+                        <p class="text-muted">Login to access your LEGO collection and continue building</p>
+                    </div>
+
+                    <!-- Login Form -->
+                    <form class="ajax-form" 
+                          data-url="/api/auth/login" 
+                          data-method="POST"
+                          data-on-success="login"
+                          id="loginForm">
+                        
+                        <!-- Email Field -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                <i class="bi bi-envelope me-2"></i>Email Address
+                            </label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="email" 
+                                   name="email" 
+                                   placeholder="Enter your email"
+                                   required>
+                            <div class="invalid-feedback">
+                                Please provide a valid email address.
+                            </div>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="bi bi-lock me-2"></i>Password
+                            </label>
+                            <div class="input-group">
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="password" 
+                                       name="password" 
+                                       placeholder="Enter your password"
+                                       required>
+                                <button class="btn btn-outline-secondary" 
+                                        type="button" 
+                                        id="togglePassword">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Password is required.
+                            </div>
+                        </div>
+
+                        <!-- Remember Me & Forgot Password -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           id="rememberMe"
+                                           name="remember_me">
+                                    <label class="form-check-label" for="rememberMe">
+                                        Remember me
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <a href="forgot-password.html" class="text-decoration-none">
+                                    Forgot password?
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-lego w-100 mb-3">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Login to Account
+                        </button>
+
+                        <!-- Demo Account Notice -->
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Demo Account:</strong> You can use any email and password for demonstration purposes.
+                        </div>
+                    </form>
+
+                    <!-- Social Login (Optional) -->
+                    <div class="text-center mb-3">
+                        <span class="text-muted">Or continue with</span>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100" disabled>
+                                <i class="bi bi-google me-2"></i>Google
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-dark w-100" disabled>
+                                <i class="bi bi-facebook me-2"></i>Facebook
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Register Link -->
+                    <div class="text-center">
+                        <p class="mb-0">
+                            Don't have an account? 
+                            <a href="register.html" class="text-decoration-none fw-bold">
+                                Create one here
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Additional Features -->
+                <div class="row mt-4">
+                    <div class="col-4 text-center">
+                        <i class="bi bi-shield-check text-success fs-2"></i>
+                        <small class="d-block text-muted">Secure Login</small>
+                    </div>
+                    <div class="col-4 text-center">
+                        <i class="bi bi-speedometer2 text-primary fs-2"></i>
+                        <small class="d-block text-muted">Fast Access</small>
+                    </div>
+                    <div class="col-4 text-center">
+                        <i class="bi bi-heart text-danger fs-2"></i>
+                        <small class="d-block text-muted">Save Favorites</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="/js/main.js"></script>
+    
+    <!-- Page-specific JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle password visibility
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordField = document.getElementById('password');
+            
+            togglePassword.addEventListener('click', function() {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                
+                const icon = this.querySelector('i');
+                icon.className = type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+            });
+
+            // Form validation enhancement
+            const form = document.getElementById('loginForm');
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+
+            // Auto-focus on email field
+            document.getElementById('email').focus();
+        });
+    </script>
+</body>
+</html>
