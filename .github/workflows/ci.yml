@@ -138,7 +138,7 @@ jobs:
       run: |
         if [ -f backend/package.json ]; then
           cd backend
-          if npm run build >/dev/null 2>&1; then
+          if npm run --silent build 2>/dev/null; then
             echo "Backend build successful"
           else
             echo "Backend build script not found or failed, but continuing..."
@@ -181,7 +181,7 @@ jobs:
       run: |
         if [ -f frontend/package.json ]; then
           cd frontend
-          if npm run build >/dev/null 2>&1; then
+          if npm run --silent build 2>/dev/null; then
             echo "Frontend build successful"
           else
             echo "Frontend build script not found or failed, but continuing..."
@@ -224,7 +224,7 @@ jobs:
       run: |
         if [ -f backend/package.json ]; then
           cd backend
-          if npm test >/dev/null 2>&1; then
+          if npm run --silent test 2>/dev/null; then
             echo "Backend tests passed"
           else
             echo "Backend tests not found or failed, but continuing..."
@@ -237,7 +237,7 @@ jobs:
       run: |
         if [ -f frontend/package.json ]; then
           cd frontend
-          if npm test >/dev/null 2>&1; then
+          if npm run --silent test 2>/dev/null; then
             echo "Frontend tests passed"
           else
             echo "Frontend tests not found or failed, but continuing..."
