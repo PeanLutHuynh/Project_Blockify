@@ -1,0 +1,20 @@
+{
+  "name": "project-blockify",
+  "version": "1.0.0",
+  "description": "LEGO E-commerce Platform for Academic Purpose",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "cd backend && npm run dev",
+    "backend:build": "cd backend && npm run build",
+    "backend:test": "cd backend && npm test",
+    "frontend:dev": "cd frontend && npm run dev",
+    "setup": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": ["lego", "ecommerce", "academic", "nodejs", "typescript"],
+  "author": "PeanLutHuynh",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
