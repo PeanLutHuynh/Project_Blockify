@@ -22,7 +22,9 @@ export class JWTConfig {
   }
 
   static generateRefreshToken(payload: JwtPayload): string {
-    return jwt.sign(payload, this.refreshSecret, { expiresIn: this.refreshExpiresIn });
+    return jwt.sign(payload, this.refreshSecret, {
+      expiresIn: this.refreshExpiresIn,
+    });
   }
 
   static verifyAccessToken(token: string): JwtPayload | null {
@@ -36,6 +38,14 @@ export class JWTConfig {
   static verifyRefreshToken(token: string): JwtPayload | null {
     try {
       return jwt.verify(token, this.refreshSecret) as JwtPayload;
+    } catch {
+      return null;
+    }
+  }
+
+  static decodeToken(token: string): JwtPayload | null {
+    try {
+      return jwt.decode(token) as JwtPayload;
     } catch {
       return null;
     }
