@@ -7,7 +7,16 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "update-types": "npx supabase gen types typescript --project-id oxpvtqghrksdhhouhbij > src/types/supabase.ts",
+    "dev": "npm run update-types && nodemon app.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write src/**/*.ts"
   },
   "keywords": [],
   "author": "",

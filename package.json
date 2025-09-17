@@ -11,10 +11,19 @@
     "frontend:dev": "cd frontend && npm run dev",
     "setup": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
-  "keywords": ["lego", "ecommerce", "academic", "nodejs", "typescript"],
+  "keywords": [
+    "lego",
+    "ecommerce",
+    "academic",
+    "nodejs",
+    "typescript"
+  ],
   "author": "PeanLutHuynh",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "winston": "^3.17.0"
   }
 }
