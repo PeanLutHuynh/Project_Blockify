@@ -20,3 +20,19 @@ export const supabaseAdmin = createClient(supabaseURL, supabaseServiceKey, {
 });
 
 export default supabase;
+
+export async function testDatabaseConnection(): Promise<void> {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('count')
+      .limit(1);
+    
+    if (error) throw error;
+    
+    console.log('Supabase connection successful');
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    throw error;
+  }
+}
