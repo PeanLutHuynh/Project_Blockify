@@ -7,7 +7,7 @@ export const ENV = {
 
   MAX_FILE_SIZE: 5242880,
   ALLOWED_FILE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'],
-  RATE_LIMIT_WINDOW_MS: 15,
+  RATE_LIMIT_WINDOW_MS: 900000,
   RATE_LIMIT_MAX_REQUESTS: 100,
   PORT: process.env.PORT || '3001',
   HOST: process.env.HOST || 'localhost',
