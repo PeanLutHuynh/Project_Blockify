@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Detail</title>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .navbar {
+      background-color: #0d6efd;
+    }
+    .navbar a {
+      color: #fff !important;
+    }
+    .product-title {
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+    .price {
+      color: red;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+    .btn-purchase {
+      background-color: #ff6b6b;
+      color: white;
+    }
+    .review-box {
+      background: #e9f5ff;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    .recommend-card img {
+      height: 140px;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand text-white fw-bold" href="#">Blockify</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Introduction</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Service</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+      </ul>
+    </div>
+    <form class="d-flex mx-3">
+      <input class="form-control form-control-sm" type="search" placeholder="Search">
+    </form>
+    <a href="#" class="btn btn-light btn-sm me-2"><i class="fas fa-shopping-cart"></i></a>
+    <a href="#" class="btn btn-light btn-sm">Log out</a>
+  </div>
+</nav>
+
+<!-- Product Section -->
+<div class="container my-4">
+  <div class="row">
+    <!-- Product Images -->
+    <div class="col-md-5">
+      <img id="pd-image" src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt1.png" class="img-fluid border">
+      <div class="d-flex mt-2">
+        <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt2.png" class="img-thumbnail me-2" width="80">
+        <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt3.png" class="img-thumbnail me-2" width="80">
+        <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt4.png" class="img-thumbnail me-2" width="80">
+      </div>
+    </div>
+
+    <!-- Product Info -->
+    <div class="col-md-7">
+      <h5 id="pd-title" class="product-title">Product Name: Police Car</h5>
+      <p>Brand: LEGO CITY <br> Material: ABS Plastic</p>
+      <p><i class="fas fa-star text-warning"></i> <i class="fas fa-star text-warning"></i>
+         <i class="fas fa-star text-warning"></i> <i class="fas fa-star text-warning"></i>
+         <i class="fas fa-star text-warning"></i></p>
+      <p id="pd-price" class="price">190.000 VND</p>
+      <pre>Description
+        Theme: LEGO City
+        Age: 5+
+        Short Description: 
+        Join the world of LEGO City with the high-speed police car 
+        and brave police minifigure. Perfect for thrilling chases and 
+        creative adventures.</p>
+      <pre><i class="fas fa-user"></i> Age: 5+ &nbsp; <i class="fas fa-users"></i> 1476 &nbsp; <i class="fas fa-star"></i> 4.8</p>
+      <div class="d-flex align-items-center mb-3">
+        <input type="number" value="1" min="1" class="form-control w-25 me-2">
+        <button class="btn btn-primary me-2"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+        <button class="btn btn-purchase">Purchase</button>
+      </div>
+      <a href="#" class="btn btn-outline-primary btn-sm">View Model</a>
+    </div>
+  </div>
+</div>
+
+<!-- Product Details -->
+<div class="container my-4">
+  <h6 class="fw-bold">PRODUCT DETAILS</h6>
+  <div class ="row">
+    <div class ="col-8">
+      Join the thrilling chases with the LEGO City Police set! This set includes:
+      A powerful police supercar in the signature blue and white colors,
+       featuring a sporty spoiler and flashing siren lights on the roof.
+      A police minifigure dressed in official uniform and helmet, ready
+       for action.
+       This is a great choice for kids to play while developing their imagination, 
+       role-playing as police officers protecting the city, chasing criminals, and
+       keeping the peace.
+       Product Information:
+      Brand: LEGO City
+      Age: 5+
+      Includes: Police car, 1 police minifigure
+      Material: Safe, durable ABS plastic
+    </div>
+    <div class ="col-4">
+      <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239.png" class="img-fluid">
+    </div>
+  </div>
+  
+</div>
+
+<!-- Product Rate -->
+<div class="container my-4">
+  <h6 class="fw-bold">PRODUCT RATE</h6>
+  <div class="review-box">
+    <p><strong>JessicaNguyen</strong> ⭐⭐⭐⭐⭐ <br>
+      31-05-2025 13:52 <br>
+      <em>Fast delivery, overall good quality material, carefully packaged.</em></p>
+  </div>
+  <div class="review-box">
+    <p><strong>BatmanRobin</strong> ⭐⭐⭐⭐ <br>
+      12-02-2025 01:30 <br>
+      <em>Good quality, but I give 4 stars.</em></p>
+  </div>
+</div>
+
+<!-- Recommend -->
+<div class="container my-4">
+  <h6 class="fw-bold">Recommend for you</h6>
+  <div class="row">
+    <div class="col-md-2 recommend-card">
+      <div class="card p-2">
+        <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239.png" class="card-img-top">
+        <div class="card-body text-center">
+          <small>LEGO Helicopter</small>
+          <p class="price">250.000 VND</p>
+          <button class="btn btn-primary btn-sm">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 recommend-card">
+      <div class="card p-2">
+        <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239.png" class="card-img-top">
+        <div class="card-body text-center">
+          <small>LEGO Helicopter</small>
+          <p class="price">250.000 VND</p>
+          <button class="btn btn-primary btn-sm">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 recommend-card">
+      <div class="card p-2">
+        <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239.png" class="card-img-top">
+        <div class="card-body text-center">
+          <small>LEGO Helicopter</small>
+          <p class="price">250.000 VND</p>
+          <button class="btn btn-primary btn-sm">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 recommend-card">
+      <div class="card p-2">
+        <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239.png" class="card-img-top">
+        <div class="card-body text-center">
+          <small>LEGO Helicopter</small>
+          <p class="price">250.000 VND</p>
+          <button class="btn btn-primary btn-sm">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 recommend-card">
+      <div class="card p-2">
+        <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239.png" class="card-img-top">
+        <div class="card-body text-center">
+          <small>LEGO Helicopter</small>
+          <p class="price">250.000 VND</p>
+          <button class="btn btn-primary btn-sm">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 recommend-card">
+      <div class="card p-2">
+        <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239.png" class="card-img-top">
+        <div class="card-body text-center">
+          <small>LEGO Helicopter</small>
+          <p class="price">250.000 VND</p>
+          <button class="btn btn-primary btn-sm">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+    <!-- thêm nhiều col-md-2 nữa cho sản phẩm khác -->
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-white text-center py-3">
+  © 2025 Blockify Store
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Nạp dữ liệu sản phẩm đã chọn (nếu có)
+  (function(){
+    let data = null;
+    try {
+      const raw = localStorage.getItem('selectedProduct');
+      if(raw) data = JSON.parse(raw);
+    } catch(_) {}
+    if(!data){
+      return; // fallback giữ nguyên nội dung tĩnh
+    }
+    const titleEl = document.getElementById('pd-title');
+    const priceEl = document.getElementById('pd-price');
+    const imgEl = document.getElementById('pd-image');
+    if(titleEl) titleEl.textContent = `Product Name: ${data.title || 'Product'}`;
+    if(priceEl) priceEl.textContent = data.price || '';
+    if(imgEl && data.img) imgEl.src = data.img;
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LEGO Shop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body { background-color: #f5f5f5; }
+    .navbar { background-color: #0d6efd; }
+    .navbar a { color: white !important; }
+    .banner { background: white; padding: 20px; }
+    .banner img { width: 100%; border-radius: 10px; }
+    .category { background: white; border-radius: 10px; }
+    .category p { padding: 10px; border-bottom: 1px solid #ddd; cursor: pointer; }
+    .category p:hover { color: #0d6efd; }
+    .product-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      background: #fff;
+      padding: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .product-image img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .icon-heart {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 18px;
+      color: #666;
+      cursor: pointer;
+    }
+    .product-info {
+      font-size: 14px;
+      margin: 10px 0;
+    }
+    .product-info i {
+      margin-right: 4px;
+      color: #666;
+    }
+    .divider {
+      border-top: 1px solid #e0e0e0;
+      margin: 8px 0;
+    }
+    .product-title {
+      font-weight: 500;
+      font-size: 15px;
+    }
+    .product-price {
+      font-weight: bold;
+      color: #333;
+    }
+    .product-card1 {
+      position: relative;
+      width: 250px;
+      overflow: hidden;
+    }
+
+    .product-img {
+      width: 100%;
+      display: block;
+    }
+
+    /* Nhãn Hot */
+    .badge-hot {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: red;
+      color: white;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    /* Thanh Police dưới */
+    .product-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 20%;
+      
+      background-image: url("img/Rectangle\ 121.png");
+      background-size: cover;
+      background-repeat: no-repeat;
+      color: white;
+      text-align: center;
+      font-weight: bold;
+      padding: 8px;
+    }
+    .btn-cart {
+      background-color: #0d99ff;
+      border: none;
+      border-radius: 20px;
+      color: white;
+      padding: 6px 15px;
+      font-size: 14px;
+      margin-top: 10px;
+      width: 100%;
+    }
+    .btn-cart:hover {
+      background-color: #007ad6;
+    }
+    .promo-item { background: white; border-radius: 10px; padding: 15px; }
+    .promotion-box { background: #0d6efd; color: white; border-radius: 10px; padding: 20px; text-align: center; }
+    .recommended { background-image: url("img/Rectangle 53.png"); background-repeat: round; background-size: contain; color: white; padding: 40px 20px; }
+    .recommended .card { border-radius: 10px; }
+    /* ===== Enhancements (non-intrusive) ===== */
+    html { scroll-behavior: smooth; }
+    .navbar { transition: box-shadow 0.25s ease; }
+    .navbar.scrolled { box-shadow: 0 6px 18px rgba(0,0,0,0.15); }
+    .product-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 22px rgba(0,0,0,0.12); }
+    .btn-cart { position: relative; overflow: hidden; }
+    .ripple {
+      position: absolute; border-radius: 50%; transform: scale(0);
+      animation: ripple 600ms linear; background: rgba(255,255,255,0.6);
+      pointer-events: none;
+    }
+    @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+    .banner img { transition: transform 6s ease; }
+    .banner img:hover { transform: scale(1.06); }
+    .icon-heart.liked { color: #e91e63; }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark px-4">
+  <a class="navbar-brand fw-bold" href="#">LEGO SHOP</a>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navMenu">
+    <ul class="navbar-nav mx-auto">
+      <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+      <li class="nav-item"><a class="nav-link" href="#">Introduction</a></li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Service</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">Service 1</a></li>
+          <li><a class="dropdown-item" href="#">Service 2</a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Contact</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">Email</a></li>
+          <li><a class="dropdown-item" href="#">Phone</a></li>
+        </ul>
+      </li>
+    </ul>
+    <form class="d-flex">
+      <input class="form-control me-2" type="search" placeholder="Search">
+      <button class="btn btn-light">Search</button>
+    </form>
+    <a href="CartPage.html" class="btn btn-light ms-2" title="Cart"><i class="fas fa-shopping-cart"></i></a>
+  </div>
+</nav>
+
+<!-- Banner -->
+<section class="banner bg-dark container my-4">
+  <div class="row" >
+    <div class="col-md-8 p-0 m-0 bg-light">
+      <img src="img/Rectangle 22.png" alt="banner">
+    </div>
+    <div class="col-md-4 d-flex p-5 flex-column justify-content-center">
+      <h2 class="text-primary fw-bold">LEGO CITY</h2>
+      <p>Discover your own city</p>
+      <button class="btn btn-danger">Buy Now</button>
+    </div>
+  </div>
+</section>
+
+<!-- Category + Products -->
+<section class="container my-4">
+  <div class="row g-4">
+    <!-- Category -->
+    <div class="col-md-3">
+      <div class="category p-3">
+        <h5 class="text-primary fw-bold mb-3">Category</h5>
+        <p>Police</p>
+        <p>Fire Fighter</p>
+        <p>Service & Transportation</p>
+        <p>Construction</p>
+        <p>Train</p>
+        <p>Airport</p>
+        <p>Seaport</p>
+      </div>
+    </div>
+    <!-- Products -->
+    <div class="col-md-9">
+      <div class="d-flex gap-2 mb-3">
+        <button class="btn btn-primary">Newest</button>
+        <button class="btn btn-secondary">Hot</button>
+        <button class="btn btn-secondary">Filter</button>
+      </div>
+    
+      <!-- đổi id -->
+      <div class="row g-3" id="main-product-list"></div>
+    </div>
+    
+    <script>
+      // Đổi tên mảng
+      const mainProducts = [
+        { img: "img/Rectangle 108 (4).png", title: "Police Car", age: "8+", pieces: 79, rating: 4.8, price: "190.000 VND" },
+        { img: "img/Rectangle 108 (4).png", title: "Fire Truck", age: "10+", pieces: 120, rating: 4.9, price: "250.000 VND" },
+        { img: "img/Rectangle 108 (4).png", title: "Crane", age: "12+", pieces: 200, rating: 4.7, price: "300.000 VND" },
+        { img: "img/Rectangle 108 (4).png", title: "Airplane", age: "6+", pieces: 150, rating: 4.6, price: "500.000 VND" },
+        { img: "img/Rectangle 108 (4).png", title: "Police Car", age: "8+", pieces: 79, rating: 4.8, price: "190.000 VND" },
+        { img: "img/Rectangle 108 (4).png", title: "Fire Truck", age: "10+", pieces: 120, rating: 4.9, price: "250.000 VND" },
+        { img: "img/Rectangle 108 (4).png", title: "Crane", age: "12+", pieces: 200, rating: 4.7, price: "300.000 VND" },
+        { img: "img/Rectangle 108 (4).png", title: "Airplane", age: "6+", pieces: 150, rating: 4.6, price: "500.000 VND" }
+      ];
+    
+      // Render sản phẩm
+      const mainList = document.getElementById("main-product-list");
+      mainList.innerHTML = mainProducts.map((p, i) => `
+        <div class="col-6 col-md-3">
+          <div class="product-card position-relative" data-index="${i}">
+            <i class="far fa-heart icon-heart"></i>
+            <div class="product-image">
+              <img src="${p.img}" alt="${p.title}">
+            </div>
+            <div class="product-info d-flex align-items-center justify-content-between">
+              <span><i class="fas fa-child"></i> ${p.age}</span>
+              <span><i class="fas fa-cube"></i> ${p.pieces}</span>
+              <span><i class="fas fa-star text-warning"></i> ${p.rating}</span>
+            </div>
+            <div class="divider"></div>
+            <div class="product-title">${p.title}</div>
+            <div class="product-price">${p.price}</div>
+            <button class="btn-cart">Add to Cart</button>
+          </div>
+        </div>
+      `).join("");
+
+      // Điều hướng sang ProductDetail với dữ liệu đúng
+      mainList.addEventListener('click', (e) => {
+        // Add to Cart button: update localStorage and stop navigation
+        const addBtn = e.target.closest('.btn-cart');
+        if(addBtn){
+          const card = e.target.closest('.product-card');
+          if(card){
+            const idx = Number(card.getAttribute('data-index'));
+            if(!Number.isNaN(idx)){
+              const product = mainProducts[idx];
+              try {
+                const raw = localStorage.getItem('cartItems');
+                const cart = raw ? JSON.parse(raw) : [];
+                const normalize = (s) => (s||'').toString();
+                const id = normalize(product.title);
+                const priceNumber = Number(normalize(product.price).replace(/[^0-9]/g,'')) || 0;
+                const foundIdx = cart.findIndex(it => it.id === id);
+                if(foundIdx >= 0){
+                  cart[foundIdx].qty += 1;
+                } else {
+                  cart.push({ id, title: product.title, img: product.img, priceText: product.price, price: priceNumber, qty: 1 });
+                }
+                localStorage.setItem('cartItems', JSON.stringify(cart));
+              } catch(_) {}
+            }
+          }
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+
+        const card = e.target.closest('.product-card');
+        if(!card) return;
+        const idx = Number(card.getAttribute('data-index'));
+        if(Number.isNaN(idx)) return;
+        try {
+          localStorage.setItem('selectedProduct', JSON.stringify(mainProducts[idx]));
+        } catch(_) {}
+        window.location.href = 'ProductDetail.html';
+      });
+    </script>
+    
+  </div>
+</section>
+
+<!-- Promotion -->
+<section class="container my-5 " style="background-color: rgb(212, 238, 255);">
+  <h3 class="text-primary fw-bold mb-3">PROMOTION</h3>
+  <div class="row ">
+    <div class="col-md-5">
+      <div class="promotion-box ">
+        <img src="img/Group 60.png" class="img-fluid" alt="lego">
+      </div>
+    </div>
+    <div class="col-md-7 rounded-3  bg-light">
+      <div class="promo-card bg-light p-3 m-5">
+        <div class ="row">
+        <div class = "col-md-3 bg-danger">
+          h
+        </div>
+          <div class ="col-md-9">
+            <div class="promo-image">
+              <div class="promo-badge">Limited quantity</div>
+            </div>
+            <div class="promo-content">
+              <div>
+                <span class="badge bg-primary">Discount</span>
+                <span class="ms-2">Get 15% off for orders over 15k</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar bg-danger" style="width: 56%;"></div>
+              </div>
+              <div class="promo-footer d-flex justify-content-between">
+                <span>44% remaining - <span class="text-danger">Expires in 23 hours</span></span>
+                <a href="#" class="btn btn-sm btn-primary">View</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+      </div>
+      
+      <div class="promo-card bg-light p-3 m-5">
+        <div class="promo-image">
+          <div class="promo-badge">Limited quantity</div>
+        </div>
+        <div class="promo-content">
+          <div>
+            <span class="badge bg-primary">Discount</span>
+            <span class="ms-2">Get 15% off for orders over 15k</span>
+          </div>
+          <div class="progress">
+            <div class="progress-bar bg-danger" style="width: 56%;"></div>
+          </div>
+          <div class="promo-footer d-flex justify-content-between">
+            <span>44% remaining - <span class="text-danger">Expires in 23 hours</span></span>
+            <a href="#" class="btn btn-sm btn-primary">View</a>
+          </div>
+        </div>
+      </div>
+      <div class="promo-card bg-light p-3 m-5">
+        <div class="promo-image">
+          <div class="promo-badge">Limited quantity</div>
+        </div>
+        <div class="promo-content">
+          <div>
+            <span class="badge bg-primary">Discount</span>
+            <span class="ms-2">Get 15% off for orders over 15k</span>
+          </div>
+          <div class="progress">
+            <div class="progress-bar bg-danger" style="width: 56%;"></div>
+          </div>
+          <div class="promo-footer d-flex justify-content-between">
+            <span>44% remaining - <span class="text-danger">Expires in 23 hours</span></span>
+            <a href="#" class="btn btn-sm btn-primary">View</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Recommended Product -->
+<section class="recommended">
+  <div class="container">
+    <h3 class="text-center mb-4">RECOMMENDED PRODUCT</h3>
+    <!-- thêm justify-content-center -->
+    <div class="row g-4 justify-content-center" id="product-list"></div>
+  </div>
+</section>
+
+<script>
+  // Danh sách sản phẩm
+  const products = [
+    { img: "img/Group 61.png", name: "Police" },
+    { img: "img/Group 61 (1).png", name: "City" },
+    { img: "img/Group 61 (2).png", name: "Fire" },
+    { img: "img/Group 61 (3).png", name: "Rescue" },
+    { img: "img/Group 61 (4).png", name: "Rescue" },
+    { img: "img/Group 61 (5).png", name: "Rescue" },
+    { img: "img/Group 61 (6).png", name: "Rescue" },
+    { img: "img/Group 61 (7).png", name: "Space" }
+  ];
+
+  const list = document.getElementById("product-list");
+
+  // Render card tự động
+  products.forEach(p => {
+    list.innerHTML += `
+      <div class="col-md-3 col-sm-6">
+        <div class="product-card1">
+          <img src="${p.img}" alt="${p.name}" class="product-img">
+          <span class="badge-hot">Hot</span>
+          <div class="product-footer pt-4">${p.name}</div>
+        </div>
+      </div>
+    `;
+  });
+</script>
+
+<footer class="bg-dark text-white text-center p-3">
+  &copy; 2024 LEGO Shop. All rights reserved.
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Navbar shadow on scroll
+  (function(){
+    const nav = document.querySelector('.navbar');
+    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  })();
+
+  // Toggle heart like
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.classList.contains('icon-heart')){
+      e.target.classList.toggle('liked');
+    }
+  });
+
+  // Button ripple
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('.btn-cart, .btn');
+    if(!btn) return;
+    const rect = btn.getBoundingClientRect();
+    const ripple = document.createElement('span');
+    const size = Math.max(rect.width, rect.height);
+    ripple.className = 'ripple';
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+    btn.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 650);
+  });
+
+  // Scroll reveal for sections/cards
+  (function(){
+    const revealTargets = [];
+    document.querySelectorAll('.product-card, .product-card1, .promo-card, .category, .banner, .recommended').forEach(el => {
+      el.classList.add('reveal');
+      revealTargets.push(el);
+    });
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          entry.target.classList.add('show');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealTargets.forEach(el => io.observe(el));
+  })();
+</script>
+</body>
+</html>

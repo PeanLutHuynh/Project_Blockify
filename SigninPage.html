@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      min-height: 100vh;
+      background: url('img/SignupPage (2).png') center/cover no-repeat fixed;
+    }
+    /* Glassmorphism panel */
+    .glass {
+      background: rgba(255, 255, 255, 0.55);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .auth-wrap {
+      min-height: 100vh;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 520px;
+    }
+    .title {
+      font-weight: 800;
+    }
+    .underline-input .form-control {
+      background: transparent;
+      border: 0;
+      border-bottom: 2px solid rgba(0,0,0,0.15);
+      border-radius: 0;
+      padding-left: 0;
+      padding-right: 44px;
+      height: 54px;
+      box-shadow: none !important;
+    }
+    .underline-input .form-control:focus {
+      border-bottom-color: #0d6efd;
+    }
+    .input-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      pointer-events: none;
+    }
+    .btn-primary {
+      height: 52px;
+      font-weight: 700;
+      border-radius: 12px;
+    }
+    .form-check-label {
+      user-select: none;
+    }
+    .link-like { text-decoration: none; }
+    .link-like:hover { text-decoration: underline; }
+  </style>
+  <script>
+    // Prevent FOUC for backdrop-filter on some browsers
+    document.documentElement.style.visibility = 'hidden';
+    window.addEventListener('load', function(){
+      document.documentElement.style.visibility = '';
+    });
+  </script>
+  <meta name="color-scheme" content="light only">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+
+<div class="container-fluid auth-wrap d-flex justify-content-end align-items-center px-3 px-md-5">
+  <div class="auth-card glass p-4 p-md-5">
+    <h2 class="text-center title mb-4">Sign In</h2>
+
+    <form class="needs-validation" novalidate>
+      <!-- Username -->
+      <div class="mb-4 position-relative underline-input">
+        <label class="form-label small text-muted">Username</label>
+        <input id="username" type="text" class="form-control" placeholder="Username" required>
+        <i class="fa-regular fa-user input-icon"></i>
+        <div class="invalid-feedback">Please enter your username.</div>
+      </div>
+
+      <!-- Password -->
+      <div class="mb-2 position-relative underline-input">
+        <label class="form-label small text-muted">Password</label>
+        <input id="password" type="password" class="form-control" placeholder="Password" required>
+        <i class="fa-solid fa-lock input-icon"></i>
+        <div class="invalid-feedback">Please enter your password.</div>
+      </div>
+
+      <!-- Show password -->
+      <div class="form-check mb-4">
+        <input class="form-check-input" type="checkbox" id="showPwd">
+        <label class="form-check-label" for="showPwd">Show Password</label>
+      </div>
+
+      <!-- Sign In button -->
+      <button type="submit" class="btn btn-primary w-100 mb-3">Sign In</button>
+
+      <p class="text-center text-muted mb-0">
+        Don't have an account yet?
+        <a href="#" class="link-primary link-like">here</a>.
+      </p>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Show/Hide password toggle
+  document.getElementById('showPwd').addEventListener('change', function(){
+    const pwd = document.getElementById('password');
+    pwd.type = this.checked ? 'text' : 'password';
+  });
+
+  // Simple client-side validation stub
+  document.querySelector('form').addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!this.checkValidity()){
+      e.stopPropagation();
+      this.classList.add('was-validated');
+      return;
+    }
+    // Demo only
+    alert('Signed in!');
+  });
+</script>
+</body>
+</html>
+
