@@ -1,0 +1,10 @@
+body { background-color: #f5f5f5; }
+.cart-header { background: #0d6efd; color: white; padding: 15px; font-size: 1.4rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+.cart-item { background: white; border-radius: 8px; padding: 15px; margin-bottom: 10px; }
+.product-img { width: 70px; height: auto; }
+.price { color: red; font-weight: bold; }
+.quantity-control button { width: 30px; height: 30px; border: none; background: #ddd; font-weight: bold; }
+.total-box { background: white; border-radius: 8px; padding: 20px; text-align: right; font-size: 1.2rem; }
+.btn-purchase { background: #ff6b6b; color: white; font-weight: bold; }
+
+

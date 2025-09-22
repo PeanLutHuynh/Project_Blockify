@@ -1,0 +1,1 @@
+﻿import { defineConfig } from vite; import { fileURLToPath, URL } from node:url; export default defineConfig({ root: frontend, publicDir: public, server: { open: false }, build: { outDir: dist, emptyOutDir: true }, resolve: { alias: { @: fileURLToPath(new URL(./frontend/src, import.meta.url)), }, }, });
