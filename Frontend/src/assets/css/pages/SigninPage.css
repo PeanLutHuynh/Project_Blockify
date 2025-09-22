@@ -1,0 +1,15 @@
+body { min-height: 100vh; background: url('/images/SignupPage (2).png') center/cover no-repeat fixed; }
+/* Glassmorphism panel */
+.glass { background: rgba(255, 255, 255, 0.55); border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.auth-wrap { min-height: 100vh; }
+.auth-card { width: 100%; max-width: 520px; }
+.title { font-weight: 800; }
+.underline-input .form-control { background: transparent; border: 0; border-bottom: 2px solid rgba(0,0,0,0.15); border-radius: 0; padding-left: 0; padding-right: 44px; height: 54px; box-shadow: none !important; }
+.underline-input .form-control:focus { border-bottom-color: #0d6efd; }
+.input-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #6c757d; pointer-events: none; }
+.btn-primary { height: 52px; font-weight: 700; border-radius: 12px; }
+.form-check-label { user-select: none; }
+.link-like { text-decoration: none; }
+.link-like:hover { text-decoration: underline; }
+
+
