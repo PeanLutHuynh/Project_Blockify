@@ -1,12 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
 import morgan from 'morgan';
+import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { ENV } from './src/config/env';
 import { logger } from './src/config/logger';
-
-// Import security middleware
 import { enhancedSanitization, sqlInjectionProtection, suspiciousActivityDetection } from './src/middlewares/security.middleware';
 import { csrfMiddleware, csrfTokenEndpoint } from './src/middlewares/csrf.middleware';
 import { cookieSecurity } from './src/middlewares/cookie-security.middleware';
@@ -15,28 +13,17 @@ import { conditionalSecurity, cspViolationReporter } from './src/middlewares/htt
 import { generalRateLimit } from './src/middlewares/rate-limit.middleware';
 import { urlSecurityCheck, parameterValidation, httpMethodValidation } from './src/middlewares/url-security.middleware';
 import { globalErrorHandler, notFoundHandler } from './src/middlewares/error.middleware';
+import { xmlParserMiddleware, responseFormatMiddleware } from './src/middlewares/xml.middleware';
+import userRoutes from './src/modules/user/presentation/userRoutes';
 
 const app = express();
 
-// Cookie parsing (required for CSRF and session security)
 app.use(cookieParser());
-
-// HTTP method validation (only allow safe methods)
 app.use(httpMethodValidation);
-
-// URL security checks (path traversal, suspicious patterns, etc.)
 app.use(urlSecurityCheck);
-
-// Parameter validation (prevent parameter pollution)
 app.use(parameterValidation);
-
-// HTTP Security Headers (HTTPS, CSP, HSTS, Clickjacking protection)
 app.use(conditionalSecurity);
-
-// Suspicious activity detection (before other processing)
 app.use(suspiciousActivityDetection);
-
-// Rate limiting (DDoS protection)
 app.use(generalRateLimit);
 
 // CORS configuration
@@ -52,26 +39,21 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Request sanitization (XSS and SQL injection protection)
-app.use(sanitizeRequest);
-app.use(enhancedSanitization);
+app.use(xmlParserMiddleware());
+app.use(responseFormatMiddleware);
+// app.use(sanitizeRequest); => Problem
+// app.use(enhancedSanitization) => Problem;
 app.use(sqlInjectionProtection);
-
-// Cookie security configuration
 app.use(cookieSecurity.config());
 app.use(cookieSecurity.tamperingDetection());
 app.use(cookieSecurity.consentManagement);
-
-// CSRF Protection (after cookie parsing)
 app.use(csrfMiddleware);
 
-// Logging (after sanitization to log clean data)
 app.use(morgan('combined', { 
   stream: { write: message => logger.info(message.trim()) },
   skip: (req) => req.path === '/health' // Skip health check logs
 }));
 
-// Security endpoints
 app.get('/api/v1/security/csrf-token', csrfTokenEndpoint);
 app.post('/api/v1/security/csp-violation', cspViolationReporter);
 
@@ -92,14 +74,29 @@ app.get('/health', (req, res) => {
 });
 
 // Main API routes
+app.use('/api/v1/users', userRoutes);
+
 app.use('/api/v1', (req, res) => {
   res.json({ 
-    message: 'Blockify API v1 - Coming Soon',
+    message: 'Blockify API v1',
     endpoints: {
-      auth: '/api/v1/auth',
-      products: '/api/v1/products',
-      categories: '/api/v1/categories',
-      users: '/api/v1/users'
+      users: '/api/v1/users',
+      auth: '/api/v1/auth (coming soon)',
+      products: '/api/v1/products (coming soon)',
+      categories: '/api/v1/categories (coming soon)'
+    },
+    documentation: {
+      users: {
+        'GET /api/v1/users': 'Get all users',
+        'GET /api/v1/users/active': 'Get active users',
+        'GET /api/v1/users/:id': 'Get user by ID',
+        'GET /api/v1/users/email/:email': 'Get user by email',
+        'POST /api/v1/users': 'Create new user',
+        'PUT /api/v1/users/:id': 'Update user',
+        'PATCH /api/v1/users/:id/profile': 'Update user profile',
+        'PATCH /api/v1/users/:id/deactivate': 'Deactivate user',
+        'DELETE /api/v1/users/:id': 'Delete user'
+      }
     }
   });
 });
@@ -110,7 +107,9 @@ app.use('/api/v1', (req, res) => {
 // app.use('/api/v1/categories', categoryRoutes);
 
 // 404 handler for unmatched routes
-app.use('*', notFoundHandler);
+app.use((req, res, next) => {
+  notFoundHandler(req, res, next);
+});
 
 // Global error handler
 app.use(globalErrorHandler);

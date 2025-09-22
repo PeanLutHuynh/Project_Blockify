@@ -1,14 +1,17 @@
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config();
+const envPath = path.join(__dirname, '../../../.env');
+console.log('Trying to load .env from:', envPath);
+const result = dotenv.config({ path: envPath });
 
 export const ENV = {
   NODE_ENV: process.env.NODE_ENV || 'development',
 
   MAX_FILE_SIZE: 5242880,
   ALLOWED_FILE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'],
-  RATE_LIMIT_WINDOW_MS: 900000,
-  RATE_LIMIT_MAX_REQUESTS: 100,
+  RATE_LIMIT_WINDOW_MS: Number(process.env.RATE_LIMIT_WINDOW_MS) || 900000,
+  RATE_LIMIT_MAX_REQUESTS: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
   PORT: process.env.PORT || '3001',
   HOST: process.env.HOST || 'localhost',
 
