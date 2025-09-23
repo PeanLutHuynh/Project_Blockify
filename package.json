@@ -3,20 +3,28 @@
   "version": "1.0.0",
   "description": "LEGO E-commerce Platform for Academic Purpose",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
-    "backend:dev": "cd backend ; npm run dev",
-    "backend:build": "cd backend ; npm run build",
-    "backend:test": "cd backend ; npm test",
-    "frontend:dev": "cd frontend ; npm run dev",
-    "setup": "npm install ; cd backend ; npm install ; cd ../frontend ; npm install"
+    "backend:dev": "cd backend && npm run dev",
+    "backend:build": "cd backend && npm run build",
+    "backend:start": "cd backend && npm start",
+    "backend:test": "cd backend && npm test",
+    "frontend:dev": "cd frontend && npm run dev",
+    "frontend:build": "cd frontend && npm run build",
+    "setup": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build": "npm run backend:build && npm run frontend:build",
+    "start": "npm run backend:start"
   },
   "keywords": [
     "lego",
     "ecommerce",
     "academic",
     "nodejs",
-    "typescript"
+    "typescript",
+    "bootstrap",
+    "ddd",
+    "mvc"
   ],
   "author": "PeanLutHuynh",
   "license": "MIT",
