@@ -14,6 +14,77 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_logs: {
+        Row: {
+          action: string
+          admin_id: number | null
+          created_at: string | null
+          log_id: number
+          payload: Json | null
+          target_id: number | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          admin_id?: number | null
+          created_at?: string | null
+          log_id?: number
+          payload?: Json | null
+          target_id?: number | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: number | null
+          created_at?: string | null
+          log_id?: number
+          payload?: Json | null
+          target_id?: number | null
+          target_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_audit_logs_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["admin_id"]
+          },
+        ]
+      }
+      admin_users: {
+        Row: {
+          admin_id: number
+          auth_uid: string | null
+          created_at: string | null
+          email: string
+          full_name: string
+          is_active: boolean | null
+          last_login: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          admin_id?: number
+          auth_uid?: string | null
+          created_at?: string | null
+          email: string
+          full_name: string
+          is_active?: boolean | null
+          last_login?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          admin_id?: number
+          auth_uid?: string | null
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          is_active?: boolean | null
+          last_login?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           added_at: string | null
@@ -203,6 +274,54 @@ export type Database = {
         }
         Relationships: []
       }
+      order_applied_coupons: {
+        Row: {
+          coupon_code: string
+          coupon_id: number
+          created_at: string | null
+          discount_amount: number
+          discount_type: string
+          discount_value: number
+          id: number
+          order_id: number
+        }
+        Insert: {
+          coupon_code: string
+          coupon_id: number
+          created_at?: string | null
+          discount_amount: number
+          discount_type: string
+          discount_value: number
+          id?: number
+          order_id: number
+        }
+        Update: {
+          coupon_code?: string
+          coupon_id?: number
+          created_at?: string | null
+          discount_amount?: number
+          discount_type?: string
+          discount_value?: number
+          id?: number
+          order_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_applied_coupons_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["coupon_id"]
+          },
+          {
+            foreignKeyName: "order_applied_coupons_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["order_id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           order_id: number
@@ -248,6 +367,61 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      order_status_history: {
+        Row: {
+          changed_by_admin: number | null
+          changed_by_user: number | null
+          created_at: string | null
+          id: number
+          new_status: string | null
+          note: string | null
+          old_status: string | null
+          order_id: number
+        }
+        Insert: {
+          changed_by_admin?: number | null
+          changed_by_user?: number | null
+          created_at?: string | null
+          id?: number
+          new_status?: string | null
+          note?: string | null
+          old_status?: string | null
+          order_id: number
+        }
+        Update: {
+          changed_by_admin?: number | null
+          changed_by_user?: number | null
+          created_at?: string | null
+          id?: number
+          new_status?: string | null
+          note?: string | null
+          old_status?: string | null
+          order_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_history_changed_by_admin_fkey"
+            columns: ["changed_by_admin"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["admin_id"]
+          },
+          {
+            foreignKeyName: "order_status_history_changed_by_user_fkey"
+            columns: ["changed_by_user"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["order_id"]
           },
         ]
       }
@@ -322,6 +496,70 @@ export type Database = {
           },
         ]
       }
+      payment_proofs: {
+        Row: {
+          created_at: string | null
+          file_type: string | null
+          file_url: string
+          note: string | null
+          order_id: number
+          proof_id: number
+          reviewed_at: string | null
+          reviewed_by: number | null
+          status: string | null
+          updated_at: string | null
+          user_id: number
+        }
+        Insert: {
+          created_at?: string | null
+          file_type?: string | null
+          file_url: string
+          note?: string | null
+          order_id: number
+          proof_id?: number
+          reviewed_at?: string | null
+          reviewed_by?: number | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: number
+        }
+        Update: {
+          created_at?: string | null
+          file_type?: string | null
+          file_url?: string
+          note?: string | null
+          order_id?: number
+          proof_id?: number
+          reviewed_at?: string | null
+          reviewed_by?: number | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_proofs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "payment_proofs_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["admin_id"]
+          },
+          {
+            foreignKeyName: "payment_proofs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       product_images: {
         Row: {
           alt_text: string | null
@@ -363,7 +601,6 @@ export type Database = {
       product_reviews: {
         Row: {
           created_at: string | null
-          helpful_count: number | null
           is_approved: boolean | null
           is_verified_purchase: boolean | null
           order_id: number | null
@@ -377,7 +614,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
-          helpful_count?: number | null
           is_approved?: boolean | null
           is_verified_purchase?: boolean | null
           order_id?: number | null
@@ -391,7 +627,6 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
-          helpful_count?: number | null
           is_approved?: boolean | null
           is_verified_purchase?: boolean | null
           order_id?: number | null
@@ -513,6 +748,77 @@ export type Database = {
           },
         ]
       }
+      review_media: {
+        Row: {
+          created_at: string | null
+          file_type: string | null
+          file_url: string
+          media_id: number
+          review_id: number
+        }
+        Insert: {
+          created_at?: string | null
+          file_type?: string | null
+          file_url: string
+          media_id?: number
+          review_id: number
+        }
+        Update: {
+          created_at?: string | null
+          file_type?: string | null
+          file_url?: string
+          media_id?: number
+          review_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_media_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "product_reviews"
+            referencedColumns: ["review_id"]
+          },
+        ]
+      }
+      review_votes: {
+        Row: {
+          created_at: string | null
+          is_helpful: boolean
+          review_id: number
+          user_id: number
+          vote_id: number
+        }
+        Insert: {
+          created_at?: string | null
+          is_helpful: boolean
+          review_id: number
+          user_id: number
+          vote_id?: number
+        }
+        Update: {
+          created_at?: string | null
+          is_helpful?: boolean
+          review_id?: number
+          user_id?: number
+          vote_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_votes_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "product_reviews"
+            referencedColumns: ["review_id"]
+          },
+          {
+            foreignKeyName: "review_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       user_addresses: {
         Row: {
           address_id: number
@@ -562,6 +868,7 @@ export type Database = {
       }
       users: {
         Row: {
+          auth_uid: string | null
           avatar_url: string | null
           birth_date: string | null
           created_at: string | null
@@ -577,6 +884,7 @@ export type Database = {
           username: string
         }
         Insert: {
+          auth_uid?: string | null
           avatar_url?: string | null
           birth_date?: string | null
           created_at?: string | null
@@ -592,6 +900,7 @@ export type Database = {
           username: string
         }
         Update: {
+          auth_uid?: string | null
           avatar_url?: string | null
           birth_date?: string | null
           created_at?: string | null
