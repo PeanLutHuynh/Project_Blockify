@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LEGO Shop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/pages/HomePage.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+  <div class="container">
+      <a class="navbar-brand" href="IntroductionPage.html">Blockify</a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+              <li class="nav-item">
+                  <a class="nav-link" href="HomePage.html">Home</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="IntroductionPage.html">Introduction</a>
+              </li>
+              <li class="nav-item ">
+                  <a class="nav-link " href="Service.html" >
+                      Service
+                  </a>
+                  
+              </li>
+              <li class="nav-item ">
+                  <a class="nav-link " href="Contact.html" >
+                      Contact
+                  </a>
+              </li>
+          </ul>
+          
+          <div class="navbar-right-icons">
+              <a href="#" class="search-icon">
+                  <i class="bi bi-search" id="openSearch"> </i>
+              </a>
+              <a href="CartPage.html" class="cart-icon">
+                  <i class="bi bi-cart"></i>
+              </a>
+              <a href="SigninPage.html" class="btn-sign">Sign in</a>
+              <a href="SignupPage.html" class="btn-sign">Sign up</a>
+          </div>
+      </div>
+      <div class="overlay" id="overlay">
+        <div class="search-popup">
+          <div class="search-header">
+            <strong class="text-white">Search</strong>
+            <i class="bi bi-x-circle" id="closeSearch" style="cursor:pointer; color:white"></i>
+          </div>
+      
+          <!-- Input -->
+          <input 
+            type="text" 
+            class="search-input text-white" 
+            id="searchInput" 
+            style="border: 0; background-color: rgb(30, 41, 57);" 
+            placeholder="Enter keyword...">
+          
+          <div class="line mb-2"></div>
+      
+          <!-- Suggestions -->
+          <div class="suggestion-box">
+            <div>
+              <button class="suggestion-btn text-white">Suggestion</button>
+              <span class="suggestion-text">Yellow Lego Truck Set</span>
+            </div>
+            <i class="bi bi-box-arrow-up-right" style="color:white"></i>
+          </div>
+          <div class="suggestion-box">
+            <div>
+              <button class="suggestion-btn text-white">Suggestion</button>
+              <span class="suggestion-text">Water Park</span>
+            </div>
+            <i class="bi bi-box-arrow-up-right" style="color:white"></i>
+          </div>
+          <div class="suggestion-box">
+            <div>
+              <button class="suggestion-btn text-white">Suggestion</button>
+              <span class="suggestion-text">Ninjago World</span>
+            </div>
+            <i class="bi bi-box-arrow-up-right" style="color:white"></i>
+          </div>
+        </div>
+      </div>
+      
+  </div>
+</nav>
+<!-- Banner -->
+<section class="banner bg-dark container my-4">
+  <div class="row">
+    <!-- Slider ảnh -->
+    <div class="col-md-8 p-0 m-0 bg-light">
+      <div class="slider">
+        <div class="slides">
+         
+          <img src="../../public/images/Rectangle 24 (1).png" class="img h-100 w-100" alt="lego" alt="banner2">
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Nội dung bên phải -->
+    <div class="col-md-4 d-flex p-5 flex-column justify-content-center">
+      <h2 class="text-primary fw-bold">LEGO CITY</h2>
+      <p>Discover your own city</p>
+      <button class="btn btn-danger">Buy Now</button>
+    </div>
+  </div>
+</section>
+<!-- Category + Products -->
+<section class="container my-4">
+  <div class="row g-4">
+    <!-- Category -->
+    <div class="col-md-3">
+      <div class="category p-3">
+        <h5 class="text-primary fw-bold mb-3">Category</h5>
+        <p>Police</p>
+        <p>Fire Fighter</p>
+        <p>Service & Transportation</p>
+        <p>Construction</p>
+        <p>Train</p>
+        <p>Airport</p>
+        <p>Seaport</p>
+      </div>
+    </div>
+    <!-- Products -->
+    <div class="col-md-9">
+      <div class="d-flex gap-2 mb-3">
+        <button class="btn btn-primary">Newest</button>
+        <button class="btn btn-secondary">Hot</button>
+        <button class="btn btn-secondary">Filter</button>
+      </div>
+    
+      <!-- đổi id -->
+      <div class="row g-3" id="main-product-list"></div>
+    </div>
+    
+  </div>
+</section>
+
+<!-- Promotion -->
+<section class="container my-5 pb-3" style="background-color: rgb(212, 238, 255);">
+  <h3 class="text-primary fw-bold mb-3">PROMOTION</h3>
+  <div class="row">
+    <div class="col-md-3">
+      <div class="promotion-box p-0">
+        <img src="../../public/images/Group 60.png" class="img h-100 w-100" alt="lego">
+      </div>
+    </div>
+    <div class="col-md-5 ms-2 rounded-3" style="background-color: #e4e4e4;">
+      <!-- Voucher 1 -->
+      <div class="voucher mt-3">
+        <div class="voucher-left">
+          <span class="tag">Limited quantity</span>
+          <div class="voucher-img"></div>
+        </div>
+        <div class="voucher-right">
+          <div class="voucher-title">
+            <span class="badge">Discount</span>
+            Get 15% off for orders over 15k
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:44%"></div>
+          </div>
+          <div class="voucher-info">
+            <span>44% remaining</span> - 
+            <span class="expire">Expires in 23 hours</span>
+          </div>
+          <button class="view-btn">View</button>
+        </div>
+      </div>
+
+      <!-- Voucher 2 -->
+      <div class="voucher mt-3">
+        <div class="voucher-left">
+          <span class="tag">Limited quantity</span>
+          <div class="voucher-img"></div>
+        </div>
+        <div class="voucher-right">
+          <div class="voucher-title">
+            <span class="badge">Discount</span>
+            Get 15% off for orders over 15k
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:44%"></div>
+          </div>
+          <div class="voucher-info">
+            <span>44% remaining</span> - 
+            <span class="expire">Expires in 23 hours</span>
+          </div>
+          <button class="view-btn">View</button>
+        </div>
+      </div>
+
+      <!-- Voucher 3 -->
+      <div class="voucher mt-3">
+        <div class="voucher-left">
+          <span class="tag">Limited quantity</span>
+          <div class="voucher-img"></div>
+        </div>
+        <div class="voucher-right">
+          <div class="voucher-title">
+            <span class="badge">Discount</span>
+            Get 15% off for orders over 15k
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:44%"></div>
+          </div>
+          <div class="voucher-info">
+            <span>44% remaining</span> - 
+            <span class="expire">Expires in 23 hours</span>
+          </div>
+          <button class="view-btn">View</button>
+        </div>
+      </div>
+    </div> <!-- 🔹 đóng col-md-5 -->
+    <div class = "col-md-3 ms-5 bg-danger">
+      <div class="row">
+        
+          <div class="promotion-box p-0">
+            <img src="../../public/images/Group 60.png" class="img h-100 w-100" alt="lego">
+          </div>
+        </div>
+    
+    </div>
+  </div> <!-- 🔹 đóng row -->
+</section>
+<!-- Recommended Product -->
+<section class="recommended">
+  <div class="container ">
+    <h3 class="text-center mb-4"><b>RECOMMENDED PRODUCT</b></h3>
+    <!-- thêm justify-content-center -->
+    <div class="row g-4 justify-content-center pb-4" id="product-list"></div>
+    
+  </div>
+</section>
+
+<section class ="content">
+
+</section>
+<footer class="footer">
+  <div class="container">
+      <p class="mb-0">&copy; 2024 LEGO SHOP. All rights reserved. | Designed with ❤️ for LEGO enthusiasts</p>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="../assets/js/components/HomePage.js"></script>
+</body>
+</html>

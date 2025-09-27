@@ -1,0 +1,93 @@
+body { min-height: 100vh; background: url('../../../../public/images/SignupPage (2).png') center/cover no-repeat fixed; }
+/* Glassmorphism panel */
+.glass { background: rgba(255, 255, 255, 0.55); border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.auth-wrap { min-height: 100vh; }
+.auth-card { width: 100%; max-width: 520px; }
+.title { font-weight: 800; }
+.underline-input .form-control { background: transparent; border: 0; border-bottom: 2px solid rgba(0,0,0,0.15); border-radius: 0; padding-left: 0; padding-right: 44px; height: 54px; box-shadow: none !important; }
+.underline-input .form-control:focus { border-bottom-color: #0d9bff; }
+.input-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #6c757d; pointer-events: none; }
+.btn-primary { height: 52px; font-weight: 700; border-radius: 12px; }
+.form-check-label { user-select: none; }
+.link-like { text-decoration: none; }
+.link-like:hover { text-decoration: underline; }
+.btn-google {
+    background: #ffffff;
+    border: 1px solid #dadce0;
+    color: #3c4043;
+    height: 52px;
+    font-weight: 500;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+  }
+  .btn-google:hover {
+    background: #f8f9fa;
+    border-color: #dadce0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    color: #3c4043;
+  }
+  .google-icon { width: 18px; height: 18px; }
+  .divider {
+    position: relative;
+    text-align: center;
+    margin: 25px 0;
+  }
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(0,0,0,0.15);
+  }
+  .divider span {
+    background: rgba(255, 255, 255, 0.55);
+    padding: 0 15px;
+    color: #6c757d;
+    font-size: 13px;
+  }
+.welcome-typing {
+  position: fixed;
+  left: 80px;
+  top: 50%;
+  bottom: unset;
+  z-index: 1000;
+  font-size: 6rem;
+  font-weight: 900;
+  color: #111;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: 'Montserrat', Arial, sans-serif;
+  user-select: none;
+  pointer-events: none;
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  line-height: 1.05;
+  transform: translateY(-50%);
+  -webkit-text-stroke: 3px #0d9bff;
+  
+}
+.welcome-typing span {
+  display: block;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@media (max-width: 767.98px) {
+    .welcome-typing {
+      display: none !important;
+    }
+  }
