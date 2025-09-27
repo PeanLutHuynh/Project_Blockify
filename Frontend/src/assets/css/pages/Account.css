@@ -1,0 +1,380 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+}
+
+/* Header Bar */
+.header-bar {
+  background: #0d9bff;
+  color: white;
+  padding: 12px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-logo {
+  width: 120px;
+  height: 40px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+}
+
+.header-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+}
+
+.header-link {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.header-link:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+/* Footer Bar */
+.footer-bar {
+  background: #000;
+  height: 80px;
+  width: 100%;
+}
+
+.account-container {
+  min-height: calc(100vh - 160px);
+}
+
+/* Sidebar */
+.sidebar {
+  background: #fff;
+  border-right: 1px solid #ddd;
+  padding: 0;
+  height: fit-content;
+}
+
+.sidebar .nav-link {
+  color: #666;
+  font-weight: 500;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 0;
+}
+
+.sidebar .nav-link:hover {
+  background: #f8f9fa;
+  color: #0d9bff;
+}
+
+.sidebar .nav-link.active {
+  background: #f8f9fa;
+  color: #0d9bff;
+  border-right: 3px solid #0d9bff;
+}
+
+.user-info {
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: center;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.username {
+  font-weight: 700;
+  font-size: 16px;
+  color: #333;
+  margin-top: 10px;
+}
+
+/* Content */
+.content-area {
+  background: #f5f5f5;
+  padding: 20px;
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+.section-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
+  border: none;
+}
+
+.section-header {
+  background: #fff;
+  color: #333;
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  font-weight: 700;
+  font-size: 18px;
+  border-radius: 8px 8px 0 0;
+}
+
+.section-body {
+  padding: 20px;
+}
+
+.text-muted-custom {
+  color: #888;
+  font-size: 14px;
+  font-weight: normal;
+  margin-top: 4px;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.form-control, .form-select {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #0d9bff;
+  box-shadow: 0 0 0 0.2rem rgba(13, 155, 255, 0.25);
+}
+
+.btn-primary-custom {
+  background: #0d9bff;
+  border-color: #0d9bff;
+  color: white;
+  font-weight: 500;
+  padding: 12px 24px;
+  border-radius: 6px;
+}
+
+.btn-primary-custom:hover {
+  background: #0b87e0;
+  border-color: #0b87e0;
+}
+
+.btn-outline-primary-custom {
+  color: #0d9bff;
+  border-color: #0d9bff;
+  background: white;
+  font-weight: 500;
+  padding: 12px 24px;
+  border-radius: 6px;
+}
+
+.btn-outline-primary-custom:hover {
+  background: #0d9bff;
+  border-color: #0d9bff;
+  color: white;
+}
+
+.large-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Orders */
+.orders-tabs .nav-pills .nav-link {
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: #f1f5ff;
+  color: #0d9bff;
+  font-weight: 600;
+  border: none;
+  margin-right: 12px;
+}
+
+.orders-tabs .nav-pills .nav-link.active {
+  background: #0d9bff;
+  color: white;
+}
+
+.shop-block {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-top: 15px;
+  background: #fff;
+}
+
+.shop-header {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  font-weight: 600;
+}
+
+.status-delivered {
+  color: #28a745;
+  font-weight: 700;
+}
+
+.order-line {
+  padding: 15px;
+}
+
+.order-line img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #f8f9fa;
+}
+
+.order-total {
+  padding: 15px;
+  border-top: 1px solid #eee;
+  font-weight: 700;
+  text-align: right;
+}
+
+/* Wishlist */
+.wishlist-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  text-align: center;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.wishlist-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #f8f9fa;
+}
+
+.wishlist-card h5 {
+  margin: 15px 0 8px;
+  color: #333;
+}
+
+/* Address */
+.address-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 15px;
+  background: #fff;
+}
+
+.badge-default {
+  background: #e6f2ff;
+  color: #0d9bff;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+/* Password */
+.verification-code {
+  background: #eef3ff;
+  border: 1px solid #ccd7ff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  font-weight: 600;
+  color: #333;
+  height: 48px;
+}
+
+/* Add Address Form */
+.add-address-form {
+  display: none;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.add-address-form.show {
+  display: block;
+}
+.navbar-brand {
+  color: white !important;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+/* Blockify Coin Modal Styles */
+#blockifyCoinModal .modal-content {
+  border-radius: 16px;
+  background: #f8f9fa;
+}
+#blockifyCoinModal .modal-header {
+  border-bottom: 1px solid #e0e0e0;
+  background: #0d9bff;
+  color: #fff;
+  border-radius: 16px 16px 0 0;
+}
+#blockifyCoinModal .modal-title {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+#blockifyCoinModal .btn-close {
+  background: #fff;
+  border-radius: 50%;
+  opacity: 1;
+}
+#blockifyCoinModal .card {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  background: #fff;
+}
+#blockifyCoinModal .badge.bg-danger {
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+#blockifyCoinModal .bg-primary {
+  background: #0d9bff !important;
+}
+#blockifyCoinModal .btn-outline-danger {
+  border-color: #ff4d4f;
+  color: #ff4d4f;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 6px 18px;
+}
+#blockifyCoinModal .btn-outline-danger:hover {
+  background: #ff4d4f;
+  color: #fff;
+}
+#blockifyCoinModal .text-success {
+  color: #28a745 !important;
+  font-weight: 600;
+}
+#blockifyCoinModal .text-primary {
+  color: #0d9bff !important;
+  font-weight: 600;
+}
+@media (max-width: 767.98px) {
+  #blockifyCoinModal .modal-dialog {
+    max-width: 98vw;
+    margin: 0.5rem auto;
+  }
+  #blockifyCoinModal .card {
+    margin-bottom: 1rem;
+  }
+}
