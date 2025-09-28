@@ -82,14 +82,12 @@ body { min-height: 100vh; background: url('../../../../public/images/SignupPage 
 .welcome-typing span {
   display: block;
 }
-
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
-
 @media (max-width: 767.98px) {
-  .welcome-typing {
-    display: none !important;
+    .welcome-typing {
+      display: none !important;
+    }
   }
-}

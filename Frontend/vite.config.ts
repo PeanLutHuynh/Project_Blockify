@@ -1,19 +1,27 @@
 import { defineConfig } from 'vite'
+import { fileURLToPath, URL } from 'node:url'
 import { resolve } from 'path'
 
+const r = (p: string) => fileURLToPath(new URL(p, import.meta.url))
+
 export default defineConfig({
+  root: '.',
+  publicDir: 'public',
+  
   // Entry points for different pages
   build: {
+    outDir: 'dist',
+    emptyOutDir: true,
     rollupOptions: {
       input: {
-        home: resolve(__dirname, 'src/pages/HomePage.html'),
-        signin: resolve(__dirname, 'src/pages/SigninPage.html'),
-        account: resolve(__dirname, 'src/pages/Account.html'),
-        admin: resolve(__dirname, 'src/pages/Admin.html'),
-        cart: resolve(__dirname, 'src/pages/CartPage.html'),
-        intro: resolve(__dirname, 'src/pages/IntroductionPage.html'),
-        order: resolve(__dirname, 'src/pages/OrderPage.html'),
-        product: resolve(__dirname, 'src/pages/ProductDetail.html')
+        home: r('./src/pages/HomePage.html'),
+        signin: r('./src/pages/SigninPage.html'),
+        account: r('./src/pages/Account.html'),
+        admin: r('./src/pages/Admin.html'),
+        cart: r('./src/pages/CartPage.html'),
+        intro: r('./src/pages/IntroductionPage.html'),
+        order: r('./src/pages/OrderPage.html'),
+        product: r('./src/pages/ProductDetail.html')
       }
     }
   },
@@ -21,7 +29,7 @@ export default defineConfig({
   // Development server configuration
   server: {
     port: 3000,
-    open: true,
+    open: '/src/pages/HomePage.html',
     proxy: {
       // Proxy API requests to backend
       '/api': {
@@ -35,7 +43,7 @@ export default defineConfig({
   // Path resolution
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@/types': resolve(__dirname, 'src/types'),
       '@/core': resolve(__dirname, 'src/core'),
       '@/modules': resolve(__dirname, 'src/modules'),
@@ -46,6 +54,7 @@ export default defineConfig({
 
   // CSS processing
   css: {
+    postcss: {},
     preprocessorOptions: {
       scss: {
         additionalData: `@import "@/assets/scss/variables.scss";`

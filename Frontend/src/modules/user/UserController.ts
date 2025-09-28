@@ -449,7 +449,8 @@ export class UserManagementController {
 
   private renderPagination(): void {
     // Implementation for pagination
-    console.log('Rendering pagination');
+    const totalPages = Math.ceil(this.totalUsers / this.pageSize);
+    console.log('Rendering pagination:', { currentPage: this.currentPage, totalPages, totalUsers: this.totalUsers });
   }
 }
 
