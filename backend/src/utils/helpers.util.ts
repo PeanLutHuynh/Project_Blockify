@@ -3,9 +3,6 @@ import jwt, { SignOptions } from 'jsonwebtoken';
 import { ENV } from '../config/env';
 import { JwtPayload } from '../types/common';
 
-/* -----------------------------------------------------
- * 🔐 CRYPTO UTILITIES
- * --------------------------------------------------- */
 export const generateRandomString = (length: number = 32): string =>
   crypto.randomBytes(length).toString('hex');
 
@@ -21,9 +18,6 @@ export const hashString = (str: string): string =>
 export const generateApiKey = (): string =>
   'ak_' + crypto.randomBytes(32).toString('hex');
 
-/* -----------------------------------------------------
- * 🔑 JWT UTILITIES
- * --------------------------------------------------- */
 export const generateJwtToken = (payload: JwtPayload): string =>
   jwt.sign(payload, ENV.JWT_SECRET!, {
     expiresIn: ENV.JWT_EXPIRES_IN as SignOptions['expiresIn'],
@@ -42,9 +36,6 @@ export const verifyJwtToken = <T>(token: string, secret: string): T | null => {
   }
 };
 
-/* -----------------------------------------------------
- * 🧩 OBJECT UTILITIES
- * --------------------------------------------------- */
 export const deepClone = <T>(obj: T): T =>
   JSON.parse(JSON.stringify(obj));
 
@@ -77,9 +68,6 @@ export const toCamelCase = <T extends Record<string, any>>(obj: T): Record<strin
   return result;
 };
 
-/* -----------------------------------------------------
- * ✍️ STRING UTILITIES
- * --------------------------------------------------- */
 export const createSlug = (text: string, maxLength: number = 100): string =>
   text
     .toLowerCase()
@@ -111,9 +99,6 @@ export const isValidJSON = (str: string): boolean => {
 export const truncateString = (str: string, maxLength: number): string =>
   str.length <= maxLength ? str : str.substring(0, maxLength - 3) + '...';
 
-/* -----------------------------------------------------
- * 📂 FILE UTILITIES
- * --------------------------------------------------- */
 export const generateUniqueFilename = (originalName: string): string => {
   const timestamp = Date.now();
   const random = Math.random().toString(36).substring(2, 15);
@@ -137,9 +122,6 @@ export const isImageFile = (filename: string): boolean => {
   return imageExtensions.includes(getFileExtension(filename));
 };
 
-/* -----------------------------------------------------
- * 💰 FORMAT UTILITIES
- * --------------------------------------------------- */
 export const formatPrice = (price: number, currency: string = 'VND'): string =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency }).format(price);
 
@@ -168,9 +150,6 @@ export const formatBytes = (bytes: number, decimals: number = 2): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
 
-/* -----------------------------------------------------
- * 📊 PAGINATION UTILITIES
- * --------------------------------------------------- */
 export const calculatePagination = (page: number, limit: number, total: number) => {
   const totalPages = Math.ceil(total / limit);
   const offset = (page - 1) * limit;
@@ -191,9 +170,6 @@ export const parsePaginationParams = (query: any): { page: number; limit: number
   return { page, limit };
 };
 
-/* -----------------------------------------------------
- * ⏳ TIME UTILITIES
- * --------------------------------------------------- */
 export const timeAgo = (date: Date | string): string => {
   const now = new Date();
   const past = new Date(date);
@@ -229,9 +205,6 @@ export const retry = async <T>(
   throw lastError!;
 };
 
-/* -----------------------------------------------------
- * ⚠️ ERROR & ENV UTILITIES
- * --------------------------------------------------- */
 export const validateRequiredEnvVars = (requiredVars: string[]): void => {
   const missing = requiredVars.filter((v) => !process.env[v]);
   if (missing.length > 0) {
