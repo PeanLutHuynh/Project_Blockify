@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEGO SHOP - Services</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/pages/Service.css">
+   
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="IntroductionPage.html">Blockify</a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="HomePage.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="IntroductionPage.html">Introduction</a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link " href="Service.html" >
+                            Service
+                        </a>
+                        
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link " href="Contact.html" >
+                            Contact
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="navbar-right-icons">
+                    <a href="CartPage.html" class="cart-icon">
+                        <i class="bi bi-cart"></i>
+                    </a>
+                    <a href="SigninPage.html" class="btn-sign">Sign in</a>
+                    <a href="SignupPage.html" class="btn-sign">Sign up</a>
+                </div>
+            </div>
+            <div class="overlay" id="overlay">
+              <div class="search-popup">
+                <div class="search-header">
+                  <strong class="text-white">Search</strong>
+                  <i class="bi bi-x-circle" id="closeSearch" style="cursor:pointer; color:white"></i>
+                </div>
+            
+                <!-- Input -->
+                <input 
+                  type="text" 
+                  class="search-input text-white" 
+                  id="searchInput" 
+                  style="border: 0; background-color: rgb(30, 41, 57);" 
+                  placeholder="Enter keyword...">
+                
+                <div class="line mb-2"></div>
+            
+                <!-- Suggestions -->
+                <div class="suggestion-box">
+                  <div>
+                    <button class="suggestion-btn text-white">Suggestion</button>
+                    <span class="suggestion-text">Yellow Lego Truck Set</span>
+                  </div>
+                  <i class="bi bi-box-arrow-up-right" style="color:white"></i>
+                </div>
+                <div class="suggestion-box">
+                  <div>
+                    <button class="suggestion-btn text-white">Suggestion</button>
+                    <span class="suggestion-text">Water Park</span>
+                  </div>
+                  <i class="bi bi-box-arrow-up-right" style="color:white"></i>
+                </div>
+                <div class="suggestion-box">
+                  <div>
+                    <button class="suggestion-btn text-white">Suggestion</button>
+                    <span class="suggestion-text">Ninjago World</span>
+                  </div>
+                  <i class="bi bi-box-arrow-up-right" style="color:white"></i>
+                </div>
+              </div>
+            </div>
+            
+        </div>
+      </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1>Our Services</h1>
+            <p class="lead">We provide high-quality LEGO services to turn your building dreams into reality</p>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="section-title">Our Services</h2>
+            
+            <div class="row g-4">
+                <!-- Custom Build Service -->
+                <div class="col-lg-6 col-md-6">
+                    <div class="card service-card h-100">
+                        <div class="card-body p-4">
+                            <div class="service-icon">
+                                <i class="bi bi-tools"></i>
+                            </div>
+                            <h3 class="card-title h4 mb-3">Custom Design</h3>
+                            <p class="card-text text-muted">Create unique LEGO models based on your ideas with our professional design team.</p>
+                            <ul class="service-features">
+                                <li>Free design consultation</li>
+                                <li>3D models before production</li>
+                                <li>Genuine LEGO parts only</li>
+                                <li>6-month warranty</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Repair Service -->
+                <div class="col-lg-6 col-md-6">
+                    <div class="card service-card h-100">
+                        <div class="card-body p-4">
+                            <div class="service-icon">
+                                <i class="bi bi-wrench"></i>
+                            </div>
+                            <h3 class="card-title h4 mb-3">Repair & Maintenance</h3>
+                            <p class="card-text text-muted">Restore and maintain your LEGO models to keep them looking like new.</p>
+                            <ul class="service-features">
+                                <li>Replace damaged parts</li>
+                                <li>Professional cleaning</li>
+                                <li>Structural reinforcement</li>
+                                <li>Storage advice</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rental Service -->
+                <div class="col-lg-6 col-md-6">
+                    <div class="card service-card h-100">
+                        <div class="card-body p-4">
+                            <div class="service-icon">
+                                <i class="bi bi-box"></i>
+                            </div>
+                            <h3 class="card-title h4 mb-3">LEGO Rental</h3>
+                            <p class="card-text text-muted">Rent expensive LEGO sets to experience them without a large upfront investment.</p>
+                            <ul class="service-features">
+                                <li>Over 500 LEGO sets available</li>
+                                <li>Home delivery service</li>
+                                <li>Flexible rental periods</li>
+                                <li>Full insurance coverage</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Consulting Service -->
+                <div class="col-lg-6 col-md-6">
+                    <div class="card service-card h-100">
+                        <div class="card-body p-4">
+                            <div class="service-icon">
+                                <i class="bi bi-lightbulb"></i>
+                            </div>
+                            <h3 class="card-title h4 mb-3">Professional Consulting</h3>
+                            <p class="card-text text-muted">Get advice from LEGO experts on building, collecting, and investing.</p>
+                            <ul class="service-features">
+                                <li>Video call consultations</li>
+                                <li>Detailed building plans</li>
+                                <li>Accurate cost estimates</li>
+                                <li>24/7 support</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process-section">
+        <div class="container">
+            <h2 class="section-title">Our Process</h2>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="process-step">
+                        <div class="step-number">1</div>
+                        <h4>Consultation</h4>
+                        <p class="text-muted">Listen to your needs and provide the most suitable solution for customers</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="process-step">
+                        <div class="step-number">2</div>
+                        <h4>Quote</h4>
+                        <p class="text-muted">Provide detailed and transparent quotes for the requested service</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="process-step">
+                        <div class="step-number">3</div>
+                        <h4>Implementation</h4>
+                        <p class="text-muted">Execute the service with high quality and on time as committed</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="process-step">
+                        <div class="step-number">4</div>
+                        <h4>Delivery</h4>
+                        <p class="text-muted">Deliver the product/service and provide detailed usage instructions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <section class="contact-cta">
+        <div class="container">
+            <h2>Ready to Get Started?</h2>
+            <p class="lead mb-4">Contact us now for free consultation on LEGO services</p>
+            <a href="#" class="btn btn-light-custom btn-lg">Contact Now</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 LEGO SHOP. All rights reserved. | Designed with ❤️ for LEGO enthusiasts</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

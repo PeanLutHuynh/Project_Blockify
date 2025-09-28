@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LEGO City</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/pages/IntroductionPage.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+ 
+</head>
+<body>
+
+  <!-- Navbar -->
+ <nav class="navbar navbar-expand-lg navbar-custom">
+  <div class="container">
+      <a class="navbar-brand" href="IntroductionPage.html">Blockify</a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+              <li class="nav-item">
+                  <a class="nav-link" href="HomePage.html">Home</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="IntroductionPage.html">Introduction</a>
+              </li>
+              <li class="nav-item dropdown">
+                  <a class="nav-link" href="Service.html" >
+                      Service
+                  </a>
+                  
+              </li>
+              <li class="nav-item dropdown">
+                  <a class="nav-link " href="Contact.html" >
+                      Contact
+                  </a>
+                  
+              </li>
+          </ul>
+          
+          <div class="navbar-right-icons">
+              <a href="#" class="search-icon">
+                  <i class="bi bi-search" id="openSearch"> </i>
+              </a>
+              <a href="CartPage.html" class="cart-icon">
+                  <i class="bi bi-cart"></i>
+              </a>
+              <a href="SigninPage.html" class="btn-sign">Sign in</a>
+              <a href="SignupPage.html" class="btn-sign">Sign up</a>
+          </div>
+      </div>
+      <div class="overlay" id="overlay">
+        <div class="search-popup">
+          <div class="search-header">
+            <strong class="text-white">Search</strong>
+            <i class="bi bi-x-circle" id="closeSearch" style="cursor:pointer; color:white"></i>
+          </div>
+      
+          <!-- Input -->
+          <input 
+            type="text" 
+            class="search-input text-white" 
+            id="searchInput" 
+            style="border: 0; background-color: rgb(30, 41, 57);" 
+            placeholder="Enter keyword...">
+          
+          <div class="line mb-2"></div>
+      
+          <!-- Suggestions -->
+          <div class="suggestion-box">
+            <div>
+              <button class="suggestion-btn text-white">Suggestion</button>
+              <span class="suggestion-text">Yellow Lego Truck Set</span>
+            </div>
+            <i class="bi bi-box-arrow-up-right" style="color:white"></i>
+          </div>
+          <div class="suggestion-box">
+            <div>
+              <button class="suggestion-btn text-white">Suggestion</button>
+              <span class="suggestion-text">Water Park</span>
+            </div>
+            <i class="bi bi-box-arrow-up-right" style="color:white"></i>
+          </div>
+          <div class="suggestion-box">
+            <div>
+              <button class="suggestion-btn text-white">Suggestion</button>
+              <span class="suggestion-text">Ninjago World</span>
+            </div>
+            <i class="bi bi-box-arrow-up-right" style="color:white"></i>
+          </div>
+        </div>
+      </div>
+      
+  </div>
+</nav>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <img src="../../public/images/Rectangle 24 (1).png" style="max-width: 100%; object-fit: contain; max-height: 100%;" alt="LEGO Logo">
+    
+  </div>
+
+  <!-- Intro Section -->
+  <div class="intro">
+    <h2><b>Blockify</b></h2>
+    <p style="white-space: pre-line; font-size: 2rem;">Welcome to Blockify
+      Where the journey of discovery, play, and creativity begins!
+      With a diverse collection of iconic buildings, vehicles, and characters,
+      LEGO City offers the whole family countless opportunities to build together, imagine, and share exciting stories in this bustling city.
+    </p>
+  </div>
+
+  <!-- Blue Section -->
+  <div class="blue-section">
+   
+  </div>
+
+  <!-- Highlight Section -->
+  <div class="highlight container my-5">
+    <h4 class="fw-bold mb-4 text-center"><b>Hot</b></h4>
+    <div id="lego-list" class="d-flex justify-content-center flex-wrap gap-3"></div>
+  </div>
+  
+  <script>
+    // Danh sách LEGO
+    const legoItems = [
+      { img: "../../public/images/Group 40.png"},
+      { img: "../../public/images/Group 41 (1).png"},
+      { img: "../../public/images/Group 42 (1).png"},
+      { img: "../../public/images/Group 43 (1).png"},
+      { img: "../../public/images/Group 44 (1).png"},
+      { img: "../../public/images/Group 45 (2).png"},
+    ];
+  
+    // Render card
+    const legoList = document.getElementById("lego-list");
+    legoItems.forEach(item => {
+      legoList.innerHTML += `
+        <div class="card" style="width: 12rem; border:none; height:15rem;">
+          <img src="${item.img}" class="card-img-top" style="max-height:100%; max-width:100%; object-fit:contain; margin:0;" alt="${item.title}">
+        </div>
+      `;
+    });
+  </script>
+   
+</div>
+  <div class="footer">
+    <div class="stripe-above"></div>
+    <div class="stripe-top"></div>
+    <div class="stripe-middle"></div>
+    <div class="stripe-blue"></div>
+    <img src="../../public/images/Rectangle 73.png" alt="Lego Batman" class="batman">
+  </div>
+  <div class ="bottom">
+
+  </div>
+  <footer class="footer">
+    <div class="container">
+        <p class="mb-0">&copy; 2024 LEGO SHOP. All rights reserved. | Designed with ❤️ for LEGO enthusiasts</p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+ 
+<script src="../assets/js/components/Introduction.js"></script>
+</body>
+</html>
