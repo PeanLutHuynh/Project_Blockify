@@ -1,4 +1,4 @@
-body { min-height: 100vh; background: url('../../../../public/images/SignupPage (2).png') center/cover no-repeat fixed; }
+body { margin: 0; padding: 0; min-height: 100vh; background: url('/images/SignupPage (2).png') center/cover no-repeat fixed; }
 /* Glassmorphism panel */
 .glass { background: rgba(255, 255, 255, 0.55); border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 .auth-wrap { min-height: 100vh; }
@@ -8,7 +8,7 @@ body { min-height: 100vh; background: url('../../../../public/images/SignupPage 
 .underline-input .form-control:focus { border-bottom-color: #0d9bff; }
 .input-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #6c757d; pointer-events: none; }
 .btn-primary { height: 52px; font-weight: 700; border-radius: 12px; }
-.form-check-label { user-select: none; }
+.form-check-label { -webkit-user-select: none; user-select: none; }
 .link-like { text-decoration: none; }
 .link-like:hover { text-decoration: underline; }
 .btn-google {
@@ -63,6 +63,7 @@ body { min-height: 100vh; background: url('../../../../public/images/SignupPage 
   letter-spacing: 2px;
   text-transform: uppercase;
   font-family: 'Montserrat', Arial, sans-serif;
+  -webkit-user-select: none;
   user-select: none;
   pointer-events: none;
   background: none;

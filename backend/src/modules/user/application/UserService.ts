@@ -14,11 +14,29 @@ export class UserService extends BaseService<User> {
     return await this.userRepository.findByEmail(email);
   }
 
-  async createUser(userData: { email: string; name: string; role?: string }): Promise<User> {
+  async findByUsername(username: string): Promise<User | null> {
+    return await this.userRepository.findByUsername(username);
+  }
+
+  async createUser(userData: { 
+    email: string; 
+    name: string; 
+    username?: string;
+    role?: string;
+    password?: string;
+  }): Promise<User> {
     // Business logic: Check if user already exists
     const existingUser = await this.userRepository.findByEmail(userData.email);
     if (existingUser) {
       throw new Error('User with this email already exists');
+    }
+
+    // Check username if provided
+    if (userData.username) {
+      const existingUsername = await this.userRepository.findByUsername(userData.username);
+      if (existingUsername) {
+        throw new Error('User with this username already exists');
+      }
     }
 
     // Validate email format
@@ -27,18 +45,30 @@ export class UserService extends BaseService<User> {
       throw new Error('Invalid email format');
     }
 
-    // Create new user
-    const user = User.create(userData);
+    // Create new user with proper UserProps
+    const userProps = {
+      email: userData.email,
+      fullName: userData.name, // Map name to fullName
+      username: userData.username || userData.email.split('@')[0], // Generate username from email if not provided
+      role: userData.role || 'user',
+      password: userData.password || null, // Will be hashed by AuthService
+      isActive: true,
+      lastLogin: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const user = User.create(userProps);
     return await this.userRepository.save(user);
   }
 
-  async updateUserProfile(id: string, name: string): Promise<User> {
+  async updateUserProfile(id: string, fullName: string): Promise<User> {
     const user = await this.userRepository.findById(id);
     if (!user) {
       throw new Error('User not found');
     }
 
-    const updatedUser = user.updateProfile(name);
+    const updatedUser = user.updateProfile(fullName);
     return await this.userRepository.update(id, updatedUser);
   }
 
@@ -54,5 +84,15 @@ export class UserService extends BaseService<User> {
 
   async getActiveUsers(): Promise<User[]> {
     return await this.userRepository.findActiveUsers();
+  }
+
+  async updateLastLogin(id: string): Promise<User> {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const updatedUser = user.updateLastLogin();
+    return await this.userRepository.update(id, updatedUser);
   }
 }

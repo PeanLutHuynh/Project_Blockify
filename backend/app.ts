@@ -15,24 +15,44 @@ import { urlSecurityCheck, parameterValidation, httpMethodValidation } from './s
 import { globalErrorHandler, notFoundHandler } from './src/middlewares/error.middleware';
 import { xmlParserMiddleware, responseFormatMiddleware } from './src/middlewares/xml.middleware';
 import userRoutes from './src/modules/user/presentation/userRoutes';
+import { authRoutes } from './src/modules/auth/presentation/authRoutes';
 
 const app = express();
 
 app.use(cookieParser());
-app.use(httpMethodValidation);
+// app.use(httpMethodValidation);
 app.use(urlSecurityCheck);
 app.use(parameterValidation);
 app.use(conditionalSecurity);
 app.use(suspiciousActivityDetection);
-app.use(generalRateLimit);
+// app.use(generalRateLimit);
 
-// CORS configuration
+// CORS configuration - Support multiple origins for dev and production
+const allowedOrigins = [
+  'http://localhost:3000',    // Vite dev server
+  'http://localhost:4173',    // Vite preview server
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:4173',
+  process.env.FRONTEND_URL    // Production URL from .env
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      console.log(`🚫 CORS blocked origin: ${origin}`);
+      return callback(new Error('Not allowed by CORS'), false);
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
-  exposedHeaders: ['X-CSRF-Token']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Requested-With'],
+  exposedHeaders: ['X-CSRF-Token'],
+  optionsSuccessStatus: 200 // Support legacy browsers
 }));
 
 // Body parsing with size limits
@@ -75,6 +95,7 @@ app.get('/health', (req, res) => {
 
 // Main API routes
 app.use('/api/v1/users', userRoutes);
+app.use('/api', authRoutes);
 
 app.use('/api/v1', (req, res) => {
   res.json({ 
@@ -102,7 +123,6 @@ app.use('/api/v1', (req, res) => {
 });
 
 // Future routes will be added here
-// app.use('/api/v1/auth', authRoutes);
 // app.use('/api/v1/products', productRoutes);
 // app.use('/api/v1/categories', categoryRoutes);
 

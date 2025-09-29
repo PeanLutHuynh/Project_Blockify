@@ -8,6 +8,10 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
     super('users');
   }
 
+  protected getIdColumn(): string {
+    return 'user_id';
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     try {
       const { data, error } = await supabase
@@ -27,6 +31,44 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
     }
   }
 
+  async findByUsername(username: string): Promise<User | null> {
+    try {
+      const { data, error } = await supabase
+        .from(this.tableName)
+        .select('*')
+        .eq('username', username)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') return null; // Not found
+        throw error;
+      }
+
+      return this.mapToEntity(data);
+    } catch (error) {
+      throw new Error(`Error finding user by username: ${error}`);
+    }
+  }
+
+  async findByAuthUid(authUid: string): Promise<User | null> {
+    try {
+      const { data, error } = await supabase
+        .from(this.tableName)
+        .select('*')
+        .eq('auth_uid', authUid)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') return null; // Not found
+        throw error;
+      }
+
+      return this.mapToEntity(data);
+    } catch (error) {
+      throw new Error(`Error finding user by auth UID: ${error}`);
+    }
+  }
+
   async findActiveUsers(): Promise<User[]> {
     try {
       const { data, error } = await supabase
@@ -42,28 +84,74 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
     }
   }
 
+  async existsByEmail(email: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase
+        .from(this.tableName)
+        .select('user_id')
+        .eq('email', email)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      return !!data;
+    } catch (error) {
+      throw new Error(`Error checking email existence: ${error}`);
+    }
+  }
+
+  async existsByUsername(username: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase
+        .from(this.tableName)
+        .select('user_id')
+        .eq('username', username)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      return !!data;
+    } catch (error) {
+      throw new Error(`Error checking username existence: ${error}`);
+    }
+  }
+
   protected mapToEntity(data: any): User {
     return new User({
-      id: data.id,
+      id: data.user_id?.toString() || data.id,
       email: data.email,
-      name: data.name,
-      role: data.role,
+      fullName: data.full_name,
+      username: data.username,
+      passwordHash: data.password_hash,
+      gender: data.gender,
+      phone: data.phone,
+      birthDate: data.birth_date ? new Date(data.birth_date) : undefined,
+      avatarUrl: data.avatar_url,
       isActive: data.is_active,
-      createdAt: new Date(data.created_at),
-      updatedAt: new Date(data.updated_at)
+      emailVerified: data.email_verified,
+      authUid: data.auth_uid,
+      createdAt: data.created_at ? new Date(data.created_at) : undefined,
+      updatedAt: data.updated_at ? new Date(data.updated_at) : undefined
     });
   }
 
   protected mapFromEntity(entity: User | Partial<User>): any {
     const data: any = {};
     
-    if ('id' in entity) data.id = entity.id;
-    if ('email' in entity) data.email = entity.email;
-    if ('name' in entity) data.name = entity.name;
-    if ('role' in entity) data.role = entity.role;
+    if ('id' in entity && entity.id) data.user_id = parseInt(entity.id);
+    if ('email' in entity && entity.email) {
+      data.email = typeof entity.email === 'string' ? entity.email : entity.email.getValue();
+    }
+    if ('fullName' in entity) data.full_name = entity.fullName;
+    if ('username' in entity) data.username = entity.username;
+    if ('passwordHash' in entity) data.password_hash = entity.passwordHash;
+    if ('gender' in entity) data.gender = entity.gender;
+    if ('phone' in entity) data.phone = entity.phone;
+    if ('birthDate' in entity && entity.birthDate) data.birth_date = entity.birthDate.toISOString();
+    if ('avatarUrl' in entity) data.avatar_url = entity.avatarUrl;
     if ('isActive' in entity) data.is_active = entity.isActive;
-    if ('createdAt' in entity) data.created_at = entity.createdAt;
-    if ('updatedAt' in entity) data.updated_at = entity.updatedAt;
+    if ('emailVerified' in entity) data.email_verified = entity.emailVerified;
+    if ('authUid' in entity) data.auth_uid = entity.authUid;
+    if ('createdAt' in entity && entity.createdAt) data.created_at = entity.createdAt.toISOString();
+    if ('updatedAt' in entity && entity.updatedAt) data.updated_at = entity.updatedAt.toISOString();
 
     return data;
   }
