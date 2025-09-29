@@ -8,12 +8,17 @@ export abstract class BaseRepository<T> implements IRepository<T> {
     this.tableName = tableName;
   }
 
+  protected getIdColumn(): string {
+    return 'id'; // Default column name
+  }
+
   async findById(id: string): Promise<T | null> {
     try {
+      const idColumn = this.getIdColumn();
       const { data, error } = await supabase
         .from(this.tableName)
         .select('*')
-        .eq('id', id)
+        .eq(idColumn, id)
         .single();
 
       if (error) {
@@ -60,11 +65,12 @@ export abstract class BaseRepository<T> implements IRepository<T> {
 
   async update(id: string, entity: Partial<T>): Promise<T> {
     try {
+      const idColumn = this.getIdColumn();
       const data = this.mapFromEntity(entity);
       const { data: result, error } = await supabase
         .from(this.tableName)
         .update(data)
-        .eq('id', id)
+        .eq(idColumn, id)
         .select()
         .single();
 
@@ -78,10 +84,11 @@ export abstract class BaseRepository<T> implements IRepository<T> {
 
   async delete(id: string): Promise<boolean> {
     try {
+      const idColumn = this.getIdColumn();
       const { error } = await supabase
         .from(this.tableName)
         .delete()
-        .eq('id', id);
+        .eq(idColumn, id);
 
       if (error) throw error;
 

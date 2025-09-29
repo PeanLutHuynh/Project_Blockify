@@ -10,11 +10,13 @@
     "backend:build": "cd backend && npm run build",
     "backend:start": "cd backend && npm start",
     "backend:test": "cd backend && npm test",
-    "frontend:dev": "cd frontend && npm run dev",
-    "frontend:build": "cd frontend && npm run build",
-    "setup": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "frontend:dev": "cd Frontend && npm run dev",
+    "frontend:preview": "cd Frontend && npm run preview",
+    "frontend:build": "cd Frontend && npm run build",
+    "setup": "npm install && cd backend && npm install && cd ../Frontend && npm install",
     "build": "npm run backend:build && npm run frontend:build",
-    "start": "npm run backend:start"
+    "start": "npm run backend:start",
+    "start:all": "concurrently \"npm run backend:start\" \"npm run frontend:preview\""
   },
   "keywords": [
     "lego",

@@ -384,3 +384,6 @@ export const authStore = new AuthStore();
 export const toastStore = new ToastStore();
 export const modalStore = new ModalStore();
 export const appStore = new AppStore();
+
+// Export AuthService
+export { AuthService, authService } from './AuthService';

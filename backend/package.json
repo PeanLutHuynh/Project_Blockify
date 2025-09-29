@@ -8,7 +8,8 @@
   },
   "scripts": {
     "update-types": "npx supabase gen types typescript --project-id oxpvtqghrksdhhouhbij > src/types/supabase.ts",
-    "dev": "npm run update-types ; nodemon app.ts",
+    "dev": "nodemon app.ts",
+    "dev:with-types": "npm run update-types && nodemon app.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "jest",
@@ -24,6 +25,8 @@
   "type": "commonjs",
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
