@@ -128,7 +128,7 @@ export const validateUsername = (username: string): { isValid: boolean; errors: 
     if (username.length > 30) {
       errors.push('Username must be no more than 30 characters long');
     }
-    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+    if (!/^(?=\p{L})[\p{L}0-9]+(?:[_\-.][\p{L}0-9]+)*$/u.test(username)) {
       errors.push('Username can only contain letters, numbers, and underscores');
     }
   }

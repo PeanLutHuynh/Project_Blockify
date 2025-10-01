@@ -101,11 +101,7 @@ export class ModernAuthController {
   async handleGoogleAuth(): Promise<{ success: boolean; user?: User; message: string; errors?: string[] }> {
     try {
       const result = await this.authService.googleAuth();
-      
-      if (result.success) {
-        this.redirectAfterAuth();
-      }
-
+      // Redirect happens immediately in googleAuth
       return result;
     } catch (error) {
       console.error('Google auth error:', error);
@@ -209,7 +205,7 @@ export class ModernAuthController {
       errors.push('Username must be at least 3 characters long');
     }
 
-    if (data.username && !/^[a-zA-Z0-9_]+$/.test(data.username)) {
+    if (data.username && !/^(?=\p{L})[\p{L}0-9]+(?:[_\-.][\p{L}0-9]+)*$/u.test(data.username)) {
       errors.push('Username can only contain letters, numbers, and underscores');
     }
 
@@ -248,16 +244,14 @@ export class ModernAuthController {
    * Redirect after successful authentication
    */
   private redirectAfterAuth(): void {
-    // Check if there's a redirect URL in session storage
+    // Check if redirect URL is set
     const redirectUrl = sessionStorage.getItem('redirectAfterAuth');
     sessionStorage.removeItem('redirectAfterAuth');
-
     if (redirectUrl) {
       window.location.href = redirectUrl;
-    } else {
-      // Default redirect to home page
-      window.location.href = '/src/pages/HomePage.html';
+      return;
     }
+    window.location.href = '/src/pages/HomePage.html';
   }
 
   /**
@@ -281,9 +275,20 @@ export class ModernAuthController {
     const container = document.getElementById(containerId);
     if (!container) return;
 
+    // Normalize errors to array of strings
+    let normalized: string[] = [];
+    if (Array.isArray(errors)) {
+      normalized = errors.filter(Boolean).map(String);
+    } else if (typeof errors === 'string') {
+      normalized = [errors];
+    } else if (errors && typeof errors === 'object') {
+      // Convert object of validation errors to messages
+      normalized = Object.values(errors as any).flat().map((e: any) => String(e));
+    }
+
     container.innerHTML = '';
     
-    if (errors.length === 0) {
+    if (normalized.length === 0) {
       container.classList.add('d-none');
       return;
     }
@@ -293,7 +298,7 @@ export class ModernAuthController {
     const errorList = document.createElement('ul');
     errorList.className = 'list-unstyled mb-0';
     
-    errors.forEach(error => {
+    normalized.forEach(error => {
       const listItem = document.createElement('li');
       listItem.className = 'text-danger small';
       listItem.innerHTML = `<i class="fa fa-exclamation-circle me-1"></i>${error}`;

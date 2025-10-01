@@ -19,8 +19,8 @@ const signUpValidation = [
   body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
   body('fullName').notEmpty().withMessage('Full name is required'),
   body('username').isLength({ min: 3 }).withMessage('Username must be at least 3 characters long')
-    .matches(/^[a-zA-Z0-9_]+$/).withMessage('Username can only contain letters, numbers, and underscores'),
-  body('gender').optional().isIn(['male', 'female', 'other']).withMessage('Gender must be male, female, or other'),
+    .matches(/^(?=\p{L})[\p{L}0-9]+(?:[_\-.][\p{L}0-9]+)*$/u).withMessage('Username can only contain letters, numbers, and underscores'),
+  body('gender').optional().isIn(['male', 'female', null]).withMessage('Gender must be male or female'),
   validateRequest
 ];
 
@@ -38,10 +38,23 @@ const googleAuthValidation = [
   validateRequest
 ];
 
+const verifyEmailValidation = [
+  body('token').notEmpty().withMessage('Verification token is required'),
+  body('type').optional().isIn(['signup', 'magiclink']).withMessage('Type must be signup or magiclink'),
+  validateRequest
+];
+
+const resendVerificationValidation = [
+  body('email').isEmail().withMessage('Valid email is required'),
+  validateRequest
+];
+
 // Auth routes
 router.post('/signup', signUpValidation, authController.signUp);
 router.post('/signin', signInValidation, authController.signIn);
 router.post('/google', googleAuthValidation, authController.googleAuth);
+router.post('/verify-email', verifyEmailValidation, authController.verifyEmail);
+router.post('/resend-verification', resendVerificationValidation, authController.resendVerification);
 router.post('/verify-token', authController.verifyToken);
 router.get('/me', authenticateToken, authController.me);
 

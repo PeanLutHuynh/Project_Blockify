@@ -7,7 +7,7 @@ export class User {
   private _phone?: string;
   private _birthDate?: Date;
   private _avatarUrl?: string;
-  private _emailVerified: boolean;
+  private _authUid: string; // Supabase Auth UID - REQUIRED
   private _isActive: boolean;
   private _createdAt?: Date;
   private _updatedAt?: Date;
@@ -17,11 +17,11 @@ export class User {
     email: string;
     fullName: string;
     username: string;
+    authUid: string;
     gender?: string;
     phone?: string;
     birthDate?: Date | string;
     avatarUrl?: string;
-    emailVerified?: boolean;
     isActive?: boolean;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -30,11 +30,11 @@ export class User {
     this._email = data.email;
     this._fullName = data.fullName;
     this._username = data.username;
+    this._authUid = data.authUid;
     this._gender = data.gender;
     this._phone = data.phone;
     this._birthDate = typeof data.birthDate === 'string' ? new Date(data.birthDate) : data.birthDate;
     this._avatarUrl = data.avatarUrl;
-    this._emailVerified = data.emailVerified ?? false;
     this._isActive = data.isActive ?? true;
     this._createdAt = typeof data.createdAt === 'string' ? new Date(data.createdAt) : data.createdAt;
     this._updatedAt = typeof data.updatedAt === 'string' ? new Date(data.updatedAt) : data.updatedAt;
@@ -73,8 +73,8 @@ export class User {
     return this._avatarUrl;
   }
 
-  public get emailVerified(): boolean {
-    return this._emailVerified;
+  public get authUid(): string {
+    return this._authUid;
   }
 
   public get isActive(): boolean {
@@ -103,7 +103,9 @@ export class User {
   }
 
   public isEmailVerified(): boolean {
-    return this._emailVerified;
+    // Email verification is checked via Supabase Auth, not stored in public.users
+    // This method is kept for backward compatibility but should query Supabase Auth
+    return true; // Placeholder - should be checked via Supabase Auth API
   }
 
   public getAge(): number | null {
@@ -181,12 +183,12 @@ export class User {
       email: data.email,
       fullName: data.fullName || data.full_name,
       username: data.username,
+      authUid: data.authUid || data.auth_uid,
       gender: data.gender,
       phone: data.phone,
       birthDate: data.birthDate || data.birth_date,
       avatarUrl: data.avatarUrl || data.avatar_url,
-      emailVerified: data.emailVerified || data.email_verified,
-      isActive: data.isActive || data.is_active,
+      isActive: data.isActive ?? data.is_active ?? true,
       createdAt: data.createdAt || data.created_at,
       updatedAt: data.updatedAt || data.updated_at
     });
@@ -199,11 +201,11 @@ export class User {
       email: this._email,
       fullName: this._fullName,
       username: this._username,
+      authUid: this._authUid,
       gender: this._gender,
       phone: this._phone,
       birthDate: this._birthDate?.toISOString(),
       avatarUrl: this._avatarUrl,
-      emailVerified: this._emailVerified,
       isActive: this._isActive
     };
   }
@@ -215,11 +217,11 @@ export class User {
       email: this._email,
       fullName: this._fullName,
       username: this._username,
+      authUid: this._authUid,
       gender: this._gender,
       phone: this._phone,
       birthDate: this._birthDate,
       avatarUrl: this._avatarUrl,
-      emailVerified: this._emailVerified,
       isActive: this._isActive,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt
@@ -250,9 +252,8 @@ export class User {
   }
 
   public verifyEmail(): User {
-    const clone = this.clone();
-    clone._emailVerified = true;
-    clone._updatedAt = new Date();
-    return clone;
+    // Email verification is handled by Supabase Auth, not stored in public.users
+    // This method is kept for backward compatibility but doesn't change anything
+    return this.clone();
   }
 }

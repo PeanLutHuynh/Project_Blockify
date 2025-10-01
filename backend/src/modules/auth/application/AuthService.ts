@@ -1,38 +1,80 @@
-import bcrypt from 'bcrypt';
 import { User } from '../../user/domain/User';
 import { IUserRepository } from '../../user/domain/IUserRepository';
 import { JWTConfig, JwtPayload } from '../../../config/jwt';
-import { SignUpCommand, SignInCommand, GoogleAuthCommand, AuthResponse } from './dto';
+import { SignUpCommand, SignInCommand, GoogleAuthCommand, AuthResponse, VerifyEmailCommand, ResendVerificationCommand } from './dto';
 import { Email } from '../../user/domain/Email';
 import { Password } from '../../user/domain/Password';
+import { supabaseAdmin } from '../../../config/database';
 
 export class AuthService {
   constructor(private readonly userRepository: IUserRepository) {}
 
+  // Helper method to validate commands
+  private validateCommand(command: { validate: () => string[] }): string[] {
+    return command.validate();
+  }
+
+  // Helper method to check if user is valid for login
+  private async checkUserLoginEligibility(user: User): Promise<AuthResponse | null> {
+    if (!user.isActive) {
+      return AuthResponse.failure('Account is deactivated');
+    }
+    
+    // Check email verification in Supabase Auth
+    const { data: authUser, error } = await supabaseAdmin.auth.admin.getUserById(user.authUid);
+    if (error || !authUser.user) {
+      return AuthResponse.failure('Authentication error');
+    }
+    
+    if (!authUser.user.email_confirmed_at) {
+      return AuthResponse.failure('Email not verified. Please check your email to verify your account.');
+    }
+    
+    return null;
+  }
+
+  // Helper method to generate JWT token
+  private generateToken(user: User): string {
+    const tokenPayload: JwtPayload = {
+      userId: user.id,
+      email: user.email.getValue()
+    };
+    return JWTConfig.generateAccessToken(tokenPayload);
+  }
+
+  // Helper method to update user profile
+  private async updateUserProfile(user: User, updates: Partial<User>): Promise<User> {
+    const updatedUser = new User({
+      ...user,
+      ...updates,
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      createdAt: user.createdAt,
+      updatedAt: new Date()
+    });
+    return await this.userRepository.update(updatedUser.id, updatedUser);
+  }
+
   async signUp(command: SignUpCommand): Promise<AuthResponse> {
     try {
       // Validate command
-      const validationErrors = command.validate();
+      const validationErrors = this.validateCommand(command);
       if (validationErrors.length > 0) {
         return AuthResponse.failure('Validation failed', validationErrors);
       }
 
-      // Check if email already exists
-      const existingEmail = await this.userRepository.existsByEmail(command.email);
-      if (existingEmail) {
+      // Check duplicates
+      if (await this.userRepository.existsByEmail(command.email)) {
         return AuthResponse.failure('Email already exists');
       }
-
-      // Check if username already exists
-      const existingUsername = await this.userRepository.existsByUsername(command.username);
-      if (existingUsername) {
+      if (await this.userRepository.existsByUsername(command.username)) {
         return AuthResponse.failure('Username already exists');
       }
 
-      // Validate email and password using value objects
+      // Validate using value objects
       let email: Email;
       let password: Password;
-
       try {
         email = new Email(command.email);
         password = new Password(command.password);
@@ -40,79 +82,84 @@ export class AuthService {
         return AuthResponse.failure(error instanceof Error ? error.message : 'Invalid email or password format');
       }
 
-      // Hash password
-      const saltRounds = 12;
-      const passwordHash = await bcrypt.hash(password.getValue(), saltRounds);
+      const fullName = command.fullName?.trim() || command.username;
 
-      // Create user
-      const user = User.create({
+      // Create user in Supabase Auth
+      // Note: Trigger sync_user_from_auth will automatically create user in public.users
+      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email: email.getValue(),
-        fullName: command.fullName,
-        username: command.username,
-        passwordHash,
-        gender: command.gender,
-        emailVerified: false,
-        isActive: true
+        password: password.getValue(),
+        email_confirm: false,
+        user_metadata: { 
+          full_name: fullName, 
+          username: command.username, 
+          gender: command.gender 
+        }
       });
 
-      // Save user
-      const savedUser = await this.userRepository.save(user);
+      if (authError || !authData.user) {
+        return AuthResponse.failure('Failed to create authentication account', [authError?.message || 'Unknown error']);
+      }
 
-      // Generate JWT token
-      const tokenPayload: JwtPayload = {
-        userId: savedUser.id,
-        email: savedUser.email.getValue()
-      };
-      const token = JWTConfig.generateAccessToken(tokenPayload);
+      // Wait a moment for trigger to complete (trigger creates user in public.users)
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      return AuthResponse.success(savedUser, token, 'Account created successfully');
+      // Fetch the user created by trigger
+      const user = await this.userRepository.findByAuthUid(authData.user.id);
+      
+      if (!user) {
+        return AuthResponse.failure('User created but not found in database. Please try signing in.');
+      }
+
+      return AuthResponse.success(
+        user,
+        '',
+        'Account created successfully. Please check your email to verify your account.'
+      );
     } catch (error) {
-      return AuthResponse.failure('Failed to create account', [error instanceof Error ? error.message : 'Unknown error']);
+      const message = error instanceof Error ? error.message : (typeof error === 'string' ? error : JSON.stringify(error));
+      return AuthResponse.failure('Failed to create account', [message]);
     }
   }
 
   async signIn(command: SignInCommand): Promise<AuthResponse> {
     try {
       // Validate command
-      const validationErrors = command.validate();
+      const validationErrors = this.validateCommand(command);
       if (validationErrors.length > 0) {
         return AuthResponse.failure('Validation failed', validationErrors);
       }
 
-      // Find user by email or username
-      let user: User | null;
-      if (command.isEmail()) {
-        user = await this.userRepository.findByEmail(command.identifier);
-      } else {
-        user = await this.userRepository.findByUsername(command.identifier);
-      }
+      // Find user
+      let user = command.isEmail()
+        ? await this.userRepository.findByEmail(command.identifier)
+        : await this.userRepository.findByUsername(command.identifier);
 
       if (!user) {
         return AuthResponse.failure('Invalid credentials');
       }
 
-      // Check if user is active
-      if (!user.isActive) {
-        return AuthResponse.failure('Account is deactivated');
+      // Check login eligibility (includes email verification check via Supabase Auth)
+      const eligibilityError = await this.checkUserLoginEligibility(user);
+      if (eligibilityError) {
+        return eligibilityError;
       }
 
-      // Verify password
-      if (!user.passwordHash) {
+      // Authenticate with Supabase Auth
+      const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithPassword({
+        email: user.email.getValue(),
+        password: command.password
+      });
+
+      if (authError || !authData.user) {
         return AuthResponse.failure('Invalid credentials');
       }
 
-      const isPasswordValid = await bcrypt.compare(command.password, user.passwordHash);
-      if (!isPasswordValid) {
-        return AuthResponse.failure('Invalid credentials');
+      if (!authData.user.email_confirmed_at) {
+        return AuthResponse.failure('Email not verified. Please check your email to verify your account.');
       }
 
-      // Generate JWT token
-      const tokenPayload: JwtPayload = {
-        userId: user.id,
-        email: user.email.getValue()
-      };
-      const token = JWTConfig.generateAccessToken(tokenPayload);
-
+      const token = this.generateToken(user);
       return AuthResponse.success(user, token, 'Sign in successful');
     } catch (error) {
       return AuthResponse.failure('Failed to sign in', [error instanceof Error ? error.message : 'Unknown error']);
@@ -122,69 +169,72 @@ export class AuthService {
   async googleAuth(command: GoogleAuthCommand): Promise<AuthResponse> {
     try {
       // Validate command
-      const validationErrors = command.validate();
+      const validationErrors = this.validateCommand(command);
       if (validationErrors.length > 0) {
         return AuthResponse.failure('Validation failed', validationErrors);
       }
 
-      // Check if user already exists by auth UID
+      // Verify authUid in Supabase Auth
+      const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(command.authUid);
+      if (authError || !authUser.user) {
+        return AuthResponse.failure('Invalid authentication credentials');
+      }
+
+      if (!authUser.user.email_confirmed_at) {
+        return AuthResponse.failure('Email not verified');
+      }
+
+      // Check if user exists (may have been created by trigger during OAuth flow)
       let user = await this.userRepository.findByAuthUid(command.authUid);
       
       if (user) {
-        // User exists, update profile if needed
+        // User exists - update profile if needed
         if (user.fullName !== command.fullName || user.avatarUrl !== command.avatarUrl) {
-          // Update user profile
-          const updatedUser = new User({
-            id: user.id,
-            email: user.email,
+          user = await this.updateUserProfile(user, {
             fullName: command.fullName,
-            username: user.username,
-            passwordHash: user.passwordHash,
-            gender: user.gender,
-            phone: user.phone,
-            birthDate: user.birthDate,
-            avatarUrl: command.avatarUrl || user.avatarUrl,
-            isActive: user.isActive,
-            emailVerified: user.emailVerified,
-            authUid: user.authUid,
-            createdAt: user.createdAt,
-            updatedAt: new Date()
+            avatarUrl: command.avatarUrl || user.avatarUrl
           });
-
-          user = await this.userRepository.update(updatedUser.id, updatedUser);
         }
       } else {
-        // Check if email exists with different auth method
+        // User doesn't exist yet - check for existing email first
         const existingEmailUser = await this.userRepository.findByEmail(command.email);
-        if (existingEmailUser && !existingEmailUser.authUid) {
-          return AuthResponse.failure('Email already registered with different authentication method');
+        if (existingEmailUser) {
+          // Email exists but different authUid - cannot link accounts
+          return AuthResponse.failure('Email already registered with a different authentication method');
         }
+        
+        // Wait for trigger to create user (if it hasn't already)
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Try to find user again
+        user = await this.userRepository.findByAuthUid(command.authUid);
+        
+        if (!user) {
+          // Trigger didn't create user - create manually as fallback
+          user = User.createFromGoogle({
+            email: command.email,
+            fullName: command.fullName,
+            authUid: command.authUid
+          });
 
-        // Create new user from Google
-        user = User.createFromGoogle({
-          email: command.email,
-          fullName: command.fullName,
-          authUid: command.authUid
-        });
+          if (command.avatarUrl) {
+            user = user.updateAvatar(command.avatarUrl);
+          }
 
-        if (command.avatarUrl) {
-          user = user.updateAvatar(command.avatarUrl);
+          user = await this.userRepository.save(user);
+        } else if (command.avatarUrl && !user.avatarUrl) {
+          // User created by trigger but needs avatar
+          user = await this.updateUserProfile(user, {
+            avatarUrl: command.avatarUrl
+          });
         }
-
-        user = await this.userRepository.save(user);
       }
 
-      // Generate JWT token  
       if (!user) {
         return AuthResponse.failure('Failed to authenticate user');
       }
 
-      const tokenPayload: JwtPayload = {
-        userId: user.id,
-        email: user.email.getValue()
-      };
-      const token = JWTConfig.generateAccessToken(tokenPayload);
-
+      const token = this.generateToken(user);
       return AuthResponse.success(user, token, 'Google authentication successful');
     } catch (error) {
       return AuthResponse.failure('Failed to authenticate with Google', [error instanceof Error ? error.message : 'Unknown error']);
@@ -197,5 +247,76 @@ export class AuthService {
 
   async getUserById(userId: string): Promise<User | null> {
     return await this.userRepository.findById(userId);
+  }
+
+  async verifyEmail(command: VerifyEmailCommand): Promise<AuthResponse> {
+    try {
+      const validationErrors = this.validateCommand(command);
+      if (validationErrors.length > 0) {
+        return AuthResponse.failure('Validation failed', validationErrors);
+      }
+
+      // Verify token with Supabase Auth
+      const { data, error } = await supabaseAdmin.auth.verifyOtp({
+        token_hash: command.token,
+        type: command.type
+      });
+
+      if (error || !data.user) {
+        return AuthResponse.failure('Invalid or expired verification token');
+      }
+
+      // Find user by auth UID
+      const user = await this.userRepository.findByAuthUid(data.user.id);
+      if (!user) {
+        return AuthResponse.failure('User not found');
+      }
+
+      // Email verification is now confirmed in Supabase Auth
+      // No need to update public.users table
+
+      return AuthResponse.success(user, '', 'Email verified successfully. You can now sign in.');
+    } catch (error) {
+      return AuthResponse.failure('Failed to verify email', [error instanceof Error ? error.message : 'Unknown error']);
+    }
+  }
+
+  async resendVerification(command: ResendVerificationCommand): Promise<AuthResponse> {
+    try {
+      const validationErrors = this.validateCommand(command);
+      if (validationErrors.length > 0) {
+        return AuthResponse.failure('Validation failed', validationErrors);
+      }
+
+      const user = await this.userRepository.findByEmail(command.email);
+      if (!user) {
+        // Security: Don't reveal email existence
+        return AuthResponse.success(undefined as any, '', 'If the email exists, a verification link has been sent.');
+      }
+
+      // Check if already verified in Supabase Auth
+      const { data: authUser, error } = await supabaseAdmin.auth.admin.getUserById(user.authUid);
+      if (error) {
+        return AuthResponse.failure('Failed to check verification status');
+      }
+
+      if (authUser.user?.email_confirmed_at) {
+        return AuthResponse.failure('Email is already verified');
+      }
+
+      // Resend verification email via Supabase
+      const { error: resendError } = await supabaseAdmin.auth.resend({
+        type: 'signup',
+        email: command.email
+      });
+
+      if (resendError) {
+        return AuthResponse.failure('Failed to send verification email', [resendError.message]);
+      }
+
+      return AuthResponse.success(undefined as any, '', 'Verification email sent successfully. Please check your inbox.');
+    } catch (error) {
+      return AuthResponse.failure('Failed to resend verification email', [error instanceof Error ? error.message : 'Unknown error']);
+    }
   }
 }

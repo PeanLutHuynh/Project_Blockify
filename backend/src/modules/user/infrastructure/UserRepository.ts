@@ -114,20 +114,25 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
     }
   }
 
+  async updateEmailVerification(userId: string, verified: boolean): Promise<User | null> {
+    // Email verification is stored in Supabase Auth (auth.users), not in public.users
+    // This method is kept for backward compatibility but should not be used
+    // Use Supabase Auth admin.updateUserById() instead
+    throw new Error('Email verification should be updated in Supabase Auth, not in public.users table');
+  }
+
   protected mapToEntity(data: any): User {
     return new User({
       id: data.user_id?.toString() || data.id,
       email: data.email,
       fullName: data.full_name,
       username: data.username,
-      passwordHash: data.password_hash,
       gender: data.gender,
       phone: data.phone,
       birthDate: data.birth_date ? new Date(data.birth_date) : undefined,
       avatarUrl: data.avatar_url,
-      isActive: data.is_active,
-      emailVerified: data.email_verified,
-      authUid: data.auth_uid,
+      isActive: data.is_active ?? true,
+      authUid: data.auth_uid, // Required field
       createdAt: data.created_at ? new Date(data.created_at) : undefined,
       updatedAt: data.updated_at ? new Date(data.updated_at) : undefined
     });
@@ -136,20 +141,24 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
   protected mapFromEntity(entity: User | Partial<User>): any {
     const data: any = {};
     
-    if ('id' in entity && entity.id) data.user_id = parseInt(entity.id);
+    if ('id' in entity && entity.id) {
+      const numericId = Number(entity.id);
+      if (Number.isFinite(numericId) && numericId > 0) {
+        data.user_id = numericId;
+      }
+      // If non-numeric (e.g., UUID), omit to let DB auto-generate
+    }
     if ('email' in entity && entity.email) {
       data.email = typeof entity.email === 'string' ? entity.email : entity.email.getValue();
     }
     if ('fullName' in entity) data.full_name = entity.fullName;
     if ('username' in entity) data.username = entity.username;
-    if ('passwordHash' in entity) data.password_hash = entity.passwordHash;
     if ('gender' in entity) data.gender = entity.gender;
     if ('phone' in entity) data.phone = entity.phone;
     if ('birthDate' in entity && entity.birthDate) data.birth_date = entity.birthDate.toISOString();
     if ('avatarUrl' in entity) data.avatar_url = entity.avatarUrl;
     if ('isActive' in entity) data.is_active = entity.isActive;
-    if ('emailVerified' in entity) data.email_verified = entity.emailVerified;
-    if ('authUid' in entity) data.auth_uid = entity.authUid;
+    if ('authUid' in entity) data.auth_uid = entity.authUid; // Required field
     if ('createdAt' in entity && entity.createdAt) data.created_at = entity.createdAt.toISOString();
     if ('updatedAt' in entity && entity.updatedAt) data.updated_at = entity.updatedAt.toISOString();
 
