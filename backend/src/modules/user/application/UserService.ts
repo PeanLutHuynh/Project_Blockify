@@ -51,11 +51,8 @@ export class UserService extends BaseService<User> {
       fullName: userData.name, // Map name to fullName
       username: userData.username || userData.email.split('@')[0], // Generate username from email if not provided
       role: userData.role || 'user',
-      password: userData.password || null, // Will be hashed by AuthService
       isActive: true,
-      lastLogin: null,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      authUid: '' // This will be set by AuthService after creating user in Supabase Auth
     };
 
     const user = User.create(userProps);

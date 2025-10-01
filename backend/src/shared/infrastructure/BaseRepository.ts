@@ -59,7 +59,9 @@ export abstract class BaseRepository<T> implements IRepository<T> {
 
       return this.mapToEntity(result);
     } catch (error) {
-      throw new Error(`Error saving ${this.tableName}: ${error}`);
+      const err: any = error;
+      const msg = err?.message || err?.error?.message || (typeof err === 'string' ? err : JSON.stringify(err));
+      throw new Error(`Error saving ${this.tableName}: ${msg}`);
     }
   }
 
@@ -78,7 +80,9 @@ export abstract class BaseRepository<T> implements IRepository<T> {
 
       return this.mapToEntity(result);
     } catch (error) {
-      throw new Error(`Error updating ${this.tableName}: ${error}`);
+      const err: any = error;
+      const msg = err?.message || err?.error?.message || (typeof err === 'string' ? err : JSON.stringify(err));
+      throw new Error(`Error updating ${this.tableName}: ${msg}`);
     }
   }
 
@@ -94,7 +98,9 @@ export abstract class BaseRepository<T> implements IRepository<T> {
 
       return true;
     } catch (error) {
-      throw new Error(`Error deleting ${this.tableName}: ${error}`);
+      const err: any = error;
+      const msg = err?.message || err?.error?.message || (typeof err === 'string' ? err : JSON.stringify(err));
+      throw new Error(`Error deleting ${this.tableName}: ${msg}`);
     }
   }
 

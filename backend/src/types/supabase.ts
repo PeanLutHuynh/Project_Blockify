@@ -868,48 +868,42 @@ export type Database = {
       }
       users: {
         Row: {
-          auth_uid: string | null
+          auth_uid: string
           avatar_url: string | null
           birth_date: string | null
           created_at: string | null
           email: string
-          email_verified: boolean | null
           full_name: string
-          gender: string
+          gender: string | null
           is_active: boolean | null
-          password_hash: string
           phone: string | null
           updated_at: string | null
           user_id: number
           username: string
         }
         Insert: {
-          auth_uid?: string | null
+          auth_uid: string
           avatar_url?: string | null
           birth_date?: string | null
           created_at?: string | null
           email: string
-          email_verified?: boolean | null
           full_name: string
-          gender: string
+          gender?: string | null
           is_active?: boolean | null
-          password_hash: string
           phone?: string | null
           updated_at?: string | null
           user_id?: number
           username: string
         }
         Update: {
-          auth_uid?: string | null
+          auth_uid?: string
           avatar_url?: string | null
           birth_date?: string | null
           created_at?: string | null
           email?: string
-          email_verified?: boolean | null
           full_name?: string
-          gender?: string
+          gender?: string | null
           is_active?: boolean | null
-          password_hash?: string
           phone?: string | null
           updated_at?: string | null
           user_id?: number

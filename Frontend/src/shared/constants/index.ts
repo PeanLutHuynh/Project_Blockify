@@ -97,7 +97,7 @@ export const VALIDATION_RULES = {
   USERNAME: {
     MIN_LENGTH: 3,
     MAX_LENGTH: 30,
-    PATTERN: /^[a-zA-Z0-9_]+$/,
+    PATTERN: /^(?=[a-zA-ZÀ-ÿ])[a-zA-ZÀ-ÿ0-9]+(?:[_\-\\.][a-zA-ZÀ-ÿ0-9]+)*$/,
     MESSAGE: 'Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới'
   },
   PHONE: {

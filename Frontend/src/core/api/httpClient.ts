@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ApiResponse, RequestConfig } from '@/types';
+import { ENV } from '../config/env';
 
 /**
  * HTTP Client for API communication with backend
@@ -8,14 +9,14 @@ export class HttpClient {
   private instance: AxiosInstance;
   private baseURL: string;
 
-  constructor(baseURL: string = 'http://localhost:3001/api') {
+  constructor(baseURL: string = ENV.API_BASE_URL) {
     this.baseURL = baseURL;
     this.instance = axios.create({
       baseURL,
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json, application/xml'
+        'Accept': 'application/json'
       },
       withCredentials: true // For cookies and session management
     });
@@ -97,7 +98,7 @@ export class HttpClient {
    * Get auth token from localStorage
    */
   private getAuthToken(): string | null {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem(ENV.JWT_STORAGE_KEY);
   }
 
   /**
@@ -114,7 +115,7 @@ export class HttpClient {
     });
 
     const { data } = response.data;
-    localStorage.setItem('authToken', data.accessToken);
+    localStorage.setItem(ENV.JWT_STORAGE_KEY, data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
   }
 
@@ -122,7 +123,7 @@ export class HttpClient {
    * Handle authentication errors
    */
   private handleAuthError(): void {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem(ENV.JWT_STORAGE_KEY);
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     
@@ -270,14 +271,14 @@ export class HttpClient {
    * Set auth token
    */
   setAuthToken(token: string): void {
-    localStorage.setItem('authToken', token);
+    localStorage.setItem(ENV.JWT_STORAGE_KEY, token);
   }
 
   /**
    * Clear auth token
    */
   clearAuthToken(): void {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem(ENV.JWT_STORAGE_KEY);
     localStorage.removeItem('refreshToken');
   }
 

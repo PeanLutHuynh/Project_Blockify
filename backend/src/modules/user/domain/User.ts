@@ -6,14 +6,12 @@ export interface UserProps {
   email: string | Email;
   fullName: string;
   username: string;
-  passwordHash?: string;
   gender?: string;
   phone?: string;
   birthDate?: Date;
   avatarUrl?: string;
   isActive?: boolean;
-  emailVerified?: boolean;
-  authUid?: string; // Supabase Auth UID
+  authUid: string; // Supabase Auth UID - REQUIRED in DB
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -22,27 +20,23 @@ export class User extends BaseEntity {
   public readonly email: Email;
   public readonly fullName: string;
   public readonly username: string;
-  public readonly passwordHash?: string;
   public readonly gender?: string;
   public readonly phone?: string;
   public readonly birthDate?: Date;
   public readonly avatarUrl?: string;
   public readonly isActive: boolean;
-  public readonly emailVerified: boolean;
-  public readonly authUid?: string;
+  public readonly authUid: string; // Required - Supabase Auth UID
 
   constructor(props: UserProps) {
     super(props.id, props.createdAt, props.updatedAt);
     this.email = props.email instanceof Email ? props.email : new Email(props.email);
     this.fullName = props.fullName;
     this.username = props.username;
-    this.passwordHash = props.passwordHash;
     this.gender = props.gender;
     this.phone = props.phone;
     this.birthDate = props.birthDate;
     this.avatarUrl = props.avatarUrl;
     this.isActive = props.isActive !== false;
-    this.emailVerified = props.emailVerified || false;
     this.authUid = props.authUid;
   }
 
@@ -60,9 +54,7 @@ export class User extends BaseEntity {
       fullName: props.fullName,
       username,
       authUid: props.authUid,
-      emailVerified: true,
       isActive: true,
-      gender: 'other'
     });
   }
 
@@ -72,13 +64,11 @@ export class User extends BaseEntity {
       email: this.email,
       fullName,
       username: this.username,
-      passwordHash: this.passwordHash,
       gender: gender || this.gender,
       phone: phone || this.phone,
       birthDate: birthDate || this.birthDate,
       avatarUrl: this.avatarUrl,
       isActive: this.isActive,
-      emailVerified: this.emailVerified,
       authUid: this.authUid,
       createdAt: this.createdAt,
       updatedAt: new Date()
@@ -86,22 +76,9 @@ export class User extends BaseEntity {
   }
 
   public verifyEmail(): User {
-    return new User({
-      id: this.id,
-      email: this.email,
-      fullName: this.fullName,
-      username: this.username,
-      passwordHash: this.passwordHash,
-      gender: this.gender,
-      phone: this.phone,
-      birthDate: this.birthDate,
-      avatarUrl: this.avatarUrl,
-      isActive: this.isActive,
-      emailVerified: true,
-      authUid: this.authUid,
-      createdAt: this.createdAt,
-      updatedAt: new Date()
-    });
+    // Email verification is handled by Supabase Auth, not in public.users table
+    // This method is kept for backward compatibility but doesn't change anything
+    return this;
   }
 
   public updateAvatar(avatarUrl: string): User {
@@ -110,13 +87,11 @@ export class User extends BaseEntity {
       email: this.email,
       fullName: this.fullName,
       username: this.username,
-      passwordHash: this.passwordHash,
       gender: this.gender,
       phone: this.phone,
       birthDate: this.birthDate,
       avatarUrl,
       isActive: this.isActive,
-      emailVerified: this.emailVerified,
       authUid: this.authUid,
       createdAt: this.createdAt,
       updatedAt: new Date()
@@ -129,13 +104,11 @@ export class User extends BaseEntity {
       email: this.email,
       fullName: this.fullName,
       username: this.username,
-      passwordHash: this.passwordHash,
       gender: this.gender,
       phone: this.phone,
       birthDate: this.birthDate,
       avatarUrl: this.avatarUrl,
       isActive: false,
-      emailVerified: this.emailVerified,
       authUid: this.authUid,
       createdAt: this.createdAt,
       updatedAt: new Date()
@@ -143,24 +116,23 @@ export class User extends BaseEntity {
   }
 
   public updateLastLogin(): User {
+    // Last login is tracked in Supabase Auth, not in public.users
+    // Return a new instance with updated timestamp
     return new User({
       id: this.id,
       email: this.email,
       fullName: this.fullName,
       username: this.username,
-      passwordHash: this.passwordHash,
       gender: this.gender,
       phone: this.phone,
       birthDate: this.birthDate,
       avatarUrl: this.avatarUrl,
       isActive: this.isActive,
-      emailVerified: this.emailVerified,
       authUid: this.authUid,
       createdAt: this.createdAt,
       updatedAt: new Date()
     });
   }
-
 
   public toJSON(): Record<string, any> {
     return {
@@ -173,7 +145,6 @@ export class User extends BaseEntity {
       birthDate: this.birthDate,
       avatarUrl: this.avatarUrl,
       isActive: this.isActive,
-      emailVerified: this.emailVerified,
       authUid: this.authUid,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt

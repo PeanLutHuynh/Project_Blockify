@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../application/AuthService';
-import { SignUpCommand, SignInCommand, GoogleAuthCommand } from '../application/dto';
+import { SignUpCommand, SignInCommand, GoogleAuthCommand, VerifyEmailCommand, ResendVerificationCommand } from '../application/dto';
 import { ResponseUtil } from '../../../utils/response.util';
 
 export class AuthController {
@@ -14,17 +14,18 @@ export class AuthController {
     try {
       const { email, password, fullName, username, gender } = req.body;
 
-      const command = new SignUpCommand(email, password, fullName, username, gender);
+      const command = new SignUpCommand(email, password, username, fullName, gender);
       const result = await this.authService.signUp(command);
 
       if (result.success) {
-        res.set('Authorization', `Bearer ${result.token}`);
+        // Don't set Authorization header yet - user needs to verify email first
         ResponseUtil.created(res, result.user, result.message);
       } else {
         ResponseUtil.badRequest(res, result.message, undefined, result.errors ? { errors: result.errors } : undefined);
       }
-    } catch (error) {
-      this.handleError(res, error, 'Failed to sign up');
+    } catch (error: any) {
+      const errMsg = error?.message || 'Failed to sign up';
+      ResponseUtil.badRequest(res, 'Failed to create account', undefined, { errors: [errMsg] });
     }
   };
 
@@ -57,7 +58,11 @@ export class AuthController {
         res.set('Authorization', `Bearer ${result.token}`);
         ResponseUtil.success(res, result.user, result.message);
       } else {
-        ResponseUtil.unauthorized(res, result.message);
+        if (result.errors && result.errors.length > 0) {
+          ResponseUtil.badRequest(res, result.message, undefined, { errors: result.errors });
+        } else {
+          ResponseUtil.unauthorized(res, result.message);
+        }
       }
     } catch (error) {
       this.handleError(res, error, 'Failed to authenticate with Google');
@@ -93,7 +98,7 @@ export class AuthController {
           fullName: user.fullName,
           username: user.username,
           avatarUrl: user.avatarUrl,
-          emailVerified: user.emailVerified
+          authUid: user.authUid
         },
         payload
       }, 'Token is valid');
@@ -126,11 +131,45 @@ export class AuthController {
         phone: user.phone,
         birthDate: user.birthDate,
         avatarUrl: user.avatarUrl,
-        emailVerified: user.emailVerified,
+        authUid: user.authUid,
         isActive: user.isActive
       }, 'User profile retrieved successfully');
     } catch (error) {
       this.handleError(res, error, 'Failed to get user profile');
+    }
+  };
+
+  public verifyEmail = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { token, type } = req.body;
+
+      const command = new VerifyEmailCommand(token, type || 'signup');
+      const result = await this.authService.verifyEmail(command);
+
+      if (result.success) {
+        ResponseUtil.success(res, result.user, result.message);
+      } else {
+        ResponseUtil.badRequest(res, result.message, undefined, result.errors ? { errors: result.errors } : undefined);
+      }
+    } catch (error) {
+      this.handleError(res, error, 'Failed to verify email');
+    }
+  };
+
+  public resendVerification = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email } = req.body;
+
+      const command = new ResendVerificationCommand(email);
+      const result = await this.authService.resendVerification(command);
+
+      if (result.success) {
+        ResponseUtil.success(res, null, result.message);
+      } else {
+        ResponseUtil.badRequest(res, result.message, undefined, result.errors ? { errors: result.errors } : undefined);
+      }
+    } catch (error) {
+      this.handleError(res, error, 'Failed to resend verification email');
     }
   };
 }

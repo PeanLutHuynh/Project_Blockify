@@ -25,7 +25,7 @@ interface AuthResponse {
     fullName: string;
     username: string;
     avatarUrl?: string;
-    emailVerified: boolean;
+    authUid: string;
   };
   token?: string;
   errors?: string[];
@@ -45,7 +45,7 @@ interface AuthResult {
  * Follows service layer pattern in MVC architecture
  */
 export class AuthService {
-  private readonly AUTH_TOKEN_KEY = "authToken";
+  private readonly AUTH_TOKEN_KEY = ENV.JWT_STORAGE_KEY;
   private readonly USER_KEY = "user";
   private currentUser: User | null = null;
 
@@ -70,7 +70,7 @@ export class AuthService {
         data
       );
 
-      if (response.success && response.data?.user && response.data?.token) {
+      if (response.data?.success && response.data?.user && response.data?.token) {
         this.handleAuthSuccess(response.data.user, response.data.token);
         return {
           success: true,
@@ -111,7 +111,7 @@ export class AuthService {
         data
       );
 
-      if (response.success && response.data?.user && response.data?.token) {
+      if (response.data?.success && response.data?.user && response.data?.token) {
         this.handleAuthSuccess(response.data.user, response.data.token);
         return {
           success: true,
@@ -148,7 +148,7 @@ export class AuthService {
         "/auth/verify-token"
       );
 
-      if (response.success && response.data?.user) {
+      if (response.data?.user) {
         const user = User.fromApiResponse(response.data.user);
         this.setCurrentUser(user);
         return {
@@ -184,7 +184,7 @@ export class AuthService {
     try {
       const response = await httpClient.get<any>("/auth/me");
 
-      if (response.success && response.data) {
+      if (response.data) {
         const user = User.fromApiResponse(response.data);
         this.setCurrentUser(user);
         return {
@@ -232,119 +232,25 @@ export class AuthService {
   }
 
   /**
-   * Check if user's email is verified
-   */
-  isEmailVerified(): boolean {
-    return this.currentUser?.emailVerified ?? false;
-  }
-
-  /**
-   * Google authentication with popup - FIXED VERSION
+   * Google authentication via full-page redirect (no popup)
+   * Uses Supabase implicit flow to get access_token in URL hash
    */
   async googleAuth(): Promise<{ success: boolean; message: string }> {
     try {
-      // Create popup window for Google OAuth
-      const redirectUrl = `${window.location.origin}/src/pages/AuthCallback.html`;
-      const authUrl = `${
-        ENV.SUPABASE_URL
-      }/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(
-        redirectUrl
-      )}`;
-
-      // Open popup window
-      const popup = window.open(
-        authUrl,
-        "google-auth",
-        "width=500,height=600,scrollbars=yes,resizable=yes"
-      );
-
-      if (!popup) {
-        throw new Error("Popup blocked. Please allow popups for this site.");
-      }
-
-      // Listen for popup to close or send message
-      return new Promise((resolve, reject) => {
-        let checkClosed: NodeJS.Timeout;
-
-        // Safe popup closed check với try-catch
-        const safeCheckClosed = () => {
-          try {
-            if (popup.closed) {
-              clearInterval(checkClosed);
-              reject(new Error("Authentication cancelled by user"));
-            }
-          } catch (error) {
-            // Nếu bị chặn bởi COOP, chỉ log warning và tiếp tục chờ message
-            console.warn(
-              "Cannot access popup.closed due to security policy, waiting for message..."
-            );
-            // KHÔNG reject ở đây, tiếp tục chờ message từ callback
-          }
-        };
-
-        checkClosed = setInterval(safeCheckClosed, 1000);
-
-        // Listen for message from popup
-        const messageListener = (event: MessageEvent) => {
-          // Verify origin for security
-          if (event.origin !== window.location.origin) {
-            return;
-          }
-
-          if (event.data.type === "GOOGLE_AUTH_SUCCESS") {
-            clearInterval(checkClosed);
-            window.removeEventListener("message", messageListener);
-            try {
-              popup.close();
-            } catch (e) {
-              // Ignore close errors
-            }
-
-            // Handle the auth success
-            this.handleAuthSuccess(event.data.user, event.data.token);
-            resolve({
-              success: true,
-              message: "Google authentication successful",
-            });
-          } else if (event.data.type === "GOOGLE_AUTH_ERROR") {
-            clearInterval(checkClosed);
-            window.removeEventListener("message", messageListener);
-            try {
-              popup.close();
-            } catch (e) {
-              // Ignore close errors
-            }
-
-            reject(
-              new Error(event.data.message || "Google authentication failed")
-            );
-          }
-        };
-
-        window.addEventListener("message", messageListener);
-
-        // Timeout after 5 minutes
-        setTimeout(() => {
-          clearInterval(checkClosed);
-          window.removeEventListener("message", messageListener);
-          try {
-            if (popup && !popup.closed) {
-              popup.close();
-            }
-          } catch (e) {
-            // Ignore close errors
-          }
-          reject(new Error("Authentication timeout"));
-        }, 300000);
-      });
+      const redirectUrl = `${window.location.origin}${ENV.GOOGLE_OAUTH_REDIRECT_URL}`;
+      
+      // Supabase OAuth URL with implicit flow (returns access_token in hash)
+      const authUrl = new URL(`${ENV.SUPABASE_URL}/auth/v1/authorize`);
+      authUrl.searchParams.set('provider', 'google');
+      authUrl.searchParams.set('redirect_to', redirectUrl);
+      
+      window.location.href = authUrl.toString();
+      return { success: true, message: "Redirecting to Google..." };
     } catch (error) {
       console.error("Google auth error:", error);
       return {
         success: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to initialize Google authentication",
+        message: error instanceof Error ? error.message : "Failed to initialize Google authentication",
       };
     }
   }

@@ -2,9 +2,9 @@ export class SignUpCommand {
   constructor(
     public readonly email: string,
     public readonly password: string,
-    public readonly fullName: string,
     public readonly username: string,
-    public readonly gender: string = 'other'
+    public readonly fullName?: string,
+    public readonly gender?: string
   ) {}
 
   public validate(): string[] {
@@ -18,15 +18,13 @@ export class SignUpCommand {
       errors.push('Password is required');
     }
 
-    if (!this.fullName || this.fullName.trim() === '') {
-      errors.push('Full name is required');
-    }
+    // fullName is optional
 
     if (!this.username || this.username.trim() === '') {
       errors.push('Username is required');
     }
 
-    if (this.username && !/^[a-zA-Z0-9_]+$/.test(this.username)) {
+    if (this.username && !/^(?=\p{L})[\p{L}0-9]+(?:[_\-.][\p{L}0-9]+)*$/u.test(this.username)) {
       errors.push('Username can only contain letters, numbers, and underscores');
     }
 

@@ -8,7 +8,7 @@ export class AuthResponse {
       fullName: string;
       username: string;
       avatarUrl?: string;
-      emailVerified: boolean;
+      authUid: string;
     },
     public readonly token?: string,
     public readonly errors?: string[]
@@ -24,7 +24,7 @@ export class AuthResponse {
         fullName: user.fullName,
         username: user.username,
         avatarUrl: user.avatarUrl,
-        emailVerified: user.emailVerified
+        authUid: user.authUid
       },
       token
     );

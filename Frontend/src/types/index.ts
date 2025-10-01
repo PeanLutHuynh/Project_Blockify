@@ -9,7 +9,6 @@ export interface User {
   avatar?: string;
   isActive: boolean;
   role: UserRole;
-  emailVerified: boolean;
   phoneVerified: boolean;
   lastLoginAt?: Date;
   createdAt: Date;

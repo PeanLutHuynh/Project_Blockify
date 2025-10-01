@@ -56,7 +56,7 @@ export class ValidatorUtil {
       return { isValid: false, error: 'Username must be between 3 and 30 characters' };
     }
 
-    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+    if (!/^(?=\p{L})[\p{L}0-9]+(?:[_\-.][\p{L}0-9]+)*$/u.test(username)) {
       return { isValid: false, error: 'Username can only contain letters, numbers, and underscores' };
     }
 

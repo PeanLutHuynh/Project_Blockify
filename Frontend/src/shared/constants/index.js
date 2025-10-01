@@ -64,7 +64,7 @@ export const VALIDATION_RULES = {
             minLength: 3,
             maxLength: 30,
             required: true,
-            pattern: /^[a-zA-Z0-9_]+$/
+            pattern: /^(?=[a-zA-ZÀ-ÿ])[a-zA-ZÀ-ÿ0-9]+(?:[_\-\\.][a-zA-ZÀ-ÿ0-9]+)*$/
         },
         email: {
             required: true,

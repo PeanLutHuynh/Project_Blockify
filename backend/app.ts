@@ -29,9 +29,13 @@ app.use(suspiciousActivityDetection);
 
 // CORS configuration - Support multiple origins for dev and production
 const allowedOrigins = [
-  'http://localhost:3000',    // Vite dev server
+  'http://localhost:3000',    // Vite dev server (alt)
+  'http://localhost:3002',    // Vite dev server used in logs
+  'http://localhost:5173',    // Vite default dev port
   'http://localhost:4173',    // Vite preview server
   'http://127.0.0.1:3000',
+  'http://127.0.0.1:3002',
+  'http://127.0.0.1:5173',
   'http://127.0.0.1:4173',
   process.env.FRONTEND_URL    // Production URL from .env
 ].filter(Boolean);
@@ -67,7 +71,7 @@ app.use(sqlInjectionProtection);
 app.use(cookieSecurity.config());
 app.use(cookieSecurity.tamperingDetection());
 app.use(cookieSecurity.consentManagement);
-app.use(csrfMiddleware);
+// app.use(csrfMiddleware);
 
 app.use(morgan('combined', { 
   stream: { write: message => logger.info(message.trim()) },
@@ -95,7 +99,7 @@ app.get('/health', (req, res) => {
 
 // Main API routes
 app.use('/api/v1/users', userRoutes);
-app.use('/api', authRoutes);
+app.use('/api/auth', authRoutes);
 
 app.use('/api/v1', (req, res) => {
   res.json({ 
