@@ -3,24 +3,308 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Verify Your Email</title>
+  <title>Verify Your Email - Blockify</title>
   <link rel="icon" href="/public/favicon.ico" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <link rel="stylesheet" href="/src/assets/css/base.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .verify-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 3rem;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .email-icon {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .email-icon i {
+      font-size: 60px;
+      color: white;
+    }
+    
+    .verify-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 1rem;
+    }
+    
+    .verify-text {
+      color: #718096;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    
+    .email-display {
+      background: #f7fafc;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      font-weight: 600;
+      color: #667eea;
+      word-break: break-all;
+    }
+    
+    .resend-section {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .resend-text {
+      color: #718096;
+      font-size: 14px;
+      margin-bottom: 1rem;
+    }
+    
+    .btn-resend {
+      background: white;
+      border: 2px solid #667eea;
+      color: #667eea;
+      padding: 0.75rem 2rem;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .btn-resend:hover:not(:disabled) {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-resend:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .success-message, .error-message {
+      padding: 1rem;
+      border-radius: 10px;
+      margin-top: 1rem;
+      font-size: 14px;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .back-to-login {
+      margin-top: 2rem;
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s;
+    }
+    
+    .back-to-login:hover {
+      color: #764ba2;
+      transform: translateX(-5px);
+    }
+    
+    .countdown {
+      font-weight: 600;
+      color: #667eea;
+    }
+  </style>
 </head>
 <body>
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-md-8">
-        <div class="card shadow-sm">
-          <div class="card-body p-4">
-            <h3 class="card-title mb-3">Verify your email</h3>
-            <p class="text-muted">We have sent a verification link to your email address. Please check your inbox and click the link to verify your account.</p>
-            <p class="mb-0">After verification, come back and <a href="/src/pages/SigninPage.html">sign in</a>.</p>
-          </div>
-        </div>
-      </div>
+  <div class="verify-container">
+    <div class="email-icon">
+      <i class="bi bi-envelope-check"></i>
     </div>
+    
+    <h1 class="verify-title">Check Your Email</h1>
+    <p class="verify-text">
+      We've sent a verification link to:
+    </p>
+    <div class="email-display" id="userEmail">
+      Loading...
+    </div>
+    
+    <p class="verify-text">
+      Please click the link in the email to verify your account and complete the registration.
+      The link will expire in 24 hours.
+    </p>
+    
+    <div class="resend-section">
+      <p class="resend-text">Didn't receive the email?</p>
+      <button id="resendBtn" class="btn btn-resend">
+        <i class="bi bi-arrow-clockwise me-2"></i>
+        Resend Verification Email
+      </button>
+      <div id="countdownText" class="resend-text mt-2" style="display: none;">
+        You can resend in <span class="countdown" id="countdown">60</span> seconds
+      </div>
+      <div id="messageContainer"></div>
+    </div>
+    
+    <a href="/src/pages/SigninPage.html" class="back-to-login">
+      <i class="bi bi-arrow-left"></i>
+      Back to Sign In
+    </a>
   </div>
+
+  <script type="module">
+    import { ENV } from '../core/config/env.js';
+
+    // Get email from localStorage or URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('email') || localStorage.getItem('pending_verification_email');
+    
+    const emailDisplay = document.getElementById('userEmail');
+    const resendBtn = document.getElementById('resendBtn');
+    const messageContainer = document.getElementById('messageContainer');
+    const countdownText = document.getElementById('countdownText');
+    const countdownSpan = document.getElementById('countdown');
+
+    if (email) {
+      emailDisplay.textContent = email;
+      localStorage.setItem('pending_verification_email', email);
+    } else {
+      emailDisplay.textContent = 'your registered email';
+    }
+
+    let countdownTimer = null;
+    let secondsRemaining = 0;
+
+    function startCountdown(seconds) {
+      secondsRemaining = seconds;
+      resendBtn.disabled = true;
+      countdownText.style.display = 'block';
+      
+      countdownTimer = setInterval(() => {
+        secondsRemaining--;
+        countdownSpan.textContent = secondsRemaining;
+        
+        if (secondsRemaining <= 0) {
+          clearInterval(countdownTimer);
+          resendBtn.disabled = false;
+          countdownText.style.display = 'none';
+        }
+      }, 1000);
+    }
+
+    function showMessage(message, isError = false) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = isError ? 'error-message' : 'success-message';
+      messageDiv.innerHTML = `
+        <i class="bi bi-${isError ? 'exclamation-circle' : 'check-circle'} me-2"></i>
+        ${message}
+      `;
+      messageContainer.innerHTML = '';
+      messageContainer.appendChild(messageDiv);
+      
+      // Auto-hide success messages after 5 seconds
+      if (!isError) {
+        setTimeout(() => {
+          messageDiv.style.opacity = '0';
+          setTimeout(() => messageDiv.remove(), 300);
+        }, 5000);
+      }
+    }
+
+    resendBtn.addEventListener('click', async () => {
+      if (!email) {
+        showMessage('Email address not found. Please try signing up again.', true);
+        return;
+      }
+
+      resendBtn.disabled = true;
+      resendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+
+      try {
+        const response = await fetch(`${ENV.API_BASE_URL}/auth/resend-verification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (data.success || response.ok) {
+          showMessage('Verification email sent! Please check your inbox.');
+          startCountdown(60);
+        } else {
+          showMessage(data.message || 'Failed to send verification email', true);
+          resendBtn.disabled = false;
+        }
+      } catch (error) {
+        console.error('Resend error:', error);
+        showMessage('Network error. Please try again later.', true);
+        resendBtn.disabled = false;
+      } finally {
+        resendBtn.innerHTML = '<i class="bi bi-arrow-clockwise me-2"></i>Resend Verification Email';
+      }
+    });
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+      }
+    });
+  </script>
 </body>
 </html>
 
