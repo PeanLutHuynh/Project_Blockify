@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Email Verified - Blockify</title>
+  <link rel="icon" href="/public/favicon.ico" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/src/assets/css/base.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .verified-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 3rem;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+    }
+    
+    .success-icon {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 2rem;
+      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: scaleIn 0.5s ease-out;
+    }
+    
+    @keyframes scaleIn {
+      from {
+        transform: scale(0);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    .success-icon i {
+      font-size: 60px;
+      color: white;
+    }
+    
+    .error-icon {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 2rem;
+      background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: shake 0.5s ease-out;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+    
+    .error-icon i {
+      font-size: 60px;
+      color: white;
+    }
+    
+    .verified-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 1rem;
+    }
+    
+    .verified-text {
+      color: #718096;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    
+    .btn-signin {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      color: white;
+      padding: 1rem 3rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .btn-signin:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      color: white;
+    }
+    
+    .loading-container {
+      text-align: center;
+    }
+    
+    .spinner {
+      width: 60px;
+      height: 60px;
+      margin: 2rem auto;
+      border: 4px solid #f3f4f6;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .countdown-text {
+      color: #718096;
+      font-size: 14px;
+      margin-top: 1rem;
+    }
+    
+    .countdown-number {
+      font-weight: 600;
+      color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div class="verified-container">
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-container">
+      <div class="spinner"></div>
+      <p class="verified-text">Verifying your email...</p>
+    </div>
+
+    <!-- Success State -->
+    <div id="successState" class="d-none">
+      <div class="success-icon">
+        <i class="bi bi-check-circle"></i>
+      </div>
+      <h1 class="verified-title">Email Verified!</h1>
+      <p class="verified-text">
+        Your email has been successfully verified. You can now sign in to your account and start using Blockify.
+      </p>
+      <a href="/src/pages/SigninPage.html" class="btn-signin" id="signInBtn">
+        Sign In Now
+      </a>
+      <p class="countdown-text">
+        Redirecting in <span class="countdown-number" id="countdown">5</span> seconds...
+      </p>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="d-none">
+      <div class="error-icon">
+        <i class="bi bi-x-circle"></i>
+      </div>
+      <h1 class="verified-title">Verification Failed</h1>
+      <p class="verified-text" id="errorMessage">
+        The verification link is invalid or has expired. Please request a new verification email.
+      </p>
+      <a href="/src/pages/VerifyEmail.html" class="btn-signin">
+        Request New Link
+      </a>
+      <div class="mt-3">
+        <a href="/src/pages/SigninPage.html" class="text-muted" style="text-decoration: none;">
+          <i class="bi bi-arrow-left me-2"></i>Back to Sign In
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const loadingState = document.getElementById('loadingState');
+    const successState = document.getElementById('successState');
+    const errorState = document.getElementById('errorState');
+    const errorMessage = document.getElementById('errorMessage');
+    const countdownSpan = document.getElementById('countdown');
+    const signInBtn = document.getElementById('signInBtn');
+
+    // Parse URL fragments or query params for verification
+    function parseVerificationParams() {
+      // Check URL hash first (Supabase confirmation redirects with #access_token...)
+      const hash = window.location.hash.substring(1);
+      const hashParams = new URLSearchParams(hash);
+      
+      // Check query params (Supabase might use this for errors)
+      const queryParams = new URLSearchParams(window.location.search);
+      
+      // Check for error in either hash or query
+      const error = hashParams.get('error') || queryParams.get('error');
+      const errorDescription = hashParams.get('error_description') || queryParams.get('error_description');
+      const accessToken = hashParams.get('access_token');
+      const type = hashParams.get('type') || queryParams.get('type');
+      
+      return { error, errorDescription, accessToken, type };
+    }
+
+    function showSuccess() {
+      loadingState.classList.add('d-none');
+      successState.classList.remove('d-none');
+      
+      // Clear pending verification email
+      localStorage.removeItem('pending_verification_email');
+      
+      // Start countdown
+      let seconds = 5;
+      const countdownInterval = setInterval(() => {
+        seconds--;
+        countdownSpan.textContent = seconds;
+        
+        if (seconds <= 0) {
+          clearInterval(countdownInterval);
+          window.location.href = '/src/pages/SigninPage.html';
+        }
+      }, 1000);
+      
+      // Allow manual navigation
+      signInBtn.addEventListener('click', () => {
+        clearInterval(countdownInterval);
+      });
+    }
+
+    function showError(message) {
+      loadingState.classList.add('d-none');
+      errorState.classList.remove('d-none');
+      if (message) {
+        errorMessage.textContent = message;
+      }
+    }
+
+    // Main verification logic
+    async function verifyEmail() {
+      try {
+        const { error, errorDescription, accessToken, type } = parseVerificationParams();
+        
+        // Handle errors from Supabase
+        if (error) {
+          console.error('Verification error:', error, errorDescription);
+          showError(errorDescription || 'Verification failed. The link may be invalid or expired.');
+          return;
+        }
+        
+        // Check if this is an email confirmation
+        if (type === 'signup' || type === 'email_change' || accessToken) {
+          // Email verified successfully by Supabase
+          // The user is now confirmed in auth.users
+          showSuccess();
+        } else {
+          // No verification parameters found
+          showError('Invalid verification link. Please use the link sent to your email.');
+        }
+      } catch (err) {
+        console.error('Verification error:', err);
+        showError('An unexpected error occurred. Please try again.');
+      }
+    }
+
+    // Run verification on page load
+    verifyEmail();
+  </script>
+</body>
+</html>

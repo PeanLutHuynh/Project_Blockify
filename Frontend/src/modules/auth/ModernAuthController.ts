@@ -36,8 +36,8 @@ export class ModernAuthController {
       });
 
       if (result.success) {
-        // Redirect to appropriate page
-        this.redirectAfterAuth();
+        // Redirect to email verification page (user must verify email before signing in)
+        this.redirectToVerifyEmail(formData.email);
       }
 
       return result;
@@ -259,6 +259,13 @@ export class ModernAuthController {
    */
   private redirectToSignIn(): void {
     window.location.href = '/src/pages/SigninPage.html';
+  }
+
+  /**
+   * Redirect to email verification page
+   */
+  private redirectToVerifyEmail(email: string): void {
+    window.location.href = `/src/pages/VerifyEmail.html?email=${encodeURIComponent(email)}&from=signup`;
   }
 
   /**

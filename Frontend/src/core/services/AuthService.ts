@@ -56,9 +56,7 @@ export class AuthService {
   /**
    * Sign up new user
    */
-  async signUp(
-    data: SignUpRequest
-  ): Promise<{
+  async signUp(data: SignUpRequest): Promise<{
     success: boolean;
     user?: User;
     message: string;
@@ -70,12 +68,18 @@ export class AuthService {
         data
       );
 
-      if (response.data?.success && response.data?.user && response.data?.token) {
-        this.handleAuthSuccess(response.data.user, response.data.token);
+      if (response.data?.success) {
+        const user = response.data.user
+          ? User.fromApiResponse(response.data.user)
+          : undefined;
+
         return {
           success: true,
-          user: this.currentUser!,
-          message: response.data.message,
+          user,
+          message:
+            response.data.message ||
+            "Sign up successful. Please check your email to verify your account.",
+          errors: [], // optional, có thể để undefined nếu muốn
         };
       } else {
         return {
@@ -97,9 +101,7 @@ export class AuthService {
   /**
    * Sign in existing user
    */
-  async signIn(
-    data: SignInRequest
-  ): Promise<{
+  async signIn(data: SignInRequest): Promise<{
     success: boolean;
     user?: User;
     message: string;
@@ -111,7 +113,11 @@ export class AuthService {
         data
       );
 
-      if (response.data?.success && response.data?.user && response.data?.token) {
+      if (
+        response.data?.success &&
+        response.data?.user &&
+        response.data?.token
+      ) {
         this.handleAuthSuccess(response.data.user, response.data.token);
         return {
           success: true,
@@ -238,19 +244,22 @@ export class AuthService {
   async googleAuth(): Promise<{ success: boolean; message: string }> {
     try {
       const redirectUrl = `${window.location.origin}${ENV.GOOGLE_OAUTH_REDIRECT_URL}`;
-      
+
       // Supabase OAuth URL with implicit flow (returns access_token in hash)
       const authUrl = new URL(`${ENV.SUPABASE_URL}/auth/v1/authorize`);
-      authUrl.searchParams.set('provider', 'google');
-      authUrl.searchParams.set('redirect_to', redirectUrl);
-      
+      authUrl.searchParams.set("provider", "google");
+      authUrl.searchParams.set("redirect_to", redirectUrl);
+
       window.location.href = authUrl.toString();
       return { success: true, message: "Redirecting to Google..." };
     } catch (error) {
       console.error("Google auth error:", error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : "Failed to initialize Google authentication",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to initialize Google authentication",
       };
     }
   }

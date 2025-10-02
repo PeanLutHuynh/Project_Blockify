@@ -101,6 +101,19 @@ export class AuthService {
         return AuthResponse.failure('Failed to create authentication account', [authError?.message || 'Unknown error']);
       }
 
+      // Send verification email
+      const { error: resendError } = await supabaseAdmin.auth.resend({
+        type: 'signup',
+        email: email.getValue(),
+      });
+
+      if (resendError) {
+        return AuthResponse.failure(
+          'User created but failed to send verification email',
+          [resendError.message]
+        );
+      }
+
       // Wait a moment for trigger to complete (trigger creates user in public.users)
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -111,10 +124,11 @@ export class AuthService {
         return AuthResponse.failure('User created but not found in database. Please try signing in.');
       }
 
+      // Return success WITHOUT token - user must verify email before signing in
       return AuthResponse.success(
         user,
-        '',
-        'Account created successfully. Please check your email to verify your account.'
+        '', // No token until email is verified
+        'Account created successfully! Please check your email to verify your account before signing in.'
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : (typeof error === 'string' ? error : JSON.stringify(error));
