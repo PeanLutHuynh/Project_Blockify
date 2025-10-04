@@ -3,3 +3,4 @@ node_modules
 dist
 rule.md
 logs/
+.DS_Store
