@@ -26,11 +26,12 @@
 ### 🎨 Frontend
 - **Languages & UI**: HTML, CSS, SCSS, Bootstrap, TypeScript
 - **Architecture**: MVC + Object-Oriented Programming
-- **HTTP Client**: Axios (primary), Fetch API (fallback)
+- **HTTP Client**: Native Fetch API (custom wrapper implementation)
 - **Data Format**: JSON
 
 ### 🔧 Backend  
-- **Runtime & Framework**: Node.js, TypeScript, Express.js
+- **Runtime & Language**: Node.js, TypeScript
+- **HTTP Server**: Native Node.js HTTP/HTTPS module (custom implementation)
 - **Architecture**: Domain-Driven Design (DDD) + Clean Architecture (Onion Architecture)
 - **Database**: Supabase (PostgreSQL + SDK)
 - **API Style**: REST API returning JSON
@@ -63,7 +64,7 @@ graph TB
     I --> D
 ```
 
-- **Presentation**: Entry points (controllers, routes, middleware)
+- **Presentation**: Entry points (controllers, custom routing, middleware chain)
 - **Application**: Business use cases and Data Transfer Objects
 - **Domain**: Core business logic and interfaces
 - **Infrastructure**: External dependencies and implementations
@@ -77,7 +78,7 @@ graph TB
 src/
 ├── 📁 core/
 │   ├── 📁 models/           # OOP Models (User, Product, Article)
-│   ├── 📁 services/         # API services (Axios client + endpoints)
+│   ├── 📁 services/         # API services (Custom Fetch wrapper + endpoints)
 │   └── 📁 utils/            # Helper functions
 ├── 📁 modules/              # Feature modules (MVC pattern)
 │   ├── 📁 products/
@@ -98,8 +99,8 @@ src/
 src/
 ├── 📁 presentation/
 │   ├── 📁 controllers/      # HTTP request handlers
-│   ├── 📁 routes/          # API route definitions
-│   └── 📁 middleware/      # Request/response middleware
+│   ├── 📁 routes/          # Custom router implementation
+│   └── 📁 middleware/      # Custom middleware chain
 ├── 📁 application/
 │   ├── 📁 services/        # Application services (use cases)
 │   └── 📁 dto/             # Data Transfer Objects
@@ -110,7 +111,8 @@ src/
 │   └── 📁 events/          # Domain events
 └── 📁 infrastructure/
     ├── 📁 repositories/    # Supabase implementations
-    ├── 📁 database/        # Database client configuration
+    ├── 📁 database/        # Supabase client configuration
+    ├── 📁 http/            # Custom HTTP server & router
     └── 📁 external/        # Third-party service adapters
 ```
 
@@ -124,14 +126,15 @@ src/
 - **Admin Panel**: CRUD operations for categories, products, and articles
 - **Authentication**: User registration and login system
 - **Responsive Design**: Mobile-first approach with Bootstrap
-- **AJAX Integration**: Seamless data fetching without page reloads
+- **AJAX Integration**: Seamless data fetching without page reloads using native Fetch API
 
 ### 🔧 Backend Features
-- **RESTful API**: JSON-based API endpoints
+- **RESTful API**: JSON-based API endpoints with custom HTTP server
 - **Core Modules**: User management, product catalog, article system
 - **Business Logic**: Use cases handled by application services
 - **Data Persistence**: Repository pattern with Supabase integration
 - **Domain-Rich Models**: Entities following OOP principles
+- **Custom Routing**: Hand-written routing system without external frameworks
 
 ---
 
@@ -144,23 +147,28 @@ src/
   - **Abstraction**: Abstract base classes and interfaces
   - **Inheritance**: Extend base classes for specialized behavior
   - **Polymorphism**: Override methods for different implementations
-- ✅ Use **Axios** as primary HTTP client
+- ✅ Use **native Fetch API** with custom wrapper (no external HTTP libraries)
 - ✅ All data exchange in **JSON format**
 - ✅ Component-based UI with reusable elements
+- ✅ **Bootstrap only** for UI framework (no other CSS frameworks)
 
 ### 🏛️ Backend Guidelines
 - ✅ Maintain **pure DDD + Clean Architecture** (no MVC mixing)
 - ✅ Business logic stays in **Domain Layer**
 - ✅ Use cases implemented as **Application Services**
 - ✅ Repository pattern for **data access abstraction**
-- ✅ **JSON-only** API responses
+- ✅ **JSON-only** API responses (hand-written parsing)
 - ✅ Rich domain entities with proper business rules
+- ✅ Custom HTTP server using **Node.js native modules** (no Express.js)
+- ✅ Hand-written routing and middleware system
+- ✅ **Supabase SDK only** for database operations
 
 ### 🔄 Communication Guidelines
-- ✅ **AJAX/Webservice**: Use existing services, don't create new ones
+- ✅ **AJAX/Webservice**: Custom Fetch API wrapper for all HTTP requests
 - ✅ **JSON Format**: All client-server communication
 - ✅ **REST Conventions**: Proper HTTP methods and status codes
 - ✅ **Error Handling**: Consistent error response format
+- ✅ **No External Dependencies**: Except Bootstrap (UI) and Supabase SDK (Database)
 
 ---
 
@@ -174,4 +182,4 @@ src/
 
 ---
 
-*! Let's build something amazing together! 🧩✨*
+*Built with 💪 using native Node.js and TypeScript 🧩✨*
