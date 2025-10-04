@@ -83,9 +83,9 @@ export class AuthService {
       if (await this.userRepository.existsByEmail(command.email)) {
         return AuthResponse.failure("Email already exists");
       }
-      if (await this.userRepository.existsByUsername(command.username)) {
-        return AuthResponse.failure("Username already exists");
-      }
+      // if (await this.userRepository.existsByUsername(command.username)) {
+      //   return AuthResponse.failure("Username already exists");
+      // }
 
       // Validate using value objects
       let email: Email;

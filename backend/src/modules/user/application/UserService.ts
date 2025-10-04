@@ -31,13 +31,13 @@ export class UserService extends BaseService<User> {
       throw new Error('User with this email already exists');
     }
 
-    // Check username if provided
-    if (userData.username) {
-      const existingUsername = await this.userRepository.findByUsername(userData.username);
-      if (existingUsername) {
-        throw new Error('User with this username already exists');
-      }
-    }
+    // // Check username if provided
+    // if (userData.username) {
+    //   const existingUsername = await this.userRepository.findByUsername(userData.username);
+    //   if (existingUsername) {
+    //     throw new Error('User with this username already exists');
+    //   }
+    // }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
