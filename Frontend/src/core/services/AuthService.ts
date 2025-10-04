@@ -69,23 +69,17 @@ export class AuthService {
       );
 
       if (response.data?.success) {
-        const user = response.data.user
-          ? User.fromApiResponse(response.data.user)
-          : undefined;
-
         return {
           success: true,
-          user,
-          message:
-            response.data.message ||
-            "Sign up successful. Please check your email to verify your account.",
-          errors: [], // optional, có thể để undefined nếu muốn
+          message: response.data.message,
+          user: response.data.user
+            ? User.fromApiResponse(response.data.user)
+            : undefined,
         };
       } else {
         return {
           success: false,
           message: response.data?.message || "Sign up failed",
-          errors: response.data?.errors,
         };
       }
     } catch (error: any) {
@@ -93,7 +87,6 @@ export class AuthService {
       return {
         success: false,
         message: error.response?.data?.message || "Network error occurred",
-        errors: error.response?.data?.errors,
       };
     }
   }

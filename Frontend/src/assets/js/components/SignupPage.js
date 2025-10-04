@@ -47,7 +47,7 @@ document.querySelector('form').addEventListener('submit', async function(e){
     password: document.getElementById('password').value,
     confirmPassword: document.getElementById('confirmPassword').value,
     fullName: document.getElementById('username').value.trim(), // Note: HTML has username field as display name
-    username: document.getElementById('email').value.split('@')[0] || document.getElementById('username').value.toLowerCase().replace(/\s+/g, ''),
+    username: document.getElementById('username').value.trim() || document.getElementById('username').value.toLowerCase().replace(/\s+/g, ''),
     gender: null // Default gender
   };
 

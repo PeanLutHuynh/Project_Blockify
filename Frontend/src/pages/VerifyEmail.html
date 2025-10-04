@@ -105,18 +105,21 @@
       border-radius: 10px;
       font-weight: 600;
       transition: all 0.3s;
+      cursor: pointer;
     }
     
-    .btn-resend:hover:not(:disabled) {
+    .btn-resend:hover:not(:disabled):not(.processing) {
       background: #667eea;
       color: white;
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
     
-    .btn-resend:disabled {
+    .btn-resend:disabled,
+    .btn-resend.processing {
       opacity: 0.6;
       cursor: not-allowed;
+      pointer-events: none;
     }
     
     .success-message, .error-message {
@@ -187,7 +190,7 @@
     
     <div class="resend-section">
       <p class="resend-text">Didn't receive the email?</p>
-      <button id="resendBtn" class="btn btn-resend">
+      <button type="button" id="resendBtn" class="btn btn-resend">
         <i class="bi bi-arrow-clockwise me-2"></i>
         Resend Verification Email
       </button>
@@ -206,104 +209,154 @@
   <script type="module">
     import { ENV } from '../core/config/env.js';
 
-    // Get email from localStorage or URL parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    const email = urlParams.get('email') || localStorage.getItem('pending_verification_email');
-    
-    const emailDisplay = document.getElementById('userEmail');
-    const resendBtn = document.getElementById('resendBtn');
-    const messageContainer = document.getElementById('messageContainer');
-    const countdownText = document.getElementById('countdownText');
-    const countdownSpan = document.getElementById('countdown');
-
-    if (email) {
-      emailDisplay.textContent = email;
-      localStorage.setItem('pending_verification_email', email);
+    // Prevent multiple script execution
+    if (window.verifyEmailPageInitialized) {
+      console.log('VerifyEmail page already initialized, skipping...');
     } else {
-      emailDisplay.textContent = 'your registered email';
-    }
+      window.verifyEmailPageInitialized = true;
 
-    let countdownTimer = null;
-    let secondsRemaining = 0;
-
-    function startCountdown(seconds) {
-      secondsRemaining = seconds;
-      resendBtn.disabled = true;
-      countdownText.style.display = 'block';
+      // Get email from localStorage or URL parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const email = urlParams.get('email') || localStorage.getItem('pending_verification_email');
       
-      countdownTimer = setInterval(() => {
-        secondsRemaining--;
-        countdownSpan.textContent = secondsRemaining;
+      const emailDisplay = document.getElementById('userEmail');
+      const resendBtn = document.getElementById('resendBtn');
+      const messageContainer = document.getElementById('messageContainer');
+      const countdownText = document.getElementById('countdownText');
+      const countdownSpan = document.getElementById('countdown');
+
+      if (email) {
+        emailDisplay.textContent = email;
+        localStorage.setItem('pending_verification_email', email);
+      } else {
+        emailDisplay.textContent = 'your registered email';
+      }
+
+      let countdownTimer = null;
+      let secondsRemaining = 0;
+      let isResending = false; // Flag to prevent multiple simultaneous requests
+      let lastClickTime = 0; // Track last click time for debouncing
+      let activeRequest = null; // Track active request promise
+
+      function startCountdown(seconds) {
+        secondsRemaining = seconds;
+        resendBtn.disabled = true;
+        countdownText.style.display = 'block';
         
-        if (secondsRemaining <= 0) {
-          clearInterval(countdownTimer);
-          resendBtn.disabled = false;
-          countdownText.style.display = 'none';
-        }
-      }, 1000);
-    }
+        countdownTimer = setInterval(() => {
+          secondsRemaining--;
+          countdownSpan.textContent = secondsRemaining;
+          
+          if (secondsRemaining <= 0) {
+            clearInterval(countdownTimer);
+            resendBtn.disabled = false;
+            countdownText.style.display = 'none';
+          }
+        }, 1000);
+      }
 
-    function showMessage(message, isError = false) {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = isError ? 'error-message' : 'success-message';
-      messageDiv.innerHTML = `
-        <i class="bi bi-${isError ? 'exclamation-circle' : 'check-circle'} me-2"></i>
-        ${message}
-      `;
-      messageContainer.innerHTML = '';
-      messageContainer.appendChild(messageDiv);
+      function showMessage(message, isError = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = isError ? 'error-message' : 'success-message';
+        messageDiv.innerHTML = `
+          <i class="bi bi-${isError ? 'exclamation-circle' : 'check-circle'} me-2"></i>
+          ${message}
+        `;
+        messageContainer.innerHTML = '';
+        messageContainer.appendChild(messageDiv);
+        
+        // Auto-hide success messages after 5 seconds
+        if (!isError) {
+          setTimeout(() => {
+            messageDiv.style.opacity = '0';
+            setTimeout(() => messageDiv.remove(), 300);
+          }, 5000);
+        }
+      }
+
+      async function handleResendClick(e) {
+        // Prevent default and stop propagation
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Debounce: prevent clicks within 1 second
+        const now = Date.now();
+        if (now - lastClickTime < 1000) {
+          console.log('Click debounced - too fast!');
+          return;
+        }
+        lastClickTime = now;
+        
+        console.log('Resend button clicked, isResending:', isResending);
+        
+        // Prevent multiple simultaneous requests
+        if (isResending || activeRequest) {
+          console.log('Already resending, ignoring click. activeRequest:', !!activeRequest);
+          return;
+        }
+
+        if (!email) {
+          showMessage('Email address not found. Please try signing up again.', true);
+          return;
+        }
+
+        isResending = true;
+        resendBtn.disabled = true;
+        resendBtn.classList.add('processing'); // Add class to block all pointer events
+        resendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+
+        console.log('Sending resend request to:', `${ENV.API_BASE_URL}/auth/resend-verification`);
+
+        try {
+          // Store the active request promise
+          activeRequest = fetch(`${ENV.API_BASE_URL}/auth/resend-verification`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email })
+          });
+
+          const response = await activeRequest;
+          const data = await response.json();
+          console.log('Resend response:', data);
+
+          if (data.success || response.ok) {
+            showMessage('Verification email sent! Please check your inbox.');
+            startCountdown(60);
+          } else {
+            showMessage(data.message || 'Failed to send verification email', true);
+            resendBtn.disabled = false;
+            resendBtn.classList.remove('processing');
+          }
+        } catch (error) {
+          console.error('Resend error:', error);
+          showMessage('Network error. Please try again later.', true);
+          resendBtn.disabled = false;
+          resendBtn.classList.remove('processing');
+        } finally {
+          activeRequest = null; // Clear active request
+          resendBtn.innerHTML = '<i class="bi bi-arrow-clockwise me-2"></i>Resend Verification Email';
+          isResending = false;
+          console.log('Resend request completed, isResending reset to false');
+        }
+      }
+
+      // Remove any existing event listeners first
+      const newResendBtn = resendBtn.cloneNode(true);
+      resendBtn.parentNode.replaceChild(newResendBtn, resendBtn);
       
-      // Auto-hide success messages after 5 seconds
-      if (!isError) {
-        setTimeout(() => {
-          messageDiv.style.opacity = '0';
-          setTimeout(() => messageDiv.remove(), 300);
-        }, 5000);
-      }
-    }
+      // Add single event listener to the new button
+      newResendBtn.addEventListener('click', handleResendClick);
+      console.log('Event listener attached to resend button');
 
-    resendBtn.addEventListener('click', async () => {
-      if (!email) {
-        showMessage('Email address not found. Please try signing up again.', true);
-        return;
-      }
-
-      resendBtn.disabled = true;
-      resendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
-
-      try {
-        const response = await fetch(`${ENV.API_BASE_URL}/auth/resend-verification`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email })
-        });
-
-        const data = await response.json();
-
-        if (data.success || response.ok) {
-          showMessage('Verification email sent! Please check your inbox.');
-          startCountdown(60);
-        } else {
-          showMessage(data.message || 'Failed to send verification email', true);
-          resendBtn.disabled = false;
+      // Cleanup on page unload
+      window.addEventListener('beforeunload', () => {
+        if (countdownTimer) {
+          clearInterval(countdownTimer);
         }
-      } catch (error) {
-        console.error('Resend error:', error);
-        showMessage('Network error. Please try again later.', true);
-        resendBtn.disabled = false;
-      } finally {
-        resendBtn.innerHTML = '<i class="bi bi-arrow-clockwise me-2"></i>Resend Verification Email';
-      }
-    });
-
-    // Cleanup on page unload
-    window.addEventListener('beforeunload', () => {
-      if (countdownTimer) {
-        clearInterval(countdownTimer);
-      }
-    });
+      });
+    }
   </script>
 </body>
 </html>
