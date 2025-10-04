@@ -20,9 +20,9 @@ export class UserService extends BaseService<User> {
 
   async createUser(userData: { 
     email: string; 
-    name: string; 
-    username?: string;
-    role?: string;
+    username: string;
+    fullName: string;
+    role: string;
     password?: string;
   }): Promise<User> {
     // Business logic: Check if user already exists
@@ -48,8 +48,8 @@ export class UserService extends BaseService<User> {
     // Create new user with proper UserProps
     const userProps = {
       email: userData.email,
-      fullName: userData.name, // Map name to fullName
-      username: userData.username || userData.email.split('@')[0], // Generate username from email if not provided
+      fullName: userData.fullName,
+      username: userData.username, // Generate username from email if not provided
       role: userData.role || 'user',
       isActive: true,
       authUid: '' // This will be set by AuthService after creating user in Supabase Auth

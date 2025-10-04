@@ -47,7 +47,7 @@ document.querySelector('form').addEventListener('submit', async function(e){
 
   // Get form data
   const formData = {
-    identifier: document.getElementById('username').value.trim(),
+    identifier: document.getElementById('email').value.trim(),
     password: document.getElementById('password').value,
     rememberMe: false // Add checkbox if needed
   };
