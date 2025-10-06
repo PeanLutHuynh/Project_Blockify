@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { HttpRequest, HttpResponse } from '../infrastructure/http/types';
 import { ApiResponse, ServiceResponse, ValidationErrors } from './common';
 
 // Base Error Class for Error Hierarchy
@@ -70,7 +70,7 @@ export class NotFoundError extends BaseError {
 // Base Controller - Abstract class for all controllers (MVC Pattern)
 export abstract class BaseController {
     protected sendSuccess<T>(
-        res: Response, 
+        res: HttpResponse, 
         data: T, 
         message = 'Operation successful',
         meta?: Record<string, any>
@@ -88,7 +88,7 @@ export abstract class BaseController {
     }
     
     protected sendError(
-        res: Response, 
+        res: HttpResponse, 
         error: BaseError | string, 
         statusCode?: number
     ): void {
@@ -117,11 +117,12 @@ export abstract class BaseController {
             };
         }
         
-        res.status(statusCode || 500).json(errorResponse);
+        res.status(statusCode || 500);
+        res.json(errorResponse);
     }
     
     protected sendPaginatedResponse<T>(
-        res: Response,
+        res: HttpResponse,
         data: T[],
         page: number,
         limit: number,
@@ -150,10 +151,10 @@ export abstract class BaseController {
         res.json(response);
     }
     
-    protected abstract validateRequest(req: Request): boolean;
+    protected abstract validateRequest(req: HttpRequest): boolean;
     
     // Common error handling
-    protected handleError(res: Response, error: unknown): void {
+    protected handleError(res: HttpResponse, error: unknown): void {
         if (error instanceof BaseError) {
             this.sendError(res, error);
         } else if (error instanceof Error) {

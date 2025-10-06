@@ -15,6 +15,7 @@ if (result.error) {
 export const ENV = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   FRONTEND_URL: process.env.FRONTEND_URL,
+  EMAIL_REDIRECT_URL: process.env.EMAIL_REDIRECT_URL || 'http://127.0.0.1:3002/src/pages/EmailVerified.html',
 
   MAX_FILE_SIZE: 5242880,
   ALLOWED_FILE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'],
@@ -32,12 +33,7 @@ export const ENV = {
   JWT_SECRET: process.env.JWT_SECRET || 'default-secret',
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'default-refresh-secret',
   JWT_EXPIRES_IN: process.env.JWT_EXPIRE_IN || '24h',
-  JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRE_IN || '7d',
-
-  VITE_API_BASE_URL: process.env.VITE_API_BASE_URL || 'http://localhost:3001/api',
-  VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || '',
-  VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY || '',
-  VITE_GOOGLE_OAUTH_REDIRECT_URL: '/src/pages/AuthCallback.html'
+  JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRE_IN || '7d'
 };
 
 export const isDevelopment = ENV.NODE_ENV === 'development';

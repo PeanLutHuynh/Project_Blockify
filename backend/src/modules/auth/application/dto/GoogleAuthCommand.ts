@@ -3,7 +3,8 @@ export class GoogleAuthCommand {
     public readonly email: string,
     public readonly fullName: string,
     public readonly authUid: string,
-    public readonly avatarUrl?: string
+    public readonly avatarUrl?: string,
+    public readonly username?: string
   ) {}
 
   public validate(): string[] {

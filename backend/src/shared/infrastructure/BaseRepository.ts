@@ -49,18 +49,25 @@ export abstract class BaseRepository<T> implements IRepository<T> {
   async save(entity: T): Promise<T> {
     try {
       const data = this.mapFromEntity(entity);
+      console.log(`[${this.tableName}] 💾 Attempting to save:`, JSON.stringify(data, null, 2));
+      
       const { data: result, error } = await supabase
         .from(this.tableName)
         .insert(data)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error(`[${this.tableName}] ❌ Save error:`, error);
+        throw error;
+      }
 
+      console.log(`[${this.tableName}] ✅ Save successful:`, result);
       return this.mapToEntity(result);
     } catch (error) {
       const err: any = error;
       const msg = err?.message || err?.error?.message || (typeof err === 'string' ? err : JSON.stringify(err));
+      console.error(`[${this.tableName}] ❌ Save exception:`, msg);
       throw new Error(`Error saving ${this.tableName}: ${msg}`);
     }
   }

@@ -4,25 +4,22 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "dev": "npm run build && npx http-server . -p 3002 -c-1 --cors -o /src/pages/HomePage.html",
+    "dev:watch": "tsc --watch & npx http-server . -p 3002 -c-1 --cors",
+    "serve": "npx http-server . -p 3002 -c-1 --cors",
+    "start": "npm run build && npx http-server . -p 3002 -c-1 --cors -o /src/pages/HomePage.html",
     "type-check": "tsc --noEmit",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "clean": "powershell -Command \"Get-ChildItem -Path src -Include *.js,*.js.map,*.d.ts -Recurse | Remove-Item -Force\""
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "axios": "^1.6.2",
     "bootstrap": "^5.3.2"
   },
   "devDependencies": {
-    "@types/json-schema": "^7.0.15",
     "@types/node": "^24.5.2",
-    "@types/semver": "^7.7.1",
-    "@typescript-eslint/eslint-plugin": "^8.44.1",
-    "@typescript-eslint/parser": "^8.44.1",
-    "eslint": "^9.36.0",
-    "typescript": "^5.9.2",
-    "vite": "^7.1.7"
+    "http-server": "^14.1.1",
+    "typescript": "^5.9.2"
   }
 }

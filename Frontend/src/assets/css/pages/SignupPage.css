@@ -1,4 +1,4 @@
-body { margin: 0; padding: 0; min-height: 100vh; background: url('/images/SignupPage (2).png') center/cover no-repeat fixed; }
+body { margin: 0; padding: 0; min-height: 100vh; background: url('/public/images/SignupPage (2).png') center/cover no-repeat fixed; }
 /* Glassmorphism panel */
 .glass { background: rgba(255, 255, 255, 0.55); border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 .auth-wrap { min-height: 100vh; }
@@ -51,12 +51,13 @@ body { margin: 0; padding: 0; min-height: 100vh; background: url('/images/Signup
     color: #6c757d;
     font-size: 13px;
   }
+/* Welcome typing animation - positioned behind form */
 .welcome-typing {
   position: fixed;
   left: 80px;
   top: 50%;
-  bottom: unset;
-  z-index: 1000;
+  transform: translateY(-50%);
+  z-index: 0; /* Behind everything */
   font-size: 6rem;
   font-weight: 900;
   color: #111;
@@ -66,29 +67,62 @@ body { margin: 0; padding: 0; min-height: 100vh; background: url('/images/Signup
   -webkit-user-select: none;
   user-select: none;
   pointer-events: none;
-  background: none;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   line-height: 1.05;
-  transform: translateY(-50%);
   -webkit-text-stroke: 3px #0d9bff;
-  
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
 }
+
 .welcome-typing span {
   display: block;
 }
+
+/* Ensure auth card is above welcome text */
+.auth-wrap {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+}
+
+.auth-card {
+  position: relative;
+  z-index: 20;
+  width: 100%;
+  max-width: 520px;
+}
+
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
-@media (max-width: 767.98px) {
-    .welcome-typing {
-      display: none !important;
-    }
+
+/* Responsive breakpoints */
+@media (max-width: 1400px) {
+  .welcome-typing {
+    font-size: 5rem;
+    left: 60px;
   }
+}
+
+@media (max-width: 1200px) {
+  .welcome-typing {
+    font-size: 4rem;
+    left: 40px;
+  }
+}
+
+@media (max-width: 992px) {
+  .welcome-typing {
+    font-size: 3rem;
+    left: 30px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .welcome-typing {
+    display: none !important;
+  }
+}

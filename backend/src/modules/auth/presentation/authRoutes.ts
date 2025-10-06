@@ -1,55 +1,49 @@
-import { Router } from 'express';
+﻿import { Router } from '../../../infrastructure/http/Router';
 import { AuthController } from './AuthController';
 import { AuthService } from '../application/AuthService';
 import { UserRepository } from '../../user/infrastructure/UserRepository';
-import { authenticateToken } from '../../../middlewares/auth.middleware';
-import { validateRequest } from '../../../middlewares/validation.middleware';
-import { body } from 'express-validator';
+import { authenticateToken } from '../../../infrastructure/auth/authMiddleware';
+import { Validator } from '../../../infrastructure/validation/Validator';
 
 // Create dependencies
 const userRepository = new UserRepository();
 const authService = new AuthService(userRepository);
 const authController = new AuthController(authService);
 
-const router = Router();
+const router = new Router();
 
-// Validation rules
-const signUpValidation = [
-  body('email').isEmail().withMessage('Valid email is required'),
-  body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
-  body('fullName').notEmpty().withMessage('Full name is required'),
-  body('username').isLength({ min: 3 }).withMessage('Username must be at least 3 characters long')
-    .matches(/^(?=\p{L})[\p{L}0-9]+(?:[_\-.][\p{L}0-9]+)*$/u).withMessage('Username can only contain letters, numbers, and underscores'),
-  body('gender').optional().isIn(['male', 'female', null]).withMessage('Gender must be male or female'),
-  validateRequest
-];
+// Validation rules using custom Validator
+const signUpValidation = Validator.validate([
+  Validator.field('email').required().isEmail('Valid email is required'),
+  Validator.field('password').required().minLength(8, 'Password must be at least 8 characters long'),
+  Validator.field('fullName').required('Full name is required'),
+  Validator.field('username').required().minLength(3, 'Username must be at least 3 characters long')
+    .custom((value) => /^(?=\p{L})[\p{L}0-9]+(?:[_\-.][\p{L}0-9]+)*$/u.test(value), 'Username can only contain letters, numbers, and underscores'),
+  Validator.field('gender').optional().custom((value) => !value || ['male', 'female'].includes(value), 'Gender must be male or female'),
+]);
 
-const signInValidation = [
-  body('identifier').notEmpty().withMessage('Username or email is required'),
-  body('password').notEmpty().withMessage('Password is required'),
-  validateRequest
-];
+const signInValidation = Validator.validate([
+  Validator.field('identifier').required('Username or email is required'),
+  Validator.field('password').required('Password is required'),
+]);
 
-const googleAuthValidation = [
-  body('email').isEmail().withMessage('Valid email is required'),
-  body('fullName').notEmpty().withMessage('Full name is required'),
-  body('authUid').notEmpty().withMessage('Auth UID is required'),
-  body('avatarUrl').optional().isURL().withMessage('Avatar URL must be a valid URL'),
-  validateRequest
-];
+const googleAuthValidation = Validator.validate([
+  Validator.field('email').required().isEmail('Valid email is required'),
+  Validator.field('fullName').required('Full name is required'),
+  Validator.field('authUid').required('Auth UID is required'),
+  Validator.field('avatarUrl').optional().custom((value) => !value || /^https?:\/\/.+/.test(value), 'Avatar URL must be a valid URL'),
+]);
 
-const verifyEmailValidation = [
-  body('token').notEmpty().withMessage('Verification token is required'),
-  body('type').optional().isIn(['signup', 'magiclink']).withMessage('Type must be signup or magiclink'),
-  validateRequest
-];
+const verifyEmailValidation = Validator.validate([
+  Validator.field('token').required('Verification token is required'),
+  Validator.field('type').optional().custom((value) => !value || ['signup', 'magiclink'].includes(value), 'Type must be signup or magiclink'),
+]);
 
-const resendVerificationValidation = [
-  body('email').isEmail().withMessage('Valid email is required'),
-  validateRequest
-];
+const resendVerificationValidation = Validator.validate([
+  Validator.field('email').required().isEmail('Valid email is required'),
+]);
 
-// Auth routes
+// Auth routes with custom Router
 router.post('/signup', signUpValidation, authController.signUp);
 router.post('/signin', signInValidation, authController.signIn);
 router.post('/google', googleAuthValidation, authController.googleAuth);

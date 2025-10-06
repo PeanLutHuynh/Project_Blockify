@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { HttpResponse } from '../infrastructure/http/types';
 import { ApiResponse, PaginationInfo } from '../types/common';
 import { logger } from '../config/logger';
 
@@ -8,7 +8,7 @@ import { logger } from '../config/logger';
  */
 export class ResponseUtil {
   static success<T>(
-    res: Response,
+    res: HttpResponse,
     data?: T,
     message: string = 'Success',
     statusCode: number = 200,
@@ -23,14 +23,15 @@ export class ResponseUtil {
       meta
     };
 
-    res.status(statusCode).json(response);
+    res.status(statusCode);
+    res.json(response);
   }
 
   /**
    * Send created response (201)
    */
   static created<T>(
-    res: Response,
+    res: HttpResponse,
     data?: T,
     message: string = 'Resource created successfully'
   ): void {
@@ -41,7 +42,7 @@ export class ResponseUtil {
    * Send error response
    */
   static error(
-    res: Response,
+    res: HttpResponse,
     message: string = 'An error occurred',
     statusCode: number = 500,
     error?: string,
@@ -54,14 +55,15 @@ export class ResponseUtil {
       errors
     };
 
-    res.status(statusCode).json(response);
+    res.status(statusCode);
+    res.json(response);
   }
 
   /**
    * Send bad request response (400)
    */
   static badRequest(
-    res: Response,
+    res: HttpResponse,
     message: string = 'Bad request',
     error?: string,
     errors?: Record<string, string | string[]>
@@ -73,7 +75,7 @@ export class ResponseUtil {
    * Send unauthorized response (401)
    */
   static unauthorized(
-    res: Response,
+    res: HttpResponse,
     message: string = 'Unauthorized',
     error?: string
   ): void {
@@ -84,7 +86,7 @@ export class ResponseUtil {
    * Send forbidden response (403)
    */
   static forbidden(
-    res: Response,
+    res: HttpResponse,
     message: string = 'Forbidden',
     error?: string
   ): void {
@@ -95,7 +97,7 @@ export class ResponseUtil {
    * Send not found response (404)
    */
   static notFound(
-    res: Response,
+    res: HttpResponse,
     message: string = 'Resource not found',
     error?: string
   ): void {
@@ -106,7 +108,7 @@ export class ResponseUtil {
    * Send conflict response (409)
    */
   static conflict(
-    res: Response,
+    res: HttpResponse,
     message: string = 'Resource conflict',
     error?: string
   ): void {
@@ -117,7 +119,7 @@ export class ResponseUtil {
    * Send validation error response (422)
    */
   static validationError(
-    res: Response,
+    res: HttpResponse,
     errors: Record<string, string | string[]>,
     message: string = 'Validation failed'
   ): void {
@@ -128,7 +130,7 @@ export class ResponseUtil {
    * Send internal server error response (500)
    */
   static internalError(
-    res: Response,
+    res: HttpResponse,
     message: string = 'Internal server error',
     error?: string
   ): void {
@@ -139,7 +141,7 @@ export class ResponseUtil {
    * Send paginated response
    */
   static paginated<T>(
-    res: Response,
+    res: HttpResponse,
     data: T[],
     pagination: PaginationInfo,
     message: string = 'Data retrieved successfully'
@@ -150,15 +152,16 @@ export class ResponseUtil {
   /**
    * Send no content response (204)
    */
-  static noContent(res: Response): void {
-    res.status(204).send();
+  static noContent(res: HttpResponse): void {
+    res.status(204);
+    res.send('');
   }
 
   /**
    * Log and send error response
    */
   static logAndError(
-    res: Response,
+    res: HttpResponse,
     error: any,
     message: string = 'An error occurred',
     statusCode: number = 500
@@ -178,7 +181,7 @@ export class ResponseUtil {
  */
 
 export const sendSuccess = <T>(
-  res: Response,
+  res: HttpResponse,
   data?: T,
   message?: string,
   statusCode?: number,
@@ -186,49 +189,49 @@ export const sendSuccess = <T>(
 ) => ResponseUtil.success(res, data, message, statusCode, pagination);
 
 export const sendError = (
-  res: Response,
+  res: HttpResponse,
   message?: string,
   statusCode?: number,
   error?: string,
   errors?: Record<string, string | string[]>
 ) => ResponseUtil.error(res, message, statusCode, error, errors);
 
-export const sendCreated = <T>(res: Response, data?: T, message?: string) =>
+export const sendCreated = <T>(res: HttpResponse, data?: T, message?: string) =>
   ResponseUtil.created(res, data, message);
 
 export const sendBadRequest = (
-  res: Response,
+  res: HttpResponse,
   message?: string,
   error?: string,
   errors?: Record<string, string | string[]>
 ) => ResponseUtil.badRequest(res, message, error, errors);
 
-export const sendNotFound = (res: Response, message?: string, error?: string) =>
+export const sendNotFound = (res: HttpResponse, message?: string, error?: string) =>
   ResponseUtil.notFound(res, message, error);
 
-export const sendUnauthorized = (res: Response, message?: string, error?: string) =>
+export const sendUnauthorized = (res: HttpResponse, message?: string, error?: string) =>
   ResponseUtil.unauthorized(res, message, error);
 
-export const sendForbidden = (res: Response, message?: string, error?: string) =>
+export const sendForbidden = (res: HttpResponse, message?: string, error?: string) =>
   ResponseUtil.forbidden(res, message, error);
 
-export const sendConflict = (res: Response, message?: string, error?: string) =>
+export const sendConflict = (res: HttpResponse, message?: string, error?: string) =>
   ResponseUtil.conflict(res, message, error);
 
 export const sendValidationError = (
-  res: Response,
+  res: HttpResponse,
   errors: Record<string, string | string[]>,
   message?: string
 ) => ResponseUtil.validationError(res, errors, message);
 
-export const sendInternalError = (res: Response, message?: string, error?: string) =>
+export const sendInternalError = (res: HttpResponse, message?: string, error?: string) =>
   ResponseUtil.internalError(res, message, error);
 
 export const sendPaginated = <T>(
-  res: Response,
+  res: HttpResponse,
   data: T[],
   pagination: PaginationInfo,
   message?: string
 ) => ResponseUtil.paginated(res, data, pagination, message);
 
-export const sendNoContent = (res: Response) => ResponseUtil.noContent(res);
+export const sendNoContent = (res: HttpResponse) => ResponseUtil.noContent(res);

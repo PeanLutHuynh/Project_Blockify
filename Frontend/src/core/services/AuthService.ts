@@ -1,6 +1,6 @@
-import { httpClient } from "../api/httpClient";
-import { User } from "../models/User";
-import { ENV } from "../config/env";
+import { httpClient } from "../api/FetchHttpClient.js";
+import { User } from "../models/User.js";
+import { ENV } from "../config/env.js";
 
 // Define interfaces for auth requests/responses
 interface SignUpRequest {
@@ -64,7 +64,7 @@ export class AuthService {
   }> {
     try {
       const response = await httpClient.post<AuthResponse>(
-        "/auth/signup",
+        "/api/auth/signup",
         data
       );
 
@@ -102,7 +102,7 @@ export class AuthService {
   }> {
     try {
       const response = await httpClient.post<AuthResponse>(
-        "/auth/signin",
+        "/api/auth/signin",
         data
       );
 
@@ -144,7 +144,7 @@ export class AuthService {
   }> {
     try {
       const response = await httpClient.post<{ user: any; payload: any }>(
-        "/auth/verify-token"
+        "/api/auth/verify-token"
       );
 
       if (response.data?.user) {
@@ -181,7 +181,7 @@ export class AuthService {
     message: string;
   }> {
     try {
-      const response = await httpClient.get<any>("/auth/me");
+      const response = await httpClient.get<any>("/api/auth/me");
 
       if (response.data) {
         const user = User.fromApiResponse(response.data);
@@ -267,7 +267,7 @@ export class AuthService {
     avatarUrl?: string;
   }): Promise<AuthResult> {
     try {
-      const response = await httpClient.post("/auth/google", authData, {
+      const response = await httpClient.post("/api/auth/google", authData, {
         headers: {
           "Content-Type": "application/json",
         },

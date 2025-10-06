@@ -4,3 +4,7 @@ dist
 rule.md
 logs/
 .DS_Store
+
+# TypeScript compiled output
+Frontend/dist/
+backend/dist/

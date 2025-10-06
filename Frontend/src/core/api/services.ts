@@ -1,4 +1,4 @@
-import { httpClient } from './httpClient';
+import { httpClient } from './FetchHttpClient.js';
 import { 
   User, 
   CreateUserDto, 
@@ -235,7 +235,7 @@ export class UserService {
    * Upload user avatar
    */
   async uploadAvatar(file: File, onProgress?: (progress: number) => void): Promise<ApiResponse<{ avatarUrl: string }>> {
-    return await httpClient.uploadFile('/upload/avatar', file, onProgress);
+    return await httpClient.uploadFile('/upload/avatar', file, 'file', undefined, onProgress);
   }
 }
 

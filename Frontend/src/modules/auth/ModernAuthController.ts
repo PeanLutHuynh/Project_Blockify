@@ -1,5 +1,5 @@
-import { authService } from '../../core/services/AuthService';
-import { User } from '../../core/models/User';
+import { authService } from '../../core/services/AuthService.js';
+import { User } from '../../core/models/User.js';
 
 export class ModernAuthController {
   private authService = authService;
