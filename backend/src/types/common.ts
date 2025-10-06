@@ -1,5 +1,4 @@
-import { Request } from 'express';
-import multer from 'multer';
+import { HttpRequest } from '../infrastructure/http/types';
 
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -34,13 +33,13 @@ export interface QueryOptions {
 }
 
 // Request Types
-export interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends HttpRequest {
   user?: AuthUser;
 }
 
 export interface FileUploadRequest extends AuthenticatedRequest {
-  file?: Express.Multer.File;
-  files?: Express.Multer.File[];
+  file?: UploadedFile;
+  files?: UploadedFile[];
 }
 
 // Database Types

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { HttpRequest, HttpResponse } from '../../infrastructure/http/types';
 import { BaseService } from '../application/BaseService';
 
 export interface ApiResponse<T> {
@@ -16,7 +16,7 @@ export abstract class BaseController<T> {
   }
 
   protected sendResponse<U>(
-    res: Response,
+    res: HttpResponse,
     statusCode: number,
     data?: U,
     message?: string,
@@ -29,63 +29,10 @@ export abstract class BaseController<T> {
       error
     };
 
-    // Check if client wants XML response
-    const acceptHeader = res.req.headers.accept;
-    if (acceptHeader && acceptHeader.includes('application/xml')) {
-      res.set('Content-Type', 'application/xml');
-      const xml = this.convertToXML(response);
-      res.status(statusCode).send(xml);
-    } else {
-      // Default to JSON
-      res.status(statusCode).json(response);
-    }
+    res.status(statusCode).json(response);
   }
 
-  private convertToXML(obj: any): string {
-    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<response>\n';
-    
-    for (const [key, value] of Object.entries(obj)) {
-      if (value === null || value === undefined) {
-        xml += `  <${key} />\n`;
-      } else if (Array.isArray(value)) {
-        xml += `  <${key}>\n`;
-        value.forEach((item, index) => {
-          xml += `    <item index="${index}">\n`;
-          if (typeof item === 'object') {
-            for (const [itemKey, itemValue] of Object.entries(item)) {
-              xml += `      <${itemKey}>${this.escapeXml(String(itemValue))}</${itemKey}>\n`;
-            }
-          } else {
-            xml += `      ${this.escapeXml(String(item))}\n`;
-          }
-          xml += '    </item>\n';
-        });
-        xml += `  </${key}>\n`;
-      } else if (typeof value === 'object') {
-        xml += `  <${key}>\n`;
-        for (const [subKey, subValue] of Object.entries(value)) {
-          xml += `    <${subKey}>${this.escapeXml(String(subValue))}</${subKey}>\n`;
-        }
-        xml += `  </${key}>\n`;
-      } else {
-        xml += `  <${key}>${this.escapeXml(String(value))}</${key}>\n`;
-      }
-    }
-    
-    xml += '</response>';
-    return xml;
-  }
-
-  private escapeXml(str: string): string {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
-  async getAll(req: Request, res: Response): Promise<void> {
+  async getAll(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
       const data = await this.service.findAll();
       this.sendResponse(res, 200, data, 'Data retrieved successfully');
@@ -94,7 +41,7 @@ export abstract class BaseController<T> {
     }
   }
 
-  async getById(req: Request, res: Response): Promise<void> {
+  async getById(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
       const { id } = req.params;
       const data = await this.service.findById(id);
@@ -110,7 +57,7 @@ export abstract class BaseController<T> {
     }
   }
 
-  async create(req: Request, res: Response): Promise<void> {
+  async create(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
       const data = await this.service.create(req.body);
       this.sendResponse(res, 201, data, 'Data created successfully');
@@ -119,7 +66,7 @@ export abstract class BaseController<T> {
     }
   }
 
-  async update(req: Request, res: Response): Promise<void> {
+  async update(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
       const { id } = req.params;
       const data = await this.service.update(id, req.body);
@@ -129,7 +76,7 @@ export abstract class BaseController<T> {
     }
   }
 
-  async delete(req: Request, res: Response): Promise<void> {
+  async delete(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
       const { id } = req.params;
       await this.service.delete(id);

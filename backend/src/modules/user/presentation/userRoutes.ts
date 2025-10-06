@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router } from '../../../infrastructure/http/Router';
 import { UserController } from '../presentation/UserController';
 import { UserService } from '../application/UserService';
 import { UserRepository } from '../infrastructure/UserRepository';
@@ -8,17 +8,21 @@ const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 const userController = new UserController(userService);
 
-const router = Router();
+export function createUserRouter(): Router {
+  const router = new Router();
 
-// REST API routes
-router.get('/', (req, res) => userController.getAll(req, res));
-router.get('/active', (req, res) => userController.getActiveUsers(req, res));
-router.get('/:id', (req, res) => userController.getById(req, res));
-router.get('/email/:email', (req, res) => userController.getUserByEmail(req, res));
-router.post('/', (req, res) => userController.createUser(req, res));
-router.put('/:id', (req, res) => userController.update(req, res));
-router.patch('/:id/profile', (req, res) => userController.updateUserProfile(req, res));
-router.patch('/:id/deactivate', (req, res) => userController.deactivateUser(req, res));
-router.delete('/:id', (req, res) => userController.delete(req, res));
+  // REST API routes
+  router.addRoute('GET', '/', (req, res) => userController.getAll(req, res));
+  router.addRoute('GET', '/active', (req, res) => userController.getActiveUsers(req, res));
+  router.addRoute('GET', '/:id', (req, res) => userController.getById(req, res));
+  router.addRoute('GET', '/email/:email', (req, res) => userController.getUserByEmail(req, res));
+  router.addRoute('POST', '/', (req, res) => userController.createUser(req, res));
+  router.addRoute('PUT', '/:id', (req, res) => userController.update(req, res));
+  router.addRoute('PATCH', '/:id/profile', (req, res) => userController.updateUserProfile(req, res));
+  router.addRoute('PATCH', '/:id/deactivate', (req, res) => userController.deactivateUser(req, res));
+  router.addRoute('DELETE', '/:id', (req, res) => userController.delete(req, res));
 
-export default router;
+  return router;
+}
+
+export default createUserRouter();

@@ -386,4 +386,4 @@ export const modalStore = new ModalStore();
 export const appStore = new AppStore();
 
 // Export AuthService
-export { AuthService, authService } from './AuthService';
+export { AuthService, authService } from './AuthService.js';

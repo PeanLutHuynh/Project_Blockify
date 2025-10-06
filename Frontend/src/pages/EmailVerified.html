@@ -187,94 +187,23 @@
     </div>
   </div>
 
+  <!-- Controller initialization -->
   <script type="module">
-    const loadingState = document.getElementById('loadingState');
-    const successState = document.getElementById('successState');
-    const errorState = document.getElementById('errorState');
-    const errorMessage = document.getElementById('errorMessage');
-    const countdownSpan = document.getElementById('countdown');
-    const signInBtn = document.getElementById('signInBtn');
-
-    // Parse URL fragments or query params for verification
-    function parseVerificationParams() {
-      // Check URL hash first (Supabase confirmation redirects with #access_token...)
-      const hash = window.location.hash.substring(1);
-      const hashParams = new URLSearchParams(hash);
-      
-      // Check query params (Supabase might use this for errors)
-      const queryParams = new URLSearchParams(window.location.search);
-      
-      // Check for error in either hash or query
-      const error = hashParams.get('error') || queryParams.get('error');
-      const errorDescription = hashParams.get('error_description') || queryParams.get('error_description');
-      const accessToken = hashParams.get('access_token');
-      const type = hashParams.get('type') || queryParams.get('type');
-      
-      return { error, errorDescription, accessToken, type };
-    }
-
-    function showSuccess() {
-      loadingState.classList.add('d-none');
-      successState.classList.remove('d-none');
-      
-      // Clear pending verification email
-      localStorage.removeItem('pending_verification_email');
-      
-      // Start countdown
-      let seconds = 5;
-      const countdownInterval = setInterval(() => {
-        seconds--;
-        countdownSpan.textContent = seconds;
-        
-        if (seconds <= 0) {
-          clearInterval(countdownInterval);
-          window.location.href = '/src/pages/SigninPage.html';
-        }
-      }, 1000);
-      
-      // Allow manual navigation
-      signInBtn.addEventListener('click', () => {
-        clearInterval(countdownInterval);
+    import { emailVerifiedController } from '/dist/src/modules/auth/EmailVerifiedController.js';
+    
+    // Initialize controller when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        emailVerifiedController.init();
       });
+    } else {
+      emailVerifiedController.init();
     }
-
-    function showError(message) {
-      loadingState.classList.add('d-none');
-      errorState.classList.remove('d-none');
-      if (message) {
-        errorMessage.textContent = message;
-      }
-    }
-
-    // Main verification logic
-    async function verifyEmail() {
-      try {
-        const { error, errorDescription, accessToken, type } = parseVerificationParams();
-        
-        // Handle errors from Supabase
-        if (error) {
-          console.error('Verification error:', error, errorDescription);
-          showError(errorDescription || 'Verification failed. The link may be invalid or expired.');
-          return;
-        }
-        
-        // Check if this is an email confirmation
-        if (type === 'signup' || type === 'email_change' || accessToken) {
-          // Email verified successfully by Supabase
-          // The user is now confirmed in auth.users
-          showSuccess();
-        } else {
-          // No verification parameters found
-          showError('Invalid verification link. Please use the link sent to your email.');
-        }
-      } catch (err) {
-        console.error('Verification error:', err);
-        showError('An unexpected error occurred. Please try again.');
-      }
-    }
-
-    // Run verification on page load
-    verifyEmail();
+    
+    // Cleanup on unload
+    window.addEventListener('beforeunload', () => {
+      emailVerifiedController.destroy();
+    });
   </script>
 </body>
 </html>

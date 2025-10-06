@@ -127,6 +127,9 @@ export class AuthService {
       const { error: resendError } = await supabaseAdmin.auth.resend({
         type: "signup",
         email: email.getValue(),
+        options: {
+          emailRedirectTo: process.env.EMAIL_REDIRECT_URL || 'http://127.0.0.1:3002/src/pages/EmailVerified.html'
+        }
       });
 
       if (resendError) {
@@ -211,87 +214,133 @@ export class AuthService {
 
   async googleAuth(command: GoogleAuthCommand): Promise<AuthResponse> {
     try {
+      console.log('🔍 [GoogleAuth] Starting Google Auth process:', {
+        email: command.email,
+        authUid: command.authUid,
+        fullName: command.fullName
+      });
+
       // Validate command
       const validationErrors = this.validateCommand(command);
       if (validationErrors.length > 0) {
+        console.error('❌ [GoogleAuth] Validation failed:', validationErrors);
         return AuthResponse.failure("Validation failed", validationErrors);
       }
 
       // Verify authUid in Supabase Auth
+      console.log('🔍 [GoogleAuth] Verifying authUid in Supabase Auth...');
       const { data: authUser, error: authError } =
         await supabaseAdmin.auth.admin.getUserById(command.authUid);
       if (authError || !authUser.user) {
+        console.error('❌ [GoogleAuth] Auth verification failed:', authError);
         return AuthResponse.failure("Invalid authentication credentials");
       }
 
       if (!authUser.user.email_confirmed_at) {
+        console.error('❌ [GoogleAuth] Email not verified');
         return AuthResponse.failure("Email not verified");
       }
 
+      console.log('✅ [GoogleAuth] Auth verification successful');
+
       // Check if user exists (may have been created by trigger during OAuth flow)
+      console.log('🔍 [GoogleAuth] Checking if user exists by authUid...');
       let user = await this.userRepository.findByAuthUid(command.authUid);
 
       if (user) {
+        console.log('✅ [GoogleAuth] User found in database:', user.id);
         // User exists - update profile if needed
         if (
           user.fullName !== command.fullName ||
           user.avatarUrl !== command.avatarUrl
         ) {
+          console.log('🔄 [GoogleAuth] Updating user profile...');
           user = await this.updateUserProfile(user, {
             fullName: command.fullName,
             avatarUrl: command.avatarUrl || user.avatarUrl,
           });
+          console.log('✅ [GoogleAuth] User profile updated');
         }
       } else {
+        console.log('⚠️ [GoogleAuth] User not found in database, checking email...');
         // User doesn't exist yet - check for existing email first
         const existingEmailUser = await this.userRepository.findByEmail(
           command.email
         );
+        
         if (existingEmailUser) {
-          // Email exists but different authUid - cannot link accounts
-          return AuthResponse.failure(
-            "Email already registered with a different authentication method"
-          );
-        }
-
-        // Wait for trigger to create user (if it hasn't already)
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        // Try to find user again
-        user = await this.userRepository.findByAuthUid(command.authUid);
-
-        if (!user) {
-          // Trigger didn't create user - create manually as fallback
-          user = User.createFromGoogle({
-            email: command.email,
-            fullName: command.fullName,
-            authUid: command.authUid,
-          });
-
-          if (command.avatarUrl) {
-            user = user.updateAvatar(command.avatarUrl);
+          console.log('🔄 [GoogleAuth] Email already exists, converting to Google account...');
+          
+          // Convert existing manual account to Google account
+          // Update the auth_uid to link it with Google
+          try {
+            user = await this.userRepository.update(existingEmailUser.id, {
+              authUid: command.authUid,
+              fullName: command.fullName || existingEmailUser.fullName,
+              avatarUrl: command.avatarUrl || existingEmailUser.avatarUrl,
+              isActive: true, // Ensure account is active
+            });
+            console.log('✅ [GoogleAuth] Account successfully converted to Google account');
+          } catch (error) {
+            console.error('❌ [GoogleAuth] Failed to convert account:', error);
+            return AuthResponse.failure(
+              "Failed to link Google account with existing email"
+            );
           }
+        } else {
+          // Wait for trigger to create user (if it hasn't already)
+          console.log('⏳ [GoogleAuth] Waiting for database trigger...');
+          await new Promise((resolve) => setTimeout(resolve, 1000)); // Increased from 500ms
 
-          user = await this.userRepository.save(user);
-        } else if (command.avatarUrl && !user.avatarUrl) {
-          // User created by trigger but needs avatar
-          user = await this.updateUserProfile(user, {
-            avatarUrl: command.avatarUrl,
-          });
+          // Try to find user again
+          console.log('🔍 [GoogleAuth] Checking again for user...');
+          user = await this.userRepository.findByAuthUid(command.authUid);
+
+          if (!user) {
+            console.log('⚠️ [GoogleAuth] User still not found, creating manually...');
+            // Trigger didn't create user - create manually as fallback
+            user = User.createFromGoogle({
+              email: command.email,
+              fullName: command.fullName,
+              authUid: command.authUid,
+            });
+
+            if (command.avatarUrl) {
+              user = user.updateAvatar(command.avatarUrl);
+            }
+
+            console.log('💾 [GoogleAuth] Saving user to database...');
+            user = await this.userRepository.save(user);
+            console.log('✅ [GoogleAuth] User saved successfully:', user.id);
+          } else {
+            console.log('✅ [GoogleAuth] User found after waiting (created by trigger):', user.id);
+            if (command.avatarUrl && !user.avatarUrl) {
+              console.log('🔄 [GoogleAuth] Adding avatar to user...');
+              // User created by trigger but needs avatar
+              user = await this.updateUserProfile(user, {
+                avatarUrl: command.avatarUrl,
+              });
+              console.log('✅ [GoogleAuth] Avatar added');
+            }
+          }
         }
       }
 
       if (!user) {
+        console.error('❌ [GoogleAuth] Failed to create or retrieve user');
         return AuthResponse.failure("Failed to authenticate user");
       }
 
+      console.log('✅ [GoogleAuth] Generating token...');
       const token = this.generateToken(user);
+      console.log('✅ [GoogleAuth] Authentication successful!');
       return AuthResponse.success(
         user,
         token,
         "Google authentication successful"
       );
     } catch (error) {
+      console.error('❌ [GoogleAuth] Exception caught:', error);
       return AuthResponse.failure("Failed to authenticate with Google", [
         error instanceof Error ? error.message : "Unknown error",
       ]);
@@ -378,6 +427,9 @@ export class AuthService {
       const { error: resendError } = await supabaseAdmin.auth.resend({
         type: "signup",
         email: command.email,
+        options: {
+          emailRedirectTo: process.env.EMAIL_REDIRECT_URL || 'http://127.0.0.1:3002/src/pages/EmailVerified.html'
+        }
       });
 
       if (resendError) {

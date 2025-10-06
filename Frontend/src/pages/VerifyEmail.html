@@ -16,20 +16,15 @@
     </div>
     
     <h1 class="verify-title">Check Your Email</h1>
-    <p class="verify-text">
-      We've sent a verification link to:
-    </p>
-    <div class="email-display" id="userEmail">
-      Loading...
-    </div>
+    <p class="verify-text">We've sent a verification link to:</p>
+    <div class="email-display" id="userEmail">Loading...</div>
     
     <p class="verify-text">
       Please click the link in the email to verify your account and complete the registration.
-      The link will expire in 24 hours.
     </p>
     
     <div class="resend-section">
-      <p class="resend-text">Didn't receive the email? Please wait for 1 minute before clicking the button below.</p>
+      <p class="resend-text">Please wait for 1 minute before clicking the button below.</p>
       <button type="button" id="resendBtn" class="btn btn-resend">
         <i class="bi bi-arrow-clockwise me-2"></i>
         Resend Verification Email
@@ -48,13 +43,12 @@
 
   <!-- Controller initialization -->
   <script type="module">
-    import { verifyEmailController } from '../modules/auth/VerifyEmailController.js';
+    import { verifyEmailController } from '/dist/src/modules/auth/VerifyEmailController.js';
 
     // Prevent multiple initialization
     if (!window.verifyEmailPageInitialized) {
       window.verifyEmailPageInitialized = true;
       
-      // Initialize controller when DOM is ready
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
           verifyEmailController.init();
@@ -68,5 +62,3 @@
   </script>
 </body>
 </html>
-
-

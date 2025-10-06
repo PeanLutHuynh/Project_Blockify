@@ -11,12 +11,12 @@
     "backend:start": "cd backend && npm start",
     "backend:test": "cd backend && npm test",
     "frontend:dev": "cd Frontend && npm run dev",
-    "frontend:preview": "cd Frontend && npm run preview",
-    "frontend:build": "cd Frontend && npm run build",
+    "frontend:serve": "cd Frontend && npm run dev",
     "setup": "npm install && cd backend && npm install && cd ../Frontend && npm install",
-    "build": "npm run backend:build && npm run frontend:build",
+    "build": "npm run backend:build && cd Frontend && npm run build",
     "start": "npm run backend:start",
-    "start:all": "concurrently \"npm run backend:start\" \"npm run frontend:preview\""
+    "start:all": "concurrently \"npm run backend:start\" \"npm run frontend:serve\"",
+    "type-check": "cd backend && npx tsc --noEmit && cd ../Frontend && npm run type-check"
   },
   "keywords": [
     "lego",

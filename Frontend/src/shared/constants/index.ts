@@ -4,12 +4,12 @@
 export const APP_CONFIG = {
   NAME: 'Blockify',
   VERSION: '1.0.0',
-  ENVIRONMENT: process.env.NODE_ENV || 'development',
-  DEBUG: process.env.NODE_ENV === 'development',
+  ENVIRONMENT: 'development',
+  DEBUG: true,
   
   // API Configuration
   API: {
-    BASE_URL: process.env.VITE_API_BASE_URL || 'http://localhost:3001/api',
+    BASE_URL: 'http://localhost:3001/api',
     TIMEOUT: 30000,
     RETRY_ATTEMPTS: 3,
     RETRY_DELAY: 1000
