@@ -6,10 +6,8 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "dev": "npm run build && npx http-server . -p 3002 -c-1 --cors -o /src/pages/HomePage.html",
-    "dev:watch": "tsc --watch & npx http-server . -p 3002 -c-1 --cors",
-    "serve": "npx http-server . -p 3002 -c-1 --cors",
-    "start": "npm run build && npx http-server . -p 3002 -c-1 --cors -o /src/pages/HomePage.html",
+    "dev": "concurrently \"tsc --watch\" \"npx http-server . -p 3002 -c-1 --cors -o /src/pages/HomePage.html\"",
+    "serve": "npx http-server . -p 3002 -c-1 --cors -o /src/pages/HomePage.html",
     "type-check": "tsc --noEmit",
     "clean": "powershell -Command \"Get-ChildItem -Path src -Include *.js,*.js.map,*.d.ts -Recurse | Remove-Item -Force\""
   },

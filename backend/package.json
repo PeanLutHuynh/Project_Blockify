@@ -8,7 +8,7 @@
   },
   "scripts": {
     "update-types": "npx supabase gen types typescript --project-id oxpvtqghrksdhhouhbij > src/types/supabase.ts",
-    "dev": "nodemon",
+    "dev": "nodemon",                      
     "dev:with-types": "npm run update-types && nodemon",
     "build": "tsc",
     "start": "node dist/server.js",
