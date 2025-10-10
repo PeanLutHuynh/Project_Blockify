@@ -1,6 +1,7 @@
 import { Middleware } from '../http/types';
 import { JWT } from '../security/JWT';
 import { ENV } from '../../config/env';
+import { createClient } from '@supabase/supabase-js';
 
 /**
  * Custom Auth Middleware
@@ -9,8 +10,12 @@ import { ENV } from '../../config/env';
 // Create JWT instance
 const jwt = new JWT(ENV.JWT_SECRET || '');
 
+// Create Supabase client for token verification
+const supabase = createClient(ENV.SUPABASE_URL || '', ENV.SUPABASE_ANON_KEY || '');
+
 /**
  * Authenticate token middleware - can be used directly
+ * Accepts both backend JWT tokens and Supabase access tokens
  */
 export const authenticateToken: Middleware = async (req, res, next) => {
   try {
@@ -32,25 +37,51 @@ export const authenticateToken: Middleware = async (req, res, next) => {
       return;
     }
 
-    // Verify token
-    const result = jwt.verify(token);
+    // Try to verify as backend JWT first
+    const jwtResult = jwt.verify(token);
 
-    if (!result.valid) {
+    if (jwtResult.valid) {
+      // Backend JWT token - attach user to request
+      (req as any).user = jwtResult.payload;
+      await next();
+      return;
+    }
+
+    // If JWT verification failed, try Supabase token
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser(token);
+      
+      if (error || !user) {
+        res.status(401);
+        res.json({
+          success: false,
+          error: {
+            code: 'INVALID_TOKEN',
+            message: 'Invalid or expired token',
+          },
+        });
+        return;
+      }
+
+      // Supabase token is valid - create temporary user object
+      // We'll use authUid to find user in database if needed
+      (req as any).user = {
+        authUid: user.id,
+        email: user.email,
+        supabaseUser: user,
+      };
+
+      await next();
+    } catch (supabaseError: any) {
       res.status(401);
       res.json({
         success: false,
         error: {
           code: 'INVALID_TOKEN',
-          message: result.error || 'Invalid or expired token',
+          message: supabaseError.message || 'Invalid or expired token',
         },
       });
-      return;
     }
-
-    // Attach user to request
-    (req as any).user = result.payload;
-
-    await next();
   } catch (error: any) {
     res.status(401);
     res.json({

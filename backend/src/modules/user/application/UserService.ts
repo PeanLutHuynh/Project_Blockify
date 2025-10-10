@@ -59,14 +59,31 @@ export class UserService extends BaseService<User> {
     return await this.userRepository.save(user);
   }
 
-  async updateUserProfile(id: string, fullName: string): Promise<User> {
+  async updateUserProfile(id: string, updates: {
+    fullName?: string;
+    phone?: string;
+    gender?: string;
+    birthDate?: Date;
+    avatarUrl?: string;
+  }): Promise<User> {
     const user = await this.userRepository.findById(id);
     if (!user) {
       throw new Error('User not found');
     }
 
-    const updatedUser = user.updateProfile(fullName);
-    return await this.userRepository.update(id, updatedUser);
+    const updatedUser = user.updateProfile(
+      updates.fullName || user.fullName,
+      updates.phone,
+      updates.gender,
+      updates.birthDate
+    );
+
+    // Update avatar if provided
+    const finalUser = updates.avatarUrl 
+      ? updatedUser.updateAvatar(updates.avatarUrl)
+      : updatedUser;
+
+    return await this.userRepository.update(id, finalUser);
   }
 
   async deactivateUser(id: string): Promise<User> {

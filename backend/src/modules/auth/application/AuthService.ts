@@ -355,6 +355,10 @@ export class AuthService {
     return await this.userRepository.findById(userId);
   }
 
+  async getUserByAuthUid(authUid: string): Promise<User | null> {
+    return await this.userRepository.findByAuthUid(authUid);
+  }
+
   async verifyEmail(command: VerifyEmailCommand): Promise<AuthResponse> {
     try {
       const validationErrors = this.validateCommand(command);

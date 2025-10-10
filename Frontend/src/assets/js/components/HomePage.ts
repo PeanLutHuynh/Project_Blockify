@@ -1,4 +1,16 @@
-document.addEventListener('DOMContentLoaded', function() {
+import { initializeOnReady } from '../../../core/config/init.js';
+import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
+
+// Initialize app and run page logic
+initializeOnReady(() => {
+  // Initialize navbar authentication UI
+  initializeNavbarAuth();
+  
+  // Original homepage logic
+  initializeHomePage();
+});
+
+function initializeHomePage() {
   // Danh sách sản phẩm
   const products = [
     { img: "../../public/images/Group 61.png", name: "Police" },
@@ -348,4 +360,5 @@ document.addEventListener('DOMContentLoaded', function() {
       window.location.href = 'ProductDetail.html';
     });
   }
-});
+}
+

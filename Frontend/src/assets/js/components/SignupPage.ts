@@ -1,14 +1,14 @@
 import { modernAuthController } from '../../../modules/auth/ModernAuthController.js';
-import { waitForConfig } from '../../../core/config/init.js';
+import { initializeApp } from '../../../core/config/init.js';
 import { ENV } from '../../../core/config/env.js';
 
 // Wait for DOM and config to be ready
 document.addEventListener('DOMContentLoaded', async function() {
 
-// Wait for config to load from backend
-await waitForConfig();
+// Initialize app (loads config + initializes Supabase)
+await initializeApp();
 
-console.log('✅ Config loaded, SUPABASE_URL:', ENV.SUPABASE_URL);
+console.log('✅ App initialized, SUPABASE_URL:', ENV.SUPABASE_URL);
 
 // Typing effect for welcome message (2 lines)
 const welcomeLines = ['WELCOME TO', 'OUR SHOP'];

@@ -1,3 +1,325 @@
+import { authService } from "../../../core/services/AuthService.js";
+import { httpClient } from "../../../core/api/FetchHttpClient.js";
+import { User } from "../../../core/models/User.js";
+import { initializeOnReady } from '../../../core/config/init.js';
+
+/**
+ * Account Controller
+ * Handles user account page functionality
+ */
+
+class AccountController {
+  private currentUser: User | null = null;
+
+  async initialize(): Promise<void> {
+    // Check if user is authenticated
+    if (!authService.isAuthenticated()) {
+      window.location.href = 'SigninPage.html';
+      return;
+    }
+
+    // Load user data
+    await this.loadUserProfile();
+    
+    // Setup event handlers
+    this.setupEventHandlers();
+    
+    // Setup date dropdowns
+    this.setupDateDropdowns();
+  }
+
+  /**
+   * Load user profile from backend
+   */
+  private async loadUserProfile(): Promise<void> {
+    try {
+      const result = await authService.getCurrentUser();
+      
+      if (result.success && result.user) {
+        this.currentUser = result.user;
+        this.populateUserData(result.user);
+      } else {
+        console.error('Failed to load user profile');
+        alert('Failed to load user profile. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+      alert('Error loading user profile. Please try again.');
+    }
+  }
+
+  /**
+   * Populate form fields with user data
+   */
+  private populateUserData(user: User): void {
+    // Update sidebar avatar and username
+    const sidebarAvatar = document.querySelector('.user-info .avatar') as HTMLImageElement;
+    const sidebarUsername = document.querySelector('.user-info .username') as HTMLElement;
+    
+    if (sidebarAvatar && user.avatarUrl) {
+      sidebarAvatar.src = user.avatarUrl;
+    }
+    if (sidebarUsername) {
+      sidebarUsername.textContent = user.username;
+    }
+
+    // Update form fields
+    const nameInput = document.querySelector('input[placeholder="Enter your name"]') as HTMLInputElement;
+    const emailInput = document.querySelector('input[placeholder="Enter your email"]') as HTMLInputElement;
+    const phoneInput = document.querySelector('input[placeholder="Enter your phone number"]') as HTMLInputElement;
+    
+    if (nameInput) nameInput.value = user.fullName || '';
+    if (emailInput) {
+      emailInput.value = user.email || '';
+      emailInput.disabled = true; // Email cannot be changed
+    }
+    if (phoneInput) phoneInput.value = user.phone || '';
+
+    // Update gender radio buttons
+    if (user.gender) {
+      const genderInput = document.querySelector(`input[name="sex"][value="${user.gender}"]`) as HTMLInputElement;
+      if (genderInput) genderInput.checked = true;
+    }
+
+    // Update date of birth dropdowns
+    if (user.birthDate) {
+      const birthDate = new Date(user.birthDate);
+      this.setDateDropdown('day', birthDate.getDate());
+      this.setDateDropdown('month', birthDate.getMonth() + 1);
+      this.setDateDropdown('year', birthDate.getFullYear());
+    }
+
+    // Update large avatar
+    const largeAvatar = document.querySelector('.large-avatar') as HTMLImageElement;
+    if (largeAvatar && user.avatarUrl) {
+      largeAvatar.src = user.avatarUrl;
+    }
+  }
+
+  /**
+   * Setup event handlers for buttons
+   */
+  private setupEventHandlers(): void {
+    // Find all buttons with .btn-primary-custom class
+    const buttons = document.querySelectorAll('.btn-primary-custom');
+    buttons.forEach(btn => {
+      const buttonText = btn.textContent?.trim();
+      if (buttonText === 'Save') {
+        btn.addEventListener('click', () => this.handleSaveProfile());
+      }
+    });
+
+    // Logout button 
+    const logoutLink = document.querySelector('a[href="SigninPage.html"]') as HTMLAnchorElement;
+    if (logoutLink && logoutLink.textContent?.includes('Log out')) {
+      logoutLink.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await authService.signOut();
+        window.location.href = 'SigninPage.html';
+      });
+    }
+
+    // Choose Image button
+    const chooseImageBtns = document.querySelectorAll('.btn-outline-primary-custom');
+    chooseImageBtns.forEach(btn => {
+      if (btn.textContent?.includes('Choose Image')) {
+        btn.addEventListener('click', () => this.handleChooseImage());
+      }
+    });
+  }
+
+  /**
+   * Handle save profile
+   */
+  private async handleSaveProfile(): Promise<void> {
+    if (!this.currentUser) return;
+
+    try {
+      // Gather form data
+      const nameInput = document.querySelector('input[placeholder="Enter your name"]') as HTMLInputElement;
+      const phoneInput = document.querySelector('input[placeholder="Enter your phone number"]') as HTMLInputElement;
+      const genderInput = document.querySelector('input[name="sex"]:checked') as HTMLInputElement;
+      
+      const day = this.getDateDropdownValue('day');
+      const month = this.getDateDropdownValue('month');
+      const year = this.getDateDropdownValue('year');
+      
+      let birthDate: Date | undefined;
+      if (day && month && year) {
+        birthDate = new Date(year, month - 1, day);
+      }
+
+      // Prepare update data
+      const updateData: any = {
+        fullName: nameInput?.value || this.currentUser.fullName,
+        phone: phoneInput?.value || undefined,
+        gender: genderInput?.value || undefined,
+      };
+      
+      if (birthDate) {
+        updateData.birthDate = birthDate.toISOString();
+      }
+
+      // Send update request
+      const response = await httpClient.patch(
+        `/api/users/${this.currentUser.id}/profile`,
+        updateData
+      );
+
+      if (response.data) {
+        alert('Profile updated successfully!');
+        
+        // Refresh user data
+        await this.loadUserProfile();
+      } else {
+        alert('Failed to update profile. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Error updating profile. Please try again.');
+    }
+  }
+
+  /**
+   * Handle choose image
+   */
+  private handleChooseImage(): void {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    
+    fileInput.addEventListener('change', async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      try {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const avatarUrl = e.target?.result as string;
+          
+          // Update avatar displays
+          const largeAvatar = document.querySelector('.large-avatar') as HTMLImageElement;
+          const sidebarAvatar = document.querySelector('.user-info .avatar') as HTMLImageElement;
+          
+          if (largeAvatar) largeAvatar.src = avatarUrl;
+          if (sidebarAvatar) sidebarAvatar.src = avatarUrl;
+          
+          alert('Image selected. Click Save to update your profile.');
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error handling image:', error);
+        alert('Error selecting image. Please try again.');
+      }
+    });
+
+    fileInput.click();
+  }
+
+  /**
+   * Setup date dropdowns
+   */
+  private setupDateDropdowns(): void {
+    const dayMenu = document.getElementById('day-menu');
+    const monthMenu = document.getElementById('month-menu');
+    const yearMenu = document.getElementById('year-menu');
+    
+    const dayButton = document.getElementById('day-button');
+    const monthButton = document.getElementById('month-button');
+    const yearButton = document.getElementById('year-button');
+
+    // Populate days (1-31)
+    if (dayMenu) {
+      for (let i = 1; i <= 31; i++) {
+        const li = document.createElement('li');
+        li.innerHTML = `<a class="dropdown-item" href="#" data-value="${i}">${i}</a>`;
+        li.querySelector('a')?.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (dayButton) dayButton.textContent = i.toString();
+        });
+        dayMenu.appendChild(li);
+      }
+    }
+
+    // Populate months (1-12)
+    if (monthMenu) {
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+      for (let i = 1; i <= 12; i++) {
+        const li = document.createElement('li');
+        li.innerHTML = `<a class="dropdown-item" href="#" data-value="${i}">${monthNames[i-1]}</a>`;
+        li.querySelector('a')?.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (monthButton) monthButton.textContent = monthNames[i-1];
+        });
+        monthMenu.appendChild(li);
+      }
+    }
+
+    // Populate years (current year - 100 to current year)
+    if (yearMenu) {
+      const currentYear = new Date().getFullYear();
+      for (let i = currentYear; i >= currentYear - 100; i--) {
+        const li = document.createElement('li');
+        li.innerHTML = `<a class="dropdown-item" href="#" data-value="${i}">${i}</a>`;
+        li.querySelector('a')?.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (yearButton) yearButton.textContent = i.toString();
+        });
+        yearMenu.appendChild(li);
+      }
+    }
+  }
+
+  /**
+   * Set date dropdown value
+   */
+  private setDateDropdown(type: 'day' | 'month' | 'year', value: number): void {
+    const button = document.getElementById(`${type}-button`);
+    if (!button) return;
+
+    if (type === 'month') {
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+      button.textContent = monthNames[value - 1] || 'Month';
+    } else {
+      button.textContent = value.toString();
+    }
+  }
+
+  /**
+   * Get date dropdown value
+   */
+  private getDateDropdownValue(type: 'day' | 'month' | 'year'): number | null {
+    const button = document.getElementById(`${type}-button`);
+    if (!button || !button.textContent) return null;
+
+    if (type === 'month') {
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+      const monthIndex = monthNames.indexOf(button.textContent);
+      return monthIndex >= 0 ? monthIndex + 1 : null;
+    }
+
+    const value = parseInt(button.textContent);
+    return isNaN(value) ? null : value;
+  }
+}
+
+// Initialize on page load
+initializeOnReady(() => {
+  const controller = new AccountController();
+  controller.initialize();
+  
+  // Make functions globally available for HTML onclick handlers
+  (window as any).showTab = showTab;
+  (window as any).toggleAddressForm = toggleAddressForm;
+  (window as any).cancelAddAddress = cancelAddAddress;
+  (window as any).saveAddress = saveAddress;
+});
+
+// Original code for tab navigation and address management
+
 // Handle main tab switching (Personal Info, Order, Wishlist...)
 function showTab(tabId: string, element: HTMLElement): void {
   document.querySelectorAll('.tab-pane').forEach(div => {
@@ -39,11 +361,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Address form functions
-function toggleAddressForm(): void {
-  const form = document.getElementById('addAddressForm');
-  if (form) form.classList.toggle('show');
-}
-
 function cancelAddAddress(): void {
   const form = document.getElementById('addAddressForm');
   if (!form) return;
@@ -59,6 +376,11 @@ function cancelAddAddress(): void {
       input.value = '';
     }
   });
+}
+
+function toggleAddressForm(): void {
+  const form = document.getElementById('addAddressForm');
+  if (form) form.classList.toggle('show');
 }
 
 function saveAddress(): void {
@@ -90,6 +412,13 @@ function saveAddress(): void {
   cancelAddAddress();
   alert('Address added successfully!');
 }
+
+// Make functions globally available for HTML onclick handlers
+(window as any).showTab = showTab;
+(window as any).toggleAddressForm = toggleAddressForm;
+(window as any).cancelAddAddress = cancelAddAddress;
+(window as any).saveAddress = saveAddress;
+// viewProductDetails is defined inline below
 
 type WishlistProduct = {
   title: string;
@@ -189,7 +518,7 @@ const wishlistProducts: Record<string, WishlistProduct> = {
   }
 };
 
-function viewProductDetails(productName: string): void {
+(window as any).viewProductDetails = function viewProductDetails(productName: string): void {
   const productData = wishlistProducts[productName];
   if (productData) {
     localStorage.setItem('selectedProduct', JSON.stringify(productData));
@@ -198,4 +527,6 @@ function viewProductDetails(productName: string): void {
     alert('Product details not found!');
   }
 }
+
+
   

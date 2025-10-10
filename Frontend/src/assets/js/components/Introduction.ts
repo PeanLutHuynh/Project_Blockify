@@ -1,4 +1,12 @@
-document.addEventListener('DOMContentLoaded', function() {
+import { initializeOnReady } from '../../../core/config/init.js';
+import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
+
+// Initialize app and navbar auth
+initializeOnReady(() => {
+  // Initialize navbar authentication UI
+  initializeNavbarAuth();
+  
+  // Original code for menu navigation
   document.querySelectorAll('.menu li').forEach(item => {
     item.addEventListener('click', () => {
       document.querySelectorAll('.menu li').forEach(li => li.classList.remove('active'));
@@ -12,3 +20,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
