@@ -46,17 +46,47 @@ export class UserController extends BaseController<User> {
   async updateUserProfile(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
       const { id } = req.params;
-      const { name } = req.body;
+      const { fullName, phone, gender, birthDate, avatarUrl } = req.body;
       
-      if (!name) {
-        this.sendResponse(res, 400, undefined, undefined, 'Name is required');
+      const updates: any = {};
+      if (fullName) updates.fullName = fullName;
+      if (phone) updates.phone = phone;
+      if (gender) updates.gender = gender;
+      if (birthDate) updates.birthDate = new Date(birthDate);
+      if (avatarUrl) updates.avatarUrl = avatarUrl;
+
+      if (Object.keys(updates).length === 0) {
+        this.sendResponse(res, 400, undefined, undefined, 'No update fields provided');
         return;
       }
 
-      const user = await this.userService.updateUserProfile(id, name);
+      const user = await this.userService.updateUserProfile(id, updates);
       this.sendResponse(res, 200, user, 'User profile updated successfully');
     } catch (error) {
       this.sendResponse(res, 400, undefined, undefined, (error as Error).message);
+    }
+  }
+
+  async getCurrentUserProfile(req: HttpRequest, res: HttpResponse): Promise<void> {
+    try {
+      // Get user ID from authenticated request (set by auth middleware)
+      const userId = (req as any).user?.userId;
+      
+      if (!userId) {
+        this.sendResponse(res, 401, undefined, undefined, 'Unauthorized');
+        return;
+      }
+
+      const user = await this.userService.findById(userId);
+      
+      if (!user) {
+        this.sendResponse(res, 404, undefined, undefined, 'User not found');
+        return;
+      }
+
+      this.sendResponse(res, 200, user, 'User profile retrieved successfully');
+    } catch (error) {
+      this.sendResponse(res, 500, undefined, undefined, (error as Error).message);
     }
   }
 

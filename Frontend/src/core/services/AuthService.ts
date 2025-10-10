@@ -1,4 +1,5 @@
 import { httpClient } from "../api/FetchHttpClient.js";
+import { supabaseService } from "../api/supabaseClient.js";
 import { User } from "../models/User.js";
 import { ENV } from "../config/env.js";
 
@@ -68,18 +69,20 @@ export class AuthService {
         data
       );
 
-      if (response.data?.success) {
+      // Backend structure: { success: true/false, data: {...}, message }
+      if (response.success) {
         return {
           success: true,
-          message: response.data.message,
-          user: response.data.user
+          message: response.message || "Sign up successful",
+          user: response.data?.user
             ? User.fromApiResponse(response.data.user)
             : undefined,
         };
       } else {
         return {
           success: false,
-          message: response.data?.message || "Sign up failed",
+          message: response.message || response.data?.message || "Sign up failed",
+          errors: response.data?.errors,
         };
       }
     } catch (error: any) {
@@ -92,7 +95,7 @@ export class AuthService {
   }
 
   /**
-   * Sign in existing user
+   * Sign in existing user using Supabase Auth
    */
   async signIn(data: SignInRequest): Promise<{
     success: boolean;
@@ -101,31 +104,51 @@ export class AuthService {
     errors?: string[];
   }> {
     try {
+      console.log('🔐 Attempting sign in with:', { identifier: data.identifier });
+      
+      // Authenticate with backend first (backend will verify with Supabase)
       const response = await httpClient.post<AuthResponse>(
         "/api/auth/signin",
         data
       );
 
+      console.log('📡 Backend response:', response);
+
+      // Backend structure: { success: true, data: { user, token }, message }
       if (
-        response.data?.success &&
+        response.success &&
         response.data?.user &&
         response.data?.token
       ) {
         this.handleAuthSuccess(response.data.user, response.data.token);
+        
+        // Then try to sync Supabase session (optional, backend already verified)
+        try {
+          const email = response.data.user.email;
+          if (email && data.password) {
+            await supabaseService.signInWithPassword(email, data.password);
+            console.log('✅ Supabase session synced');
+          }
+        } catch (supabaseError) {
+          console.warn('⚠️ Supabase sign in failed, but backend auth succeeded:', supabaseError);
+          // Continue anyway since backend auth succeeded
+        }
+        
         return {
           success: true,
           user: this.currentUser!,
-          message: response.data.message,
+          message: response.message || "Sign in successful",
         };
       } else {
+        console.error('❌ Backend authentication failed:', response);
         return {
           success: false,
-          message: response.data?.message || "Sign in failed",
+          message: response.message || response.data?.message || "Sign in failed",
           errors: response.data?.errors,
         };
       }
     } catch (error: any) {
-      console.error("SignIn error:", error);
+      console.error("❌ SignIn error:", error);
       return {
         success: false,
         message: error.response?.data?.message || "Network error occurred",
@@ -183,18 +206,19 @@ export class AuthService {
     try {
       const response = await httpClient.get<any>("/api/auth/me");
 
-      if (response.data) {
+      // Backend structure: { success: true, data: { id, email, ... }, message }
+      if (response.success && response.data) {
         const user = User.fromApiResponse(response.data);
         this.setCurrentUser(user);
         return {
           success: true,
           user,
-          message: "User profile retrieved successfully",
+          message: response.message || "User profile retrieved successfully",
         };
       } else {
         return {
           success: false,
-          message: "Failed to get user profile",
+          message: response.message || "Failed to get user profile",
         };
       }
     } catch (error: any) {
@@ -207,9 +231,13 @@ export class AuthService {
   }
 
   /**
-   * Sign out user
+   * Sign out user using Supabase Auth
    */
-  signOut(): void {
+  async signOut(): Promise<void> {
+    // Sign out from Supabase
+    await supabaseService.signOut();
+    
+    // Clear local state
     this.currentUser = null;
     localStorage.removeItem(this.AUTH_TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
@@ -231,19 +259,22 @@ export class AuthService {
   }
 
   /**
-   * Google authentication via full-page redirect (no popup)
-   * Uses Supabase implicit flow to get access_token in URL hash
+   * Google authentication using Supabase OAuth
+   * Supabase will handle redirect and session management automatically
    */
   async googleAuth(): Promise<{ success: boolean; message: string }> {
     try {
-      const redirectUrl = `${window.location.origin}${ENV.GOOGLE_OAUTH_REDIRECT_URL}`;
-
-      // Supabase OAuth URL with implicit flow (returns access_token in hash)
-      const authUrl = new URL(`${ENV.SUPABASE_URL}/auth/v1/authorize`);
-      authUrl.searchParams.set("provider", "google");
-      authUrl.searchParams.set("redirect_to", redirectUrl);
-
-      window.location.href = authUrl.toString();
+      // Use Supabase signInWithOAuth - it handles everything automatically
+      const { error } = await supabaseService.signInWithGoogle();
+      
+      if (error) {
+        console.error('Google OAuth error:', error);
+        return {
+          success: false,
+          message: error.message || 'Failed to initialize Google authentication'
+        };
+      }
+      
       return { success: true, message: "Redirecting to Google..." };
     } catch (error) {
       console.error("Google auth error:", error);
@@ -273,21 +304,22 @@ export class AuthService {
         },
       });
 
-      if (response.data.success) {
+      // Backend structure: { success: true, data: { user, token }, message }
+      if (response.success && response.data?.user && response.data?.token) {
         this.handleAuthSuccess(response.data.user, response.data.token);
 
         return {
           success: true,
           user: this.currentUser!,
           token: response.data.token,
-          message: response.data.message,
+          message: response.message || "Google authentication successful",
           redirectTo: "/src/pages/HomePage.html",
         };
       } else {
         return {
           success: false,
-          message: response.data.message,
-          errors: response.data.errors,
+          message: response.message || response.data?.message || "Google authentication failed",
+          errors: response.data?.errors,
         };
       }
     } catch (error: any) {
@@ -358,9 +390,118 @@ export class AuthService {
       return verifyResult.success;
     } catch (error) {
       console.error("Token refresh failed:", error);
-      this.signOut();
+      await this.signOut();
       return false;
     }
+  }
+
+  /**
+   * Initialize auth state listener
+   * Listen to Supabase auth state changes and sync with local state
+   */
+  initializeAuthListener(): () => void {
+    let authSyncPromise: Promise<void> | null = null; // Promise-based lock
+    
+    return supabaseService.onAuthStateChange(async (supabaseUser) => {
+      // If already syncing, wait for it to complete
+      if (authSyncPromise) {
+        await authSyncPromise;
+        return;
+      }
+      
+      // Create sync promise
+      authSyncPromise = (async () => {
+        try {
+          if (!supabaseUser) {
+            // User logged out - only clear local state, don't trigger another signOut
+            if (this.currentUser) {
+              this.currentUser = null;
+              localStorage.removeItem(this.AUTH_TOKEN_KEY);
+              localStorage.removeItem(this.USER_KEY);
+              httpClient.clearAuthToken();
+            }
+          } else if (!this.currentUser || this.currentUser.authUid !== supabaseUser.id) {
+            // New user logged in or session restored
+            
+            // Wait for Supabase session to be fully ready
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            try {
+              // Get Supabase access token
+              const { data: sessionData, error: sessionError } = await supabaseService.getSession();
+              const supabaseToken = sessionData?.session?.access_token;
+              
+              if (sessionError) {
+                console.error('❌ Session error, signing out:', sessionError.message);
+                await supabaseService.signOut();
+                return;
+              }
+              
+              if (!supabaseToken) {
+                console.error('❌ No Supabase token, clearing expired session');
+                await supabaseService.signOut();
+                return;
+              }
+              
+              // Set temporary token to call backend
+              httpClient.setAuthToken(supabaseToken);
+              
+              // Try to fetch user profile from backend with Supabase token
+              const response = await httpClient.get<any>("/api/auth/me");
+              
+              // Backend structure: { success: true, data: {...}, message }
+              if (response.success && response.data) {
+                // Backend knows this user, sync profile
+                const user = User.fromApiResponse(response.data);
+                this.setCurrentUser(user);
+                console.log('✅ Google OAuth: User synced:', user.email);
+              } else {
+                // User not in backend, need to create via OAuth callback
+                
+                // Call Google OAuth endpoint to create user in backend
+                const authData = {
+                  email: supabaseUser.email!,
+                  fullName: supabaseUser.user_metadata?.full_name || supabaseUser.email!.split('@')[0],
+                  authUid: supabaseUser.id,
+                  avatarUrl: supabaseUser.user_metadata?.avatar_url,
+                };
+                
+                const oauthResponse = await httpClient.post("/api/auth/google", authData);
+                
+                // Backend structure: { success: true, data: { user, token }, message }
+                if (oauthResponse.success && oauthResponse.data?.user && oauthResponse.data?.token) {
+                  this.handleAuthSuccess(oauthResponse.data.user, oauthResponse.data.token);
+                  console.log('✅ Google OAuth: User created:', oauthResponse.data.user.email);
+                } else {
+                  console.error('❌ OAuth user creation failed');
+                }
+              }
+            } catch (error) {
+              console.error('❌ Failed to sync user:', error);
+            }
+          }
+        } finally {
+          authSyncPromise = null; // Clear lock
+        }
+      })(); // Execute immediately
+      
+      // Wait for sync to complete
+      await authSyncPromise;
+    });
+  }
+
+  /**
+   * Get current Supabase user
+   */
+  async getSupabaseUser() {
+    return await supabaseService.getUser();
+  }
+
+  /**
+   * Check if Supabase session is active
+   */
+  async isSupabaseAuthenticated(): Promise<boolean> {
+    return await supabaseService.isAuthenticated();
   }
 }
 

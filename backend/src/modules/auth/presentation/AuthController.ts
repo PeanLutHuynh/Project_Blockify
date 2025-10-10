@@ -59,7 +59,11 @@ export class AuthController {
 
       if (result.success) {
         res.setHeader("Authorization", `Bearer ${result.token}`);
-        this.sendSuccess(res, 200, result.user, result.message || 'Signed in successfully');
+        // Return both user and token in response
+        this.sendSuccess(res, 200, {
+          user: result.user,
+          token: result.token
+        }, result.message || 'Signed in successfully');
       } else {
         this.sendError(res, 401, result.message || 'Authentication failed');
       }
@@ -78,7 +82,11 @@ export class AuthController {
 
       if (result.success) {
         res.setHeader("Authorization", `Bearer ${result.token}`);
-        this.sendSuccess(res, 200, result.user, result.message || 'Google authentication successful');
+        // Return both user and token in response
+        this.sendSuccess(res, 200, {
+          user: result.user,
+          token: result.token
+        }, result.message || 'Google authentication successful');
       } else {
         if (result.errors && result.errors.length > 0) {
           this.sendError(res, 400, result.message || 'Authentication failed', result.errors);
@@ -132,12 +140,25 @@ export class AuthController {
   public me = async (req: HttpRequest, res: HttpResponse): Promise<void> => {
     try {
       const userId = (req as any).user?.userId;
-      if (!userId) {
+      const authUid = (req as any).user?.authUid;
+      
+      if (!userId && !authUid) {
         this.sendError(res, 401, "Unauthorized");
         return;
       }
 
-      const user = await this.authService.getUserById(userId);
+      let user;
+      
+      // Try to find by userId first (backend JWT)
+      if (userId) {
+        user = await this.authService.getUserById(userId);
+      }
+      
+      // If not found, try by authUid (Supabase token)
+      if (!user && authUid) {
+        user = await this.authService.getUserByAuthUid(authUid);
+      }
+      
       if (!user) {
         this.sendError(res, 404, "User not found");
         return;

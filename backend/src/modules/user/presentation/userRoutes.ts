@@ -14,6 +14,7 @@ export function createUserRouter(): Router {
   // REST API routes
   router.addRoute('GET', '/', (req, res) => userController.getAll(req, res));
   router.addRoute('GET', '/active', (req, res) => userController.getActiveUsers(req, res));
+  router.addRoute('GET', '/me', (req, res) => userController.getCurrentUserProfile(req, res));
   router.addRoute('GET', '/:id', (req, res) => userController.getById(req, res));
   router.addRoute('GET', '/email/:email', (req, res) => userController.getUserByEmail(req, res));
   router.addRoute('POST', '/', (req, res) => userController.createUser(req, res));
