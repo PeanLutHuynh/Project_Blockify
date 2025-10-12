@@ -166,6 +166,22 @@ export class AuthService {
     message: string;
   }> {
     try {
+      // First check if we have a Supabase session
+      const { data: sessionData, error: sessionError } = await supabaseService.getSession();
+      
+      if (sessionError || !sessionData?.session) {
+        console.warn('⚠️ No Supabase session found');
+        this.signOut();
+        return {
+          success: false,
+          message: "No active session",
+        };
+      }
+
+      // Use Supabase token for verification
+      const supabaseToken = sessionData.session.access_token;
+      httpClient.setAuthToken(supabaseToken);
+
       const response = await httpClient.post<{ user: any; payload: any }>(
         "/api/auth/verify-token"
       );
@@ -204,12 +220,31 @@ export class AuthService {
     message: string;
   }> {
     try {
+      // First check if we have a Supabase session
+      const { data: sessionData, error: sessionError } = await supabaseService.getSession();
+      
+      if (sessionError || !sessionData?.session) {
+        console.warn('⚠️ No Supabase session found');
+        return {
+          success: false,
+          message: "No active session",
+        };
+      }
+
+      // Use Supabase token to authenticate with backend
+      const supabaseToken = sessionData.session.access_token;
+      httpClient.setAuthToken(supabaseToken);
+
       const response = await httpClient.get<any>("/api/auth/me");
 
       // Backend structure: { success: true, data: { id, email, ... }, message }
       if (response.success && response.data) {
         const user = User.fromApiResponse(response.data);
         this.setCurrentUser(user);
+        
+        // Store the Supabase token as well
+        localStorage.setItem(this.AUTH_TOKEN_KEY, supabaseToken);
+        
         return {
           success: true,
           user,
@@ -357,7 +392,7 @@ export class AuthService {
   /**
    * Set current user and persist to localStorage
    */
-  private setCurrentUser(user: User): void {
+  setCurrentUser(user: User): void {
     this.currentUser = user;
     localStorage.setItem(this.USER_KEY, JSON.stringify(user.toApiRequest()));
   }
@@ -438,8 +473,9 @@ export class AuthService {
               }
               
               if (!supabaseToken) {
-                console.error('❌ No Supabase token, clearing expired session');
-                await supabaseService.signOut();
+                console.warn('⚠️ No Supabase token found, but user object exists. Session may be loading...');
+                // Don't immediately sign out - the session might be loading
+                // Just skip syncing for now and wait for next auth state change
                 return;
               }
               

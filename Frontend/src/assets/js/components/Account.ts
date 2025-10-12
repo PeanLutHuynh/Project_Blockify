@@ -2,6 +2,7 @@ import { authService } from "../../../core/services/AuthService.js";
 import { httpClient } from "../../../core/api/FetchHttpClient.js";
 import { User } from "../../../core/models/User.js";
 import { initializeOnReady } from '../../../core/config/init.js';
+import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
 
 /**
  * Account Controller
@@ -12,9 +13,12 @@ class AccountController {
   private currentUser: User | null = null;
 
   async initialize(): Promise<void> {
-    // Check if user is authenticated
-    if (!authService.isAuthenticated()) {
-      window.location.href = 'SigninPage.html';
+    // Initialize navbar auth first
+    initializeNavbarAuth();
+
+    // Check authentication - improved to handle Supabase session
+    const isAuth = await this.checkAuthentication();
+    if (!isAuth) {
       return;
     }
 
@@ -26,6 +30,42 @@ class AccountController {
     
     // Setup date dropdowns
     this.setupDateDropdowns();
+  }
+
+  /**
+   * Check authentication with Supabase session support
+   */
+  private async checkAuthentication(): Promise<boolean> {
+    // Check if Supabase session exists
+    const isSupabaseAuth = await authService.isSupabaseAuthenticated();
+    
+    if (!isSupabaseAuth) {
+      console.warn('⚠️ No Supabase session found, redirecting to sign in');
+      window.location.href = 'SigninPage.html';
+      return false;
+    }
+
+    // Check local auth state
+    const isLocalAuth = authService.isAuthenticated();
+    
+    if (!isLocalAuth) {
+      console.warn('⚠️ No local auth state, fetching from backend...');
+      
+      // Try to get current user from backend using Supabase token
+      const result = await authService.getCurrentUser();
+      
+      if (!result.success || !result.user) {
+        console.error('❌ Failed to get user profile from backend');
+        window.location.href = 'SigninPage.html';
+        return false;
+      }
+      
+      this.currentUser = result.user;
+      return true;
+    }
+
+    this.currentUser = authService.getUser();
+    return !!this.currentUser;
   }
 
   /**
@@ -52,15 +92,19 @@ class AccountController {
    * Populate form fields with user data
    */
   private populateUserData(user: User): void {
+    console.log('📋 Populating user data:', user);
+
     // Update sidebar avatar and username
     const sidebarAvatar = document.querySelector('.user-info .avatar') as HTMLImageElement;
     const sidebarUsername = document.querySelector('.user-info .username') as HTMLElement;
     
-    if (sidebarAvatar && user.avatarUrl) {
-      sidebarAvatar.src = user.avatarUrl;
+    const avatarUrl = user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.getDisplayName())}&background=random`;
+    
+    if (sidebarAvatar) {
+      sidebarAvatar.src = avatarUrl;
     }
     if (sidebarUsername) {
-      sidebarUsername.textContent = user.username;
+      sidebarUsername.textContent = user.username || user.email;
     }
 
     // Update form fields
@@ -91,9 +135,11 @@ class AccountController {
 
     // Update large avatar
     const largeAvatar = document.querySelector('.large-avatar') as HTMLImageElement;
-    if (largeAvatar && user.avatarUrl) {
-      largeAvatar.src = user.avatarUrl;
+    if (largeAvatar) {
+      largeAvatar.src = avatarUrl;
     }
+
+    console.log('✅ User data populated successfully');
   }
 
   /**
@@ -104,20 +150,15 @@ class AccountController {
     const buttons = document.querySelectorAll('.btn-primary-custom');
     buttons.forEach(btn => {
       const buttonText = btn.textContent?.trim();
-      if (buttonText === 'Save') {
-        btn.addEventListener('click', () => this.handleSaveProfile());
+      if (buttonText === 'Save' || buttonText === 'Update') {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.handleSaveProfile();
+        });
       }
     });
 
-    // Logout button 
-    const logoutLink = document.querySelector('a[href="SigninPage.html"]') as HTMLAnchorElement;
-    if (logoutLink && logoutLink.textContent?.includes('Log out')) {
-      logoutLink.addEventListener('click', async (e) => {
-        e.preventDefault();
-        await authService.signOut();
-        window.location.href = 'SigninPage.html';
-      });
-    }
+    // Logout is handled by NavbarAuth component
 
     // Choose Image button
     const chooseImageBtns = document.querySelectorAll('.btn-outline-primary-custom');

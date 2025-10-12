@@ -1,3 +1,6 @@
+import { initializeOnReady } from '../../../core/config/init.js';
+import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
+
 // Product data
 type Product = {
   name: string;
@@ -99,7 +102,16 @@ declare global {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+// Initialize app and run page logic
+initializeOnReady(() => {
+  // Initialize navbar authentication UI
+  initializeNavbarAuth();
+  
+  // Original product detail page logic
+  initializeProductDetailPage();
+});
+
+function initializeProductDetailPage() {
   initProducts();
 
   // Hiện popup search khi click icon search
@@ -263,4 +275,4 @@ document.addEventListener('DOMContentLoaded', function() {
     const reviewForm = document.querySelector(".add-review-form") as HTMLFormElement | null;
     if (reviewForm) reviewForm.reset();
   };
-});
+}

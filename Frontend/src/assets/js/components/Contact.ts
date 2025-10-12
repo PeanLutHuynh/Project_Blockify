@@ -1,4 +1,16 @@
-document.addEventListener('DOMContentLoaded', function() {
+import { initializeOnReady } from '../../../core/config/init.js';
+import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
+
+// Initialize app and run page logic
+initializeOnReady(() => {
+  // Initialize navbar authentication UI
+  initializeNavbarAuth();
+  
+  // Original contact page logic
+  initializeContactPage();
+});
+
+function initializeContactPage() {
   // Form validation and submission
   const form = document.querySelector('form');
   if (!form) return;
@@ -55,4 +67,4 @@ document.addEventListener('DOMContentLoaded', function() {
     (el as HTMLElement).style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
     observer.observe(el);
   });
-});
+}
