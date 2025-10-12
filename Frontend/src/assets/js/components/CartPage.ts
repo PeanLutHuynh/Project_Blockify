@@ -1,3 +1,6 @@
+import { initializeOnReady } from '../../../core/config/init.js';
+import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
+
 // Helpers
 const formatVND = (n: number): string => {
   try { return new Intl.NumberFormat('vi-VN').format(n) + ' VND'; } catch(_){ return (n||0) + ' VND'; }
@@ -67,10 +70,19 @@ function render(): void {
   if(sa){
     sa.checked = allSelected && !noneSelected;
     sa.indeterminate = !allSelected && !noneSelected;
-  }
+  };
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+// Initialize app and run page logic
+initializeOnReady(() => {
+  // Initialize navbar authentication UI
+  initializeNavbarAuth();
+  
+  // Original cart page logic
+  initializeCartPage();
+});
+
+function initializeCartPage() {
   // Event delegation
   const cartList = document.getElementById('cart-list');
   if (cartList) {
@@ -147,4 +159,4 @@ document.addEventListener('DOMContentLoaded', function() {
       window.location.href = 'OrderPage.html';
     });
   }
-});
+}

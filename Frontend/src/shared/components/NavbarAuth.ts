@@ -78,9 +78,11 @@ export class NavbarAuth {
       container.innerHTML = this.renderAuthenticatedState(user);
       this.attachLogoutHandler();
       this.attachAvatarClickHandler();
+      this.attachSearchHandler();
     } else {
       // User is not logged in - show sign in/sign up buttons
       container.innerHTML = this.renderUnauthenticatedState();
+      this.attachSearchHandler();
     }
   }
 
@@ -172,6 +174,39 @@ export class NavbarAuth {
       });
       avatar.addEventListener('mouseleave', () => {
         (avatar as HTMLElement).style.transform = 'scale(1)';
+      });
+    }
+  }
+  
+  /**
+   * Attach search button click handler
+   */
+  private attachSearchHandler(): void {
+    const searchIcon = document.getElementById('openSearch');
+    const overlay = document.getElementById('overlay');
+    const closeSearch = document.getElementById('closeSearch');
+    const searchInput = document.getElementById('searchInput') as HTMLInputElement | null;
+    
+    if (searchIcon && overlay) {
+      searchIcon.addEventListener('click', (e) => {
+        e.preventDefault();
+        overlay.style.display = 'flex';
+        if (searchInput) searchInput.focus();
+      });
+    }
+    
+    if (closeSearch && overlay) {
+      closeSearch.addEventListener('click', () => {
+        overlay.style.display = 'none';
+      });
+    }
+    
+    // Click outside to close
+    if (overlay) {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.style.display = 'none';
+        }
       });
     }
   }

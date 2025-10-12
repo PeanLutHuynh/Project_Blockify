@@ -9,10 +9,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 // Initialize app (loads config + initializes Supabase)
 await initializeApp();
 
-// Force sign out any existing session when on signin page
+// If user is already authenticated, redirect to home page
 if (await authService.isSupabaseAuthenticated()) {
-  console.log('🔓 Found existing session on signin page, signing out...');
-  await authService.signOut();
+  console.log('✅ User already authenticated, redirecting to home...');
+  window.location.href = 'HomePage.html';
+  return;
 }
 
 console.log('✅ App initialized, SUPABASE_URL:', ENV.SUPABASE_URL);
