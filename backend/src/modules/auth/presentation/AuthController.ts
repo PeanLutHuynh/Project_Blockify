@@ -159,6 +159,24 @@ export class AuthController {
         user = await this.authService.getUserByAuthUid(authUid);
       }
       
+      // If still not found, might be an admin - check admin_users table
+      if (!user && authUid) {
+        const adminUser = await this.authService.getAdminByAuthUid(authUid);
+        if (adminUser) {
+          this.sendSuccess(res, 200, {
+            id: adminUser.id,
+            email: adminUser.email.getValue(),
+            fullName: adminUser.fullName,
+            username: adminUser.username,
+            avatarUrl: adminUser.avatarUrl,
+            authUid: adminUser.authUid,
+            isActive: adminUser.isActive,
+            role: 'admin', // Mark as admin
+          }, "Admin profile retrieved successfully");
+          return;
+        }
+      }
+      
       if (!user) {
         this.sendError(res, 404, "User not found");
         return;

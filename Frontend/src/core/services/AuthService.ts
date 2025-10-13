@@ -102,6 +102,7 @@ export class AuthService {
     user?: User;
     message: string;
     errors?: string[];
+    redirectTo?: string;
   }> {
     try {
       console.log('🔐 Attempting sign in with:', { identifier: data.identifier });
@@ -126,8 +127,20 @@ export class AuthService {
         try {
           const email = response.data.user.email;
           if (email && data.password) {
-            await supabaseService.signInWithPassword(email, data.password);
+            const { data: signInData } = await supabaseService.signInWithPassword(email, data.password);
             console.log('✅ Supabase session synced');
+            
+            // Check if user is admin based on Supabase user metadata
+            const userRole = signInData?.user?.user_metadata?.role;
+            if (userRole === 'admin') {
+              console.log('👑 Admin user detected, redirecting to admin panel');
+              return {
+                success: true,
+                user: this.currentUser!,
+                message: response.message || "Sign in successful",
+                redirectTo: '/src/pages/Admin.html'
+              };
+            }
           }
         } catch (supabaseError) {
           console.warn('⚠️ Supabase sign in failed, but backend auth succeeded:', supabaseError);
@@ -138,6 +151,7 @@ export class AuthService {
           success: true,
           user: this.currentUser!,
           message: response.message || "Sign in successful",
+          redirectTo: '/src/pages/HomePage.html'
         };
       } else {
         console.error('❌ Backend authentication failed:', response);

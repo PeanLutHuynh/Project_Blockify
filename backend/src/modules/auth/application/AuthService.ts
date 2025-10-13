@@ -1,5 +1,6 @@
 import { User } from "../../user/domain/User";
 import { IUserRepository } from "../../user/domain/IUserRepository";
+import { IAdminRepository } from "../../admin/domain/repositories/IAdminRepository";
 import { JWTConfig, JwtPayload } from "../../../config/jwt";
 import {
   SignUpCommand,
@@ -14,7 +15,10 @@ import { Password } from "../../user/domain/Password";
 import { supabaseAdmin } from "../../../config/database";
 
 export class AuthService {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(
+    private readonly userRepository: IUserRepository,
+    private readonly adminRepository?: IAdminRepository
+  ) {}
 
   // Helper method to validate commands
   private validateCommand(command: { validate: () => string[] }): string[] {
@@ -46,10 +50,11 @@ export class AuthService {
   }
 
   // Helper method to generate JWT token
-  private generateToken(user: User): string {
+  private generateToken(user: User, role: 'admin' | 'user' = 'user'): string {
     const tokenPayload: JwtPayload = {
       userId: user.id,
       email: user.email.getValue(),
+      role: role, // Include role in JWT payload
     };
     return JWTConfig.generateAccessToken(tokenPayload);
   }
@@ -171,41 +176,112 @@ export class AuthService {
         return AuthResponse.failure("Validation failed", validationErrors);
       }
 
-      // Find user
-      let user = command.isEmail()
-        ? await this.userRepository.findByEmail(command.identifier)
-        : await this.userRepository.findByUsername(command.identifier);
-
-      if (!user) {
-        return AuthResponse.failure("Invalid credentials");
-      }
-
-      // Check login eligibility (includes email verification check via Supabase Auth)
-      const eligibilityError = await this.checkUserLoginEligibility(user);
-      if (eligibilityError) {
-        return eligibilityError;
-      }
-
-      // Authenticate with Supabase Auth
+      // Authenticate with Supabase Auth first (works for both admin and regular users)
       const { data: authData, error: authError } =
         await supabaseAdmin.auth.signInWithPassword({
-          email: user.email.getValue(),
+          email: command.identifier, // Try identifier as email first
           password: command.password,
         });
 
-      if (authError || !authData.user) {
+      // If auth fails with identifier, might be username - need to look up email first
+      if (authError) {
+        if (!command.isEmail()) {
+          // Try to find user by username to get email
+          const userByUsername = await this.userRepository.findByUsername(command.identifier);
+          if (userByUsername) {
+            // Retry auth with actual email
+            const { data: retryAuthData, error: retryAuthError } =
+              await supabaseAdmin.auth.signInWithPassword({
+                email: userByUsername.email.getValue(),
+                password: command.password,
+              });
+            
+            if (retryAuthError || !retryAuthData.user) {
+              return AuthResponse.failure("Invalid credentials");
+            }
+
+            if (!retryAuthData.user.email_confirmed_at) {
+              return AuthResponse.failure(
+                "Email not verified. Please check your email to verify your account."
+              );
+            }
+
+            const token = this.generateToken(userByUsername);
+            return AuthResponse.success(userByUsername, token, "Sign in successful");
+          }
+        }
+        
         return AuthResponse.failure("Invalid credentials");
       }
 
+      if (!authData.user) {
+        return AuthResponse.failure("Invalid credentials");
+      }
+
+      // Check email verification
       if (!authData.user.email_confirmed_at) {
         return AuthResponse.failure(
           "Email not verified. Please check your email to verify your account."
         );
       }
 
+      // Check if user is admin (admins have records in public.admin_users table)
+      const userRole = authData.user.user_metadata?.role;
+      if (userRole === 'admin') {
+        // Check if admin exists in admin_users table and is active
+        if (!this.adminRepository) {
+          return AuthResponse.failure("Admin authentication not configured");
+        }
+
+        const admin = await this.adminRepository.findByAuthUid(authData.user.id);
+        if (!admin) {
+          return AuthResponse.failure("Admin account not found");
+        }
+
+        if (!admin.isActive) {
+          return AuthResponse.failure("Admin account is deactivated");
+        }
+
+        // Update last login (use adminId which is a number)
+        await this.adminRepository.updateLastLogin(admin.adminId);
+
+        // Create a minimal user object for token generation
+        const adminUser = new User({
+          id: authData.user.id, // Use auth UID as user ID for admins
+          email: new Email(authData.user.email!),
+          username: authData.user.email!.split('@')[0], // Use email prefix as username
+          fullName: admin.fullName,
+          authUid: authData.user.id,
+          isActive: admin.isActive,
+          createdAt: admin.createdAt,
+          updatedAt: admin.updatedAt,
+        });
+        
+        const token = this.generateToken(adminUser, 'admin');
+        return AuthResponse.success(adminUser, token, "Admin sign in successful", 'admin');
+      }
+
+      // Find regular user in database
+      let user = await this.userRepository.findByAuthUid(authData.user.id);
+      
+      if (!user) {
+        // Try to find by email as fallback
+        user = await this.userRepository.findByEmail(command.identifier);
+        
+        if (!user) {
+          return AuthResponse.failure("User account not found in database");
+        }
+      }
+
+      // Check if user is active
+      if (!user.isActive) {
+        return AuthResponse.failure("Account is deactivated");
+      }
+
       const token = this.generateToken(user);
       return AuthResponse.success(user, token, "Sign in successful");
     } catch (error) {
+      console.error("Sign in error:", error);
       return AuthResponse.failure("Failed to sign in", [
         error instanceof Error ? error.message : "Unknown error",
       ]);
@@ -242,6 +318,63 @@ export class AuthService {
       }
 
       console.log('✅ [GoogleAuth] Auth verification successful');
+
+      // CHECK ADMIN FIRST - Before checking users table
+      if (this.adminRepository) {
+        console.log('🔍 [GoogleAuth] Checking if email belongs to admin...');
+        const existingAdmin = await this.adminRepository.findByEmail(command.email);
+        
+        if (existingAdmin) {
+          console.log('👑 [GoogleAuth] Admin account found! Linking with Google auth...');
+          
+          // Update admin's auth_uid if not already set
+          if (!existingAdmin.authUid || existingAdmin.authUid !== command.authUid) {
+            await this.adminRepository.linkAuthAccount(existingAdmin.adminId, command.authUid);
+            console.log('✅ [GoogleAuth] Admin auth_uid linked');
+          }
+
+          // Update user_metadata.role in Supabase Auth
+          const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+            command.authUid,
+            {
+              user_metadata: {
+                role: 'admin',
+                full_name: existingAdmin.fullName
+              }
+            }
+          );
+
+          if (updateError) {
+            console.error('⚠️ [GoogleAuth] Failed to update user metadata:', updateError);
+          } else {
+            console.log('✅ [GoogleAuth] User metadata updated with admin role');
+          }
+
+          // Update last login
+          await this.adminRepository.updateLastLogin(existingAdmin.adminId);
+
+          // Create user object for token generation (using admin data)
+          const adminUser = new User({
+            id: command.authUid,
+            email: new Email(existingAdmin.email),
+            username: existingAdmin.email.split('@')[0],
+            fullName: existingAdmin.fullName,
+            authUid: command.authUid,
+            isActive: existingAdmin.isActive,
+            avatarUrl: command.avatarUrl || existingAdmin.avatarUrl || undefined,
+            createdAt: existingAdmin.createdAt,
+            updatedAt: new Date(),
+          });
+
+          const token = this.generateToken(adminUser, 'admin');
+          console.log('✅ [GoogleAuth] Admin Google authentication successful!');
+          console.log('📦 [GoogleAuth] Token payload role:', JWTConfig.decodeToken(token)?.role);
+          const response = AuthResponse.success(adminUser, token, "Admin Google authentication successful", 'admin');
+          console.log('📦 [GoogleAuth] Response user role:', response.user?.role);
+          return response;
+        }
+        console.log('ℹ️ [GoogleAuth] Email not found in admin_users, proceeding as regular user...');
+      }
 
       // Check if user exists (may have been created by trigger during OAuth flow)
       console.log('🔍 [GoogleAuth] Checking if user exists by authUid...');
@@ -357,6 +490,30 @@ export class AuthService {
 
   async getUserByAuthUid(authUid: string): Promise<User | null> {
     return await this.userRepository.findByAuthUid(authUid);
+  }
+
+  async getAdminByAuthUid(authUid: string): Promise<User | null> {
+    if (!this.adminRepository) {
+      return null;
+    }
+
+    const admin = await this.adminRepository.findByAuthUid(authUid);
+    if (!admin) {
+      return null;
+    }
+
+    // Convert Admin entity to User for response compatibility
+    return new User({
+      id: authUid, // Use auth UID as user ID for admins
+      email: new Email(admin.email),
+      username: admin.email.split('@')[0],
+      fullName: admin.fullName,
+      authUid: authUid,
+      isActive: admin.isActive,
+      avatarUrl: admin.avatarUrl || undefined,
+      createdAt: admin.createdAt,
+      updatedAt: admin.updatedAt,
+    });
   }
 
   async verifyEmail(command: VerifyEmailCommand): Promise<AuthResponse> {

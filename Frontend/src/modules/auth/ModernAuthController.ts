@@ -81,8 +81,12 @@ export class ModernAuthController {
           localStorage.setItem('rememberMe', 'true');
         }
 
-        // Redirect to appropriate page
-        this.redirectAfterAuth();
+        // Redirect to appropriate page based on service response
+        if (result.redirectTo) {
+          window.location.href = result.redirectTo;
+        } else {
+          this.redirectAfterAuth();
+        }
       }
 
       return result;
