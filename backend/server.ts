@@ -15,6 +15,7 @@ import { testDatabaseConnection } from './src/config/database';
 import { createUserRouter } from './src/modules/user/presentation/userRoutes';
 import { authRoutes } from './src/modules/auth/presentation/authRoutes';
 import { configRoutes } from './src/modules/config/presentation/configRoutes';
+import { setupAdminRoutes } from './src/modules/admin/presentation/adminRoutes';
 
 /**
  * Bootstrap application with custom HTTP server
@@ -182,6 +183,7 @@ async function bootstrap() {
           config: '/api/v1/config',
           users: '/api/v1/users',
           auth: '/api/auth',
+          admin: '/api/admin (Admin panel)',
           products: '/api/v1/products (coming soon)',
           categories: '/api/v1/categories (coming soon)',
           orders: '/api/v1/orders (coming soon)',
@@ -192,6 +194,10 @@ async function bootstrap() {
 
     // Mount config routes (public configuration for frontend)
     server.useRouter('/api/v1', configRoutes);
+
+    // Mount admin routes (protected)
+    const router = server.getRouter();
+    setupAdminRoutes(router);
 
     // Mount routers
     const userRouter = createUserRouter();

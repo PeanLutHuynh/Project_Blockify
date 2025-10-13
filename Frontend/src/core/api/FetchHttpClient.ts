@@ -3,6 +3,7 @@
  */
 
 import type { ApiResponse } from '@/types';
+import { ENV } from '../config/env.js';
 
 export interface RequestConfig {
   headers?: Record<string, string>;
@@ -28,7 +29,7 @@ export class FetchHttpClient {
    * Get auth token from localStorage
    */
   private getAuthToken(): string | null {
-    return localStorage.getItem('jwt_token') || null;
+    return localStorage.getItem(ENV.JWT_STORAGE_KEY) || null;
   }
 
   /**
@@ -384,14 +385,14 @@ export class FetchHttpClient {
    * Set auth token
    */
   setAuthToken(token: string): void {
-    localStorage.setItem('jwt_token', token);
+    localStorage.setItem(ENV.JWT_STORAGE_KEY, token);
   }
 
   /**
    * Clear auth token
    */
   clearAuthToken(): void {
-    localStorage.removeItem('jwt_token');
+    localStorage.removeItem(ENV.JWT_STORAGE_KEY);
     localStorage.removeItem('refreshToken');
   }
 

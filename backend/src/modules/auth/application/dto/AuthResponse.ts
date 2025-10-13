@@ -9,12 +9,13 @@ export class AuthResponse {
       username: string;
       avatarUrl?: string;
       authUid: string;
+      role?: string; // Add role field
     },
     public readonly token?: string,
     public readonly errors?: string[]
   ) {}
 
-  public static success(user: any, token: string, message: string = 'Authentication successful'): AuthResponse {
+  public static success(user: any, token: string, message: string = 'Authentication successful', role?: string): AuthResponse {
     // Handle case where user is undefined (e.g., resend verification)
     if (!user) {
       return new AuthResponse(true, message, undefined, token);
@@ -29,7 +30,8 @@ export class AuthResponse {
         fullName: user.fullName,
         username: user.username,
         avatarUrl: user.avatarUrl,
-        authUid: user.authUid
+        authUid: user.authUid,
+        role: role // Include role in response
       },
       token
     );

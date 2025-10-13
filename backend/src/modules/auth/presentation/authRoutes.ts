@@ -2,12 +2,14 @@
 import { AuthController } from './AuthController';
 import { AuthService } from '../application/AuthService';
 import { UserRepository } from '../../user/infrastructure/UserRepository';
+import { AdminRepository } from '../../admin/infrastructure/repositories/AdminRepository';
 import { authenticateToken } from '../../../infrastructure/auth/authMiddleware';
 import { Validator } from '../../../infrastructure/validation/Validator';
 
 // Create dependencies
 const userRepository = new UserRepository();
-const authService = new AuthService(userRepository);
+const adminRepository = new AdminRepository();
+const authService = new AuthService(userRepository, adminRepository);
 const authController = new AuthController(authService);
 
 const router = new Router();
