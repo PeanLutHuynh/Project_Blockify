@@ -21,7 +21,7 @@ export type Database = {
           created_at: string | null
           log_id: number
           payload: Json | null
-          target_id: number | null
+          target_id: string | null
           target_type: string | null
         }
         Insert: {
@@ -30,7 +30,7 @@ export type Database = {
           created_at?: string | null
           log_id?: number
           payload?: Json | null
-          target_id?: number | null
+          target_id?: string | null
           target_type?: string | null
         }
         Update: {
@@ -39,7 +39,7 @@ export type Database = {
           created_at?: string | null
           log_id?: number
           payload?: Json | null
-          target_id?: number | null
+          target_id?: string | null
           target_type?: string | null
         }
         Relationships: [
@@ -55,7 +55,8 @@ export type Database = {
       admin_users: {
         Row: {
           admin_id: number
-          auth_uid: string | null
+          auth_uid: string
+          avatar_url: string | null
           created_at: string | null
           email: string
           full_name: string
@@ -65,7 +66,8 @@ export type Database = {
         }
         Insert: {
           admin_id?: number
-          auth_uid?: string | null
+          auth_uid: string
+          avatar_url?: string | null
           created_at?: string | null
           email: string
           full_name: string
@@ -75,7 +77,8 @@ export type Database = {
         }
         Update: {
           admin_id?: number
-          auth_uid?: string | null
+          auth_uid?: string
+          avatar_url?: string | null
           created_at?: string | null
           email?: string
           full_name?: string
