@@ -1,10 +1,14 @@
 import { initializeOnReady } from '../../../core/config/init.js';
 import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
+import { initializeSearch } from '../../../shared/components/SearchInit.js';
 
 // Initialize app and navbar auth
 initializeOnReady(() => {
   // Initialize navbar authentication UI
   initializeNavbarAuth();
+  
+  // Initialize search controller
+  initializeSearch();
   
   // Original code for menu navigation
   document.querySelectorAll('.menu li').forEach(item => {
