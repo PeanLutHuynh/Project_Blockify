@@ -1,10 +1,14 @@
 import { initializeOnReady } from '../../../core/config/init.js';
 import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
+import { initializeSearch } from '../../../shared/components/SearchInit.js';
 
 // Initialize app and run page logic
 initializeOnReady(() => {
   // Initialize navbar authentication UI
   initializeNavbarAuth();
+  
+  // Initialize search controller
+  initializeSearch();
   
   // Original contact page logic
   initializeContactPage();
