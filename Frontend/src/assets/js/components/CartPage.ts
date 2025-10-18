@@ -1,5 +1,6 @@
 import { initializeOnReady } from '../../../core/config/init.js';
 import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
+import { initializeSearch } from '../../../shared/components/SearchInit.js';
 
 // Helpers
 const formatVND = (n: number): string => {
@@ -77,6 +78,9 @@ function render(): void {
 initializeOnReady(() => {
   // Initialize navbar authentication UI
   initializeNavbarAuth();
+  
+  // Initialize search controller
+  initializeSearch();
   
   // Original cart page logic
   initializeCartPage();

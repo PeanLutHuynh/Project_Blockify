@@ -16,6 +16,8 @@ import { createUserRouter } from './src/modules/user/presentation/userRoutes';
 import { authRoutes } from './src/modules/auth/presentation/authRoutes';
 import { configRoutes } from './src/modules/config/presentation/configRoutes';
 import { setupAdminRoutes } from './src/modules/admin/presentation/adminRoutes';
+import { productRoutes } from './src/modules/products/presentation/productRoutes';
+import { categoryRoutes } from './src/modules/products/presentation/categoryRoutes';
 
 /**
  * Bootstrap application with custom HTTP server
@@ -184,7 +186,9 @@ async function bootstrap() {
           users: '/api/v1/users',
           auth: '/api/auth',
           admin: '/api/admin (Admin panel)',
-          products: '/api/v1/products (coming soon)',
+          products: '/api/v1/products',
+          search: '/api/v1/products/search?q=keyword',
+          suggestions: '/api/v1/products/suggestions?q=keyword',
           categories: '/api/v1/categories (coming soon)',
           orders: '/api/v1/orders (coming soon)',
         },
@@ -204,6 +208,8 @@ async function bootstrap() {
 
     server.useRouter('/api/v1/users', userRouter);
     server.useRouter('/api/auth', authRoutes);
+    server.useRouter('/api/v1/products', productRoutes); // Product routes
+    server.useRouter('/api/v1/categories', categoryRoutes); // Category routes
 
     // Debug: Log all registered routes
     console.log('📋 Registered routes:');
