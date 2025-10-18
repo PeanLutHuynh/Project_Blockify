@@ -144,44 +144,44 @@
 </head>
 <body>
   <div class="verified-container">
-    <!-- Loading State -->
+    <!-- Trạng thái Đang Xác Minh -->
     <div id="loadingState" class="loading-container">
       <div class="spinner"></div>
-      <p class="verified-text">Verifying your email...</p>
+      <p class="verified-text">Đang xác minh email của bạn...</p>
     </div>
 
-    <!-- Success State -->
+    <!-- Trạng thái Thành Công -->
     <div id="successState" class="d-none">
       <div class="success-icon">
         <i class="bi bi-check-circle"></i>
       </div>
-      <h1 class="verified-title">Email Verified!</h1>
+      <h1 class="verified-title">Xác minh email thành công!</h1>
       <p class="verified-text">
-        Your email has been successfully verified. You can now sign in to your account and start using Blockify.
+        Email của bạn đã được xác minh thành công. Giờ đây, bạn có thể đăng nhập vào tài khoản của mình và bắt đầu sử dụng Blockify.
       </p>
       <a href="/src/pages/SigninPage.html" class="btn-signin" id="signInBtn">
-        Sign In Now
+        Đăng nhập ngay
       </a>
       <p class="countdown-text">
-        Redirecting in <span class="countdown-number" id="countdown">5</span> seconds...
+        Tự động chuyển hướng sau <span class="countdown-number" id="countdown">5</span> giây...
       </p>
     </div>
 
-    <!-- Error State -->
+    <!-- Trạng thái Lỗi -->
     <div id="errorState" class="d-none">
       <div class="error-icon">
         <i class="bi bi-x-circle"></i>
       </div>
-      <h1 class="verified-title">Verification Failed</h1>
+      <h1 class="verified-title">Xác minh thất bại</h1>
       <p class="verified-text" id="errorMessage">
-        The verification link is invalid or has expired. Please request a new verification email.
+        Liên kết xác minh không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu gửi lại email xác minh mới.
       </p>
       <a href="/src/pages/VerifyEmail.html" class="btn-signin">
-        Request New Link
+        Yêu cầu liên kết mới
       </a>
       <div class="mt-3">
         <a href="/src/pages/SigninPage.html" class="text-muted" style="text-decoration: none;">
-          <i class="bi bi-arrow-left me-2"></i>Back to Sign In
+          <i class="bi bi-arrow-left me-2"></i>Quay lại trang đăng nhập
         </a>
       </div>
     </div>
@@ -191,7 +191,7 @@
   <script type="module">
     import { emailVerifiedController } from '/dist/src/modules/auth/EmailVerifiedController.js';
     
-    // Initialize controller when DOM is ready
+    // Khởi tạo controller khi DOM sẵn sàng
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
         emailVerifiedController.init();
@@ -200,10 +200,11 @@
       emailVerifiedController.init();
     }
     
-    // Cleanup on unload
+    // Dọn dẹp khi rời trang
     window.addEventListener('beforeunload', () => {
       emailVerifiedController.destroy();
     });
   </script>
 </body>
+
 </html>

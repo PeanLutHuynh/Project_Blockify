@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cart Page</title>
+  <title>Giỏ hàng</title>
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- FontAwesome -->
@@ -18,28 +18,28 @@
 </head>
 <body>
 
-<!-- Navbar -->
+<!-- Thanh điều hướng (Navbar) -->
 <nav class="navbar navbar-expand-lg navbar-custom">
   <div class="container">
       <a class="navbar-brand" href="IntroductionPage.html">Blockify</a>
       
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Chuyển đổi điều hướng">
           <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
       </button>
       
       <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
               <li class="nav-item">
-                  <a class="nav-link" href="HomePage.html">Home</a>
+                  <a class="nav-link" href="HomePage.html">Trang chủ</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="IntroductionPage.html">Introduction</a>
+                  <a class="nav-link" href="IntroductionPage.html">Giới thiệu</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="Service.html">Service</a>
+                  <a class="nav-link" href="Service.html">Dịch vụ</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="Contact.html">Contact</a>
+                  <a class="nav-link" href="Contact.html">Liên hệ</a>
               </li>
           </ul>
           
@@ -50,46 +50,46 @@
               <a href="CartPage.html" class="cart-icon">
                   <i class="bi bi-cart"></i>
               </a>
-              <a href="SigninPage.html" class="btn-sign">Sign in</a>
-              <a href="SignupPage.html" class="btn-sign">Sign up</a>
+              <a href="SigninPage.html" class="btn-sign">Đăng nhập</a>
+              <a href="SignupPage.html" class="btn-sign">Đăng ký</a>
           </div>
       </div>
       <div class="overlay" id="overlay">
         <div class="search-popup">
           <div class="search-header">
-            <strong class="text-white">Search</strong>
+            <strong class="text-white">Tìm kiếm</strong>
             <i class="bi bi-x-circle" id="closeSearch" style="cursor:pointer; color:white"></i>
           </div>
       
-          <!-- Input -->
+          <!-- Ô nhập -->
           <input 
             type="text" 
             class="search-input text-white" 
             id="searchInput" 
             style="border: 0; background-color: rgb(30, 41, 57);" 
-            placeholder="Enter keyword...">
+            placeholder="Nhập từ khóa...">
           
           <div class="line mb-2"></div>
       
-          <!-- Suggestions -->
+          <!-- Gợi ý -->
           <div class="suggestion-box">
             <div>
-              <button class="suggestion-btn text-white">Suggestion</button>
-              <span class="suggestion-text">Yellow Lego Truck Set</span>
+              <button class="suggestion-btn text-white">Gợi ý</button>
+              <span class="suggestion-text">Xe tải LEGO màu vàng</span>
             </div>
             <i class="bi bi-box-arrow-up-right" style="color:white"></i>
           </div>
           <div class="suggestion-box">
             <div>
-              <button class="suggestion-btn text-white">Suggestion</button>
-              <span class="suggestion-text">Water Park</span>
+              <button class="suggestion-btn text-white">Gợi ý</button>
+              <span class="suggestion-text">Công viên nước</span>
             </div>
             <i class="bi bi-box-arrow-up-right" style="color:white"></i>
           </div>
           <div class="suggestion-box">
             <div>
-              <button class="suggestion-btn text-white">Suggestion</button>
-              <span class="suggestion-text">Ninjago World</span>
+              <button class="suggestion-btn text-white">Gợi ý</button>
+              <span class="suggestion-text">Thế giới Ninjago</span>
             </div>
             <i class="bi bi-box-arrow-up-right" style="color:white"></i>
           </div>
@@ -98,35 +98,35 @@
   </div>
 </nav>
 
-<!-- Container -->
+<!-- Nội dung trang -->
 <div class="container my-4">
 
-  <!-- Table Header -->
+  <!-- Tiêu đề bảng -->
   <div class="row fw-bold text-secondary mb-2">
     <div class="col-6 d-flex align-items-center">
       <input type="checkbox" class="form-check-input me-2" id="select-all" checked>
-      <label for="select-all" class="mb-0">Select all</label>
+      <label for="select-all" class="mb-0">Chọn tất cả</label>
     </div>
-    <div class="col-2">Unit Price</div>
-    <div class="col-2">Quantity</div>
-    <div class="col-2">Subtotal</div>
+    <div class="col-2">Đơn giá</div>
+    <div class="col-2">Số lượng</div>
+    <div class="col-2">Tạm tính</div>
   </div>
 
-  <!-- Dynamic cart list -->
+  <!-- Danh sách giỏ hàng (động) -->
   <div id="cart-list"></div>
 
-  <!-- Total -->
+  <!-- Tổng tiền -->
   <div class="total-box mt-4">
-    <p>Total: <span id="grand-total" class="price">0 VND</span></p>
-    <button id="btn-purchase" class="btn btn-purchase">Purchase</button>
+    <p>Tổng cộng: <span id="grand-total" class="price">0 VND</span></p>
+    <button id="btn-purchase" class="btn btn-purchase">Thanh toán</button>
   </div>
  
 </div>
 
-<!-- Footer -->
+<!-- Chân trang (Footer) -->
 <footer class="footer">
   <div class="container">
-      <p class="mb-0">&copy; 2025 LEGO SHOP. All rights reserved. | Designed with ❤️ for LEGO enthusiasts</p>
+      <p class="mb-0">&copy; 2025 CỬA HÀNG LEGO. Mọi quyền được bảo lưu. | Thiết kế với ❤️ dành cho những người yêu LEGO</p>
   </div>
 </footer>
 

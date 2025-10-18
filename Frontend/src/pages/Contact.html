@@ -1,44 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - LEGO City</title>
+    <title>Liên hệ - LEGO City</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/pages/Contact.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     
-    <!-- Supabase JS SDK from CDN -->
+    <!-- Supabase JS SDK từ CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Thanh điều hướng -->
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container">
             <a class="navbar-brand" href="IntroductionPage.html">Blockify</a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Chuyển đổi điều hướng">
                 <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
             </button>
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="HomePage.html">Home</a>
+                        <a class="nav-link" href="HomePage.html">Trang chủ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="IntroductionPage.html">Introduction</a>
+                        <a class="nav-link" href="IntroductionPage.html">Giới thiệu</a>
                     </li>
                     <li class="nav-item ">
-                        <a class="nav-link " href="Service.html" >
-                            Service
+                        <a class="nav-link " href="Service.html">
+                            Dịch vụ
                         </a>
-                        
                     </li>
                     <li class="nav-item ">
-                        <a class="nav-link " href="Contact.html" >
-                            Contact
+                        <a class="nav-link " href="Contact.html">
+                            Hỏi đáp
                         </a>
                     </li>
                 </ul>
@@ -47,62 +46,62 @@
                     <a href="CartPage.html" class="cart-icon">
                         <i class="bi bi-cart"></i>
                     </a>
-                    <a href="SigninPage.html" class="btn-sign">Sign in</a>
-                    <a href="SignupPage.html" class="btn-sign">Sign up</a>
+                    <a href="SigninPage.html" class="btn-sign">Đăng nhập</a>
+                    <a href="SignupPage.html" class="btn-sign">Đăng ký</a>
                 </div>
             </div>
+
             <div class="overlay" id="overlay">
               <div class="search-popup">
                 <div class="search-header">
-                  <strong class="text-white">Search</strong>
+                  <strong class="text-white">Tìm kiếm</strong>
                   <i class="bi bi-x-circle" id="closeSearch" style="cursor:pointer; color:white"></i>
                 </div>
             
-                <!-- Input -->
+                <!-- Ô nhập -->
                 <input 
                   type="text" 
                   class="search-input text-white" 
                   id="searchInput" 
                   style="border: 0; background-color: rgb(30, 41, 57);" 
-                  placeholder="Enter keyword...">
+                  placeholder="Nhập từ khóa...">
                 
                 <div class="line mb-2"></div>
             
-                <!-- Suggestions -->
+                <!-- Gợi ý -->
                 <div class="suggestion-box">
                   <div>
-                    <button class="suggestion-btn text-white">Suggestion</button>
-                    <span class="suggestion-text">Yellow Lego Truck Set</span>
+                    <button class="suggestion-btn text-white">Gợi ý</button>
+                    <span class="suggestion-text">Xe tải LEGO màu vàng</span>
                   </div>
                   <i class="bi bi-box-arrow-up-right" style="color:white"></i>
                 </div>
                 <div class="suggestion-box">
                   <div>
-                    <button class="suggestion-btn text-white">Suggestion</button>
-                    <span class="suggestion-text">Water Park</span>
+                    <button class="suggestion-btn text-white">Gợi ý</button>
+                    <span class="suggestion-text">Công viên nước</span>
                   </div>
                   <i class="bi bi-box-arrow-up-right" style="color:white"></i>
                 </div>
                 <div class="suggestion-box">
                   <div>
-                    <button class="suggestion-btn text-white">Suggestion</button>
-                    <span class="suggestion-text">Ninjago World</span>
+                    <button class="suggestion-btn text-white">Gợi ý</button>
+                    <span class="suggestion-text">Thế giới Ninjago</span>
                   </div>
                   <i class="bi bi-box-arrow-up-right" style="color:white"></i>
                 </div>
               </div>
             </div>
-            
         </div>
       </nav>
 
-    <!-- Hero Section -->
+    <!-- Phần giới thiệu (Hero Section) -->
     <section class="hero-section">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8 text-center hero-content">
-                    <h1 class="display-4 fw-bold mb-4 fade-in">Get in Touch</h1>
-                    <p class="lead mb-4 fade-in">We'd love to hear from you! Whether you have questions about our LEGO sets, need support, or want to share your amazing builds with us.</p>
+                    <h1 class="display-4 fw-bold mb-4 fade-in">Liên hệ với chúng tôi</h1>
+                    <p class="lead mb-4 fade-in">Chúng tôi rất mong nhận được phản hồi từ bạn! Dù bạn có câu hỏi về các bộ LEGO, cần hỗ trợ, hay muốn chia sẻ những mô hình tuyệt vời của mình — chúng tôi luôn sẵn sàng lắng nghe.</p>
                     <div class="fade-in">
                         <i class="fas fa-building-o fs-1 mb-3"></i>
                     </div>
@@ -111,80 +110,24 @@
         </div>
     </section>
 
-    <!-- Contact Cards -->
-    <section class="py-5">
-        <div class="container">
-
-            <!-- Contact Form & Map -->
-            <div class="row g-5">
-                <div class="col-lg-7">
-                    <div class="contact-form fade-in">
-                        <h3 class="fw-bold mb-4 text-center">Send us a Message</h3>
-                        <form>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="firstName" class="form-label fw-semibold">First Name</label>
-                                    <input type="text" class="form-control" id="firstName" placeholder="Enter your first name">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="lastName" class="form-label fw-semibold">Last Name</label>
-                                    <input type="text" class="form-control" id="lastName" placeholder="Enter your last name">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="email" class="form-label fw-semibold">Email Address</label>
-                                    <input type="email" class="form-control" id="email" placeholder="your.email@example.com">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="phone" class="form-label fw-semibold">Phone Number</label>
-                                    <input type="tel" class="form-control" id="phone" placeholder="+1 (555) 123-4567">
-                                </div>
-                               
-                                <div class="col-12">
-                                    <label for="message" class="form-label fw-semibold">Your Message</label>
-                                    <textarea class="form-control" id="message" rows="6" placeholder="Tell us how we can help you..."></textarea>
-                                </div>
-                                <div class="col-12 text-center">
-                                    <button type="submit" class="btn btn-send">
-                                        <i class="fas fa-paper-plane me-2"></i>Send Message
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <div class="col-lg-5">
-                    <div class="map-container fade-in">
-                        <div class="map-placeholder">
-                            <div class="text-center">
-                                <i class="fas fa-map-marked-alt fs-1 mb-3"></i>
-                                <br>
-                                Interactive Map Coming Soon
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
+    <!-- Câu hỏi thường gặp (FAQ) -->
     <section class="py-5 bg-light">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <div class="faq-section fade-in">
-                        <h3 class="fw-bold text-center mb-5">Frequently Asked Questions</h3>
+                        <h3 class="fw-bold text-center mb-5">Câu hỏi thường gặp</h3>
                         <div class="accordion" id="faqAccordion">
                             <div class="accordion-item">
                                 <h2 class="accordion-header">
                                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
                                         <i class="fas fa-shipping-fast me-3 text-primary"></i>
-                                        How long does shipping take?
+                                        Thời gian giao hàng mất bao lâu?
                                     </button>
                                 </h2>
                                 <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                                     <div class="accordion-body">
-                                        Standard shipping typically takes 3-5 business days within the continental US. Express shipping options are available for 1-2 day delivery.
+                                        Giao hàng tiêu chuẩn thường mất từ 3–5 ngày làm việc trong nội địa. Các tùy chọn giao hàng nhanh 1–2 ngày cũng có sẵn.
                                     </div>
                                 </div>
                             </div>
@@ -192,12 +135,12 @@
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
                                         <i class="fas fa-undo me-3 text-success"></i>
-                                        What is your return policy?
+                                        Chính sách đổi trả của cửa hàng là gì?
                                     </button>
                                 </h2>
                                 <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                     <div class="accordion-body">
-                                        We offer a 30-day return policy for unopened items in original packaging. Opened items may be returned within 14 days with all pieces included.
+                                        Chúng tôi hỗ trợ đổi trả trong vòng 30 ngày cho sản phẩm chưa mở và còn nguyên bao bì. Với sản phẩm đã mở, bạn có thể đổi trong 14 ngày nếu đầy đủ chi tiết.
                                     </div>
                                 </div>
                             </div>
@@ -205,12 +148,12 @@
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
                                         <i class="fas fa-tools me-3 text-warning"></i>
-                                        Do you offer building instructions?
+                                        Có cung cấp hướng dẫn lắp ráp không?
                                     </button>
                                 </h2>
                                 <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                     <div class="accordion-body">
-                                        Yes! All our sets come with detailed step-by-step instructions. You can also download digital copies from our website or mobile app.
+                                        Có chứ! Tất cả bộ LEGO đều đi kèm hướng dẫn chi tiết từng bước. Bạn cũng có thể tải bản kỹ thuật số trên website hoặc ứng dụng của chúng tôi.
                                     </div>
                                 </div>
                             </div>
@@ -218,12 +161,12 @@
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
                                         <i class="fas fa-gift me-3 text-danger"></i>
-                                        Do you offer gift wrapping?
+                                        Có dịch vụ gói quà không?
                                     </button>
                                 </h2>
                                 <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                     <div class="accordion-body">
-                                        Absolutely! We offer complimentary gift wrapping for all orders. You can select this option during checkout and even include a personalized message.
+                                        Tất nhiên! Chúng tôi cung cấp dịch vụ gói quà miễn phí cho tất cả đơn hàng. Bạn có thể chọn tùy chọn này khi thanh toán và thêm lời nhắn cá nhân nếu muốn.
                                     </div>
                                 </div>
                             </div>
@@ -234,12 +177,12 @@
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- Chân trang -->
     <footer class="footer">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <p class="mb-0">&copy; 2025 LEGO City. All rights reserved.</p>
+                    <p class="mb-0">&copy; 2025 LEGO City. Mọi quyền được bảo lưu.</p>
                 </div>
                 <div class="col-md-6 text-end">
                     <div class="social-links">
