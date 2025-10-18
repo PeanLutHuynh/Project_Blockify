@@ -320,20 +320,28 @@ export class AuthService {
       console.log('✅ [GoogleAuth] Auth verification successful');
 
       // CHECK ADMIN FIRST - Before checking users table
+      // Strategy: Check auth_uid first (for already linked admins), then check email (for first-time Google login)
       if (this.adminRepository) {
-        console.log('🔍 [GoogleAuth] Checking if email belongs to admin...');
-        const existingAdmin = await this.adminRepository.findByEmail(command.email);
+        let existingAdmin = await this.adminRepository.findByAuthUid(command.authUid);
         
         if (existingAdmin) {
-          console.log('👑 [GoogleAuth] Admin account found! Linking with Google auth...');
+          console.log('👑 [GoogleAuth] Admin account found by auth_uid! (Already linked)');
+        } else {
+          existingAdmin = await this.adminRepository.findByEmail(command.email);
           
-          // Update admin's auth_uid if not already set
-          if (!existingAdmin.authUid || existingAdmin.authUid !== command.authUid) {
+          if (existingAdmin) {
+            console.log('👑 [GoogleAuth] Admin account found by email! Linking with Google auth_uid...');
+            
+            // Link admin's auth_uid with Google account
             await this.adminRepository.linkAuthAccount(existingAdmin.adminId, command.authUid);
-            console.log('✅ [GoogleAuth] Admin auth_uid linked');
+            console.log('✅ [GoogleAuth] Admin auth_uid linked successfully');
           }
-
-          // Update user_metadata.role in Supabase Auth
+        }
+        
+        if (existingAdmin) {
+          console.log('👑 [GoogleAuth] Processing admin authentication...');
+          
+          // Ensure user_metadata.role is set to 'admin' in Supabase Auth
           const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
             command.authUid,
             {
@@ -373,7 +381,8 @@ export class AuthService {
           console.log('📦 [GoogleAuth] Response user role:', response.user?.role);
           return response;
         }
-        console.log('ℹ️ [GoogleAuth] Email not found in admin_users, proceeding as regular user...');
+        
+        console.log('ℹ️ [GoogleAuth] Not an admin account, proceeding as regular user...');
       }
 
       // Check if user exists (may have been created by trigger during OAuth flow)
