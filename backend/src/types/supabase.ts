@@ -565,6 +565,9 @@ export type Database = {
       }
       product_images: {
         Row: {
+          alt_img1: string | null
+          alt_img2: string | null
+          alt_img3: string | null
           alt_text: string | null
           created_at: string | null
           image_id: number
@@ -574,6 +577,9 @@ export type Database = {
           sort_order: number | null
         }
         Insert: {
+          alt_img1?: string | null
+          alt_img2?: string | null
+          alt_img3?: string | null
           alt_text?: string | null
           created_at?: string | null
           image_id?: number
@@ -583,6 +589,9 @@ export type Database = {
           sort_order?: number | null
         }
         Update: {
+          alt_img1?: string | null
+          alt_img2?: string | null
+          alt_img3?: string | null
           alt_text?: string | null
           created_at?: string | null
           image_id?: number
