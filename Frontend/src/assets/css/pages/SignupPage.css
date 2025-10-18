@@ -1,128 +1,402 @@
-body { margin: 0; padding: 0; min-height: 100vh; background: url('/public/images/SignupPage (2).png') center/cover no-repeat fixed; }
-/* Glassmorphism panel */
-.glass { background: rgba(255, 255, 255, 0.55); border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-.auth-wrap { min-height: 100vh; }
-.auth-card { width: 100%; max-width: 520px; }
-.title { font-weight: 800; }
-.underline-input .form-control { background: transparent; border: 0; border-bottom: 2px solid rgba(0,0,0,0.15); border-radius: 0; padding-left: 0; padding-right: 44px; height: 54px; box-shadow: none !important; }
-.underline-input .form-control:focus { border-bottom-color: #0d9bff; }
-.input-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #6c757d; pointer-events: none; }
-.btn-primary { height: 52px; font-weight: 700; border-radius: 12px; }
-.form-check-label { -webkit-user-select: none; user-select: none; }
-.link-like { text-decoration: none; }
-.link-like:hover { text-decoration: underline; }
-.btn-google {
-    background: #ffffff;
-    border: 1px solid #dadce0;
-    color: #3c4043;
-    height: 52px;
-    font-weight: 500;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    transition: all 0.2s ease;
-  }
-  .btn-google:hover {
-    background: #f8f9fa;
-    border-color: #dadce0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    color: #3c4043;
-  }
-  .google-icon { width: 18px; height: 18px; }
-  .divider {
-    position: relative;
-    text-align: center;
-    margin: 25px 0;
-  }
-  .divider::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: rgba(0,0,0,0.15);
-  }
-  .divider span {
-    background: rgba(255, 255, 255, 0.55);
-    padding: 0 15px;
-    color: #6c757d;
-    font-size: 13px;
-  }
-/* Welcome typing animation - positioned behind form */
-.welcome-typing {
-  position: fixed;
-  left: 80px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 0; /* Behind everything */
-  font-size: 6rem;
-  font-weight: 900;
-  color: #111;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  font-family: 'Montserrat', Arial, sans-serif;
-  -webkit-user-select: none;
-  user-select: none;
-  pointer-events: none;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  line-height: 1.05;
-  -webkit-text-stroke: 3px #0d9bff;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.welcome-typing span {
+body, html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.signin-page {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background: white;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Left Section */
+.left-section {
+  width: 740px;
+  height: 100%;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.gradient-bg {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #0096f4 0%, #c0e7ff 56.25%);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.tower-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  position: relative;
+  z-index: 1;
+}
+
+.brand-text {
+  position: absolute;
+  top: 47px;
+  left: 41px;
+  font-family: 'Jolly Lodger', cursive;
+  font-size: 64px;
+  color: white;
+  z-index: 2;
+}
+
+/* Right Section */
+.right-section {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: white;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+}
+
+.right-section .container {
+  position: relative;
+  z-index: 10;
+}
+
+/* Decorative Blocks */
+.deco-block {
+  position: absolute;
+  pointer-events: none;
+}
+
+.deco-block svg {
+  width: 100%;
+  height: 100%;
   display: block;
 }
 
-/* Ensure auth card is above welcome text */
-.auth-wrap {
+.deco-1 {
+  width: 40px;
+  height: 48px;
+  right: 14%;
+  top: 27px;
+  transform: rotate(24.482deg);
+}
+
+.deco-2 {
+  width: 26px;
+  height: 31px;
+  right: 8%;
+  top: 30px;
+  transform: rotate(330.656deg);
+}
+
+.deco-3 {
+  width: 18px;
+  height: 22px;
+  right: 3%;
+  top: 45px;
+  transform: rotate(4.797deg);
+}
+
+.deco-4 {
+  width: 14px;
+  height: 16px;
+  right: 2%;
+  top: 70px;
+  transform: rotate(21.473deg);
+}
+
+.deco-bottom-1 {
+  width: 160px;
+  height: 100px;
+  left: 10%;
+  bottom: 80px;
+  transform: rotate(342.64deg);
+}
+
+.deco-bottom-2 {
+  width: 180px;
+  height: 110px;
+  right: 12%;
+  bottom: 60px;
+  transform: rotate(341.454deg);
+}
+
+.deco-bottom-3 {
+  width: 120px;
+  height: 55px;
+  left: 25%;
+  bottom: 20px;
+  transform: rotate(18.826deg);
+}
+
+/* Welcome Section */
+.welcome-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 96px;
+  color: #0096f4;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.signin-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  color: #969696;
+  margin-bottom: 10px;
+}
+
+/* Input Groups */
+.input-group-custom {
   position: relative;
-  z-index: 10;
-  min-height: 100vh;
 }
 
-.auth-card {
-  position: relative;
-  z-index: 20;
-  width: 100%;
-  max-width: 520px;
+.input-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+.form-control-custom {
+ 
+  border: 2px solid #0096f4;
+  border-radius: 7px;
+  padding-left: 60px;
+  font-family: 'Inter', sans-serif;
+ 
+  color: #828282;
+  background: white;
 }
 
-/* Responsive breakpoints */
+.form-control-custom:focus {
+  border-color: #0096f4;
+  box-shadow: 0 0 0 0.2rem rgba(0, 150, 244, 0.15);
+}
+
+.form-control-custom::placeholder {
+  color: #828282;
+}
+
+/* Show Password Checkbox */
+.show-password-check {
+  margin-left: 20px;
+  margin-top: 15px;
+}
+
+.show-password-check .form-check-input {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background-color: #d9d9d9;
+  border: none;
+  cursor: pointer;
+}
+
+.show-password-check .form-check-input:checked {
+  background-color: #0096f4;
+  border-color: #0096f4;
+}
+
+.show-password-check .form-check-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 24px;
+  color: black;
+  margin-left: 15px;
+  cursor: pointer;
+}
+
+/* Sign In Button */
+.btn-signin {
+  background: #0096f4;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  padding: 15px 50px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  min-width: 192px;
+  height: 63px;
+  transition: all 0.3s ease;
+}
+
+.btn-signin:hover {
+  background: #0078c4;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 150, 244, 0.3);
+}
+
+/* OR Divider */
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 10px 0;
+}
+
+.or-divider hr {
+  flex: 1;
+  border: none;
+  border-top: 2px solid #515151;
+  margin: 0;
+}
+
+.or-text {
+  background: white;
+  padding: 8px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  color: #090909;
+}
+
+/* Google Button */
+.btn-google {
+  background: white;
+  border: 1px solid black;
+  border-radius: 7px;
+  padding: 12px 27px;
+  font-family: 'Inter', sans-serif;
+  font-size: 24px;
+  color: black;
+  display: inline-flex;
+  align-items: center;
+  gap: 19px;
+  height: 63px;
+  transition: all 0.3s ease;
+}
+
+.btn-google:hover {
+  background: #f8f9fa;
+  color: black;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.google-icon {
+  width: 41px;
+  height: 44px;
+  object-fit: contain;
+}
+
+/* Responsive Design */
 @media (max-width: 1400px) {
-  .welcome-typing {
-    font-size: 5rem;
-    left: 60px;
+  .welcome-title {
+      font-size: 72px;
+  }
+  
+  .left-section {
+      width: 500px;
   }
 }
 
 @media (max-width: 1200px) {
-  .welcome-typing {
-    font-size: 4rem;
-    left: 40px;
+  .welcome-title {
+      font-size: 64px;
+  }
+  
+  .signin-label,
+  .form-control-custom,
+  .show-password-check .form-check-label,
+  .btn-signin,
+  .btn-google {
+      font-size: 20px;
+  }
+  
+  .form-control-custom {
+      height: 60px;
   }
 }
 
 @media (max-width: 992px) {
-  .welcome-typing {
-    font-size: 3rem;
-    left: 30px;
+  .left-section {
+      width: 400px;
+  }
+  
+  .welcome-title {
+      font-size: 56px;
+  }
+  
+  .brand-text {
+      font-size: 48px;
   }
 }
 
-@media (max-width: 767.98px) {
-  .welcome-typing {
-    display: none !important;
+@media (max-width: 768px) {
+  .signin-page {
+      flex-direction: column;
+  }
+  
+  .left-section {
+      width: 100%;
+      height: 200px;
+  }
+  
+  .brand-text {
+      top: 20px;
+      left: 20px;
+      font-size: 36px;
+  }
+  
+  .right-section {
+      flex: 1;
+  }
+  
+  .welcome-title {
+      font-size: 48px;
+      margin-top: 20px;
+  }
+  
+  .deco-bottom-1,
+  .deco-bottom-2,
+  .deco-bottom-3 {
+      display: none;
   }
 }
+/* --- Container input --- */
+.underline-input {
+  position: relative;
+}
+
+/* --- Input chính --- */
+.form-control-custom {
+  padding-left: 50px; /* chừa chỗ cho icon bên trái */
+  height: 42px; /* đảm bảo chiều cao đồng đều */
+  line-height: 42px;
+}
+
+/* --- Icon bên trong input --- */
+.input-icon {
+  position: absolute;
+  top: 70%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+/* --- Placeholder căn đều và rõ nét --- */
+.form-control-custom::placeholder {
+  color: #aaa;
+  opacity: 1;
+}
+
