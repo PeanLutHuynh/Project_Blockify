@@ -1,40 +1,78 @@
 import { initializeOnReady } from '../../../core/config/init.js';
 import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
+import { initializeSearch } from '../../../shared/components/SearchInit.js';
+import { productService } from '../../../core/services/ProductService.js';
+import { categoryService } from '../../../core/services/CategoryService.js';
+
+// State management
+let currentCategoryFilter: string | null = null;
+let totalProducts: number = 0;
+const PRODUCTS_PER_PAGE: number = 8;
 
 // Initialize app and run page logic
-initializeOnReady(() => {
+initializeOnReady(async () => {
   // Initialize navbar authentication UI
   initializeNavbarAuth();
   
-  // Original homepage logic
+  // Initialize search controller (UC3 - Thanh tìm kiếm)
+  initializeSearch();
+  
+  // Original homepage logic (UI interactions only)
   initializeHomePage();
+  
+  // Load categories dynamically from Supabase
+  await loadCategorySidebar();
+  
+  // Load real products from Supabase (AFTER HTML is rendered)
+  // This will UPDATE the mock data with real data
+  await loadRealProductData();
+  
+  // Setup category filter handlers
+  setupCategoryFilters();
+  
+  // Setup filter button handlers
+  setupFilterButtons();
 });
 
 function initializeHomePage() {
-  // Danh sách sản phẩm
-  const products = [
-    { img: "../../public/images/Group 61.png", name: "Police" },
-    { img: "../../public/images/Group 61 (1).png", name: "City" },
-    { img: "../../public/images/Group 61 (2).png", name: "Fire" },
-    { img: "../../public/images/Group 61 (3).png", name: "Rescue" },
-    { img: "../../public/images/Group 61 (4).png", name: "Rescue" },
-    { img: "../../public/images/Group 61 (5).png", name: "Rescue" },
-    { img: "../../public/images/Group 61 (6).png", name: "Rescue" },
-    { img: "../../public/images/Group 61 (7).png", name: "Space" }
+  // Categories list (keep this for category icons/navigation)
+  const categories = [
+    { img: "../../public/images/Group 61.png", name: "Police", categoryId: "1" },
+    { img: "../../public/images/Group 61 (1).png", name: "Fire", categoryId: "2" },
+    { img: "../../public/images/Group 61 (2).png", name: "City", categoryId: "3" },
+    { img: "../../public/images/Group 61 (3).png", name: "Construction", categoryId: "4" },
+    { img: "../../public/images/Group 61 (4).png", name: "Train", categoryId: "5" },
+    { img: "../../public/images/Group 61 (5).png", name: "Airport", categoryId: "6" },
+    { img: "../../public/images/Group 61 (6).png", name: "Seaport", categoryId: "7" },
+    { img: "../../public/images/Group 61 (7).png", name: "Space", categoryId: "8" }
   ];
-  const list = document.getElementById("product-list");
-  if (list) {
-    // Render card tự động
-    products.forEach(p => {
-      list.innerHTML += `
+  
+  const categoryList = document.getElementById("product-list");
+  if (categoryList) {
+    // Render category cards
+    categories.forEach(cat => {
+      categoryList.innerHTML += `
         <div class="d-flex justify-content-center col-md-3 col-sm-6">
-          <div class="product-card1">
-            <img src="${p.img}" alt="${p.name}" class="product-img">
+          <div class="product-card1" data-category-id="${cat.categoryId}">
+            <img src="${cat.img}" alt="${cat.name}" class="product-img">
             <span class="badge-hot">Hot</span>
-            <div class="product-footer pt-4">${p.name}</div>
+            <div class="product-footer pt-4">${cat.name}</div>
           </div>
         </div>
       `;
+    });
+    
+    // Add click handlers for category navigation
+    categoryList.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const card = target.closest('.product-card1') as HTMLElement;
+      if (card) {
+        const categoryId = card.dataset.categoryId;
+        if (categoryId) {
+          // Navigate to service page with category filter
+          window.location.href = `/src/pages/Service.html?category=${categoryId}`;
+        }
+      }
     });
   }
 
@@ -90,40 +128,8 @@ function initializeHomePage() {
     revealTargets.forEach(el => io.observe(el));
   })();
 
-  // Overlay search popup
-  const overlay = document.getElementById('overlay');
-  const openBtn = document.getElementById('openSearch');
-  const closeBtn = document.getElementById('closeSearch');
-  const searchInput = document.getElementById('searchInput') as HTMLInputElement | null;
-  const suggestions = document.querySelectorAll('.suggestion-box');
-
-  if (openBtn) {
-    openBtn.addEventListener('click', () => {
-      if (overlay) overlay.style.display = 'flex';
-      if (searchInput) searchInput.focus();
-    });
-  }
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      if (overlay) overlay.style.display = 'none';
-    });
-  }
-  // Khi click suggestion -> đưa text vào ô input
-  suggestions.forEach(item => {
-    item.addEventListener('click', () => {
-      const textEl = item.querySelector('.suggestion-text');
-      const text = textEl ? (textEl as HTMLElement).innerText : '';
-      if (searchInput) searchInput.value = text;
-    });
-  });
-  // Click ra ngoài popup để đóng
-  if (overlay) {
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) {
-        overlay.style.display = 'none';
-      }
-    });
-  }
+  // Note: Search functionality is now handled by SearchController
+  // (UC3 - Thanh tìm kiếm implemented in modules/search/SearchController.ts)
 
   // Main product list render and navigation
   const mainProducts = [
@@ -362,3 +368,411 @@ function initializeHomePage() {
   }
 }
 
+/**
+ * Load real product data from Supabase with pagination
+ */
+async function loadRealProductData() {
+  try {
+    console.log('Loading real products from Supabase with pagination...');
+    
+    // Load first page of products
+    await loadProductsWithPagination(null, 1);
+    
+    console.log('✅ Real product data loaded successfully with pagination');
+    
+  } catch (error) {
+    console.error('Error loading real products:', error);
+  }
+}
+
+/**
+ * Load category sidebar dynamically from Supabase
+ */
+async function loadCategorySidebar() {
+  try {
+    console.log('📂 Loading categories for sidebar...');
+    
+    const result = await categoryService.getCategories();
+    
+    if (!result.success || !result.categories) {
+      console.error('❌ Failed to load categories');
+      return;
+    }
+
+    console.log(`✅ Loaded ${result.categories.length} categories for sidebar`);
+    
+    // Find category sidebar in HTML
+    const categorySidebar = document.querySelector('.category');
+    if (!categorySidebar) {
+      console.warn('⚠️ Category sidebar not found');
+      return;
+    }
+
+    // Clear existing content except title
+    const title = categorySidebar.querySelector('h5');
+    categorySidebar.innerHTML = '';
+    if (title) {
+      categorySidebar.appendChild(title);
+    }
+
+    // Render categories
+    result.categories.forEach(cat => {
+      const categoryItem = document.createElement('p');
+      categoryItem.textContent = cat.name;
+      categoryItem.style.cursor = 'pointer';
+      categoryItem.setAttribute('data-category-id', cat.id);
+      categoryItem.classList.add('category-item');
+      
+      // Add hover effect
+      categoryItem.addEventListener('mouseenter', () => {
+        categoryItem.style.color = '#0d6efd';
+        categoryItem.style.fontWeight = 'bold';
+      });
+      
+      categoryItem.addEventListener('mouseleave', () => {
+        if (categoryItem.getAttribute('data-category-id') !== currentCategoryFilter) {
+          categoryItem.style.color = '';
+          categoryItem.style.fontWeight = '';
+        }
+      });
+      
+      categorySidebar.appendChild(categoryItem);
+    });
+
+    console.log('✅ Category sidebar rendered');
+  } catch (error) {
+    console.error('❌ Error loading category sidebar:', error);
+  }
+}
+
+/**
+ * Setup category filter click handlers
+ */
+function setupCategoryFilters() {
+  const categorySidebar = document.querySelector('.category');
+  if (!categorySidebar) return;
+
+  // Add click handler for "Category" title to show all products
+  const categoryTitle = categorySidebar.querySelector('h5');
+  if (categoryTitle) {
+    categoryTitle.style.cursor = 'pointer';
+    categoryTitle.addEventListener('click', async () => {
+      console.log('📂 Showing all products');
+      
+      // Clear category filter
+      currentCategoryFilter = null;
+      
+      // Clear all active states
+      document.querySelectorAll('.category-item').forEach(item => {
+        const el = item as HTMLElement;
+        el.style.color = '';
+        el.style.fontWeight = '';
+      });
+      
+      // Load all products from page 1
+      await loadProductsWithPagination(null, 1);
+    });
+  }
+
+  categorySidebar.addEventListener('click', async (e) => {
+    const target = e.target as HTMLElement;
+    
+    if (target.classList.contains('category-item')) {
+      const categoryId = target.getAttribute('data-category-id');
+      
+      // Update active state
+      document.querySelectorAll('.category-item').forEach(item => {
+        const el = item as HTMLElement;
+        el.style.color = '';
+        el.style.fontWeight = '';
+      });
+      target.style.color = '#0d6efd';
+      target.style.fontWeight = 'bold';
+      
+      // Update current filter
+      currentCategoryFilter = categoryId;
+      
+      // Load products by category with pagination (reset to page 1)
+      console.log(`📂 Filtering products by category: ${categoryId}`);
+      await loadProductsWithPagination(categoryId, 1);
+    }
+  });
+
+  console.log('✅ Category filters setup complete');
+}
+
+/**
+ * Filter products by category
+ */
+async function filterProductsByCategory(categoryId: string | null) {
+  try {
+    let result;
+    
+    if (categoryId) {
+      console.log(`🔍 Loading products for category ${categoryId}`);
+      result = await productService.getProductsByCategory(categoryId);
+    } else {
+      console.log('🔍 Loading all featured products');
+      result = await productService.getFeaturedProducts(100); // Get all products
+    }
+
+    if (!result.success || !result.products) {
+      console.error('❌ Failed to load products');
+      return;
+    }
+
+    console.log(`✅ Loaded ${result.products.length} products`);
+
+    // Render products to grid
+    renderProductsToGrid(result.products);
+  } catch (error) {
+    console.error('❌ Error filtering products:', error);
+  }
+}
+
+/**
+ * Load products with pagination
+ */
+async function loadProductsWithPagination(categoryId: string | null, page: number) {
+  try {
+    let result;
+    
+    if (categoryId) {
+      console.log(`🔍 Loading products for category ${categoryId}`);
+      result = await productService.getProductsByCategory(categoryId);
+    } else {
+      console.log('🔍 Loading all products');
+      result = await productService.getFeaturedProducts(100); // Get all products
+    }
+
+    if (!result.success || !result.products) {
+      console.error('❌ Failed to load products');
+      return;
+    }
+
+    totalProducts = result.products.length;
+    console.log(`✅ Loaded ${totalProducts} products`);
+
+    // Calculate pagination
+    const startIndex = (page - 1) * PRODUCTS_PER_PAGE;
+    const endIndex = startIndex + PRODUCTS_PER_PAGE;
+    const paginatedProducts = result.products.slice(startIndex, endIndex);
+
+    // Render products to grid
+    renderProductsToGrid(paginatedProducts);
+    
+    // Render pagination controls
+    renderPagination(page, totalProducts);
+  } catch (error) {
+    console.error('❌ Error loading products:', error);
+  }
+}
+
+/**
+ * Render products to main product grid with consistent styling
+ */
+function renderProductsToGrid(products: any[]) {
+  const mainList = document.getElementById('main-product-list');
+  if (!mainList) {
+    console.warn('main-product-list not found');
+    return;
+  }
+
+  if (products.length === 0) {
+    mainList.innerHTML = '<div class="col-12 text-center"><p>Không có sản phẩm nào</p></div>';
+    return;
+  }
+
+  // Render products with consistent styling from HomePage
+  mainList.innerHTML = products.map(product => {
+    const price = parseFloat(product.price || 0);
+    const salePrice = parseFloat(product.salePrice || 0);
+    const displayPrice = salePrice > 0 ? salePrice : price;
+    const formattedPrice = displayPrice.toLocaleString('vi-VN');
+    const rating = product.rating || 4.8;
+    const age = product.recommendedAge || '8+';
+    const pieces = product.pieceCount || 120;
+    
+    return `
+      <div class="col-6 col-md-3">
+        <div class="product-card position-relative" data-product-slug="${product.slug}">
+          <i class="far fa-heart icon-heart"></i>
+          <div class="product-image">
+            <img src="${product.imageUrl}" alt="${product.name}">
+          </div>
+          <div class="product-info d-flex align-items-center justify-content-between">
+            <span><i class="fas fa-child"></i> ${age}</span>
+            <span><i class="fas fa-cube"></i> ${pieces}</span>
+            <span><i class="fas fa-star text-warning"></i> ${rating}</span>
+          </div>
+          <div class="divider"></div>
+          <div class="product-title" style="height:40px;">${product.name}</div>
+          <div class="product-price">${formattedPrice} VNĐ</div>
+          <button class="btn-cart">Add to Cart</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Add click handlers
+  mainList.querySelectorAll('.product-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      
+      // Check if clicking Add to Cart button
+      if (target.closest('.btn-cart')) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      const slug = card.getAttribute('data-product-slug');
+      if (slug) {
+        window.location.href = `/src/pages/ProductDetail.html?slug=${slug}`;
+      }
+    });
+  });
+
+  console.log(`✅ Rendered ${products.length} products to grid`);
+}
+
+/**
+ * Render pagination controls
+ */
+function renderPagination(currentPage: number, totalItems: number) {
+  const totalPages = Math.ceil(totalItems / PRODUCTS_PER_PAGE);
+  
+  if (totalPages <= 1) {
+    // Hide pagination if only 1 page
+    const paginationContainer = document.getElementById('pagination-container');
+    if (paginationContainer) {
+      paginationContainer.innerHTML = '';
+    }
+    return;
+  }
+
+  let paginationHTML = '<nav aria-label="Product pagination"><ul class="pagination justify-content-center">';
+  
+  // Previous button
+  paginationHTML += `
+    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+      <a class="page-link" href="#" data-page="${currentPage - 1}" ${currentPage === 1 ? 'tabindex="-1"' : ''}>
+        Trước
+      </a>
+    </li>
+  `;
+  
+  // Page numbers
+  const maxVisiblePages = 5;
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+  
+  // Adjust if we're near the end
+  if (endPage - startPage < maxVisiblePages - 1) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  }
+  
+  // First page
+  if (startPage > 1) {
+    paginationHTML += `<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`;
+    if (startPage > 2) {
+      paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+    }
+  }
+  
+  // Page numbers
+  for (let i = startPage; i <= endPage; i++) {
+    paginationHTML += `
+      <li class="page-item ${i === currentPage ? 'active' : ''}">
+        <a class="page-link" href="#" data-page="${i}">${i}</a>
+      </li>
+    `;
+  }
+  
+  // Last page
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+    }
+    paginationHTML += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`;
+  }
+  
+  // Next button
+  paginationHTML += `
+    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+      <a class="page-link" href="#" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'tabindex="-1"' : ''}>
+        Sau
+      </a>
+    </li>
+  `;
+  
+  paginationHTML += '</ul></nav>';
+  
+  // Find or create pagination container
+  let paginationContainer = document.getElementById('pagination-container');
+  if (!paginationContainer) {
+    const mainList = document.getElementById('main-product-list');
+    if (mainList && mainList.parentElement) {
+      paginationContainer = document.createElement('div');
+      paginationContainer.id = 'pagination-container';
+      paginationContainer.className = 'col-12 mt-4';
+      mainList.parentElement.insertBefore(paginationContainer, mainList.nextSibling);
+    }
+  }
+  
+  if (paginationContainer) {
+    paginationContainer.innerHTML = paginationHTML;
+    
+    // Add click handlers for pagination links
+    paginationContainer.querySelectorAll('.page-link').forEach(link => {
+      link.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        const pageLink = e.target as HTMLElement;
+        const page = parseInt(pageLink.getAttribute('data-page') || '1');
+        
+        if (page && page !== currentPage && page >= 1 && page <= totalPages) {
+          // Save current scroll position relative to the product grid
+          const mainList = document.getElementById('main-product-list');
+          const scrollPosition = mainList ? mainList.getBoundingClientRect().top + window.scrollY - 100 : 0;
+          
+          // Update page and load products
+          await loadProductsWithPagination(currentCategoryFilter, page);
+          
+          // Restore scroll position (don't scroll to top)
+          window.scrollTo({
+            top: scrollPosition,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+  }
+  
+  console.log(`✅ Rendered pagination: Page ${currentPage} of ${totalPages}`);
+}
+
+/**
+ * Setup filter button handlers (Newest, Hot, Filter)
+ */
+function setupFilterButtons() {
+  const filterButtons = document.querySelectorAll('.col-md-9 .btn');
+  
+  filterButtons.forEach((btn, index) => {
+    btn.addEventListener('click', async () => {
+      // Update active state
+      filterButtons.forEach(b => b.classList.remove('btn-primary'));
+      filterButtons.forEach(b => b.classList.add('btn-secondary'));
+      btn.classList.remove('btn-secondary');
+      btn.classList.add('btn-primary');
+      
+      // Filter logic (can be enhanced later)
+      console.log(`🔘 Filter button ${index} clicked`);
+      
+      // For now, just reload products
+      await filterProductsByCategory(currentCategoryFilter);
+    });
+  });
+
+  console.log('✅ Filter buttons setup complete');
+}
