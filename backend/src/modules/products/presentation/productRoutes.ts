@@ -21,6 +21,19 @@ export function createProductRoutes(): Router {
   // GET /api/v1/products/suggestions?q=keyword
   router.get('/suggestions', controller.getSuggestions);
 
+  // ✅ RECOMMENDATION ROUTES (must be before /:id)
+  // Get best-selling products (most purchased from delivered orders)
+  // GET /api/v1/products/best-selling?limit=8
+  router.get('/best-selling', controller.getBestSellingProducts);
+
+  // Get recommended products for user (based on purchase history)
+  // GET /api/v1/products/recommendations/user/:userId?limit=8
+  router.get('/recommendations/user/:userId', controller.getRecommendedProductsForUser);
+
+  // Get recommended products similar to current product (same category)
+  // GET /api/v1/products/recommendations/similar/:productId?limit=6
+  router.get('/recommendations/similar/:productId', controller.getRecommendedProductsByProduct);
+
   // Get product by slug (must be before /:id)
   // GET /api/v1/products/slug/:slug
   router.get('/slug/:slug', controller.getProductBySlug);

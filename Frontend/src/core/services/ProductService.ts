@@ -249,6 +249,148 @@ export class ProductService {
       };
     }
   }
+
+  /**
+   * ✅ Get best-selling products (most purchased from delivered orders)
+   * For HomePage default display when user not logged in or no purchase history
+   * 
+   * @param limit - Maximum number of products to return (default: 8)
+   */
+  async getBestSellingProducts(limit: number = 8): Promise<{
+    success: boolean;
+    products: Product[];
+    message?: string;
+  }> {
+    try {
+      console.log(`🔥 Getting top ${limit} best-selling products...`);
+
+      const response = await httpClient.get<SearchResponse>(
+        `/api/v1/products/best-selling?limit=${limit}`
+      );
+
+      console.log('Best-selling products API Response:', response);
+
+      if (response.success) {
+        const apiData = (response.data as any) || response;
+        const results = (apiData.results || (response as any).results || []);
+        
+        const products = results.map((item: any) => 
+          Product.fromApiResponse(item)
+        );
+
+        return {
+          success: true,
+          products,
+          message: apiData.message || (response as any).message || 'Sản phẩm bán chạy nhất'
+        };
+      }
+
+      // Fallback to featured products
+      console.warn('Best-selling failed, falling back to featured products');
+      return this.getFeaturedProducts(limit);
+
+    } catch (error) {
+      console.error('Get best-selling products error:', error);
+      // Fallback to featured products on error
+      return this.getFeaturedProducts(limit);
+    }
+  }
+
+  /**
+   * ✅ RECOMMENDATION SYSTEM
+   * Get recommended products based on user's purchase history
+   * For HomePage - recommends products from categories user has bought before
+   * 
+   * @param userId - User ID to get recommendations for
+   * @param limit - Maximum number of products to return (default: 10)
+   */
+  async getRecommendedProductsForUser(userId: number, limit: number = 10): Promise<{
+    success: boolean;
+    products: Product[];
+    message?: string;
+  }> {
+    try {
+      console.log(`🔍 Getting recommendations for user ${userId}`);
+
+      const response = await httpClient.get<SearchResponse>(
+        `/api/v1/products/recommendations/user/${userId}?limit=${limit}`
+      );
+
+      console.log('User recommendations API Response:', response);
+
+      if (response.success) {
+        const apiData = (response.data as any) || response;
+        const results = (apiData.results || (response as any).results || []);
+        
+        const products = results.map((item: any) => 
+          Product.fromApiResponse(item)
+        );
+
+        return {
+          success: true,
+          products,
+          message: apiData.message || (response as any).message || 'Gợi ý dựa trên lịch sử mua hàng'
+        };
+      }
+
+      // Fallback to featured products if recommendation fails
+      console.warn('Recommendation failed, falling back to featured products');
+      return this.getFeaturedProducts(limit);
+
+    } catch (error) {
+      console.error('Get recommended products for user error:', error);
+      // Fallback to featured products on error
+      return this.getFeaturedProducts(limit);
+    }
+  }
+
+  /**
+   * ✅ RECOMMENDATION SYSTEM
+   * Get recommended products based on current product (same category)
+   * For ProductDetail page - recommends similar products from same category
+   * 
+   * @param productId - Current product ID
+   * @param limit - Maximum number of products to return (default: 6)
+   */
+  async getRecommendedProductsByProduct(productId: number, limit: number = 6): Promise<{
+    success: boolean;
+    products: Product[];
+    message?: string;
+  }> {
+    try {
+      console.log(`🔍 Getting similar products for product ${productId}`);
+
+      const response = await httpClient.get<SearchResponse>(
+        `/api/v1/products/recommendations/similar/${productId}?limit=${limit}`
+      );
+
+      console.log('Similar products API Response:', response);
+
+      if (response.success) {
+        const apiData = (response.data as any) || response;
+        const results = (apiData.results || (response as any).results || []);
+        
+        const products = results.map((item: any) => 
+          Product.fromApiResponse(item)
+        );
+
+        return {
+          success: true,
+          products,
+          message: apiData.message || (response as any).message || 'Sản phẩm tương tự'
+        };
+      }
+
+      // Fallback to featured products if recommendation fails
+      console.warn('Similar products not found, falling back to featured products');
+      return this.getFeaturedProducts(limit);
+
+    } catch (error) {
+      console.error('Get recommended products by product error:', error);
+      // Fallback to featured products on error
+      return this.getFeaturedProducts(limit);
+    }
+  }
 }
 
 // Export singleton instance

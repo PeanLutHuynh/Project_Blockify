@@ -258,4 +258,109 @@ export class ProductController {
       });
     }
   };
+
+  /**
+   * ✅ GET /api/v1/products/recommendations/user/:userId
+   * 
+   * @description Get recommended products based on user's purchase history
+   * For HomePage - recommends products from categories user has bought before
+   */
+  getRecommendedProductsForUser = async (req: HttpRequest, res: HttpResponse): Promise<void> => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+
+      if (isNaN(userId)) {
+        res.status(400).json({
+          success: false,
+          message: 'Invalid user ID'
+        });
+        return;
+      }
+
+      const results = await this.productService.getRecommendedProductsForUser(userId, limit);
+
+      res.json({
+        success: true,
+        results,
+        count: results.length,
+        message: `Gợi ý ${results.length} sản phẩm dựa trên lịch sử mua hàng`
+      });
+
+    } catch (error) {
+      logger.error('Get recommended products for user error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Có lỗi xảy ra',
+        results: []
+      });
+    }
+  };
+
+  /**
+   * ✅ GET /api/v1/products/recommendations/similar/:productId
+   * 
+   * @description Get recommended products based on current product (same category)
+   * For ProductDetail page - recommends similar products from same category
+   */
+  getRecommendedProductsByProduct = async (req: HttpRequest, res: HttpResponse): Promise<void> => {
+    try {
+      const productId = parseInt(req.params.productId);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 6;
+
+      if (isNaN(productId)) {
+        res.status(400).json({
+          success: false,
+          message: 'Invalid product ID'
+        });
+        return;
+      }
+
+      const results = await this.productService.getRecommendedProductsByCategory(productId, limit);
+
+      res.json({
+        success: true,
+        results,
+        count: results.length,
+        message: `Gợi ý ${results.length} sản phẩm tương tự`
+      });
+
+    } catch (error) {
+      logger.error('Get recommended products by product error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Có lỗi xảy ra',
+        results: []
+      });
+    }
+  };
+
+  /**
+   * ✅ GET /api/v1/products/best-selling?limit=8
+   * 
+   * @description Get best-selling products (most purchased from delivered orders)
+   * For HomePage default display when user not logged in or no purchase history
+   */
+  getBestSellingProducts = async (req: HttpRequest, res: HttpResponse): Promise<void> => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 8;
+
+      const results = await this.productService.getBestSellingProducts(limit);
+
+      res.json({
+        success: true,
+        results,
+        count: results.length,
+        message: `Top ${results.length} sản phẩm bán chạy nhất`
+      });
+
+    } catch (error) {
+      logger.error('Get best-selling products error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Có lỗi xảy ra',
+        results: []
+      });
+    }
+  };
 }
