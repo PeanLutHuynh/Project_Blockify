@@ -496,35 +496,43 @@ export class AuthService {
               // Set temporary token to call backend
               httpClient.setAuthToken(supabaseToken);
               
-              // Try to fetch user profile from backend with Supabase token
-              const response = await httpClient.get<any>("/api/auth/me");
+              // For Google OAuth, ALWAYS call /api/auth/google endpoint
+              // This endpoint will check admin_users first, then public.users
+              console.log('🔄 Google OAuth: Calling /api/auth/google endpoint...');
+              const authData = {
+                email: supabaseUser.email!,
+                fullName: supabaseUser.user_metadata?.full_name || supabaseUser.email!.split('@')[0],
+                authUid: supabaseUser.id,
+                avatarUrl: supabaseUser.user_metadata?.avatar_url,
+                username: supabaseUser.user_metadata?.username || supabaseUser.email!.split('@')[0],
+              };
               
-              // Backend structure: { success: true, data: {...}, message }
-              if (response.success && response.data) {
-                // Backend knows this user, sync profile
-                const user = User.fromApiResponse(response.data);
-                this.setCurrentUser(user);
-                console.log('✅ Google OAuth: User synced:', user.email);
-              } else {
-                // User not in backend, need to create via OAuth callback
+              const oauthResponse = await httpClient.post("/api/auth/google", authData);
+              
+              // Backend structure: { success: true, data: { user, token }, message }
+              if (oauthResponse.success && oauthResponse.data?.user && oauthResponse.data?.token) {
+                this.handleAuthSuccess(oauthResponse.data.user, oauthResponse.data.token);
+                console.log('✅ Google OAuth: User authenticated:', oauthResponse.data.user.email);
+                console.log('👤 Google OAuth: User role:', oauthResponse.data.user.role);
                 
-                // Call Google OAuth endpoint to create user in backend
-                const authData = {
-                  email: supabaseUser.email!,
-                  fullName: supabaseUser.user_metadata?.full_name || supabaseUser.email!.split('@')[0],
-                  authUid: supabaseUser.id,
-                  avatarUrl: supabaseUser.user_metadata?.avatar_url,
-                };
-                
-                const oauthResponse = await httpClient.post("/api/auth/google", authData);
-                
-                // Backend structure: { success: true, data: { user, token }, message }
-                if (oauthResponse.success && oauthResponse.data?.user && oauthResponse.data?.token) {
-                  this.handleAuthSuccess(oauthResponse.data.user, oauthResponse.data.token);
-                  console.log('✅ Google OAuth: User created:', oauthResponse.data.user.email);
+                // Redirect based on role
+                const userRole = oauthResponse.data.user.role;
+                if (userRole === 'admin') {
+                  console.log('👑 Google OAuth: Admin detected, redirecting to Admin panel...');
+                  // Check if we're not already on admin page
+                  if (!window.location.pathname.includes('Admin.html')) {
+                    window.location.href = '/src/pages/Admin.html';
+                  }
                 } else {
-                  console.error('❌ OAuth user creation failed');
+                  console.log('👤 Google OAuth: Regular user, redirecting to Home page...');
+                  // Check if we're on auth callback or signin page
+                  if (window.location.pathname.includes('AuthCallback.html') || 
+                      window.location.pathname.includes('Signin')) {
+                    window.location.href = '/src/pages/HomePage.html';
+                  }
                 }
+              } else {
+                console.error('❌ OAuth authentication failed:', oauthResponse);
               }
             } catch (error) {
               console.error('❌ Failed to sync user:', error);
