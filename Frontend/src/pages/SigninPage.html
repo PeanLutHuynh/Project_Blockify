@@ -22,62 +22,151 @@
   <link rel="icon" href="data:,">
 </head>
 <body>
-<div id="welcome-typing" class="welcome-typing"><span></span><span></span></div>
-<div class="container-fluid auth-wrap d-flex justify-content-end align-items-center px-3 px-md-5">
-  <div class="auth-card glass p-4 p-md-5">
-    <h2 class="text-center title mb-4">Sign In</h2>
-    
-    <!-- Error container -->
-    <div id="error-container" class="d-none mb-3"></div>
-    <!-- Success container -->
-    <div id="success-container" class="d-none mb-3"></div>
-    
-    <form class="needs-validation" novalidate>
-      <!-- Email -->
-      <div class="mb-4 position-relative underline-input">
-        <label class="form-label small text-muted">Email</label>
-        <input id="email" type="email" class="form-control" placeholder="Email" required>
-        <i class="fa-regular fa-envelope input-icon"></i>
-        <div class="invalid-feedback">Please enter your email.</div>
-      </div>
+  <div class="signin-page">
+    <!-- Left Side - Image Section -->
+    <div class="left-section ">
+        <div class="brand-text">Blockify</div>
+        <div class="gradient-bg"></div>
+        <img src="../../public/images/2.jpg" alt="City building" class="tower-image">
+    </div>
 
-      <!-- Password -->
-      <div class="mb-2 position-relative underline-input">
-        <label class="form-label small text-muted">Password</label>
-        <input id="password" type="password" class="form-control" placeholder="Password" required>
-        <i class="fa-solid fa-lock input-icon"></i>
-        <div class="invalid-feedback">Please enter your password.</div>
-      </div>
-
-      <!-- Show password -->
-      <div class="form-check mb-4">
-        <input class="form-check-input" type="checkbox" id="showPwd">
-        <label class="form-check-label" for="showPwd">Show Password</label>
-      </div>
-        <!-- Divider -->
-        <div class="divider">
-          <span>OR</span>
+    <!-- Right Side - Form Section -->
+    <div class="right-section ">
+        <!-- Decorative Blocks -->
+        <div class="deco-block deco-1">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 33 39">
+                <g>
+                    <path d="M8.38445 6.60583C8.38445 3.54346 10.355 0.703752 13.3818 0.238817C15.4758 -0.082818 17.3823 -0.0780897 19.4742 0.244232C22.5169 0.71308 24.5083 3.56122 24.5083 6.63988V9.51815C24.5083 13.3841 21.3743 16.5182 17.5083 16.5182H15.3844C11.5185 16.5182 8.38445 13.3842 8.38445 9.51816V6.60583Z" fill="#0096F4" />
+                    <path d="M1.27483e-05 9.32167L16.5846 5.42183L32.8927 9.32167V32.976L16.5846 38.8552L1.27483e-05 32.976L1.27483e-05 9.32167Z" fill="#0096F4" />
+                </g>
+            </svg>
+        </div>
+        <div class="deco-block deco-2">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 22 26">
+                <g>
+                    <path d="M5.41104 5.13299C5.41104 2.64625 7.00345 0.279571 9.47971 0.0515234C10.2378 -0.018293 10.9725 -0.0168929 11.7302 0.0546105C14.2123 0.288829 15.8168 2.65602 15.8168 5.14914V5.63741C15.8168 8.51089 13.4874 10.8403 10.6139 10.8403C7.74045 10.8403 5.41104 8.51089 5.41104 5.63741V5.13299Z" fill="#0096F4" />
+                    <path d="M1.89468e-06 6.11751L10.7031 3.55819L21.2278 6.11751V21.641L10.7031 25.4993L1.89468e-06 21.641L1.89468e-06 6.11751Z" fill="#0096F4" />
+                </g>
+            </svg>
+        </div>
+        <div class="deco-block deco-3">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 15 18">
+                <g>
+                    <path d="M3.78436 3.59109C3.78436 1.85134 4.89832 0.195432 6.63075 0.0359964C7.16036 -0.0127429 7.67363 -0.0117652 8.20298 0.0381534C9.9395 0.201908 11.0619 1.85818 11.0619 3.6024V3.9456C11.0619 5.95524 9.43278 7.58438 7.42314 7.58438C5.41349 7.58438 3.78436 5.95524 3.78436 3.9456V3.59109Z" fill="#0096F4" />
+                    <path d="M1.02684e-05 4.2801L7.4855 2.48949L14.8462 4.2801V15.141L7.4855 17.8404L1.02684e-05 15.141V4.2801Z" fill="#0096F4" />
+                </g>
+            </svg>
+        </div>
+        <div class="deco-block deco-4">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 12 14">
+                <g>
+                    <path d="M2.9924 2.73973C2.9924 1.41388 3.85038 0.163998 5.16986 0.0341699C5.63942 -0.0120323 6.09101 -0.011136 6.56035 0.0360381C7.88276 0.168955 8.74695 1.41893 8.74695 2.748V2.87557C8.74695 4.46465 7.45875 5.75285 5.86967 5.75285C4.2806 5.75285 2.9924 4.46465 2.9924 2.87557V2.73973Z" fill="#0096F4" />
+                    <path d="M2.15083e-05 3.24652L5.91899 1.88832L11.7393 3.24652V11.4846L5.91899 13.5322L2.15083e-05 11.4846V3.24652Z" fill="#0096F4" />
+                </g>
+            </svg>
         </div>
 
-      <!-- Sign In button -->
-      <button type="submit" id="submit-btn" class="btn btn-primary w-100 mb-3">Sign In</button>
-      <button type="button" class="btn btn-google w-100 mb-3" id="google-signin-btn">
-        <svg class="google-icon" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-        </svg>
-        Continue with Google
-      </button>
-  
-    
-      <p class="text-center text-muted mb-0">
-        Don't have an account yet?
-        <a href="SignupPage.html" class="link-primary link-like">here</a>.
-      </p>
-    </form>
-  </div>
+        <!-- Bottom Decorative Blocks -->
+        <div class="deco-block deco-bottom-1">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 137 83">
+                <path d="M0 10.1491L14.3735 10.149V5.08835C14.3735 5.08835 14.3735 2.10509 15.9031 0.8711C17.2599 -0.223478 20.3949 0.0276497 20.3949 0.0276497H39.514H59.2169C59.2169 0.0276497 62.3357 -0.236956 63.5154 0.870966C64.695 1.97889 64.6545 4.14167 64.6545 5.08821V10.149L78.8257 10.1491L136.548 57.8902V82.6857H0L0 10.1491Z" fill="#0096F4" />
+            </svg>
+        </div>
+        <div class="deco-block deco-bottom-2">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 155 94">
+                <path d="M0 31.5524H27.9863V8.03153C27.9863 8.03153 27.9863 5.35435 30.6516 2.67718C33.317 0 35.9824 0 35.9824 0H77.2954H118.608C118.608 0 121.274 0 123.939 2.67718C126.605 5.35435 126.605 8.03153 126.605 8.03153V31.5524H154.591V93.7012H0V31.5524Z" fill="#0096F4" />
+            </svg>
+        </div>
+        <div class="deco-block deco-bottom-3">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 106 47">
+                <path d="M0 7.30791H11.8282V0.885766C11.8282 0.885766 11.8282 0.442883 12.1478 0.221441C12.4675 0 13.1069 0 13.1069 0H25.8941H37.4026C37.4026 0 38.0824 0.0280702 38.3616 0.221441C38.6408 0.414813 38.6813 0.885766 38.6813 0.885766V7.30791H65.8541V0.885766C65.8541 0.885766 65.8946 0.414813 66.1738 0.221441C66.4529 0.0280702 67.1328 0 67.1328 0H79.2806H91.4285C91.4285 0 92.1084 0.0280702 92.3875 0.221441C92.6667 0.414813 92.7072 0.885766 92.7072 0.885766V7.30791H105.494V16.1656L54.985 46.9459H0V7.30791Z" fill="#0096F4" />
+            </svg>
+        </div>
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-xl-7 ">
+                    <!-- Welcome Section -->
+                    <h1 class="welcome-title text-center">Chào mừng</h1>
+                    <p class="signin-label text-center">Đăng nhập</p>
+
+                     <!-- Error container -->
+                      <div id="error-container" class="d-none mb-3"></div>
+                      <!-- Success container -->
+                      <div id="success-container" class="d-none mb-3"></div>
+
+                    <!-- Sign In Form -->
+                    <form id="signinForm" class="needs-validation" novalidate>
+                        <!-- Username Field -->
+                        <div class="mb-4 position-relative input-group-custom">
+                            <div class="input-icon">
+                                <svg width="32" height="32" fill="none" viewBox="0 0 32 32">
+                                    <path d="M26.6667 28V25.3333C26.6667 23.9188 26.1048 22.5623 25.1046 21.5621C24.1044 20.5619 22.7478 20 21.3333 20H10.6667C9.25218 20 7.89562 20.5619 6.89543 21.5621C5.89524 22.5623 5.33333 23.9188 5.33333 25.3333V28M21.3333 9.33333C21.3333 12.2789 18.9455 14.6667 16 14.6667C13.0545 14.6667 10.6667 12.2789 10.6667 9.33333C10.6667 6.38781 13.0545 4 16 4C18.9455 4 21.3333 6.38781 21.3333 9.33333Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <input 
+                                type="email" 
+                                class="form-control form-control-custom" 
+                                id="email"
+                                placeholder="Email"
+                                required
+                            />
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="mb-3 position-relative input-group-custom">
+                            <div class="input-icon">
+                                <svg width="32" height="32" fill="none" viewBox="0 0 32 32">
+                                    <path d="M9.33333 14.6667V9.33333C9.33333 7.56522 10.0357 5.86953 11.286 4.61929C12.5362 3.36905 14.2319 2.66667 16 2.66667C17.7681 2.66667 19.4638 3.36905 20.714 4.61929C21.9643 5.86953 22.6667 7.56522 22.6667 9.33333V14.6667M6.66667 14.6667H25.3333C26.8061 14.6667 28 15.8606 28 17.3333V26.6667C28 28.1394 26.8061 29.3333 25.3333 29.3333H6.66667C5.19391 29.3333 4 28.1394 4 26.6667V17.3333C4 15.8606 5.19391 14.6667 6.66667 14.6667Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <input 
+                                type="password" 
+                                class="form-control form-control-custom" 
+                                id="password"
+                                placeholder="Mật khẩu"
+                                required
+                            />
+                            <div class="invalid-feedback">Hãy điền mật khẩu của bạn.</div>
+                        </div>
+
+                        <!-- Show Password Checkbox -->
+                        <div class="form-check mb-4 show-password-check ">
+                            <input class="form-check-input" type="checkbox" id="showPwd">
+                            <label class="form-check-label" for="showPwd">
+                                Hiện mật khẩu
+                            </label>
+                        </div>
+
+                        <!-- Sign In Button -->
+                        <div class="text-center mb-4">
+                            <button type="submit" id="submit-btn" class="btn btn-signin">Đăng nhập</button>
+                        </div>
+                    </form>
+
+                    <!-- OR Divider -->
+                    <div class="or-divider">
+                        <hr />
+                        <span class="or-text">Hoặc</span>
+                        <hr />
+                    </div>
+
+                    <!-- Google Sign In -->
+                    <div class="text-center">
+                        <button class="btn btn-google" id="google-signin-btn">
+                            <img src="https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png" alt="Google" class="google-icon">
+                            Tiếp tục với Google
+                        </button>
+
+                        <p class="text-center text-muted mt-4 mb-0">
+                          Bạn chưa có tài khoản? Đăng ký tại
+                          <a href="SignupPage.html" class="link-primary link-like">đây</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
