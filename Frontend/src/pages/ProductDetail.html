@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product Detail</title>
+  <title>Chi Tiết Sản Phẩm</title>
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -28,35 +28,31 @@
       <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
               <li class="nav-item">
-                  <a class="nav-link" href="HomePage.html">Home</a>
+                  <a class="nav-link" href="HomePage.html">Trang chủ</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="IntroductionPage.html">Introduction</a>
+                  <a class="nav-link" href="IntroductionPage.html">Giới thiệu</a>
               </li>
               <li class="nav-item dropdown">
-                  <a class="nav-link " href="Service.html">
-                      Service
-                  </a>
-                 
+                  <a class="nav-link" href="Service.html">Dịch vụ</a>
               </li>
-            
           </ul>
           
           <div class="navbar-right-icons">
               <a href="#" class="search-icon">
-                  <i class="bi bi-search" id="openSearch"> </i>
+                  <i class="bi bi-search" id="openSearch"></i>
               </a>
               <a href="CartPage.html" class="cart-icon">
                   <i class="bi bi-cart"></i>
               </a>
-              <a href="SigninPage.html" class="btn-sign">Sign in</a>
-              <a href="SignupPage.html" class="btn-sign">Sign up</a>
+              <a href="SigninPage.html" class="btn-sign">Đăng nhập</a>
+              <a href="SignupPage.html" class="btn-sign">Đăng ký</a>
           </div>
       </div>
       <div class="overlay" id="overlay">
         <div class="search-popup">
           <div class="search-header">
-            <strong class="text-white">Search</strong>
+            <strong class="text-white">Tìm kiếm</strong>
             <i class="bi bi-x-circle" id="closeSearch" style="cursor:pointer; color:white"></i>
           </div>
       
@@ -66,35 +62,34 @@
             class="search-input text-white" 
             id="searchInput" 
             style="border: 0; background-color: rgb(30, 41, 57);" 
-            placeholder="Enter keyword...">
+            placeholder="Nhập từ khóa...">
           
           <div class="line mb-2"></div>
       
           <!-- Suggestions -->
           <div class="suggestion-box">
             <div>
-              <button class="suggestion-btn text-white">Suggestion</button>
-              <span class="suggestion-text">Yellow Lego Truck Set</span>
+              <button class="suggestion-btn text-white">Gợi ý</button>
+              <span class="suggestion-text">Xe Tải LEGO Màu Vàng</span>
             </div>
             <i class="bi bi-box-arrow-up-right" style="color:white"></i>
           </div>
           <div class="suggestion-box">
             <div>
-              <button class="suggestion-btn text-white">Suggestion</button>
-              <span class="suggestion-text">Water Park</span>
+              <button class="suggestion-btn text-white">Gợi ý</button>
+              <span class="suggestion-text">Công Viên Nước</span>
             </div>
             <i class="bi bi-box-arrow-up-right" style="color:white"></i>
           </div>
           <div class="suggestion-box">
             <div>
-              <button class="suggestion-btn text-white">Suggestion</button>
-              <span class="suggestion-text">Ninjago World</span>
+              <button class="suggestion-btn text-white">Gợi ý</button>
+              <span class="suggestion-text">Thế Giới Ninjago</span>
             </div>
             <i class="bi bi-box-arrow-up-right" style="color:white"></i>
           </div>
         </div>
       </div>
-      
   </div>
 </nav>
 
@@ -105,7 +100,7 @@
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
         <li class="breadcrumb-item"><a href="#">Blockify</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Police Car</li>
+        <li class="breadcrumb-item active" aria-current="page">Xe Cảnh Sát</li>
       </ol>
     </nav>
   </div>
@@ -115,20 +110,20 @@
 <div class="container">
   <div class="product-main-container">
   <div class="row">
-    <!-- Product Images -->
+      <!-- Product Images -->
       <div class="col-md-5">
         <div class="product-image-main">
-          <img id="pd-image" src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt1.png" alt="Product Image">
+          <img id="pd-image" src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt1.png" alt="Hình Sản Phẩm">
         </div>
         <div class="thumbnail-container">
           <div class="thumbnail" onclick="changeMainImage('https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt2.png')">
-            <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt2.png" alt="Thumbnail">
+            <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt2.png" alt="Hình nhỏ">
           </div>
           <div class="thumbnail" onclick="changeMainImage('https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt3.png')">
-            <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt3.png" alt="Thumbnail">
+            <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt3.png" alt="Hình nhỏ">
           </div>
           <div class="thumbnail" onclick="changeMainImage('https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt4.png')">
-            <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt4.png" alt="Thumbnail">
+            <img src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt4.png" alt="Hình nhỏ">
           </div>
         </div>
         <div class="social-icons">
@@ -140,47 +135,45 @@
 
       <!-- Product Info -->
       <div class="col-md-7 product-info-section">
-        <h1 id="pd-title">Product Name: Police Car</h1>
-        <div id="pd-brand" class="brand-info">Brand: LEGO CITY <br> Material: ABS Plastic</div>
+        <h1 id="pd-title">Tên Sản Phẩm: Xe Cảnh Sát</h1>
+        <div id="pd-brand" class="brand-info">Thương hiệu: LEGO CITY <br> Chất liệu: Nhựa ABS</div>
         <div id="pd-rating" class="rating-stars">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i>
+          <i class="fas fa-star"></i><i class="fas fa-star"></i>
           <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-    </div>
+        </div>
 
         <div class="price-section">
-      <p id="pd-price" class="price">190.000 VND</p>
+          <p id="pd-price" class="price">190.000 VND</p>
         </div>
         
         <div class="description-section">
-          <div class="description-title">Description</div>
+          <div class="description-title">Mô tả</div>
           <div class="description-content">
-            <div id="pd-theme">Theme: LEGO City</div>
-            <div id="pd-age">Age: 5+</div>
-            <div style="margin-top: 10px;"><strong>Short Description:</strong></div>
-            <div id="pd-short-desc">Join the world of LEGO City with the high-speed police car and brave police minifigure. Perfect for thrilling chases and creative adventures.</div>
+            <div id="pd-theme">Chủ đề: LEGO City</div>
+            <div id="pd-age">Độ tuổi: 5+</div>
+            <div style="margin-top: 10px;"><strong>Mô tả ngắn:</strong></div>
+            <div id="pd-short-desc">Tham gia thế giới LEGO City với xe cảnh sát tốc độ cao và nhân vật cảnh sát dũng cảm. Phù hợp cho những pha rượt đuổi kịch tính và phiêu lưu sáng tạo.</div>
           </div>
         </div>
         
         <div class="stats-section">
           <div id="pd-stats">
-            <span class="stats-item"><i class="fas fa-user"></i> Age: 5+</span>
+            <span class="stats-item"><i class="fas fa-user"></i> Độ tuổi: 5+</span>
             <span class="stats-item"><i class="fas fa-users"></i> 1476</span>
             <span class="stats-item"><i class="fas fa-star"></i> 4.8</span>
           </div>
         </div>
         
         <div class="quantity-purchase-section">
-          <label style="margin-right: 10px;">Quantity</label>
+          <label style="margin-right: 10px;">Số lượng</label>
           <input type="number" value="1" min="1" class="form-control quantity-input">
-          <span style="color: #28a745; margin-left: 10px;">Stock</span>
-      </div>
+          <span style="color: #28a745; margin-left: 10px;">Còn hàng</span>
+        </div>
         
         <div class="quantity-purchase-section">
-          <button class="btn btn-add-cart"><i class="fas fa-cart-plus"></i> Add to Cart</button>
-        <button class="btn btn-purchase">Purchase</button>
+          <button class="btn btn-add-cart"><i class="fas fa-cart-plus"></i> Thêm vào giỏ</button>
+          <button class="btn btn-purchase">Mua ngay</button>
         </div>
       </div>
     </div>
@@ -190,28 +183,25 @@
 <!-- Product Details -->
 <div class="container">
   <div class="section-container">
-    <h6 class="section-title">PRODUCT DETAILS</h6>
+    <h6 class="section-title">CHI TIẾT SẢN PHẨM</h6>
     <div class="row">
       <div class="col-8">
         <div class="product-details-content" id="pd-full-description">
-        Join the thrilling chases with the LEGO City Police set! This set includes:
-        A powerful police supercar in the signature blue and white colors,
-         featuring a sporty spoiler and flashing siren lights on the roof.
-        A police minifigure dressed in official uniform and helmet, ready
-         for action.
-         This is a great choice for kids to play while developing their imagination, 
-         role-playing as police officers protecting the city, chasing criminals, and
-         keeping the peace.
-         Product Information:
-        Brand: LEGO City
-        Age: 5+
-        Includes: Police car, 1 police minifigure
-        Material: Safe, durable ABS plastic
+          Tham gia những cuộc rượt đuổi kịch tính cùng bộ LEGO City Police! Bộ sản phẩm bao gồm:
+          Xe cảnh sát mạnh mẽ với màu xanh trắng đặc trưng, có cánh gió thể thao và đèn còi trên nóc.
+          Nhân vật cảnh sát LEGO mặc đồng phục và đội mũ bảo hiểm, sẵn sàng hành động.
+          Đây là lựa chọn tuyệt vời giúp trẻ nhỏ vừa chơi vừa phát triển trí tưởng tượng, hóa thân thành cảnh sát bảo vệ thành phố.
+          <br><br>
+          <strong>Thông tin sản phẩm:</strong><br>
+          Thương hiệu: LEGO City<br>
+          Độ tuổi: 5+<br>
+          Bao gồm: Xe cảnh sát, 1 nhân vật cảnh sát<br>
+          Chất liệu: Nhựa ABS an toàn, bền bỉ
+        </div>
       </div>
-    </div>
       <div class="col-4">
         <div class="product-details-image">
-          <img id="pd-detail-image" src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239.png" alt="Product Detail">
+          <img id="pd-detail-image" src="https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239.png" alt="Chi tiết sản phẩm">
         </div>
       </div>
     </div>
@@ -221,27 +211,27 @@
 <!-- Product Rate -->
 <div class="container">
   <div class="section-container">
-    <h6 class="section-title">PRODUCT RATE</h6>
+    <h6 class="section-title">ĐÁNH GIÁ SẢN PHẨM</h6>
     <div class="rating-overview">
       <div class="rating-number">4.7 trên 5</div>
       <div class="rating-text">Đánh giá trung bình</div>
     </div>
-  <div id="pd-reviews" class="m-0">
+    <div id="pd-reviews" class="m-0">
       <div class="review-item">
         <div class="review-header">
           <div class="reviewer-avatar">J</div>
           <div class="reviewer-info">
             <div class="reviewer-name">JessicaNguyen</div>
             <div class="review-date">31-05-2025 13:52</div>
-            <div>Product Quality: Good</div>
-            <div>Recommended Age: 8+</div>
+            <div>Chất lượng sản phẩm: Tốt</div>
+            <div>Độ tuổi khuyên dùng: 8+</div>
           </div>
           <div class="review-stars">★★★★★</div>
         </div>
-        <div class="review-content">Fast delivery, overall good quality material, carefully packaged. Thank you, shop!</div>
+        <div class="review-content">Giao hàng nhanh, chất lượng tốt, đóng gói cẩn thận. Cảm ơn shop!</div>
         <div class="review-images">
-          <img src="https://via.placeholder.com/80x80/007bff/ffffff?text=IMG1" alt="Review Image">
-          <img src="https://via.placeholder.com/80x80/007bff/ffffff?text=IMG2" alt="Review Image">
+          <img src="https://via.placeholder.com/80x80/007bff/ffffff?text=IMG1" alt="Hình đánh giá">
+          <img src="https://via.placeholder.com/80x80/007bff/ffffff?text=IMG2" alt="Hình đánh giá">
         </div>
       </div>
       <div class="review-item">
@@ -253,53 +243,51 @@
           </div>
           <div class="review-stars">★★★★</div>
         </div>
-        <div class="review-content">Good quality, but I give 4 stars.</div>
+        <div class="review-content">Chất lượng ổn, mình cho 4 sao.</div>
       </div>
     </div>
     <div class="view-more-btn">
-      <a href="#"><< View More >></a>
+      <a href="#"><< Xem thêm >></a>
     </div>
   </div>
+
   <div class="container p-0">
     <div class="section-container">
-      <h6 class="section-title">ADD REVIEW</h6>
+      <h6 class="section-title">THÊM ĐÁNH GIÁ</h6>
       <form class="add-review-form" onsubmit="addReview(event)">
         <div class="mb-3">
-          <label for="review-user" class="form-label">Your Name</label>
-          <input type="text" id="review-user" class="form-control" placeholder="Enter your name" required>
+          <label for="review-user" class="form-label">Tên của bạn</label>
+          <input type="text" id="review-user" class="form-control" placeholder="Nhập tên của bạn" required>
         </div>
         <div class="mb-3">
-          <label for="review-rating" class="form-label">Rating</label>
+          <label for="review-rating" class="form-label">Xếp hạng</label>
           <select id="review-rating" class="form-select">
-            <option value="5">★★★★★ (5 stars)</option>
-            <option value="4">★★★★☆ (4 stars)</option>
-            <option value="3">★★★☆☆ (3 stars)</option>
-            <option value="2">★★☆☆☆ (2 stars)</option>
-            <option value="1">★☆☆☆☆ (1 star)</option>
+            <option value="5">★★★★★ (5 sao)</option>
+            <option value="4">★★★★☆ (4 sao)</option>
+            <option value="3">★★★☆☆ (3 sao)</option>
+            <option value="2">★★☆☆☆ (2 sao)</option>
+            <option value="1">★☆☆☆☆ (1 sao)</option>
           </select>
         </div>
         <div class="mb-3">
-          <label for="review-comment" class="form-label">Your Comment</label>
-          <textarea id="review-comment" class="form-control" placeholder="Write your comment..." rows="3" required></textarea>
+          <label for="review-comment" class="form-label">Bình luận của bạn</label>
+          <textarea id="review-comment" class="form-control" placeholder="Nhập bình luận..." rows="3" required></textarea>
         </div>
         <div class="mb-3">
-          <label for="review-images" class="form-label">Upload Images (max 3)</label>
+          <label for="review-images" class="form-label">Tải ảnh (tối đa 3)</label>
           <input type="file" id="review-images" class="form-control" accept="image/*" multiple>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
       </form>
     </div>
   </div>
-  
-  
 </div>
 
 <!-- Recommend -->
 <div class="container-fluid">
   <div class="row recommend-section">
-    <!-- Section Header -->
-    <div class=" col-md-8 mx-auto section-header">
-      <h2 class="section-title">Recommend for you</h2>
+    <div class="col-md-8 mx-auto section-header">
+      <h2 class="section-title">Gợi ý cho bạn</h2>
       <div class="nav-buttons">
         <div class="nav-btn" onclick="scrollProducts('left')">
           <i class="fas fa-chevron-left"></i>
@@ -310,23 +298,23 @@
       </div>
     </div>
 
-    <!-- Products Scroll Container -->
-     <div class="row">
+    <div class="row">
       <div class="product-scroll col-md-8 mx-auto" id="productScroll">
-        <div class="product-grid " id="productGrid">
+        <div class="product-grid" id="productGrid">
           <!-- Products will be generated by JavaScript -->
         </div>
       </div>
-     </div>
-    
+    </div>
   </div>
 </div>
+
 <footer class="footer">
   <div class="container">
-      <p class="mb-0">&copy; 2025 LEGO SHOP. All rights reserved. | Designed with ❤️ for LEGO enthusiasts</p>
+      <p class="mb-0">&copy; 2025 LEGO SHOP. Mọi quyền được bảo lưu. | Thiết kế với ❤️ dành cho người yêu LEGO</p>
   </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module" src="/dist/src/assets/js/components/ProductDetail.js"></script>
 </body>
+</html>
