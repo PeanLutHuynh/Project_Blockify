@@ -153,19 +153,20 @@ export class ProductController {
   /**
    * GET /api/v1/products
    * 
-   * @description Lấy tất cả sản phẩm (featured products for home page)
+   * @description Lấy sản phẩm với pagination và category filter
    */
   getAllProducts = async (req: HttpRequest, res: HttpResponse): Promise<void> => {
     try {
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
-      const featured = req.query.featured === 'true';
+      const categoryId = req.query.categoryId ? parseInt(req.query.categoryId as string) : undefined;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 12;
 
-      const results = await this.productService.getFeaturedProducts(limit, featured);
+      const result = await this.productService.getProducts(categoryId, page, limit);
 
       res.json({
         success: true,
-        results,
-        count: results.length
+        data: result.data,
+        pagination: result.pagination
       });
 
     } catch (error) {
@@ -173,7 +174,13 @@ export class ProductController {
       res.status(500).json({
         success: false,
         message: 'Có lỗi xảy ra',
-        results: []
+        data: [],
+        pagination: {
+          page: 1,
+          limit: 12,
+          total: 0,
+          totalPages: 0
+        }
       });
     }
   };

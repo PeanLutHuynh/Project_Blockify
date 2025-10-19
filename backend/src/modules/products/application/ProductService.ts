@@ -92,13 +92,19 @@ export class ProductService {
           relevanceScore = 30;
         }
 
+        // Generate slug if missing
+        const slug = item.product_slug || 
+                     item.product_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ||
+                     `product-${item.product_id}`;
+        
         return {
           id: item.product_id?.toString() || '',
           name: item.product_name || '',
+          slug: slug,
           description: item.short_description || item.description || '',
           price: parseFloat(item.price) || 0,
           image_url: imageUrl,
-          product_url: `/src/pages/ProductDetail.html?slug=${item.product_slug || ''}`,
+          product_url: `/src/pages/ProductDetail.html?slug=${slug}`,
           category: item.category_id?.toString() || '',
           _relevance: relevanceScore
         };
@@ -187,6 +193,9 @@ export class ProductService {
           product_images(
             image_id,
             image_url,
+            alt_img1,
+            alt_img2,
+            alt_img3,
             alt_text,
             is_primary,
             sort_order
@@ -206,9 +215,36 @@ export class ProductService {
         return null;
       }
 
-      // Sort images by sort_order
-      if (data && data.product_images) {
-        data.product_images.sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0));
+      // Transform product_images to include all image URLs
+      if (data && data.product_images && data.product_images.length > 0) {
+        const imageRecord = data.product_images[0];
+        const allImages = [];
+        
+        // Add main image
+        if (imageRecord.image_url) {
+          allImages.push({
+            image_id: imageRecord.image_id,
+            image_url: imageRecord.image_url,
+            alt_text: imageRecord.alt_text || data.product_name,
+            is_primary: true,
+            sort_order: 0
+          });
+        }
+        
+        // Add alternative images
+        [imageRecord.alt_img1, imageRecord.alt_img2, imageRecord.alt_img3].forEach((url, index) => {
+          if (url) {
+            allImages.push({
+              image_id: imageRecord.image_id,
+              image_url: url,
+              alt_text: `${data.product_name} - Image ${index + 2}`,
+              is_primary: false,
+              sort_order: index + 1
+            });
+          }
+        });
+        
+        data.product_images = allImages;
       }
 
       return data;
@@ -249,13 +285,19 @@ export class ProductService {
         const primaryImage = images.find((img: any) => img.is_primary);
         const imageUrl = primaryImage?.image_url || images[0]?.image_url || '/public/images/placeholder.jpg';
 
+        // Generate slug if missing
+        const slug = item.product_slug || 
+                     item.product_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ||
+                     `product-${item.product_id}`;
+        
         return {
           id: item.product_id?.toString() || '',
           name: item.product_name || '',
+          slug: slug,
           description: item.short_description || item.description || '',
           price: parseFloat(item.price) || 0,
           image_url: imageUrl,
-          product_url: `/src/pages/ProductDetail.html?slug=${item.product_slug || ''}`,
+          product_url: `/src/pages/ProductDetail.html?slug=${slug}`,
           category: item.category_id?.toString() || ''
         };
       });
@@ -310,13 +352,19 @@ export class ProductService {
         const primaryImage = images.find((img: any) => img.is_primary);
         const imageUrl = primaryImage?.image_url || images[0]?.image_url || '/public/images/placeholder.jpg';
 
+        // Generate slug if missing
+        const slug = item.product_slug || 
+                     item.product_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ||
+                     `product-${item.product_id}`;
+        
         return {
           id: item.product_id?.toString() || '',
           name: item.product_name || '',
+          slug: slug,
           description: item.short_description || item.description || '',
           price: parseFloat(item.price) || 0,
           image_url: imageUrl,
-          product_url: `/src/pages/ProductDetail.html?slug=${item.product_slug || ''}`,
+          product_url: `/src/pages/ProductDetail.html?slug=${slug}`,
           category: item.category_id?.toString() || ''
         };
       });
@@ -324,6 +372,101 @@ export class ProductService {
       return results;
     } catch (error) {
       logger.error('Get featured products error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get products with pagination and optional category filter
+   * For HomePage with filter + pagination functionality
+   */
+  async getProducts(categoryId?: number, page: number = 1, limit: number = 12): Promise<{
+    data: ProductSearchResult[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  }> {
+    try {
+      // Calculate offset
+      const offset = (page - 1) * limit;
+
+      // Build query
+      let query = supabase
+        .from('products')
+        .select(`
+          product_id,
+          product_name,
+          description,
+          short_description,
+          price,
+          sale_price,
+          product_slug,
+          category_id,
+          stock_quantity,
+          rating_average,
+          piece_count,
+          product_images(image_url, is_primary)
+        `, { count: 'exact' })
+        .eq('status', 'active')
+        .gt('stock_quantity', 0);
+
+      // Add category filter if provided
+      if (categoryId) {
+        query = query.eq('category_id', categoryId);
+      }
+
+      // Execute query with pagination
+      const { data, error, count } = await query
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) throw error;
+
+      // Transform data
+      const results = (data || []).map((item: any) => {
+        const images = item.product_images || [];
+        const primaryImage = images.find((img: any) => img.is_primary);
+        const imageUrl = primaryImage?.image_url || images[0]?.image_url || '/public/images/placeholder.jpg';
+
+        // Generate slug if missing
+        const slug = item.product_slug || 
+                     item.product_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ||
+                     `product-${item.product_id}`;
+        
+        return {
+          id: item.product_id?.toString() || '',
+          name: item.product_name || '',
+          slug: slug,
+          description: item.short_description || item.description || '',
+          price: parseFloat(item.price) || 0,
+          salePrice: item.sale_price ? parseFloat(item.sale_price) : undefined,
+          image_url: imageUrl,
+          imageUrl: imageUrl,
+          rating: item.rating_average || 0,
+          pieceCount: item.piece_count || 0,
+          product_url: `/src/pages/ProductDetail.html?slug=${slug}`,
+          category: item.category_id?.toString() || ''
+        };
+      });
+
+      // Calculate pagination
+      const total = count || 0;
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: results,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages
+        }
+      };
+    } catch (error) {
+      logger.error('Get products with pagination error:', error);
       throw error;
     }
   }
