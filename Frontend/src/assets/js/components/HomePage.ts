@@ -1,7 +1,8 @@
-import { initializeOnReady } from '../../../core/config/init.js';
+import { initializeOnReady, updateCartBadge } from '../../../core/config/init.js';
 import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
 import { initializeSearch } from '../../../shared/components/SearchInit.js';
 import { categoryService } from '../../../core/services/CategoryService.js';
+import { cartService } from '../../../core/services/CartService.js';
 
 // State management for pagination and filtering
 let currentCategoryId: number | undefined = undefined;
@@ -343,7 +344,7 @@ function renderProductsToGrid(products: any[]) {
     
     return `
       <div class="col-6 col-md-3">
-        <div class="product-card position-relative" data-product-slug="${slug}" style="cursor: pointer;">
+        <div class="product-card position-relative" data-product-id="${product.id}" data-product-slug="${slug}" style="cursor: pointer;">
           <i class="far fa-heart icon-heart"></i>
           <div class="product-image">
             <img src="${product.imageUrl}" alt="${product.name}">
@@ -367,6 +368,59 @@ function renderProductsToGrid(products: any[]) {
   console.log(`🖱️ Setting up click handlers for ${cards.length} cards`);
   
   cards.forEach((card, index) => {
+    // Add to Cart button handler
+    const addToCartBtn = card.querySelector('.btn-cart') as HTMLButtonElement;
+    if (addToCartBtn) {
+      addToCartBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        const productId = parseInt(card.getAttribute('data-product-id') || '0');
+        const productName = card.querySelector('.product-title')?.textContent || '';
+        const productSlug = card.getAttribute('data-product-slug') || '';
+        const imageUrl = (card.querySelector('.product-image img') as HTMLImageElement)?.src || '';
+        const priceText = card.querySelector('.product-price')?.textContent || '0';
+        const price = parseInt(priceText.replace(/[^\d]/g, ''));
+        
+        // Get product from products array
+        const product = products[index];
+        
+        console.log('🛒 Adding to cart:', {
+          productId,
+          productName,
+          productSlug,
+          quantity: 1
+        });
+        
+        const result = await cartService.addToCart({
+          productId,
+          productName,
+          productSlug,
+          imageUrl,
+          price,
+          salePrice: product.sale_price,
+          quantity: 1,
+          stockQuantity: product.stock_quantity,
+          minStockLevel: product.min_stock_level
+        });
+        
+        if (result.success) {
+          addToCartBtn.textContent = 'Đã thêm!';
+          addToCartBtn.style.background = '#28a745';
+          setTimeout(() => {
+            addToCartBtn.textContent = 'Add to Cart';
+            addToCartBtn.style.background = '';
+          }, 2000);
+          
+          // Update cart badge
+          updateCartBadge();
+        } else {
+          alert(result.message);
+        }
+      });
+    }
+    
+    // Card click handler for navigation
     card.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       
@@ -458,5 +512,4 @@ function renderPaginationControls(pagination: any) {
     });
   });
 }
-
 

@@ -42,8 +42,9 @@
               <a href="#" class="search-icon">
                   <i class="bi bi-search" id="openSearch"></i>
               </a>
-              <a href="CartPage.html" class="cart-icon">
+              <a href="CartPage.html" class="cart-icon position-relative">
                   <i class="bi bi-cart"></i>
+                  <span class="cart-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
               </a>
               <a href="SigninPage.html" class="btn-sign">Đăng nhập</a>
               <a href="SignupPage.html" class="btn-sign">Đăng ký</a>
@@ -167,12 +168,12 @@
         
         <div class="quantity-purchase-section">
           <label style="margin-right: 10px;">Số lượng</label>
-          <input type="number" value="1" min="1" class="form-control quantity-input">
+          <input type="number" value="1" min="1" id="product-quantity" class="form-control quantity-input">
           <span style="color: #28a745; margin-left: 10px;">Còn hàng</span>
         </div>
         
         <div class="quantity-purchase-section">
-          <button class="btn btn-add-cart"><i class="fas fa-cart-plus"></i> Thêm vào giỏ</button>
+          <button id="btn-add-to-cart" class="btn btn-add-cart"><i class="fas fa-cart-plus"></i> Thêm vào giỏ</button>
           <button class="btn btn-purchase">Mua ngay</button>
         </div>
       </div>

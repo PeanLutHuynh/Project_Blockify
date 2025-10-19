@@ -6,6 +6,7 @@
 import { loadConfig, ENV } from './env.js';
 import { supabaseService } from '../api/supabaseClient.js';
 import { authService } from '../services/AuthService.js';
+import { cartService } from '../services/CartService.js';
 
 // Immediately load config when this module is imported
 export const configPromise = loadConfig();
@@ -39,12 +40,30 @@ export async function initializeApp(): Promise<void> {
     authService.initializeAuthListener();
     console.log('✅ Auth state listener initialized');
     
-    // Step 4: Auth listener will automatically handle session detection and user sync
+    // Step 4: Load cart from backend if user is logged in
+    await cartService.loadFromBackend();
+    
+    // Step 5: Update cart badge on page load
+    updateCartBadge();
+    
+    // Step 6: Auth listener will automatically handle session detection and user sync
     // No need to manually check session here
     
     console.log('✅ Blockify frontend initialized successfully');
   } catch (error) {
     console.error('❌ Failed to initialize app:', error);
+  }
+}
+
+/**
+ * Update cart badge in navbar
+ */
+export function updateCartBadge(): void {
+  const badge = document.querySelector('.cart-badge') as HTMLElement;
+  if (badge) {
+    const count = cartService.getTotalItemsCount();
+    badge.textContent = count.toString();
+    badge.classList.toggle('d-none', count === 0);
   }
 }
 

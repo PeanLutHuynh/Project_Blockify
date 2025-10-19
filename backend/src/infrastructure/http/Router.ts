@@ -7,11 +7,13 @@ export class Router {
    * Add a route to the router
    */
   addRoute(method: HttpMethod, path: string, handler: RouteHandler): void {
-    const { pattern, paramNames } = this.pathToRegex(path);
+    // Normalize path by removing trailing slash (except for root path "/")
+    const normalizedPath = path.length > 1 ? path.replace(/\/$/, '') : path;
+    const { pattern, paramNames } = this.pathToRegex(normalizedPath);
     
     this.routes.push({
       method,
-      path,
+      path: normalizedPath,
       pattern,
       paramNames,
       handler
@@ -47,14 +49,17 @@ export class Router {
    * Find matching route
    */
   findRoute(method: HttpMethod, path: string): MatchedRoute | null {
-    console.log(`[Router] Looking for: ${method} ${path}`);
+    // Normalize path by removing trailing slash (except for root path "/")
+    const normalizedPath = path.length > 1 ? path.replace(/\/$/, '') : path;
+    
+    console.log(`[Router] Looking for: ${method} ${normalizedPath}`);
     console.log(`[Router] Available routes:`, this.routes.map(r => `${r.method} ${r.path}`));
     
     for (const route of this.routes) {
       if (route.method !== method) continue;
       
-      const match = path.match(route.pattern);
-      console.log(`[Router] Testing ${route.path} against ${path}: ${match ? 'MATCH' : 'NO MATCH'}`);
+      const match = normalizedPath.match(route.pattern);
+      console.log(`[Router] Testing ${route.path} against ${normalizedPath}: ${match ? 'MATCH' : 'NO MATCH'}`);
       
       if (match) {
         const params: Record<string, string> = {};
@@ -72,7 +77,7 @@ export class Router {
       }
     }
     
-    console.log(`[Router] No match found for ${method} ${path}`);
+    console.log(`[Router] No match found for ${method} ${normalizedPath}`);
     return null;
   }
 

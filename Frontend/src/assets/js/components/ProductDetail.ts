@@ -1,7 +1,8 @@
-import { initializeOnReady } from '../../../core/config/init.js';
+import { initializeOnReady, updateCartBadge } from '../../../core/config/init.js';
 import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
 import { initializeSearch } from '../../../shared/components/SearchInit.js';
 import { productService } from '../../../core/services/ProductService.js';
+import { cartService } from '../../../core/services/CartService.js';
 
 // Product data
 type Product = {
@@ -81,14 +82,161 @@ function toggleHeart(heart: HTMLElement): void {
   (icon as HTMLElement).style.color = isLiked ? '#999' : 'white';
 }
 
-function addToCart(productName: string, btn: HTMLElement): void {
-  alert(`Added "${productName}" to cart!`);
-  btn.textContent = 'Added!';
-  btn.style.background = '#28a745';
-  setTimeout(() => {
-    btn.textContent = 'Add to cart';
-    btn.style.background = '#007bff';
-  }, 1500);
+async function addToCart(btn: HTMLElement): Promise<void> {
+  // Get current product data from DOM or state
+  const productData = getCurrentProductData();
+  
+  if (!productData) {
+    alert('Không thể lấy thông tin sản phẩm');
+    return;
+  }
+
+  // Add to cart using CartService
+  const result = await cartService.addToCart({
+    productId: productData.productId,
+    productName: productData.productName,
+    productSlug: productData.productSlug,
+    imageUrl: productData.imageUrl,
+    price: productData.price,
+    salePrice: productData.salePrice,
+    quantity: 1,
+    stockQuantity: productData.stockQuantity,
+    minStockLevel: productData.minStockLevel
+  });
+
+  if (result.success) {
+    btn.textContent = 'Đã thêm!';
+    btn.style.background = '#28a745';
+    setTimeout(() => {
+      btn.textContent = 'Add to cart';
+      btn.style.background = '';
+    }, 1500);
+    
+    // Update cart badge
+    updateCartBadge();
+  } else {
+    alert(result.message);
+  }
+}
+
+/**
+ * Get current product data from DOM
+ */
+function getCurrentProductData(): any | null {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const slug = urlParams.get('slug');
+    
+    if (!slug) {
+      return null;
+    }
+
+    // Get product data from DOM elements
+    const titleEl = document.getElementById('pd-title');
+    const priceEl = document.getElementById('pd-price');
+    const imageEl = document.getElementById('pd-image') as HTMLImageElement;
+    
+    if (!titleEl || !priceEl || !imageEl) {
+      return null;
+    }
+
+    // Parse price from text
+    const priceText = priceEl.textContent || '0';
+    const price = parseFloat(priceText.replace(/[^\d.-]/g, ''));
+
+    return {
+      productId: parseInt(titleEl.dataset.productId || '0'),
+      productName: titleEl.textContent || 'Unknown',
+      productSlug: slug,
+      imageUrl: imageEl.src,
+      price: price,
+      salePrice: null, // Will be added from backend
+      stockQuantity: parseInt(titleEl.dataset.stockQuantity || '100'),
+      minStockLevel: parseInt(titleEl.dataset.minStockLevel || '5')
+    };
+  } catch (error) {
+    console.error('Error getting product data:', error);
+    return null;
+  }
+}
+
+/**
+ * Initialize Add to Cart button
+ */
+function initializeAddToCartButton(): void {
+  const addToCartBtn = document.getElementById('btn-add-to-cart');
+  const quantityInput = document.getElementById('product-quantity') as HTMLInputElement;
+
+  if (addToCartBtn) {
+    addToCartBtn.addEventListener('click', async () => {
+      try {
+        const productData = getCurrentProductData();
+        
+        if (!productData) {
+          alert('Không thể lấy thông tin sản phẩm');
+          return;
+        }
+
+        const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+
+        // Show loading state
+        const originalText = addToCartBtn.innerHTML;
+        addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang thêm...';
+        (addToCartBtn as HTMLButtonElement).disabled = true;
+
+        // Add to cart using CartService
+        const result = await cartService.addToCart({
+          productId: productData.productId,
+          productName: productData.productName,
+          productSlug: productData.productSlug,
+          imageUrl: productData.imageUrl,
+          price: productData.price,
+          salePrice: productData.salePrice,
+          quantity: quantity,
+          stockQuantity: productData.stockQuantity,
+          minStockLevel: productData.minStockLevel
+        });
+
+        // Reset button state
+        (addToCartBtn as HTMLButtonElement).disabled = false;
+
+        if (result.success) {
+          addToCartBtn.innerHTML = '<i class="fas fa-check"></i> Đã thêm vào giỏ!';
+          addToCartBtn.classList.add('btn-success');
+          
+          setTimeout(() => {
+            addToCartBtn.innerHTML = originalText;
+            addToCartBtn.classList.remove('btn-success');
+          }, 2000);
+          
+          // Update cart badge
+          updateCartBadge();
+          
+          // Show success notification
+          showNotification('success', result.message);
+        } else {
+          addToCartBtn.innerHTML = originalText;
+          alert(result.message);
+        }
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+        alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
+        const btn = document.getElementById('btn-add-to-cart');
+        if (btn) {
+          btn.innerHTML = '<i class="fas fa-cart-plus"></i> Thêm vào giỏ';
+          (btn as HTMLButtonElement).disabled = false;
+        }
+      }
+    });
+  }
+}
+
+/**
+ * Show notification (simple version)
+ */
+function showNotification(type: 'success' | 'error' | 'warning', message: string): void {
+  // You can integrate with your toast system here
+  console.log(`[${type.toUpperCase()}] ${message}`);
 }
 
 // Make functions available globally for HTML onclick handlers
@@ -230,6 +378,10 @@ function renderProductDetail(product: any): void {
   const pdTitle = document.getElementById('pd-title');
   if (pdTitle) {
     pdTitle.textContent = `Product Name: ${product.product_name || ''}`;
+    // Store product data in data attributes for cart functionality
+    pdTitle.dataset.productId = product.product_id?.toString() || '';
+    pdTitle.dataset.stockQuantity = product.stock_quantity?.toString() || '100';
+    pdTitle.dataset.minStockLevel = product.min_stock_level?.toString() || '5';
   }
 
   // Update brand
@@ -363,6 +515,9 @@ function renderProductDetail(product: any): void {
 function initializeProductDetailPage() {
   // Load recommended products from Supabase
   loadRecommendedProducts();
+
+  // Initialize Add to Cart button
+  initializeAddToCartButton();
 
   // Đổi ảnh chính khi click thumbnail
   (window as any).changeMainImage = function(src: string): void {
