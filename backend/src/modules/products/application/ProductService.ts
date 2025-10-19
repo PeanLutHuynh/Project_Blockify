@@ -1,384 +1,95 @@
-import { supabase } from '../../../config/database';
 import { logger } from '../../../config/logger';
 import { Product, SearchQuery, ProductSearchResult } from '../domain/Product';
+import { ProductQueryService } from './ProductQueryService';
+import { ProductSearchService } from './ProductSearchService';
+import { ProductRecommendationService } from './ProductRecommendationService';
 
 /**
- * Product Service - Business logic layer
- * Handles product search and management using Supabase
+ * Product Service - Facade pattern for backward compatibility
+ * Delegates to specialized services following Clean Architecture
+ * 
+ * @deprecated Use specific services instead:
+ * - ProductQueryService for queries
+ * - ProductSearchService for search
+ * - ProductRecommendationService for recommendations
  */
 export class ProductService {
+  private queryService: ProductQueryService;
+  private searchService: ProductSearchService;
+  private recommendationService: ProductRecommendationService;
+
+  constructor() {
+    this.queryService = new ProductQueryService();
+    this.searchService = new ProductSearchService();
+    this.recommendationService = new ProductRecommendationService();
+  }
   /**
    * UC3 - Thanh tìm kiếm
-   * Tìm kiếm sản phẩm theo từ khóa (không phân biệt hoa thường)
-   * Sử dụng Supabase .ilike() theo yêu cầu
+   * @deprecated Use ProductSearchService.searchProducts() instead
    */
   async searchProducts(searchQuery: SearchQuery): Promise<ProductSearchResult[]> {
-    const { query, limit = 10, category } = searchQuery;
-
-    try {
-      // LUỒNG THAY THẾ A1: Validate query
-      if (!query || query.trim().length < 2) {
-        logger.warn('Search query too short or empty');
-        return [];
-      }
-
-      // Normalize query
-      const normalizedQuery = query.trim();
-
-      // LUỒNG CHÍNH Bước 3: Hệ thống truy vấn dữ liệu
-      // Chỉ tìm kiếm trong product_name theo yêu cầu
-      let dbQuery = supabase
-        .from('products')
-        .select(`
-          product_id,
-          product_name,
-          description,
-          short_description,
-          price,
-          product_slug,
-          category_id,
-          stock_quantity,
-          product_images(image_url, is_primary)
-        `)
-        .eq('status', 'active')
-        .gt('stock_quantity', 0)
-        .ilike('product_name', `%${normalizedQuery}%`);
-
-      // Add category filter if provided
-      if (category) {
-        dbQuery = dbQuery.eq('category_id', category);
-      }
-
-      // Execute query (no ordering here, will sort by relevance later)
-      const { data, error } = await dbQuery.limit(100); // Get more to sort by relevance
-
-      if (error) {
-        logger.error('Supabase search error:', error);
-        throw error;
-      }
-
-      // Transform and sort by relevance
-      const allResults = (data || []).map((item: any) => {
-        // Get primary image or first image
-        const images = item.product_images || [];
-        const primaryImage = images.find((img: any) => img.is_primary);
-        const imageUrl = primaryImage?.image_url || images[0]?.image_url || '/public/images/placeholder.jpg';
-
-        // Calculate relevance score
-        const productName = (item.product_name || '').toLowerCase();
-        const shortDesc = (item.short_description || '').toLowerCase();
-        const fullDesc = (item.description || '').toLowerCase();
-        const searchTerm = normalizedQuery.toLowerCase();
-        
-        // Higher score = more relevant
-        let relevanceScore = 0;
-        
-        // Check product_name first (highest priority)
-        if (productName.includes(searchTerm)) {
-          if (productName === searchTerm) {
-            relevanceScore = 100; // Exact match
-          } else if (productName.startsWith(searchTerm)) {
-            relevanceScore = 90; // Starts with keyword
-          } else {
-            relevanceScore = 80; // Contains keyword
-          }
-        }
-        // Check short_description (medium priority)
-        else if (shortDesc.includes(searchTerm)) {
-          relevanceScore = 40;
-        }
-        // Check full description (lowest priority)
-        else if (fullDesc.includes(searchTerm)) {
-          relevanceScore = 30;
-        }
-
-        // Generate slug if missing
-        const slug = item.product_slug || 
-                     item.product_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ||
-                     `product-${item.product_id}`;
-        
-        return {
-          id: item.product_id?.toString() || '',
-          name: item.product_name || '',
-          slug: slug,
-          description: item.short_description || item.description || '',
-          price: parseFloat(item.price) || 0,
-          image_url: imageUrl,
-          product_url: `/src/pages/ProductDetail.html?slug=${slug}`,
-          category: item.category_id?.toString() || '',
-          _relevance: relevanceScore
-        };
-      });
-
-      // FILTER OUT items with relevance = 0 (no match)
-      const matchedResults = allResults.filter((item: any) => item._relevance > 0);
-
-      // Sort by relevance score (descending) then by name
-      const sortedResults = matchedResults
-        .sort((a: any, b: any) => {
-          if (b._relevance !== a._relevance) {
-            return b._relevance - a._relevance;
-          }
-          return a.name.localeCompare(b.name);
-        })
-        .slice(0, limit);
-
-      // Remove _relevance field before returning
-      const results = sortedResults.map(({ _relevance, ...rest }: any) => rest);
-
-      // LUỒNG CHÍNH Bước 4: Trả về kết quả
-      logger.info(`Search "${query}" returned ${results.length} results`);
-      return results;
-
-    } catch (error) {
-      // LUỒNG THAY THẾ A3: Lỗi hệ thống
-      logger.error('Search products error:', error);
-      throw error;
-    }
+    return this.searchService.searchProducts(searchQuery);
   }
 
   /**
    * Get suggestions for autocomplete (limited results)
+   * @deprecated Use ProductSearchService.getSuggestions() instead
    */
   async getSuggestions(query: string, limit: number = 5): Promise<ProductSearchResult[]> {
-    return this.searchProducts({ query, limit });
+    return this.searchService.getSuggestions(query, limit);
   }
 
   /**
    * Get all products (for admin)
+   * @deprecated Use ProductQueryService.getAllProducts() instead
    */
   async getAllProducts(): Promise<Product[]> {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    } catch (error) {
-      logger.error('Get all products error:', error);
-      throw error;
-    }
+    return this.queryService.getAllProducts();
   }
 
   /**
    * Get product by ID
+   * @deprecated Use ProductQueryService.getProductById() instead
    */
   async getProductById(id: string): Promise<Product | null> {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('product_id', id)
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      logger.error('Get product by ID error:', error);
-      return null;
-    }
+    return this.queryService.getProductById(id);
   }
 
   /**
    * Get product by slug (for product detail page)
+   * @deprecated Use ProductQueryService.getProductBySlug() instead
    */
   async getProductBySlug(slug: string): Promise<any | null> {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          *,
-          product_images(
-            image_id,
-            image_url,
-            alt_img1,
-            alt_img2,
-            alt_img3,
-            alt_text,
-            is_primary,
-            sort_order
-          ),
-          categories(
-            category_id,
-            category_name,
-            category_slug
-          )
-        `)
-        .eq('product_slug', slug)
-        .eq('status', 'active')
-        .single();
-
-      if (error) {
-        logger.error('Get product by slug error:', error);
-        return null;
-      }
-
-      // Transform product_images to include all image URLs
-      if (data && data.product_images && data.product_images.length > 0) {
-        const imageRecord = data.product_images[0];
-        const allImages = [];
-        
-        // Add main image
-        if (imageRecord.image_url) {
-          allImages.push({
-            image_id: imageRecord.image_id,
-            image_url: imageRecord.image_url,
-            alt_text: imageRecord.alt_text || data.product_name,
-            is_primary: true,
-            sort_order: 0
-          });
-        }
-        
-        // Add alternative images
-        [imageRecord.alt_img1, imageRecord.alt_img2, imageRecord.alt_img3].forEach((url, index) => {
-          if (url) {
-            allImages.push({
-              image_id: imageRecord.image_id,
-              image_url: url,
-              alt_text: `${data.product_name} - Image ${index + 2}`,
-              is_primary: false,
-              sort_order: index + 1
-            });
-          }
-        });
-        
-        data.product_images = allImages;
-      }
-
-      return data;
-    } catch (error) {
-      logger.error('Get product by slug error:', error);
-      return null;
-    }
+    return this.queryService.getProductBySlug(slug);
   }
 
   /**
    * Get products by category
+   * @deprecated Use ProductQueryService.getProductsByCategory() instead
    */
   async getProductsByCategory(category: string): Promise<ProductSearchResult[]> {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          product_id,
-          product_name,
-          description,
-          short_description,
-          price,
-          product_slug,
-          category_id,
-          stock_quantity,
-          product_images(image_url, is_primary)
-        `)
-        .eq('category_id', category)
-        .eq('status', 'active')
-        .gt('stock_quantity', 0)
-        .order('product_name');
-
-      if (error) throw error;
-      
-      // Transform data
-      const results = (data || []).map((item: any) => {
-        const images = item.product_images || [];
-        const primaryImage = images.find((img: any) => img.is_primary);
-        const imageUrl = primaryImage?.image_url || images[0]?.image_url || '/public/images/placeholder.jpg';
-
-        // Generate slug if missing
-        const slug = item.product_slug || 
-                     item.product_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ||
-                     `product-${item.product_id}`;
-        
-        return {
-          id: item.product_id?.toString() || '',
-          name: item.product_name || '',
-          slug: slug,
-          description: item.short_description || item.description || '',
-          price: parseFloat(item.price) || 0,
-          image_url: imageUrl,
-          product_url: `/src/pages/ProductDetail.html?slug=${slug}`,
-          category: item.category_id?.toString() || ''
-        };
-      });
-      
-      return results;
-    } catch (error) {
-      logger.error('Get products by category error:', error);
-      throw error;
-    }
+    return this.queryService.getProductsByCategory(category);
   }
 
   /**
    * Get featured products for home page
+   * @deprecated Use ProductQueryService.getFeaturedProducts() instead
    */
   async getFeaturedProducts(limit: number = 10, onlyFeatured: boolean = false): Promise<ProductSearchResult[]> {
-    try {
-      let query = supabase
-        .from('products')
-        .select(`
-          product_id,
-          product_name,
-          description,
-          short_description,
-          price,
-          product_slug,
-          category_id,
-          stock_quantity,
-          is_featured,
-          is_bestseller,
-          is_new,
-          product_images(image_url, is_primary)
-        `)
-        .eq('status', 'active')
-        .gt('stock_quantity', 0);
+    return this.queryService.getFeaturedProducts(limit, onlyFeatured);
+  }
 
-      // Filter by featured if requested
-      if (onlyFeatured) {
-        query = query.eq('is_featured', true);
-      }
-
-      const { data, error } = await query
-        .order('is_featured', { ascending: false })
-        .order('is_bestseller', { ascending: false })
-        .order('created_at', { ascending: false })
-        .limit(limit);
-
-      if (error) throw error;
-
-      // Transform data
-      const results = (data || []).map((item: any) => {
-        const images = item.product_images || [];
-        const primaryImage = images.find((img: any) => img.is_primary);
-        const imageUrl = primaryImage?.image_url || images[0]?.image_url || '/public/images/placeholder.jpg';
-
-        // Generate slug if missing
-        const slug = item.product_slug || 
-                     item.product_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ||
-                     `product-${item.product_id}`;
-        
-        return {
-          id: item.product_id?.toString() || '',
-          name: item.product_name || '',
-          slug: slug,
-          description: item.short_description || item.description || '',
-          price: parseFloat(item.price) || 0,
-          image_url: imageUrl,
-          product_url: `/src/pages/ProductDetail.html?slug=${slug}`,
-          category: item.category_id?.toString() || ''
-        };
-      });
-
-      return results;
-    } catch (error) {
-      logger.error('Get featured products error:', error);
-      throw error;
-    }
+  /**
+   * Get best-selling products (most purchased from delivered orders)
+   * @deprecated Use ProductRecommendationService.getBestSellingProducts() instead
+   */
+  async getBestSellingProducts(limit: number = 8): Promise<ProductSearchResult[]> {
+    return this.recommendationService.getBestSellingProducts(limit);
   }
 
   /**
    * Get products with pagination and optional category filter
-   * For HomePage with filter + pagination functionality
+   * @deprecated Use ProductQueryService.getProducts() instead
    */
   async getProducts(categoryId?: number, page: number = 1, limit: number = 12): Promise<{
     data: ProductSearchResult[];
@@ -389,85 +100,22 @@ export class ProductService {
       totalPages: number;
     };
   }> {
-    try {
-      // Calculate offset
-      const offset = (page - 1) * limit;
+    return this.queryService.getProducts(categoryId, page, limit);
+  }
 
-      // Build query
-      let query = supabase
-        .from('products')
-        .select(`
-          product_id,
-          product_name,
-          description,
-          short_description,
-          price,
-          sale_price,
-          product_slug,
-          category_id,
-          stock_quantity,
-          rating_average,
-          piece_count,
-          product_images(image_url, is_primary)
-        `, { count: 'exact' })
-        .eq('status', 'active')
-        .gt('stock_quantity', 0);
+  /**
+   * Get recommended products based on user's purchase history
+   * @deprecated Use ProductRecommendationService.getRecommendedProductsForUser() instead
+   */
+  async getRecommendedProductsForUser(userId: number, limit: number = 8): Promise<ProductSearchResult[]> {
+    return this.recommendationService.getRecommendedProductsForUser(userId, limit);
+  }
 
-      // Add category filter if provided
-      if (categoryId) {
-        query = query.eq('category_id', categoryId);
-      }
-
-      // Execute query with pagination
-      const { data, error, count } = await query
-        .order('created_at', { ascending: false })
-        .range(offset, offset + limit - 1);
-
-      if (error) throw error;
-
-      // Transform data
-      const results = (data || []).map((item: any) => {
-        const images = item.product_images || [];
-        const primaryImage = images.find((img: any) => img.is_primary);
-        const imageUrl = primaryImage?.image_url || images[0]?.image_url || '/public/images/placeholder.jpg';
-
-        // Generate slug if missing
-        const slug = item.product_slug || 
-                     item.product_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ||
-                     `product-${item.product_id}`;
-        
-        return {
-          id: item.product_id?.toString() || '',
-          name: item.product_name || '',
-          slug: slug,
-          description: item.short_description || item.description || '',
-          price: parseFloat(item.price) || 0,
-          salePrice: item.sale_price ? parseFloat(item.sale_price) : undefined,
-          image_url: imageUrl,
-          imageUrl: imageUrl,
-          rating: item.rating_average || 0,
-          pieceCount: item.piece_count || 0,
-          product_url: `/src/pages/ProductDetail.html?slug=${slug}`,
-          category: item.category_id?.toString() || ''
-        };
-      });
-
-      // Calculate pagination
-      const total = count || 0;
-      const totalPages = Math.ceil(total / limit);
-
-      return {
-        data: results,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages
-        }
-      };
-    } catch (error) {
-      logger.error('Get products with pagination error:', error);
-      throw error;
-    }
+  /**
+   * Get recommended products based on current product (same category)
+   * @deprecated Use ProductRecommendationService.getRecommendedProductsByCategory() instead
+   */
+  async getRecommendedProductsByCategory(productId: number, limit: number = 6): Promise<ProductSearchResult[]> {
+    return this.recommendationService.getRecommendedProductsByCategory(productId, limit);
   }
 }
