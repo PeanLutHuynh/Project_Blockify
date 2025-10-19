@@ -271,10 +271,18 @@ function renderProductDetail(product: any): void {
     pdTheme.textContent = `Theme: LEGO ${product.categories?.category_name || 'City'}`;
   }
 
-  // Update age
+  // Update age (use difficulty_level to determine age recommendation)
   const pdAge = document.getElementById('pd-age');
   if (pdAge) {
-    pdAge.textContent = `Age: ${product.recommended_age || '5+'}`;
+    // Map difficulty to age ranges
+    const ageMap: Record<string, string> = {
+      'Easy': '4+',
+      'Medium': '7+',
+      'Hard': '10+',
+      'Expert': '14+'
+    };
+    const age = ageMap[product.difficulty_level || 'Medium'] || '7+';
+    pdAge.textContent = `Age: ${age}`;
   }
 
   // Update short description
@@ -286,8 +294,17 @@ function renderProductDetail(product: any): void {
   // Update stats
   const pdStats = document.getElementById('pd-stats');
   if (pdStats) {
+    // Map difficulty to age ranges
+    const ageMap: Record<string, string> = {
+      'Easy': '4+',
+      'Medium': '7+',
+      'Hard': '10+',
+      'Expert': '14+'
+    };
+    const age = ageMap[product.difficulty_level || 'Medium'] || '7+';
+    
     pdStats.innerHTML = `
-      <span class="stats-item"><i class="fas fa-user"></i> Age: ${product.recommended_age || '5+'}</span>
+      <span class="stats-item"><i class="fas fa-user"></i> Age: ${age}</span>
       <span class="stats-item"><i class="fas fa-users"></i> ${product.piece_count || 'N/A'}</span>
       <span class="stats-item"><i class="fas fa-star"></i> ${rating.toFixed(1)}</span>
     `;
@@ -296,18 +313,23 @@ function renderProductDetail(product: any): void {
   // Update images
   if (product.product_images && product.product_images.length > 0) {
     const images = product.product_images;
+    console.log('📸 Product images:', images);
     
     // Primary image
     const primaryImage = images.find((img: any) => img.is_primary) || images[0];
+    console.log('📸 Primary image:', primaryImage);
+    
     const pdImage = document.getElementById('pd-image') as HTMLImageElement | null;
     if (pdImage && primaryImage) {
+      console.log('📸 Setting main image to:', primaryImage.image_url);
       pdImage.src = primaryImage.image_url;
       pdImage.alt = primaryImage.alt_text || product.product_name;
     }
 
-    // Thumbnails
+    // Thumbnails - render even if only 1 image
     const thumbContainer = document.querySelector('.thumbnail-container');
-    if (thumbContainer && images.length > 1) {
+    if (thumbContainer && images.length >= 1) {
+      console.log('📸 Rendering thumbnails for', images.length, 'images');
       thumbContainer.innerHTML = images
         .slice(0, 4)
         .map((img: any) => `
@@ -321,9 +343,12 @@ function renderProductDetail(product: any): void {
     // Detail image
     const detailImg = document.getElementById('pd-detail-image') as HTMLImageElement | null;
     if (detailImg && primaryImage) {
+      console.log('📸 Setting detail image to:', primaryImage.image_url);
       detailImg.src = primaryImage.image_url;
       detailImg.alt = product.product_name;
     }
+  } else {
+    console.warn('⚠️ No product images found in data');
   }
 
   // Update full description
