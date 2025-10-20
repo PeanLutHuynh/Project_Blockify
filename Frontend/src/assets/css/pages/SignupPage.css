@@ -49,7 +49,7 @@ body, html {
   position: absolute;
   top: 47px;
   left: 41px;
-  font-family: 'Jolly Lodger', cursive;
+  font-family: 'Montserrat';
   font-size: 64px;
   color: white;
   z-index: 2;
@@ -84,8 +84,8 @@ body, html {
 }
 
 .deco-1 {
-  width: 40px;
-  height: 48px;
+  width: 30px;
+  height: 40px;
   right: 14%;
   top: 27px;
   transform: rotate(24.482deg);
@@ -116,25 +116,25 @@ body, html {
 }
 
 .deco-bottom-1 {
-  width: 160px;
-  height: 100px;
-  left: 10%;
+  width: 50px;
+  height: 30px;
+  left: 5%;
   bottom: 80px;
   transform: rotate(342.64deg);
 }
 
 .deco-bottom-2 {
-  width: 180px;
-  height: 110px;
-  right: 12%;
+  width: 110px;
+  height: 60px;
+  right: 7%;
   bottom: 60px;
   transform: rotate(341.454deg);
 }
 
 .deco-bottom-3 {
-  width: 120px;
-  height: 55px;
-  left: 25%;
+  width: 90px;
+  height: 45px;
+  left: 12%;
   bottom: 20px;
   transform: rotate(18.826deg);
 }
@@ -143,7 +143,7 @@ body, html {
 .welcome-title {
   font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 96px;
+  font-size: 69px;
   color: #0096f4;
   margin-bottom: 10px;
   line-height: 1;
@@ -223,18 +223,18 @@ body, html {
   cursor: pointer;
 }
 
-/* Sign In Button */
+/* Sign Up Button */
 .btn-signin {
   background: #0096f4;
   color: white;
   border: none;
   border-radius: 7px;
-  padding: 15px 50px;
+  padding: 10px 50px;
   font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 20px;
   min-width: 192px;
-  height: 63px;
+  height: 55px;
   transition: all 0.3s ease;
 }
 
@@ -264,7 +264,7 @@ body, html {
   background: white;
   padding: 8px 16px;
   font-family: 'Inter', sans-serif;
-  font-size: 20px;
+  font-size: 15px;
   color: #090909;
 }
 
@@ -275,12 +275,12 @@ body, html {
   border-radius: 7px;
   padding: 12px 27px;
   font-family: 'Inter', sans-serif;
-  font-size: 24px;
+  font-size: 20px;
   color: black;
   display: inline-flex;
   align-items: center;
   gap: 19px;
-  height: 63px;
+  height: 55px;
   transition: all 0.3s ease;
 }
 
@@ -292,15 +292,15 @@ body, html {
 }
 
 .google-icon {
-  width: 41px;
-  height: 44px;
+  width: 30px;
+  height: 30px;
   object-fit: contain;
 }
 
 /* Responsive Design */
-@media (max-width: 1400px) {
+@media (max-width: 1500px) {
   .welcome-title {
-      font-size: 72px;
+      font-size: 62px;
   }
   
   .left-section {
@@ -310,7 +310,7 @@ body, html {
 
 @media (max-width: 1200px) {
   .welcome-title {
-      font-size: 64px;
+      font-size: 60px;
   }
   
   .signin-label,
@@ -324,9 +324,23 @@ body, html {
   .form-control-custom {
       height: 60px;
   }
+  .deco-bottom-2 {
+    width: 80px;
+    height: 40px;
+    right: 5%;
+    bottom: 5%;
+    transform: rotate(341.454deg);
+  }
+  .deco-bottom-3 {
+    width: 80px;
+    height: 40px;
+    right: 5%;
+    bottom: 2%;
+    transform: rotate(18.826deg);
+  }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1112px) {
   .left-section {
       width: 400px;
   }
@@ -338,16 +352,35 @@ body, html {
   .brand-text {
       font-size: 48px;
   }
+  
+  .deco-bottom-2 {
+    width: 70px;
+    height: 40px;
+    right: 2%;
+    bottom: 10%;
+    transform: rotate(341.454deg);
+  }
+  .deco-bottom-3 {
+    width: 80px;
+    height: 40px;
+    left: 4%;
+    bottom: 2%;
+    transform: rotate(18.826deg);
+  }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 850px) {
   .signin-page {
       flex-direction: column;
+  }
+
+  .welcome-title{
+    display: none;
   }
   
   .left-section {
       width: 100%;
-      height: 200px;
+      height: 150px;
   }
   
   .brand-text {
@@ -364,11 +397,23 @@ body, html {
       font-size: 48px;
       margin-top: 20px;
   }
+
   
   .deco-bottom-1,
   .deco-bottom-2,
-  .deco-bottom-3 {
+  .deco-bottom-3,
+  .deco-1,
+  .deco-2, 
+  .deco-3,
+  .deco-4 {
       display: none;
+  }
+  .btn-signin{
+    padding: 10px 15px;
+    height: 50px;
+  }
+  .btn-google{
+    height: 59px;
   }
 }
 /* --- Container input --- */

@@ -34,6 +34,8 @@
         <li class="nav-item" data-target="customer">Khách hàng</li>
         <li class="nav-item" data-target="product">Sản phẩm</li>
         <li class="nav-item" data-target="order">Đơn hàng</li>
+        <li class="nav-item" data-target="shop-info">Thông tin cửa hàng</li>
+        <li class="nav-item" data-target="feedback-manager">Đánh giá sản phẩm</li>
         <li class="nav-item" data-target="notification">Thông báo</li>
       </ul>
     </aside>
@@ -122,7 +124,7 @@
         <div class="bar-blue">Khách hàng</div>
         <div class="toolbar d-flex gap-2 mb-3">
           <input class="search form-control" placeholder="Tìm kiếm khách hàng">
-          <button class="btn" data-bs-toggle="modal" data-bs-target="#addCustomerModal">+ Thêm khách hàng</button>
+          
         </div>
         <div class="table-responsive">
           <table class="table table-bordered table-hover align-middle">
@@ -151,34 +153,186 @@
         <div class="row g-3" id="productList"></div>
       </section>
 
+      <!-- Shop Info -->
+      <section id="shop-info" class="section">
+        <div class="bar-blue mb-4">Thông tin cửa hàng</div>
+        <div class="shop-info-panel panel">
+          <form id="shopInfoForm">
+            <div class="row mb-3 align-items-center">
+              <div class="col-md-2 text-center mb-3 mb-md-0">
+                <img id="shopLogoPreview" src="../../public/images/Group 40.png" alt="Logo shop" class="shop-logo img-thumbnail">
+                <input type="file" id="shopLogo" class="form-control mt-2">
+              </div>
+              <div class="col-md-10">
+                <div class="mb-3">
+                  <label class="form-label">Tên cửa hàng</label>
+                  <input type="text" id="shopName" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Địa chỉ</label>
+                  <input type="text" id="shopAddress" class="form-control">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Số điện thoại</label>
+                  <input type="text" id="shopPhone" class="form-control">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input type="email" id="shopEmail" class="form-control">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Mô tả</label>
+                  <textarea id="shopDesc" class="form-control" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
       <!-- Order -->
       <section id="order" class="section">
         <div class="bar-blue">Đơn hàng</div>
         <div class="toolbar">
           <input class="search" placeholder="Tìm đơn hàng">
         </div>
-        <table>
-          <thead>
+        <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+          <thead class="table-light">
             <tr>
               <th style="width:40px;"><input type="checkbox"></th>
+              <th>Mã hóa đơn</th>
               <th>Tên đơn</th>
-              <th>Tên khách</th>
+              <th>Số lượng</th>
+              <th>Mẫu hàng</th>
+              <th>Hình SP</th>
+              <th>Khách hàng</th>
+              <th>Địa chỉ giao hàng</th>
+              <th>Email</th>
+              <th>Số điện thoại</th>
               <th>Ngày đặt</th>
               <th>Tổng tiền</th>
+              <th>Minh chứng</th>
+              <th>Phương thức</th>
               <th>Trạng thái</th>
+              <th>Hành động</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="orderList">
             <tr>
               <td><input type="checkbox"></td>
+              <td>#ODR001</td>
               <td>Xe cảnh sát</td>
+              <td>1</td>
+              <td>Mẫu A</td>
+              <td><img src="img/Rectangle 108 (2).png" alt="Sản phẩm" style="width:40px;height:30px;object-fit:cover;"></td>
               <td>ChessicaNguyen</td>
+              <td>56 Đường Lê Lợi, Q.1, TP.HCM</td>
+              <td>chessica@gmail.com</td>
+              <td>0908123456</td>
               <td>09-05-2025</td>
               <td>230.000 VND</td>
-              <td>Đã thanh toán</td>
+              <td><img src="img/pay-proof-001.png" alt="Minh chứng" style="width:40px;height:30px;object-fit:cover;"></td>
+              <td>Chuyển khoản</td>
+              <td><span class="badge bg-warning text-dark order-status">Đang xử lý</span></td>
+              <td>
+                <button type="button" class="btn btn-outline btn-sm show-order-detail" data-order-id="ODR001">Chi tiết</button>
+                <button type="button" class="btn btn-outline btn-sm action-next-status mt-2" data-order-id="ODR001">Cập nhật trạng thái</button>
+                <button type="button" class="btn btn-outline btn-sm check-payment-proof mt-2" data-order-id="ODR001">Kiểm minh chứng</button>
+                <button type="button" class="btn btn-outline btn-sm cancel-order-btn mt-2" data-order-id="ODR001">Huỷ đơn</button>
+                <button type="button" class="btn btn-outline btn-sm refund-order-btn mt-2" data-order-id="ODR001">Hoàn/Trả hàng</button>
+              </td>
             </tr>
           </tbody>
         </table>
+        </div>
+      </section>
+      <!-- Modal Chi tiết Đơn hàng -->
+      <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="orderDetailLabel">Chi tiết đơn hàng</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <strong>Khách hàng:</strong> <span id="detailCustomerName"></span><br>
+                  <strong>Email:</strong> <span id="detailCustomerEmail"></span><br>
+                  <strong>SĐT:</strong> <span id="detailCustomerPhone"></span><br>
+                  <strong>Địa chỉ:</strong> <span id="detailCustomerAddress"></span><br>
+                  <strong>Phương thức:</strong> <span id="detailPaymentMethod"></span><br>
+                </div>
+                <div class="col-md-4">
+                  <strong>Mã hóa đơn:</strong> <span id="detailOrderId"></span><br>
+                  <strong>Tên đơn:</strong> <span id="detailOrderName"></span><br>
+                  <strong>Số lượng:</strong> <span id="detailOrderQuantity"></span><br>
+                  <strong>Mẫu hàng:</strong> <span id="detailOrderVariant"></span><br>
+                  <strong>Tổng tiền:</strong> <span id="detailOrderTotal"></span><br>
+                  <strong>Trạng thái:</strong> <span id="detailOrderStatus"></span><br>
+                </div>
+                <div class="col-md-4 text-center">
+                  <strong>Hình sản phẩm:</strong><br>
+                  <img id="detailProductImg" src="" class="img-fluid mb-2" style="width: 100px;"><br>
+                  <strong>Minh chứng thanh toán:</strong><br>
+                  <img id="detailPayProof" src="" class="img-fluid" style="width: 160px;">
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer order-action-footer">
+              <button type="button" class="btn btn-success next-status-btn">Cập nhật trạng thái</button>
+              <button type="button" class="btn btn-info check-proof-btn">Kiểm minh chứng thanh toán</button>
+              <button type="button" class="btn btn-warning refund-btn">Hoàn/Trả hàng</button>
+              <button type="button" class="btn btn-danger cancel-btn">Hủy đơn</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Manager -->
+      <section id="feedback-manager" class="section">
+        <div class="bar-blue">Quản lý đánh giá sản phẩm</div>
+        <div class="panel">
+          <div class="feedback-list">
+            <div class="feedback-item d-flex align-items-start gap-3">
+              <img src="img/Rectangle 108 (2).png" class="feedback-thumb" alt="">
+              <div class="flex-fill">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong class="feedback-product">Xe cảnh sát</strong>
+                  <span class="badge bg-primary ms-2">Mới</span>
+                </div>
+                <div><b>Tên khách:</b> Nguyễn Văn A · <b>Email:</b> vana@gmail.com · <b>Đánh giá:</b>
+                  <span class="text-warning">★★★★★</span>
+                </div>
+                <div><i>"Sản phẩm rất tốt, giao hàng nhanh!"</i></div>
+                <div class="feedback-actions mt-1">
+                  <button type="button" class="btn btn-outline btn-sm view-feedback-btn" data-feedback-id="FB001">Xem</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm ms-2 acknowledge-feedback-btn" data-feedback-id="FB001">Ghi nhận</button>
+                </div>
+              </div>
+            </div>
+            <div class="feedback-item d-flex align-items-start gap-3 mt-3">
+              <img src="img/Rectangle 108 (3).png" class="feedback-thumb" alt="">
+              <div class="flex-fill">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong class="feedback-product">Xe xây dựng vàng</strong>
+                  <span class="badge bg-primary ms-2">Mới</span>
+                </div>
+                <div><b>Tên khách:</b> Trần Bảo B · <b>Email:</b> baobb@gmail.com · <b>Đánh giá:</b>
+                  <span class="text-warning">★★★★☆</span>
+                </div>
+                <div><i>"Đúng mô tả, bé nhà mình thích lắm."</i></div>
+                <div class="feedback-actions mt-1">
+                  <button type="button" class="btn btn-outline btn-sm view-feedback-btn" data-feedback-id="FB002">Xem</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm ms-2 acknowledge-feedback-btn" data-feedback-id="FB002">Ghi nhận</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- Notification -->
@@ -195,6 +349,34 @@
           </div>
         </div>
       </section>
+      <!-- Modal phản hồi đánh giá -->
+      <div class="modal fade" id="feedbackDetailModal" tabindex="-1" aria-labelledby="feedbackDetailLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="feedbackDetailLabel">Chi tiết đánh giá/Phản hồi</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-2"><strong>Sản phẩm:</strong> <span id="feedbackProductName"></span></div>
+              <div class="mb-2"><strong>Khách hàng:</strong> <span id="feedbackCustomer"></span> <span class="muted">(<span id="feedbackCustomerEmail"></span>)</span></div>
+              <div class="mb-2"><strong>Đánh giá:</strong> <span id="feedbackStars"></span></div>
+              <div class="mb-2"><strong>Nội dung phản hồi:</strong>
+                <div class="border rounded p-2 bg-light" id="feedbackContent"></div>
+              </div>
+              <div class="mt-3">
+                <label for="adminReply" class="form-label"><strong>Phản hồi/Ghi nhận của quản trị viên:</strong></label>
+                <textarea id="adminReply" rows="2" class="form-control" placeholder="Nhập phản hồi hoặc nhấn Ghi nhận..."></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary send-feedback-reply">Gửi phản hồi</button>
+              <button type="button" class="btn btn-outline-secondary acknowledge-feedback">Ghi nhận</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
@@ -246,41 +428,7 @@
       </div>
     </div>
   </div>
-  <!-- Customer Modal -->
-  <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addCustomerModalLabel">Thêm khách hàng</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-        </div>
-        <div class="modal-body">
-          <form id="customerForm">
-            <div class="mb-3">
-              <label class="form-label">Tên khách hàng</label>
-              <input type="text" class="form-control" id="customerName" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" id="customerEmail">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Số điện thoại</label>
-              <input type="text" class="form-control" id="customerPhone">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Trạng thái</label>
-              <select class="form-select" id="customerStatus">
-                <option value="Active">Hoạt động</option>
-                <option value="Inactive">Không hoạt động</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Lưu</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+</div>
 
   <script>
     document.querySelectorAll('.menu li').forEach(item => {
