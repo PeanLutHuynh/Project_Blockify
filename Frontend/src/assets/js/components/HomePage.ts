@@ -2,6 +2,8 @@ import { initializeOnReady, updateCartBadge } from '../../../core/config/init.js
 import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
 import { initializeSearch } from '../../../shared/components/SearchInit.js';
 import { categoryService } from '../../../core/services/CategoryService.js';
+import { productService } from '../../../core/services/ProductService.js';
+import { supabaseService } from '../../../core/api/supabaseClient.js';
 import { cartService } from '../../../core/services/CartService.js';
 
 // State management for pagination and filtering
@@ -15,66 +17,26 @@ initializeOnReady(async () => {
   // Initialize search controller (UC3 - Thanh tìm kiếm)
   initializeSearch();
   
-  // Original homepage logic (UI interactions only)
-  initializeHomePage();
+  // Original homepage logic (UI interactions only - synchronous)
+  setupUIInteractions();
   
   // Load categories dynamically from Supabase
   await loadCategorySidebar();
   
-  // Load products with pagination from API
+  // ✅ Load ALL products for main section (phía trên) - KHÔNG có logic gợi ý
   await loadProductsFromAPI(undefined, 1);
+  
+  // ✅ Load recommendation section - "SẢN PHẨM ĐỀ XUẤT" với logic gợi ý thông minh
+  await loadRecommendedProductsForSection();
   
   // Setup category filter handlers
   setupCategoryFilters();
 });
 
-function initializeHomePage() {
-  // Categories list (keep this for category icons/navigation)
-  const categories = [
-    { img: "../../public/images/Group 61.png", name: "Police", categoryId: "1" },
-    { img: "../../public/images/Group 61 (1).png", name: "Fire", categoryId: "2" },
-    { img: "../../public/images/Group 61 (2).png", name: "City", categoryId: "3" },
-    { img: "../../public/images/Group 61 (3).png", name: "Construction", categoryId: "4" },
-    { img: "../../public/images/Group 61 (4).png", name: "Train", categoryId: "5" },
-    { img: "../../public/images/Group 61 (5).png", name: "Airport", categoryId: "6" },
-    { img: "../../public/images/Group 61 (6).png", name: "Seaport", categoryId: "7" },
-    { img: "../../public/images/Group 61 (7).png", name: "Space", categoryId: "8" }
-  ];
-  
-  const categoryList = document.getElementById("product-list");
-  if (categoryList) {
-    // Render category cards
-    categories.forEach(cat => {
-      categoryList.innerHTML += `
-        <div class="d-flex justify-content-center col-md-3 col-sm-6">
-          <div class="product-card1" data-category-id="${cat.categoryId}">
-            <img src="${cat.img}" alt="${cat.name}" class="product-img">
-            <span class="badge-hot">Hot</span>
-            <div class="product-footer pt-4">${cat.name}</div>
-          </div>
-        </div>
-      `;
-    });
-    
-    // Add click handlers for category navigation
-    categoryList.addEventListener('click', async (e) => {
-      const target = e.target as HTMLElement;
-      const card = target.closest('.product-card1') as HTMLElement;
-      if (card) {
-        const categoryId = card.dataset.categoryId;
-        if (categoryId) {
-          // Filter products by category on same page
-          await loadProductsFromAPI(parseInt(categoryId), 1);
-          // Scroll to products section
-          const mainList = document.getElementById('main-product-list');
-          if (mainList) {
-            mainList.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }
-      }
-    });
-  }
-
+/**
+ * Setup UI interactions (synchronous only - no API calls)
+ */
+function setupUIInteractions() {
   // Navbar shadow on scroll
   (function(){
     const nav = document.querySelector('.navbar');
@@ -247,6 +209,146 @@ async function loadCategorySidebar() {
     console.log('✅ Category sidebar rendered');
   } catch (error) {
     console.error('❌ Error loading category sidebar:', error);
+  }
+}
+
+/**
+ * ✅ Load "SẢN PHẨM ĐỀ XUẤT" section (phía dưới) với logic gợi ý thông minh
+ * 
+ * Logic:
+ * 1. Nếu CHƯA ĐĂNG NHẬP hoặc CHƯA CÓ đơn hàng "Đã giao"
+ *    → Hiển thị 8 sản phẩm best-selling (được mọi người mua nhiều nhất từ đơn hàng "Đã giao")
+ * 
+ * 2. Nếu ĐÃ ĐĂNG NHẬP và CÓ đơn hàng "Đã giao"
+ *    → Hiển thị personalized recommendations (dựa trên lịch sử mua hàng)
+ *    → Nếu không có personalized → Fallback to best-selling
+ * 
+ * - Click vào sản phẩm → Navigate to ProductDetail page
+ */
+async function loadRecommendedProductsForSection() {
+  try {
+    const categoryList = document.getElementById("product-list");
+    if (!categoryList) {
+      console.warn('⚠️ product-list element not found');
+      return;
+    }
+
+    // Show loading spinner
+    categoryList.innerHTML = '<div class="col-12 text-center py-3"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
+
+    console.log('🎯 Loading "SẢN PHẨM ĐỀ XUẤT" section with smart recommendations...');
+    
+    let products: any[] = [];
+
+    // ✅ Bước 1: Check if user is authenticated AND has delivered orders
+    const isAuth = await supabaseService.isAuthenticated();
+    
+    if (isAuth) {
+      // Get current user
+      const { data: userData } = await supabaseService.getUser();
+      
+      if (userData && userData.user) {
+        // Get user_id from users table
+        const client = supabaseService.getClient();
+        const { data: userRecord } = await client
+          .from('users')
+          .select('user_id')
+          .eq('auth_uid', userData.user.id)
+          .single();
+
+        if (userRecord) {
+          const userId = userRecord.user_id;
+          console.log(`✅ User logged in: ${userId}, checking for delivered orders...`);
+
+          // Check if user has delivered orders
+          const { data: orders } = await client
+            .from('orders')
+            .select('order_id')
+            .eq('user_id', userId)
+            .eq('status', 'Đã giao')
+            .limit(1);
+
+          if (orders && orders.length > 0) {
+            console.log('✅ User has delivered orders, loading personalized recommendations...');
+            
+            // Try personalized recommendations
+            const result = await productService.getRecommendedProductsForUser(userId, 8);
+            
+            if (result.success && result.products && result.products.length > 0) {
+              products = result.products;
+              console.log(`✅ Loaded ${products.length} personalized recommendations`);
+            } else {
+              console.log('⚠️ No personalized recommendations found, will fallback to best-selling');
+            }
+          } else {
+            console.log('⚠️ User has NO delivered orders, will show best-selling products');
+          }
+        }
+      }
+    } else {
+      console.log('⚠️ User not logged in, will show best-selling products');
+    }
+
+    // ✅ Bước 2: Nếu chưa có products (chưa login / chưa có delivered orders / personalized failed)
+    // → Load best-selling products (8 sản phẩm được mọi người mua nhiều nhất)
+    if (products.length === 0) {
+      console.log('⭐ Loading best-selling products (8 sản phẩm được mọi người mua nhiều nhất từ đơn hàng "Đã giao")...');
+      const result = await productService.getBestSellingProducts(8);
+      
+      if (result.success && result.products && result.products.length > 0) {
+        products = result.products;
+        console.log(`✅ Loaded ${products.length} best-selling products`);
+      } else {
+        console.error('❌ Failed to load best-selling products');
+      }
+    }
+
+    if (products.length === 0) {
+      categoryList.innerHTML = '<div class="col-12 text-center"><p>Không có sản phẩm đề xuất</p></div>';
+      console.warn('⚠️ No products found for recommendation section');
+      return;
+    }
+
+    // Clear loading spinner
+    categoryList.innerHTML = '';
+
+    // ✅ Render PRODUCT cards (chỉ có tên sản phẩm + ảnh, không có badge)
+    products.slice(0, 8).forEach((product) => {
+      const productCard = document.createElement('div');
+      productCard.className = 'd-flex justify-content-center col-md-3 col-sm-6';
+      
+      productCard.innerHTML = `
+        <div class="product-card1" data-product-slug="${product.slug}" style="cursor: pointer;">
+          <img src="${product.imageUrl}" 
+               alt="${product.name}" 
+               class="product-img"
+               onerror="this.src='/public/images/2.jpg'">
+          <div class="product-footer pt-4">${product.name}</div>
+        </div>
+      `;
+      categoryList.appendChild(productCard);
+    });
+    
+    // ✅ Add click handlers to navigate to ProductDetail
+    categoryList.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const card = target.closest('.product-card1') as HTMLElement;
+      if (card) {
+        const slug = card.getAttribute('data-product-slug');
+        if (slug) {
+          console.log(`🔗 Navigating to ProductDetail: ${slug}`);
+          window.location.href = `/src/pages/ProductDetail.html?slug=${slug}`;
+        }
+      }
+    });
+
+    console.log(`✅ Rendered ${products.length} products in "SẢN PHẨM ĐỀ XUẤT" section`);
+  } catch (error) {
+    console.error('❌ Error loading recommended products for section:', error);
+    const categoryList = document.getElementById("product-list");
+    if (categoryList) {
+      categoryList.innerHTML = '<div class="col-12 text-center py-3 text-danger">Không thể tải sản phẩm đề xuất</div>';
+    }
   }
 }
 

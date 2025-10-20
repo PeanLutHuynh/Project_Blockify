@@ -95,6 +95,8 @@ export class Product extends BaseProduct {
   private _isActive: boolean;
   private _salePrice: number | null;
   private _minStockLevel: number;
+  private _rating: number;
+  private _pieceCount: number;
 
   constructor(
     id: string,
@@ -108,7 +110,9 @@ export class Product extends BaseProduct {
     stockQuantity: number = 0,
     isActive: boolean = true,
     salePrice: number | null = null,
-    minStockLevel: number = 0
+    minStockLevel: number = 0,
+    rating: number = 0,
+    pieceCount: number = 0,
   ) {
     // Inheritance: Call parent constructor
     super(id, name, description, price, imageUrl, category);
@@ -118,6 +122,8 @@ export class Product extends BaseProduct {
     this._isActive = isActive;
     this._salePrice = salePrice;
     this._minStockLevel = minStockLevel;
+    this._rating = rating;
+    this._pieceCount = pieceCount;
   }
 
   // Encapsulation: Additional getters
@@ -178,6 +184,14 @@ export class Product extends BaseProduct {
     return this._stockQuantity <= this._minStockLevel;
   }
 
+  get rating(): number {
+    return this._rating;
+  }
+
+  get pieceCount(): number {
+    return this._pieceCount;
+  }
+
   // Polymorphism: Override abstract method
   getDisplayPrice(): string {
     const effectivePrice = this.getEffectivePrice();
@@ -222,6 +236,8 @@ export class Product extends BaseProduct {
       slug,
       data.stock_quantity || data.stockQuantity || 0,
       data.is_active !== undefined ? data.is_active : data.isActive !== undefined ? data.isActive : true,
+      data.rating || data.rating_average || 0,
+      data.pieceCount || data.piece_count || 0,
       data.sale_price !== undefined ? data.sale_price : data.salePrice !== undefined ? data.salePrice : null,
       data.min_stock_level || data.minStockLevel || 0
     );
@@ -278,7 +294,6 @@ export class Product extends BaseProduct {
  * LegoProduct - Specialized Product (Demonstrates Inheritance & Polymorphism)
  */
 export class LegoProduct extends Product {
-  private _pieceCount: number;
   private _ageRange: string;
 
   constructor(
@@ -295,15 +310,11 @@ export class LegoProduct extends Product {
     salePrice: number | null,
     minStockLevel: number,
     pieceCount: number,
-    ageRange: string
+    ageRange: string,
+    rating: number = 0,
   ) {
-    super(id, name, description, price, imageUrl, category, productUrl, slug, stockQuantity, isActive, salePrice, minStockLevel);
-    this._pieceCount = pieceCount;
+    super(id, name, description, price, imageUrl, category, productUrl, slug, stockQuantity, isActive, salePrice, minStockLevel, rating, pieceCount);
     this._ageRange = ageRange;
-  }
-
-  get pieceCount(): number {
-    return this._pieceCount;
   }
 
   get ageRange(): string {
@@ -317,6 +328,6 @@ export class LegoProduct extends Product {
 
   // Additional method specific to Lego products
   getProductDetails(): string {
-    return `${this._name} - ${this._pieceCount} pieces (Ages ${this._ageRange})`;
+    return `${this._name} - ${this.pieceCount} pieces (Ages ${this._ageRange})`;
   }
 }

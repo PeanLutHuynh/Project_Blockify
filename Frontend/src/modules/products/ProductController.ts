@@ -84,7 +84,7 @@ export class ProductController {
       <div class="product-card shadow-sm">
         <div class="product-image position-relative">
           <i class="bi bi-heart icon-heart"></i>
-          <img src="${product.imageUrl || '/public/images/placeholder.jpg'}" 
+          <img src="${product.imageUrl || '/public/images/2.jpg'}" 
                alt="${product.name}"
                style="width: 100%; height: 250px; object-fit: cover;">
           ${hasSalePrice ? '<span class="badge bg-danger position-absolute top-0 end-0 m-2">Sale</span>' : ''}

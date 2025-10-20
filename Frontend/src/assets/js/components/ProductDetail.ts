@@ -4,67 +4,7 @@ import { initializeSearch } from '../../../shared/components/SearchInit.js';
 import { productService } from '../../../core/services/ProductService.js';
 import { cartService } from '../../../core/services/CartService.js';
 
-// Product data
-type Product = {
-  name: string;
-  age: string;
-  comments: number;
-  rating: number;
-  price: string;
-  image: string;
-  bgClass: string;
-  fallbackIcon?: string;
-  slug?: string;
-};
-
-const products: Product[] = [
-  { name: 'Police and dogs', age: '8+', comments: 223, rating: 4.3, price: '200,000', image: '../../public/images/Group 61 (1).png', bgClass: 'product-1' },
-  { name: 'Love house', age: '12+', comments: 832, rating: 4.8, price: '541,000', image: '../../public/images/Group 61 (2).png', bgClass: 'product-2' },
-  { name: '4 colors building', age: '10+', comments: 746, rating: 4.6, price: '929,000', image: '../../public/images/Group 61 (3).png', bgClass: 'product-3' },
-  { name: 'Construction vehicle', age: '8+', comments: 219, rating: 4.7, price: '190,000', image: '../../public/images/Group 61 (4).png', bgClass: 'product-4' },
-  { name: 'Space lab', age: '8+', comments: 431, rating: 5.0, price: '321,000', image: '../../public/images/Group 61 (5).png', bgClass: 'product-5' },
-  { name: 'Fighter jet', age: '6+', comments: 156, rating: 4.2, price: '450,000', image: '../../public/images/Group 61 (6).png', bgClass: 'product-1' }
-];
-
-function createProductCard(product: Product): string {
-  return `
-    <div class="product-card">
-      <div class="heart-icon" onclick="toggleHeart(this)">
-        <i class="far fa-heart"></i>
-      </div>
-      <div class="product-image ${product.bgClass}">
-        <img src="${product.image}" 
-             alt="${product.name}"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-        <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center;">
-          <i class="fas fa-${product.fallbackIcon}" style="font-size: 40px; color: white;"></i>
-        </div>
-      </div>
-      <div class="product-stats">
-        <div class="stat-item">
-          <i class="fas fa-user-friends"></i>
-          <span>${product.age}</span>
-        </div>
-        <div class="fas fa-child">
-          <i class="fas fa-cube"></i>
-          <span>${product.comments}</span>
-        </div>
-        <div class="stat-item">
-          <i class="fas fa-star text-warning"></i>
-          <span>${product.rating}</span>
-        </div>
-      </div>
-      <div class="product-name">${product.name}</div>
-      <div class="product-price">${product.price} VND</div>
-      <button class="add-to-cart-btn" onclick="addToCart('${product.name}', this)">Add to cart</button>
-    </div>
-  `;
-}
-
-function initProducts(): void {
-  const grid = document.getElementById('productGrid');
-  if (grid) grid.innerHTML = products.map(createProductCard).join('');
-}
+// ❌ Removed mock data - now using Supabase for all product data
 
 function scrollProducts(direction: 'left' | 'right'): void {
   const container = document.getElementById('productScroll');
@@ -288,18 +228,28 @@ async function loadProductFromSupabase(slug: string): Promise<any | null> {
 }
 
 /**
- * Load recommended products from Supabase
+ * ✅ Load recommended products based on current product (same category)
+ * Uses the new recommendation system
  */
-async function loadRecommendedProducts(): Promise<void> {
+async function loadRecommendedProducts(currentProductId?: number): Promise<void> {
   try {
     console.log('🔍 Loading recommended products...');
     
-    const result = await productService.getFeaturedProducts(6);
+    let result;
     
-    if (!result.success || !result.products) {
+    if (currentProductId) {
+      // ✅ Use recommendation system - get similar products from same category
+      console.log(`🎯 Loading similar products for product ID: ${currentProductId}`);
+      result = await productService.getRecommendedProductsByProduct(currentProductId, 6);
+    } else {
+      // Fallback to featured products if no product ID
+      console.log('⚠️ No product ID, loading featured products');
+      result = await productService.getFeaturedProducts(6);
+    }
+    
+    if (!result.success || !result.products || result.products.length === 0) {
       console.error('❌ Failed to load recommended products');
-      // Keep mock products as fallback
-      initProducts();
+      showEmptyState();
       return;
     }
 
@@ -308,13 +258,16 @@ async function loadRecommendedProducts(): Promise<void> {
     // Render to grid
     const grid = document.getElementById('productGrid');
     if (!grid) {
-      console.warn('productGrid not found');
+      console.warn('⚠️ productGrid not found');
       return;
     }
 
+    // ✅ Render products with proper Supabase image URLs
     grid.innerHTML = result.products.map(product => {
       const price = typeof product.price === 'number' ? product.price : parseFloat(product.price || '0');
       const formattedPrice = price.toLocaleString('vi-VN');
+      const rating = product.rating || 4.5;
+      const pieceCount = product.pieceCount || 120;
       
       return `
         <div class="product-card" data-slug="${product.slug}" style="cursor: pointer;">
@@ -322,7 +275,9 @@ async function loadRecommendedProducts(): Promise<void> {
             <i class="far fa-heart"></i>
           </div>
           <div class="product-image">
-            <img src="${product.imageUrl}" alt="${product.name}">
+            <img src="${product.imageUrl}" 
+                 alt="${product.name}"
+                 onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;color:#999;\'><i class=\'fas fa-image\' style=\'font-size:40px;\'></i></div>'">
           </div>
           <div class="product-stats">
             <div class="stat-item">
@@ -331,11 +286,11 @@ async function loadRecommendedProducts(): Promise<void> {
             </div>
             <div class="stat-item">
               <i class="fas fa-cube"></i>
-              <span>120</span>
+              <span>${pieceCount}</span>
             </div>
             <div class="stat-item">
               <i class="fas fa-star text-warning"></i>
-              <span>4.8</span>
+              <span>${rating.toFixed(1)}</span>
             </div>
           </div>
           <div class="product-name">${product.name}</div>
@@ -350,6 +305,7 @@ async function loadRecommendedProducts(): Promise<void> {
       card.addEventListener('click', () => {
         const slug = card.getAttribute('data-slug');
         if (slug) {
+          console.log(`🔗 Navigating to product: ${slug}`);
           window.location.href = `/src/pages/ProductDetail.html?slug=${slug}`;
         }
       });
@@ -357,8 +313,22 @@ async function loadRecommendedProducts(): Promise<void> {
 
   } catch (error) {
     console.error('❌ Error loading recommended products:', error);
-    // Fallback to mock data
-    initProducts();
+    showEmptyState();
+  }
+}
+
+/**
+ * Show empty state when no products available
+ */
+function showEmptyState(): void {
+  const grid = document.getElementById('productGrid');
+  if (grid) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #999;">
+        <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+        <p>Không có sản phẩm gợi ý</p>
+      </div>
+    `;
   }
 }
 
@@ -513,8 +483,7 @@ function renderProductDetail(product: any): void {
 }
 
 function initializeProductDetailPage() {
-  // Load recommended products from Supabase
-  loadRecommendedProducts();
+  console.log('🎬 Initializing ProductDetail page...');
 
   // Initialize Add to Cart button
   initializeAddToCartButton();
@@ -522,7 +491,12 @@ function initializeProductDetailPage() {
   // Đổi ảnh chính khi click thumbnail
   (window as any).changeMainImage = function(src: string): void {
     const img = document.getElementById('pd-image') as HTMLImageElement | null;
-    if (img) img.src = src;
+    if (img) {
+      img.src = src;
+      img.onerror = () => {
+        img.src = '/public/images/2.jpg';
+      };
+    }
   };
 
   // Get slug from URL parameter
@@ -538,10 +512,21 @@ function initializeProductDetailPage() {
       if (product) {
         console.log('✅ Product data received:', product.product_name);
         renderProductDetail(product);
+        
+        // ✅ Load recommended products based on current product
+        const productId = product.product_id;
+        if (productId) {
+          console.log(`🎯 Loading recommendations for product ID: ${productId}`);
+          loadRecommendedProducts(productId);
+        } else {
+          console.warn('⚠️ No product ID, loading featured products');
+          loadRecommendedProducts();
+        }
       } else {
-        console.error('❌ Product not found, showing fallback data');
+        console.error('❌ Product not found');
         alert('Không tìm thấy sản phẩm này!');
-        // Keep default HTML content as fallback
+        // Load featured products as fallback
+        loadRecommendedProducts();
       }
     });
   } else {
