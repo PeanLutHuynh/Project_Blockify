@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const shopLogoInput = document.getElementById('shopLogo') as HTMLInputElement;
     const shopLogoPreview = document.getElementById('shopLogoPreview') as HTMLImageElement;
     if (shopLogoInput && shopLogoPreview) {
-      shopLogoInput.addEventListener('change', function (e) {
+      shopLogoInput.addEventListener('change', function () {
         const file = shopLogoInput.files?.[0];
         if (file) {
           const reader = new FileReader();
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     function attachOrderActionEvents() {
       document.querySelectorAll('.action-next-status').forEach(btn => {
-        btn.addEventListener('click', (event) => {
+        btn.addEventListener('click', () => {
           const orderId = (btn as HTMLElement).getAttribute('data-order-id');
           const order = orderDataDemo.find(o => o.id === orderId);
           if(order && order.status!=='Cancelled') {
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       });
       document.querySelectorAll('.check-payment-proof').forEach(btn => {
-        btn.addEventListener('click', (event) => {
+        btn.addEventListener('click', () => {
           const orderId = (btn as HTMLElement).getAttribute('data-order-id');
           const order = orderDataDemo.find(o => o.id === orderId);
           if(order && order.status==='Processing') {
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       });
       document.querySelectorAll('.cancel-order-btn').forEach(btn => {
-        btn.addEventListener('click', (event) => {
+        btn.addEventListener('click', () => {
           const orderId = (btn as HTMLElement).getAttribute('data-order-id');
           const order = orderDataDemo.find(o => o.id === orderId);
           if(order && order.status!=='Cancelled') {
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       });
       document.querySelectorAll('.refund-order-btn').forEach(btn => {
-        btn.addEventListener('click', (event) => {
+        btn.addEventListener('click', () => {
           const orderId = (btn as HTMLElement).getAttribute('data-order-id');
           const order = orderDataDemo.find(o => o.id === orderId);
           if(order && ['Delivered','Shipping'].includes(order.status)) {
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       // click show-order-detail attach lại logic nếu cần
       document.querySelectorAll('.show-order-detail').forEach(btn => {
-        btn.addEventListener('click', (event) => {
+        btn.addEventListener('click', () => {
           const orderId = (btn as HTMLElement).getAttribute('data-order-id');
           showOrderDetailModal(orderId as string);
         });
