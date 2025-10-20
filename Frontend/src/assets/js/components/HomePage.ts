@@ -16,8 +16,8 @@ initializeOnReady(async () => {
   // Initialize search controller (UC3 - Thanh tìm kiếm)
   initializeSearch();
   
-  // Original homepage logic (UI interactions only)
-  initializeHomePage();
+  // Original homepage logic (UI interactions only - synchronous)
+  setupUIInteractions();
   
   // Load categories dynamically from Supabase
   await loadCategorySidebar();
@@ -25,14 +25,17 @@ initializeOnReady(async () => {
   // ✅ Load ALL products for main section (phía trên) - KHÔNG có logic gợi ý
   await loadProductsFromAPI(undefined, 1);
   
+  // ✅ Load recommendation section - "SẢN PHẨM ĐỀ XUẤT" với logic gợi ý thông minh
+  await loadRecommendedProductsForSection();
+  
   // Setup category filter handlers
   setupCategoryFilters();
 });
 
-function initializeHomePage() {
-  // ✅ Load recommendation section - "SẢN PHẨM ĐỀ XUẤT" với logic gợi ý thông minh
-  loadRecommendedProductsForSection();
-
+/**
+ * Setup UI interactions (synchronous only - no API calls)
+ */
+function setupUIInteractions() {
   // Navbar shadow on scroll
   (function(){
     const nav = document.querySelector('.navbar');
@@ -318,7 +321,7 @@ async function loadRecommendedProductsForSection() {
           <img src="${product.imageUrl}" 
                alt="${product.name}" 
                class="product-img"
-               onerror="this.src='/public/images/placeholder.jpg'">
+               onerror="this.src='/public/images/2.jpg'">
           <div class="product-footer pt-4">${product.name}</div>
         </div>
       `;
