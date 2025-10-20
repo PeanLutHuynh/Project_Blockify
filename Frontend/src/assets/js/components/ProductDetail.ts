@@ -339,7 +339,7 @@ function initializeProductDetailPage() {
     if (img) {
       img.src = src;
       img.onerror = () => {
-        img.src = '/public/images/placeholder.jpg';
+        img.src = '/public/images/2.jpg';
       };
     }
   };
