@@ -489,10 +489,10 @@ const wishlistProducts: Record<string, WishlistProduct> = {
     description: 'Join the world of LEGO City with the high-speed police car and brave police minifigure. Perfect for thrilling chases and creative adventures.',
     fullDescription: 'Join the thrilling chases with the LEGO City Police set! This set includes: A powerful police supercar in the signature blue and white colors, featuring a sporty spoiler and flashing siren lights on the roof. A police minifigure dressed in official uniform and helmet, ready for action. This is a great choice for kids to play while developing their imagination, role-playing as police officers protecting the city, chasing criminals, and keeping the peace.',
     images: [
-      'https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt1.png',
-      'https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt2.png',
-      'https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt3.png',
-      'https://www.lego.com/cdn/cs/set/assets/blt6af83992a8ac4c42/60239_alt4.png'
+      '/public/images/2.jpg',
+      '/public/images/lego-city.jpg',
+      '/public/images/2.jpg',
+      '/public/images/lego-city.jpg'
     ],
     reviews: [
       { user: 'JessicaNguyen', rating: 5, date: '31-05-2025 13:52', comment: 'Fast delivery, overall good quality material, carefully packaged. Thank you, shop!' },
