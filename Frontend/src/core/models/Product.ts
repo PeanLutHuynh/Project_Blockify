@@ -93,10 +93,9 @@ export class Product extends BaseProduct {
   private _slug: string;
   private _stockQuantity: number;
   private _isActive: boolean;
-  private _salePrice: number | null;
-  private _minStockLevel: number;
   private _rating: number;
   private _pieceCount: number;
+  private _salePrice?: number;
 
   constructor(
     id: string,
@@ -109,10 +108,9 @@ export class Product extends BaseProduct {
     slug: string = '',
     stockQuantity: number = 0,
     isActive: boolean = true,
-    salePrice: number | null = null,
-    minStockLevel: number = 0,
     rating: number = 0,
     pieceCount: number = 0,
+    salePrice?: number
   ) {
     // Inheritance: Call parent constructor
     super(id, name, description, price, imageUrl, category);
@@ -120,10 +118,9 @@ export class Product extends BaseProduct {
     this._slug = slug;
     this._stockQuantity = stockQuantity;
     this._isActive = isActive;
-    this._salePrice = salePrice;
-    this._minStockLevel = minStockLevel;
     this._rating = rating;
     this._pieceCount = pieceCount;
+    this._salePrice = salePrice;
   }
 
   // Encapsulation: Additional getters
@@ -143,47 +140,6 @@ export class Product extends BaseProduct {
     return this._isActive;
   }
 
-  get salePrice(): number | null {
-    return this._salePrice;
-  }
-
-  get minStockLevel(): number {
-    return this._minStockLevel;
-  }
-
-  // Business logic methods
-
-  /**
-   * Get effective price (sale price if exists, otherwise regular price)
-   */
-  getEffectivePrice(): number {
-    return this._salePrice !== null && this._salePrice > 0 ? this._salePrice : this._price;
-  }
-
-  /**
-   * Check if product has sale price
-   */
-  hasSalePrice(): boolean {
-    return this._salePrice !== null && this._salePrice > 0 && this._salePrice < this._price;
-  }
-
-  /**
-   * Get discount percentage
-   */
-  getDiscountPercentage(): number {
-    if (!this.hasSalePrice() || this._salePrice === null) {
-      return 0;
-    }
-    return Math.round(((this._price - this._salePrice) / this._price) * 100);
-  }
-
-  /**
-   * Check if product is sold out (stock equals min level)
-   */
-  isSoldOut(): boolean {
-    return this._stockQuantity <= this._minStockLevel;
-  }
-
   get rating(): number {
     return this._rating;
   }
@@ -192,13 +148,16 @@ export class Product extends BaseProduct {
     return this._pieceCount;
   }
 
+  get salePrice(): number | undefined {
+    return this._salePrice;
+  }
+
   // Polymorphism: Override abstract method
   getDisplayPrice(): string {
-    const effectivePrice = this.getEffectivePrice();
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND'
-    }).format(effectivePrice);
+    }).format(this._price);
   }
 
   // Polymorphism: Override abstract method
@@ -208,12 +167,12 @@ export class Product extends BaseProduct {
 
   // Business logic method
   isAvailable(): boolean {
-    return this._isActive && !this.isSoldOut();
+    return this._isActive && this._stockQuantity > 0;
   }
 
   // Method to check if product is in stock
   hasStock(): boolean {
-    return this._stockQuantity > this._minStockLevel;
+    return this._stockQuantity > 0;
   }
 
   // Static factory method to create Product from API response
@@ -226,10 +185,10 @@ export class Product extends BaseProduct {
     }
     
     return new Product(
-      data.id || data.product_id?.toString() || '',
-      data.name || data.product_name || '',
+      data.id,
+      data.name,
       data.description || '',
-      data.price || 0,
+      data.price,
       data.image_url || data.imageUrl || '',
       data.category || 'General',
       data.product_url || data.productUrl,
@@ -238,8 +197,7 @@ export class Product extends BaseProduct {
       data.is_active !== undefined ? data.is_active : data.isActive !== undefined ? data.isActive : true,
       data.rating || data.rating_average || 0,
       data.pieceCount || data.piece_count || 0,
-      data.sale_price !== undefined ? data.sale_price : data.salePrice !== undefined ? data.salePrice : null,
-      data.min_stock_level || data.minStockLevel || 0
+      data.salePrice || data.sale_price
     );
   }
 
@@ -250,12 +208,10 @@ export class Product extends BaseProduct {
       name: this._name,
       description: this._description,
       price: this._price,
-      sale_price: this._salePrice,
       image_url: this._imageUrl,
       category: this._category,
       product_url: this._productUrl,
       stock_quantity: this._stockQuantity,
-      min_stock_level: this._minStockLevel,
       is_active: this._isActive
     };
   }
@@ -266,26 +222,20 @@ export class Product extends BaseProduct {
     name: string;
     description: string;
     price: string;
-    effectivePrice: number;
     imageUrl: string;
     category: string;
     productUrl?: string;
     isAvailable: boolean;
-    hasSalePrice: boolean;
-    discountPercentage: number;
   } {
     return {
       id: this._id,
       name: this._name,
       description: this._description,
       price: this.getDisplayPrice(),
-      effectivePrice: this.getEffectivePrice(),
       imageUrl: this._imageUrl,
       category: this._category,
       productUrl: this._productUrl,
-      isAvailable: this.isAvailable(),
-      hasSalePrice: this.hasSalePrice(),
-      discountPercentage: this.getDiscountPercentage()
+      isAvailable: this.isAvailable()
     };
   }
 }
@@ -307,13 +257,12 @@ export class LegoProduct extends Product {
     slug: string,
     stockQuantity: number,
     isActive: boolean,
-    salePrice: number | null,
-    minStockLevel: number,
     pieceCount: number,
     ageRange: string,
     rating: number = 0,
+    salePrice?: number
   ) {
-    super(id, name, description, price, imageUrl, category, productUrl, slug, stockQuantity, isActive, salePrice, minStockLevel, rating, pieceCount);
+    super(id, name, description, price, imageUrl, category, productUrl, slug, stockQuantity, isActive, rating, pieceCount, salePrice);
     this._ageRange = ageRange;
   }
 
