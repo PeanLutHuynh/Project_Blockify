@@ -145,9 +145,13 @@ export class CartController {
     // Product info column - Use normalized image URL
     const normalizedImageUrl = this.normalizeImageUrl(item.imageUrl);
     const productCell = document.createElement('td');
+    
+    // Use a simple SVG placeholder instead of external service
+    const fallbackImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZTBlMGUwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+    
     productCell.innerHTML = `
       <div class="d-flex align-items-center">
-        <img src="${normalizedImageUrl}" alt="${item.productName}" class="product-thumbnail me-3" style="width: 60px; height: 60px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/60x60?text=No+Image'">
+        <img src="${normalizedImageUrl}" alt="${item.productName}" class="product-thumbnail me-3" style="width: 60px; height: 60px; object-fit: cover;" onerror="this.src='${fallbackImage}'">
         <div>
           <div class="fw-bold">${item.productName}</div>
           ${isSoldOut ? '<span class="badge bg-danger ms-2">Hết hàng</span>' : ''}
