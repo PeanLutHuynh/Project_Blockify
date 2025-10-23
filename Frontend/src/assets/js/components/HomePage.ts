@@ -477,7 +477,14 @@ function renderProductsToGrid(products: any[]) {
         const btn = e.currentTarget as HTMLElement;
         const productId = parseInt(btn.getAttribute('data-product-id') || '0');
         
-        console.log('🛒 Adding to cart, product ID:', productId);
+        console.log('🛒 [HomePage] Adding to cart, product ID:', productId);
+        
+        // Validate productId
+        if (!productId || productId <= 0) {
+          console.error('❌ [HomePage] Invalid product ID:', productId);
+          alert('❌ Lỗi: Không tìm thấy thông tin sản phẩm');
+          return;
+        }
         
         // Import services
         try {
@@ -485,14 +492,21 @@ function renderProductsToGrid(products: any[]) {
           const { productService } = await import('../../../core/services/ProductService.js');
           
           // Get full product data
+          console.log('📦 [HomePage] Fetching product details for ID:', productId);
           const productResult = await productService.getProductById(productId.toString());
           
           if (!productResult.success || !productResult.product) {
+            console.error('❌ [HomePage] Product not found:', productId);
             alert('Không tìm thấy sản phẩm');
             return;
           }
           
           const product = productResult.product;
+          console.log('✅ [HomePage] Product found:', {
+            id: product.id,
+            name: product.name,
+            price: product.price
+          });
           
           // Add to cart with full data
           const result = await cartService.addToCart({
