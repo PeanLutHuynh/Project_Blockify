@@ -522,6 +522,19 @@ function initializeProductDetailPage() {
       }
     }
   }
+  // ✅ Add event listener for "Add to Cart" button
+  const addToCartBtn = document.querySelector('.btn-add-cart') as HTMLButtonElement | null;
+  if (addToCartBtn) {
+    addToCartBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const productNameEl = document.getElementById('pd-title');
+      const productName = productNameEl?.textContent?.replace('Product Name: ', '') || 'Product';
+      await addToCart(productName, addToCartBtn);
+    });
+  } else {
+    console.warn('⚠️ Add to Cart button not found in ProductDetail page');
+  }
+
   // Add review form
   (window as any).addReview = function(event: Event): void {
     event.preventDefault();
