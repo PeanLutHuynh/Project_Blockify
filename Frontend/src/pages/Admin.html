@@ -14,7 +14,7 @@
   <!-- Header -->
   <div class="header d-flex justify-content-between align-items-center">
     <div class="header-left d-flex align-items-center gap-3">
-      <a class="navbar-brand" href="IntroductionPage.html">Blockify</a>
+      <a class="navbar-brand" href="#">Blockify</a>
     </div>
     <div class="header-right d-flex align-items-center gap-2">
       <span id="adminName" class="header-link">Đang tải...</span>
@@ -257,28 +257,20 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
             <div class="modal-body">
-              <div class="row">
-                <div class="col-md-4">
-                  <strong>Khách hàng:</strong> <span id="detailCustomerName"></span><br>
-                  <strong>Email:</strong> <span id="detailCustomerEmail"></span><br>
-                  <strong>SĐT:</strong> <span id="detailCustomerPhone"></span><br>
-                  <strong>Địa chỉ:</strong> <span id="detailCustomerAddress"></span><br>
-                  <strong>Phương thức:</strong> <span id="detailPaymentMethod"></span><br>
-                </div>
-                <div class="col-md-4">
-                  <strong>Mã hóa đơn:</strong> <span id="detailOrderId"></span><br>
-                  <strong>Tên đơn:</strong> <span id="detailOrderName"></span><br>
-                  <strong>Số lượng:</strong> <span id="detailOrderQuantity"></span><br>
-                  <strong>Mẫu hàng:</strong> <span id="detailOrderVariant"></span><br>
-                  <strong>Tổng tiền:</strong> <span id="detailOrderTotal"></span><br>
-                  <strong>Trạng thái:</strong> <span id="detailOrderStatus"></span><br>
-                </div>
-                <div class="col-md-4 text-center">
-                  <strong>Hình sản phẩm:</strong><br>
-                  <img id="detailProductImg" src="" class="img-fluid mb-2" style="width: 100px;"><br>
-                  <strong>Minh chứng thanh toán:</strong><br>
-                  <img id="detailPayProof" src="" class="img-fluid" style="width: 160px;">
-                </div>
+              <div class="container">
+                <div class="row mb-2"><div class="col-5 fw-semibold">Khách hàng:</div><div class="col" id="detailCustomerName"></div></div>
+                <div class="row mb-2"><div class="col-5 fw-semibold">Email:</div><div class="col" id="detailCustomerEmail"></div></div>
+                <div class="row mb-2"><div class="col-5 fw-semibold">SĐT:</div><div class="col" id="detailCustomerPhone"></div></div>
+                <div class="row mb-2"><div class="col-5 fw-semibold">Địa chỉ:</div><div class="col" id="detailCustomerAddress"></div></div>
+                <div class="row mb-2"><div class="col-5 fw-semibold">Phương thức:</div><div class="col" id="detailPaymentMethod"></div></div>
+                <div class="row mb-2"><div class="col-5 fw-semibold">Mã hóa đơn:</div><div class="col" id="detailOrderId"></div></div>
+                <div class="row mb-2"><div class="col-5 fw-semibold">Tên đơn:</div><div class="col" id="detailOrderName"></div></div>
+                <div class="row mb-2"><div class="col-5 fw-semibold">Số lượng:</div><div class="col" id="detailOrderQuantity"></div></div>
+                <div class="row mb-2"><div class="col-5 fw-semibold">Mẫu hàng:</div><div class="col" id="detailOrderVariant"></div></div>
+                <div class="row mb-2"><div class="col-5 fw-semibold">Tổng tiền:</div><div class="col" id="detailOrderTotal"></div></div>
+                <div class="row mb-2"><div class="col-5 fw-semibold">Trạng thái:</div><div class="col" id="detailOrderStatus"></div></div>
+                <div class="row mb-2"><div class="col-5 fw-semibold">Hình sản phẩm:</div><div class="col"><img id="detailProductImg" src="" class="img-fluid mb-2" style="width: 100px;"></div></div>
+                <div class="row mb-2"><div class="col-5 fw-semibold">Minh chứng thanh toán:</div><div class="col"><img id="detailPayProof" src="" class="img-fluid" style="width: 120px;"></div></div>
               </div>
             </div>
             <div class="modal-footer order-action-footer">
