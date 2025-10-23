@@ -129,9 +129,6 @@ function renderProducts(products: any[]) {
   }
 
   productGrid.innerHTML = products.map(product => {
-    const price = parseFloat(product.price || 0);
-    const formattedPrice = price.toLocaleString('vi-VN');
-    
     return `
       <div class="product-card" data-slug="${product.slug}">
         <img src="${product.imageUrl || 'https://via.placeholder.com/200'}" alt="${product.name}">
