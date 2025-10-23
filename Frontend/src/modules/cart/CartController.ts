@@ -21,28 +21,10 @@ export class CartController {
   /**
    * Initialize controller
    */
-  private async init(): Promise<void> {
+  private init(): void {
     this.initializeElements();
     this.attachEventListeners();
-    
-    // Load cart from backend if user is logged in
-    await this.loadCartFromBackend();
-    
     this.renderCart();
-  }
-
-  /**
-   * Load cart from backend (sync with Supabase)
-   */
-  private async loadCartFromBackend(): Promise<void> {
-    try {
-      console.log('🔄 Loading cart from backend...');
-      await cartService.loadFromBackend();
-      console.log('✅ Cart loaded from backend successfully');
-    } catch (error) {
-      console.error('❌ Error loading cart from backend:', error);
-      // Continue with localStorage cart if backend fails
-    }
   }
 
   /**
