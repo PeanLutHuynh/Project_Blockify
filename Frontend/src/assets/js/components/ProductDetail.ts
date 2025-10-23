@@ -2,6 +2,8 @@ import { initializeOnReady } from '../../../core/config/init.js';
 import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
 import { initializeSearch } from '../../../shared/components/SearchInit.js';
 import { productService } from '../../../core/services/ProductService.js';
+import { cartService } from '../../../core/services/CartService.js';
+import { updateCartBadge } from '../../../core/config/init.js';
 
 // ❌ Removed mock data - now using Supabase for all product data
 
@@ -21,14 +23,65 @@ function toggleHeart(heart: HTMLElement): void {
   (icon as HTMLElement).style.color = isLiked ? '#999' : 'white';
 }
 
-function addToCart(productName: string, btn: HTMLElement): void {
-  alert(`Added "${productName}" to cart!`);
-  btn.textContent = 'Added!';
-  btn.style.background = '#28a745';
-  setTimeout(() => {
-    btn.textContent = 'Add to cart';
-    btn.style.background = '#007bff';
-  }, 1500);
+async function addToCart(productName: string, btn: HTMLElement): Promise<void> {
+  try {
+    console.log('🛒 [ProductDetail] Adding to cart:', productName);
+    
+    // Get current product data from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const slug = urlParams.get('slug');
+    
+    if (!slug) {
+      alert('❌ Không tìm thấy thông tin sản phẩm!');
+      return;
+    }
+    
+    // Load product details
+    const result = await productService.getProductBySlug(slug);
+    if (!result.success || !result.product) {
+      alert('❌ Không thể tải thông tin sản phẩm!');
+      return;
+    }
+    
+    const product = result.product;
+    console.log('📦 [ProductDetail] Product data:', product);
+    
+    // Add to cart using CartService
+    const cartResult = await cartService.addToCart({
+      productId: parseInt(product.product_id),
+      productName: product.product_name,
+      productSlug: product.slug,
+      imageUrl: product.product_images?.[0]?.image_url || product.imageUrl || '',
+      price: parseFloat(product.price),
+      salePrice: product.sale_price ? parseFloat(product.sale_price) : null,
+      quantity: 1,
+      stockQuantity: parseInt(product.stock_quantity) || 0,
+      minStockLevel: parseInt(product.min_stock_level) || 0
+    });
+    
+    if (cartResult.success) {
+      console.log('✅ [ProductDetail] Added to cart successfully');
+      
+      // Visual feedback
+      btn.textContent = '✓ Đã thêm';
+      btn.style.background = '#28a745';
+      
+      // Update cart badge
+      updateCartBadge();
+      
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        btn.textContent = 'Thêm vào giỏ';
+        btn.style.background = '#007bff';
+      }, 2000);
+    } else {
+      console.error('❌ [ProductDetail] Failed to add to cart:', cartResult.message);
+      alert(cartResult.message || 'Không thể thêm vào giỏ hàng!');
+    }
+  } catch (error) {
+    console.error('❌ [ProductDetail] Error adding to cart:', error);
+    alert('Đã xảy ra lỗi khi thêm vào giỏ hàng!');
+  }
 }
 
 // Make functions available globally for HTML onclick handlers
@@ -147,7 +200,7 @@ async function loadRecommendedProducts(currentProductId?: number): Promise<void>
           </div>
           <div class="product-name">${product.name}</div>
           <div class="product-price">${formattedPrice} VND</div>
-          <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('${product.name}', this)">Add to cart</button>
+          <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('${product.name}', this)">Thêm vào giỏ</button>
         </div>
       `;
     }).join('');
