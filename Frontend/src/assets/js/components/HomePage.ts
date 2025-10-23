@@ -458,7 +458,7 @@ function renderProductsToGrid(products: any[]) {
           <div class="divider"></div>
           <div class="product-title" style="height:40px;">${product.name}</div>
           <div class="product-price">${formattedPrice} VNĐ</div>
-          <button class="btn-cart" onclick="event.stopPropagation();">Add to Cart</button>
+          <button class="btn-cart" data-product-id="${product.id}">Thêm vào giỏ</button>
         </div>
       </div>
     `;
@@ -469,6 +469,67 @@ function renderProductsToGrid(products: any[]) {
   console.log(`🖱️ Setting up click handlers for ${cards.length} cards`);
   
   cards.forEach((card, index) => {
+    // Add to cart button handler
+    const addToCartBtn = card.querySelector('.btn-cart');
+    if (addToCartBtn) {
+      addToCartBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const btn = e.currentTarget as HTMLElement;
+        const productId = parseInt(btn.getAttribute('data-product-id') || '0');
+        
+        console.log('🛒 Adding to cart, product ID:', productId);
+        
+        // Import services
+        try {
+          const { cartService } = await import('../../../core/services/CartService.js');
+          const { productService } = await import('../../../core/services/ProductService.js');
+          
+          // Get full product data
+          const productResult = await productService.getProductById(productId.toString());
+          
+          if (!productResult.success || !productResult.product) {
+            alert('Không tìm thấy sản phẩm');
+            return;
+          }
+          
+          const product = productResult.product;
+          
+          // Add to cart with full data
+          const result = await cartService.addToCart({
+            productId: parseInt(product.id),
+            productName: product.name,
+            productSlug: product.slug,
+            imageUrl: product.imageUrl,
+            price: product.price,
+            salePrice: product.salePrice,
+            quantity: 1,
+            stockQuantity: product.stockQuantity || 100,
+            minStockLevel: 0
+          });
+          
+          if (result.success) {
+            // Visual feedback
+            btn.textContent = '✓ Đã thêm';
+            btn.style.background = '#28a745';
+            setTimeout(() => {
+              btn.textContent = 'Thêm vào giỏ';
+              btn.style.background = '';
+            }, 2000);
+            
+            // Update cart badge
+            const { updateCartBadge } = await import('../../../core/config/init.js');
+            updateCartBadge();
+          } else {
+            alert(result.message || 'Không thể thêm vào giỏ hàng');
+          }
+        } catch (error) {
+          console.error('❌ Error adding to cart:', error);
+          alert('Lỗi khi thêm vào giỏ hàng');
+        }
+      });
+    }
+    
+    // Product card click handler
     card.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       

@@ -363,9 +363,15 @@ export class CartService {
       const token = localStorage.getItem(this.AUTH_TOKEN_KEY);
       if (!token) {
         // User not logged in, only save to localStorage
-        console.log('User not logged in, cart saved to localStorage only');
+        console.log('⚠️ User not logged in, cart saved to localStorage only');
+        console.log('💡 Tip: Login to sync cart across devices');
         return;
       }
+
+      console.log('🔄 Syncing cart to backend...', {
+        productId: cartItem.productId,
+        quantity: cartItem.quantity
+      });
 
       // Call backend API to save cart item
       const response = await httpClient.post('/api/v1/cart', {
@@ -374,12 +380,13 @@ export class CartService {
       });
 
       if (response.success) {
-        console.log('✅ Cart synced to backend successfully:', response);
+        console.log('✅ Cart synced to backend successfully:', response.data);
       } else {
-        console.warn('⚠️ Backend sync response:', response);
+        console.warn('⚠️ Backend sync failed:', response);
       }
     } catch (error: any) {
       console.error('❌ Error syncing to backend:', error);
+      console.error('❌ Error details:', error.message);
       // Don't fail the add to cart operation if backend sync fails
       // Item is already saved to localStorage
     }
