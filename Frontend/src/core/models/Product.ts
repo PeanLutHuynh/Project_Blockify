@@ -177,6 +177,27 @@ export class Product extends BaseProduct {
 
   // Static factory method to create Product from API response
   static fromApiResponse(data: any): Product {
+    // Extract ID - handle both product_id (number from DB) and id (string)
+    const productId = String(data.product_id || data.id || '0');
+    
+    // Extract name - handle both product_name and name
+    const productName = data.product_name || data.name || 'Unknown Product';
+    
+    // Extract description
+    const description = data.description || data.product_description || '';
+    
+    // Extract price - handle string prices from DB
+    const price = typeof data.price === 'string' ? parseFloat(data.price) : (data.price || 0);
+    const salePrice = data.sale_price ? 
+      (typeof data.sale_price === 'string' ? parseFloat(data.sale_price) : data.sale_price) 
+      : undefined;
+    
+    // Extract image URL - handle product_images array
+    let imageUrl = data.image_url || data.imageUrl || '';
+    if (!imageUrl && data.product_images && Array.isArray(data.product_images) && data.product_images.length > 0) {
+      imageUrl = data.product_images[0].image_url || '';
+    }
+    
     // Extract slug from product_url if not provided directly
     let slug = data.slug || data.product_slug || '';
     if (!slug && data.product_url) {
@@ -184,20 +205,31 @@ export class Product extends BaseProduct {
       if (match) slug = match[1];
     }
     
+    // Extract stock quantity
+    const stockQuantity = parseInt(String(data.stock_quantity || data.stockQuantity || 0));
+    
+    // Extract piece count
+    const pieceCount = parseInt(String(data.pieceCount || data.piece_count || 0));
+    
+    console.log('🔄 [Product.fromApiResponse] Parsing:', {
+      input: { product_id: data.product_id, id: data.id, product_name: data.product_name, name: data.name },
+      output: { id: productId, name: productName, price, stockQuantity }
+    });
+    
     return new Product(
-      data.id,
-      data.name,
-      data.description || '',
-      data.price,
-      data.image_url || data.imageUrl || '',
-      data.category || 'General',
+      productId,
+      productName,
+      description,
+      price,
+      imageUrl,
+      data.category || data.category_name || 'General',
       data.product_url || data.productUrl,
       slug,
-      data.stock_quantity || data.stockQuantity || 0,
+      stockQuantity,
       data.is_active !== undefined ? data.is_active : data.isActive !== undefined ? data.isActive : true,
       data.rating || data.rating_average || 0,
-      data.pieceCount || data.piece_count || 0,
-      data.salePrice || data.sale_price
+      pieceCount,
+      salePrice
     );
   }
 
