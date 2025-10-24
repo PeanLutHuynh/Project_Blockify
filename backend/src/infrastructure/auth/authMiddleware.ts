@@ -63,13 +63,41 @@ export const authenticateToken: Middleware = async (req, res, next) => {
         return;
       }
 
-      // Supabase token is valid - create temporary user object
-      // We'll use authUid to find user in database if needed
+      // Supabase token is valid - query database to get user ID
+      const { data: dbUser, error: dbError } = await supabase
+        .from('users')
+        .select('user_id, email, full_name, username')
+        .eq('auth_uid', user.id)
+        .single();
+
+      if (dbError || !dbUser) {
+        console.error('❌ Failed to fetch user from database:', dbError?.message);
+        console.log('🔍 Looking for auth_uid:', user.id);
+        res.status(401);
+        res.json({
+          success: false,
+          error: {
+            code: 'USER_NOT_FOUND',
+            message: 'User not found in database',
+          },
+        });
+        return;
+      }
+
+      // Attach user with proper userId to request
       (req as any).user = {
+        userId: dbUser.user_id,
+        user_id: dbUser.user_id,
+        id: dbUser.user_id,
         authUid: user.id,
-        email: user.email,
+        email: user.email || dbUser.email,
+        fullName: dbUser.full_name,
+        username: dbUser.username,
+        role: 'user', // Regular users don't have role in users table
         supabaseUser: user,
       };
+
+      console.log('✅ Supabase auth - userId:', dbUser.user_id, 'email:', dbUser.email);
 
       await next();
     } catch (supabaseError: any) {
