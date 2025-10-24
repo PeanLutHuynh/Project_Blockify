@@ -364,68 +364,47 @@
             <button class="btn btn-outline-primary-custom" onclick="toggleAddressForm()">+ Thêm địa chỉ</button>
           </div>
           <div class="section-body">
-            <div class="address-card">
-              <div class="d-flex justify-content-between mb-2">
-                <div><strong>QTLHH</strong> <span class="badge badge-default">Mặc định</span></div>
-                <div class="text-muted small">Chỉnh sửa • Xóa</div>
-              </div>
-              <div>Ho Chi Minh City, Vietnam</div>
-              <div>098.xxx.xxx</div>
-            </div>
-            <div class="address-card">
-              <div class="d-flex justify-content-between mb-2">
-                <div><strong>QTLHH</strong></div>
-                <div class="text-muted small">Chỉnh sửa • Xóa</div>
-              </div>
-              <div>Ho Chi Minh City, Vietnam</div>
-              <div>098.xxx.xxx</div>
+            <!-- Address list will be rendered here dynamically -->
+            <div id="addresses-list">
+              <!-- Dynamic address cards will be inserted here by AccountController -->
             </div>
             
             <!-- Add Address Form (Initially Hidden) -->
-            <div class="add-address-form" id="addAddressForm">
+            <div class="add-address-form" id="addAddressForm" style="display: none;">
               <h6 class="mb-3">Thêm địa chỉ mới</h6>
               <div class="mb-3">
-                <label class="form-label">Tên đầy đủ</label>
-                <input type="text" class="form-control" placeholder="Enter full name" id="newFullName">
-              </div>
-                <div class="mb-3">
-                <label class="form-label">Tên đường</label>
-                <input type="text" class="form-control" placeholder="Enter street address" id="newAddress">
-              </div>
-              <div class="row mb-3">
-                <div class="col-6">
-                  <label class="form-label">Thành phố</label>
-                  <input type="text" class="form-control" placeholder="Enter city" id="newCity">
-                </div>
-                <div class="col-6">
-                  <label class="form-label">Tỉnh</label>
-                  <input type="text" class="form-control" placeholder="Enter state" id="newState">
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-6">
-                  <label class="form-label">Mã ZIP</label>
-                  <input type="text" class="form-control" placeholder="Enter ZIP code" id="newZip">
-                </div>
-                <label for="country">Nước</label>
-                  <input list="countries" id="country" name="country" class="form-control">
-                  <datalist id="countries">
-                    <option value="Vietnam">
-                    <option value="United States">
-                    <option value="Canada">
-                    <option value="United Kingdom">
-                  </datalist>
-
+                <label class="form-label">Tên địa chỉ</label>
+                <input type="text" class="form-control" placeholder="VD: Nhà riêng, Văn phòng" id="addressName">
               </div>
               <div class="mb-3">
-                <label class="form-label">Số điện thoại</label>
-                <input type="text" class="form-control" placeholder="Enter phone number" id="newPhone">
+                <label class="form-label">Địa chỉ đầy đủ</label>
+                <input type="text" class="form-control" placeholder="Số nhà, tên đường" id="fullAddress">
+              </div>
+              <div class="row mb-3">
+                <div class="col-6">
+                  <label class="form-label">Phường/Xã</label>
+                  <input type="text" class="form-control" placeholder="Nhập phường/xã" id="ward">
                 </div>
-                <div class="mb-3">
+                <div class="col-6">
+                  <label class="form-label">Quận/Huyện</label>
+                  <input type="text" class="form-control" placeholder="Nhập quận/huyện" id="district">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-6">
+                  <label class="form-label">Thành phố/Tỉnh</label>
+                  <input type="text" class="form-control" placeholder="Nhập thành phố" id="city">
+                </div>
+                <div class="col-6">
+                  <label class="form-label">Mã bưu điện</label>
+                  <input type="text" class="form-control" placeholder="6 chữ số" id="postalCode" pattern="\d{6}">
+                </div>
+              </div>
+              <div class="mb-3">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="setAsDefault">
-                  <label class="form-check-label" for="setAsDefault">
-                    Đặt địa chỉ mặc định
+                  <input class="form-check-input" type="checkbox" id="isDefault">
+                  <label class="form-check-label" for="isDefault">
+                    Đặt làm địa chỉ mặc định
                   </label>
                 </div>
               </div>
@@ -433,6 +412,10 @@
                 <button class="btn btn-primary-custom" onclick="saveAddress()">Lưu địa chỉ</button>
                 <button class="btn btn-outline-secondary" onclick="cancelAddAddress()">Hủy</button>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
             </div>
           </div>
         </div>
@@ -488,6 +471,69 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // Global functions for address management (called from HTML onclick)
+  window.toggleAddressForm = function() {
+    const form = document.getElementById('addAddressForm');
+    if (form) {
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      // Clear form if showing
+      if (form.style.display === 'block') {
+        window.clearAddressForm();
+      }
+    }
+  };
+
+  window.saveAddress = function() {
+    // This will be called by AccountController
+    if (window.accountControllerInstance) {
+      window.accountControllerInstance.handleSaveAddress();
+    }
+  };
+
+  window.cancelAddAddress = function() {
+    const form = document.getElementById('addAddressForm');
+    if (form) {
+      form.style.display = 'none';
+      window.clearAddressForm();
+    }
+  };
+
+  window.clearAddressForm = function() {
+    document.getElementById('addressName').value = '';
+    document.getElementById('fullAddress').value = '';
+    document.getElementById('ward').value = '';
+    document.getElementById('district').value = '';
+    document.getElementById('city').value = '';
+    document.getElementById('postalCode').value = '';
+    document.getElementById('isDefault').checked = false;
+    
+    // Clear editing state
+    if (window.accountControllerInstance) {
+      window.accountControllerInstance.editingAddressId = null;
+    }
+  };
+
+  window.editAddress = function(addressId) {
+    if (window.accountControllerInstance) {
+      window.accountControllerInstance.handleEditAddress(addressId);
+    }
+  };
+
+  window.deleteAddress = function(addressId) {
+    if (window.accountControllerInstance) {
+      window.accountControllerInstance.handleDeleteAddress(addressId);
+    }
+  };
+
+  window.setDefaultAddress = function(addressId) {
+    if (window.accountControllerInstance) {
+      window.accountControllerInstance.handleSetDefaultAddress(addressId);
+    }
+  };
+</script>
+
 <script type="module" src="/dist/src/assets/js/components/Account.js"></script>
 </body>
 </html>
