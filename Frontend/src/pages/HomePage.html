@@ -7,6 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/pages/HomePage.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -99,22 +100,20 @@
       </div>
   </div>
 </nav>
-
-
 <!-- Banner -->
-<section class="banner bg-dark container my-2">
-  <div class="row">
-    <div class="col-md-8 p-0 m-0 bg-light">
+<section class="banner container mt-4 ">
+  <div class="row bg-dark p-2 rounded-1">
+    <div class="col-md-9 p-0 m-0  bg-light">
       <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
         <div class="carousel-inner">
           <div class="carousel-item active">
-            <img src="../../public/images/Rectangle 24 (1).png" class="d-block w-100" alt="banner1">
+            <img src="../../public/images/Rectangle 24.png" class="d-block w-100" alt="banner1">
           </div>
           <div class="carousel-item">
             <img src="../../public/images/Rectangle 22.png" class="d-block w-100" alt="banner2">
           </div>
           <div class="carousel-item">
-            <img src="../../public/images/Rectangle 23 (1).png" class="d-block w-100" alt="banner3">
+            <img src="../../public/images/Rectangle 23.png" class="d-block w-100" alt="banner3">
           </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
@@ -127,10 +126,10 @@
     </div>
 
     <!-- Right content -->
-    <div class="col-md-4 d-flex p-5 flex-column justify-content-center">
-      <h2 class="text-primary fw-bold" style="text-align: right;">LEGO CITY</h2>
-      <p>Khám phá thành phố của riêng bạn</p>
-      <button class="btn btn-danger"><i style="margin-right: 7px;" class="fa-solid fa-cart-shopping"></i>Mua ngay</button>
+    <div class="col-md-3 d-flex p-3 flex-column justify-content-center text-end">
+      <h2 class="text-white fw-bold" style="text-align: right; font-family: 'Montserrat', Arial, sans-serif;"><b>LEGO CITY</b></h2>
+      <p class ="text-white ">Khám phá thành phố của riêng bạn</p>
+      <button class="btn btn-buy w-50 text-white border border-white align-self-end rounded-4"><i style="margin-right: 7px;" class="fa-solid fa-cart-shopping"></i>Mua ngay</button>
     </div>
   </div>
 </section>
@@ -139,21 +138,22 @@
 <section class="container my-4">
   <div class="row g-4">
     <div class="col-md-3">
-      <div class="category p-3">
-        <h5 class="text-primary fw-bold mb-3">Danh mục</h5>
-        <p>Cảnh sát</p>
-        <p>Lính cứu hỏa</p>
-        <p>Dịch vụ & Vận chuyển</p>
-        <p>Xây dựng</p>
-        <p>Tàu hỏa</p>
-        <p>Sân bay</p>
-        <p>Cảng biển</p>
+      <div class="category pb-1 text-center">
+        <h5 class="text-white fw-bold m-0 p-3 rounded-top-3" style="background-color: #0D9BFF;">Danh mục</h5>
+        <ul class="list-unstyled ">
+          <li>Cảnh sát</li>
+          <li>Lính cứu hỏa</li>
+          <li>Dịch vụ & Vận chuyển</li>
+          <li>Xây dựng</li>
+          <li>Tàu hỏa</li>
+          <li>Sân bay</li>
+          <li>Cảng biển</li>
+        </ul>
       </div>
     </div>
-
     <div class="col-md-9">
       <div class="d-flex gap-2 mb-3">
-        <button class="btn btn-primary">Mới nhất</button>
+        <button class="btn text-white" style ="background-color: #0D9BFF;">Mới nhất</button>
         <button class="btn btn-secondary">Phổ biến</button>
         <button class="btn btn-secondary">Bộ lọc</button>
       </div>
@@ -163,7 +163,7 @@
 </section>
 
 <!-- Promotion -->
-<section class="container my-5 pb-3" style="background-color: rgb(212, 238, 255);">
+<section class="container my-5 p-3 rounded-3" style="background-color: rgb(212, 238, 255);">
   <h3 class="text-primary fw-bold mb-3">KHUYẾN MÃI</h3>
   <div class="row">
     <div class="col-md-3">
@@ -171,10 +171,55 @@
         <img src="../../public/images/Group 60.png" class="img h-100 w-100" alt="lego">
       </div>
     </div>
+    <div class="col-md-3">
+      <div class="promotion-box p-0">
+        <img src="../../public/images/Group 60.png" class="img h-100 w-100" alt="lego">
+      </div>
+    </div>
 
-    <div class="col-md-5 ms-2 rounded-3" style="background-color: #e4e4e4;">
+    <div class="col-12 col-md-6 rounded-3" style="background-color: #F5F5F5;">
       <!-- Voucher -->
-      <div class="voucher mt-3">
+      <div class="voucher mt-4 mx-auto">
+        <div class="voucher-left">
+          <span class="tag">Số lượng có hạn</span>
+          <div class="voucher-img"></div>
+        </div>
+        <div class="voucher-right">
+          <div class="voucher-title">
+            <span class="badge">Giảm giá</span>
+            Giảm 15% cho đơn hàng trên 15k
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:44%"></div>
+          </div>
+          <div class="voucher-info">
+            <span>Còn 44%</span> - 
+            <span class="expire">Hết hạn sau 23 giờ</span>
+          </div>
+          <button class="view-btn">Xem ngay</button>
+        </div>
+      </div>
+      <div class="voucher mt-3 mx-auto">
+        <div class="voucher-left">
+          <span class="tag">Số lượng có hạn</span>
+          <div class="voucher-img"></div>
+        </div>
+        <div class="voucher-right">
+          <div class="voucher-title">
+            <span class="badge">Giảm giá</span>
+            Giảm 15% cho đơn hàng trên 15k
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:44%"></div>
+          </div>
+          <div class="voucher-info">
+            <span>Còn 44%</span> - 
+            <span class="expire">Hết hạn sau 23 giờ</span>
+          </div>
+          <button class="view-btn">Xem ngay</button>
+        </div>
+      </div>
+      <div class="voucher mt-3 mx-auto">
         <div class="voucher-left">
           <span class="tag">Số lượng có hạn</span>
           <div class="voucher-img"></div>
@@ -195,15 +240,6 @@
         </div>
       </div>
     </div>
-
-    <div class="col-md-3 ms-5 bg-danger">
-      <div class="row">
-        <div class="promotion-box p-0">
-          <img src="../../public/images/Group 60.png" class="img h-100 w-100" alt="lego">
-        </div>
-      </div>
-    </div>
-  </div>
 </section>
 
 <!-- Recommended Product -->
