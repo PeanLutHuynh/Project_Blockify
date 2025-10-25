@@ -331,11 +331,12 @@ export class CartController {
       return;
     }
 
-    // Redirect to checkout page (implement later)
-    this.showToast('success', 'Chức năng thanh toán đang được phát triển');
-    
-    // For now, just log the purchase
-    console.log('Purchase items:', selectedItems.map(item => item.toJSON()));
+    // Store selected items in sessionStorage for order page
+    const selectedItemsData = selectedItems.map(item => item.toJSON());
+    sessionStorage.setItem('checkoutItems', JSON.stringify(selectedItemsData));
+
+    // Redirect to order page
+    window.location.href = '/src/pages/OrderPage.html';
   }
 
   /**

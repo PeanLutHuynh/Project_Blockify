@@ -8,4 +8,5 @@ export interface IUserRepository extends IRepository<User> {
   findActiveUsers(): Promise<User[]>;
   existsByEmail(email: string): Promise<boolean>;
   existsByUsername(username: string): Promise<boolean>;
+  getUserAddresses(userId: string): Promise<any[]>;
 }

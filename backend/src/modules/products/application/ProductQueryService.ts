@@ -46,6 +46,36 @@ export class ProductQueryService {
   }
 
   /**
+   * Get multiple products by IDs
+   * Used for cart stock validation
+   */
+  async getProductsByIds(ids: number[]): Promise<Product[]> {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          product_id,
+          product_name,
+          price,
+          stock_quantity,
+          product_images(image_url, is_primary)
+        `)
+        .in('product_id', ids);
+
+      if (error) throw error;
+
+      // Transform to include image
+      return (data || []).map((item: any) => ({
+        ...item,
+        image: item.product_images?.[0]?.image_url || '/public/images/placeholder.jpg'
+      }));
+    } catch (error) {
+      logger.error('Get products by IDs error:', error);
+      return [];
+    }
+  }
+
+  /**
    * Get product by slug (for product detail page)
    */
   async getProductBySlug(slug: string): Promise<any | null> {

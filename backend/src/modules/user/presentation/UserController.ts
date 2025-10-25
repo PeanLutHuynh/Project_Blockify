@@ -108,4 +108,14 @@ export class UserController extends BaseController<User> {
       this.sendResponse(res, 500, undefined, undefined, (error as Error).message);
     }
   }
+
+  async getUserAddresses(req: HttpRequest, res: HttpResponse): Promise<void> {
+    try {
+      const { id } = req.params;
+      const addresses = await this.userService.getUserAddresses(id);
+      this.sendResponse(res, 200, addresses, 'User addresses retrieved successfully');
+    } catch (error) {
+      this.sendResponse(res, 500, undefined, undefined, (error as Error).message);
+    }
+  }
 }
