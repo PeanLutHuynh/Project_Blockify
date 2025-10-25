@@ -109,4 +109,8 @@ export class UserService extends BaseService<User> {
     const updatedUser = user.updateLastLogin();
     return await this.userRepository.update(id, updatedUser);
   }
+
+  async getUserAddresses(userId: string): Promise<any[]> {
+    return await this.userRepository.getUserAddresses(userId);
+  }
 }

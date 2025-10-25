@@ -56,6 +56,14 @@ export class ProductService {
   }
 
   /**
+   * Get multiple products by IDs
+   * Used for cart stock validation
+   */
+  async getProductsByIds(ids: number[]): Promise<Product[]> {
+    return this.queryService.getProductsByIds(ids);
+  }
+
+  /**
    * Get product by slug (for product detail page)
    * @deprecated Use ProductQueryService.getProductBySlug() instead
    */

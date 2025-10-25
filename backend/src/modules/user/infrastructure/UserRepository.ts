@@ -164,4 +164,28 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
 
     return data;
   }
+
+  async getUserAddresses(userId: string): Promise<any[]> {
+    try {
+      console.log('[UserRepository] Getting addresses for userId:', userId);
+      
+      const { data, error } = await supabase
+        .from('user_addresses')
+        .select('*')
+        .eq('user_id', userId)
+        .order('is_default', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('[UserRepository] Database error:', error);
+        throw error;
+      }
+      
+      console.log('[UserRepository] Found addresses:', data?.length || 0);
+      return data || [];
+    } catch (error) {
+      console.error('[UserRepository] Exception:', error);
+      throw new Error(`Error getting user addresses: ${error}`);
+    }
+  }
 }

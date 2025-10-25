@@ -303,7 +303,7 @@ export class CartService {
       const productIds = items.map(item => item.productId);
 
       // Fetch latest product data from backend
-      const response = await httpClient.post<any>('/api/products/check-stock', {
+      const response = await httpClient.post<any>('/api/v1/products/check-stock', {
         productIds
       });
 
