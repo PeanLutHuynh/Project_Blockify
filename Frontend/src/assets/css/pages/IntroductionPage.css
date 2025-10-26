@@ -1,5 +1,5 @@
 body {
-  font-family: Arial, sans-serif;
+  background-color: #ffffff;
   margin: 0;
   padding: 0;
   }
@@ -45,13 +45,21 @@ body {
   align-items: center;
   gap: 15px;
   }
-  .search-icon,
-  .cart-icon {
-  color: white;
+  .search-icon{
+  background-color: rgb(255, 255, 255);
   font-size: 1.2rem;
+  border-radius: 5px;
   text-decoration: none;
   transition: opacity 0.3s;
+  padding: 0 90px 0 5px;
   }
+  .cart-icon {
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: opacity 0.3s;
+    padding: 0 20px;
+    color: white;
+    }
   .search-icon:hover,
   .cart-icon:hover {
   color: white;
@@ -107,24 +115,12 @@ body {
     background: #000;
   }
   
-  /* Hiệu ứng chuyển ảnh */
-  @keyframes hero-slide {
-    0%   { transform: translateX(0%); }
-    30%  { transform: translateX(0%); }
-    
-    35%  { transform: translateX(-100%); }
-    65%  { transform: translateX(-100%); }
-    
-    70%  { transform: translateX(-200%); }
-    100% { transform: translateX(-200%); }
-  }
-  
   
   /* Intro Section */
   .intro {
   padding: 40px 20px;
   text-align: center;
-  background: #f5f5f5;
+  background: #ffffff;
   }
   
   /* Blue Section */
@@ -132,10 +128,10 @@ body {
   margin: 0;
   padding: 0;
   color: rgb(0, 0, 0);
-  background-image: url('../../../../public/images/Frame\ 33.png');
+  background-image: url('../../../../public/images/Frame 26.png');
   background-size: contain;
   background-repeat: no-repeat;
-  height: 200vh;
+  height: 225vh;
   background-position: center;
   position: relative;
   }
@@ -164,14 +160,14 @@ body {
   .content1 {
   font-size: 2rem;
   padding: 40px;
-  background-color: #f8f9fa;
+  background-color: #ffffff;
   color: #333;
   }
   .content2 {
   font-size: 2rem;
   margin-right: 1rem;
   padding: 40px;
-  background-color: #fff;
+  background-color: #ffffff;
   color: #333;
   }
   
@@ -186,13 +182,13 @@ body {
   }
   
   /* Card hover effects */
-  .card {
+  .card1 {
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
   overflow: hidden;
   }
-  .card::before {
+  .card1::before {
   content: '';
   position: absolute;
   top: 0; left: 0;
@@ -202,10 +198,10 @@ body {
   transition: opacity 0.3s ease;
   z-index: 1;
   }
-  .card:hover::before {
+  .card1:hover::before {
   opacity: 1;
   }
-  .card:hover {
+  .card1:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   }
@@ -303,15 +299,15 @@ body {
   }
   
   /* Footer */
-  .footer {
+  .footer1 {
   position: relative;
   width: 100%;
-  height: 300px;
+  
   overflow: hidden;
   }
   .stripe-top {
   background-color: black;
-  height: 100px;
+  height: 30px;
   }
   .stripe-middle {
   height: 200px;
@@ -320,17 +316,20 @@ body {
   }
   .stripe-blue {
   background: #009dff;
-  height: 120px;
+  height: 170px;
   position: absolute;
-  bottom: 35px;
+  bottom: 80px;
   left: 0;
-  width: 40%;
+  width: 60%;
   z-index: 1;
+  }
+  .stripe-text{
+    font-size: 1.9ch;
   }
   .batman {
   position: absolute;
   top: 17px;
-  left: 40%;
+  left: 60%;
   transform: translateX(-50%);
   height: 300px;
   z-index: 2;
@@ -353,6 +352,12 @@ body {
   height: 70vh;
   padding: 2rem 1rem;
   background-size: contain;
+  }
+  .stripe-text{
+    font-size: 1.4ch;
+  }
+  .batman{
+    display:none;
   }
   .lmm1 {
   height: 10vh;
@@ -403,4 +408,61 @@ body {
     color: white;
     padding: 30px 0;
     text-align: center;
+}
+.img-img {
+  width: 100%;
+  height: 300px; /* cố định chiều cao khung ảnh */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+/* Ảnh bên trong */
+.img-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* co ảnh lại để lấp đầy mà không méo */
+  transition: transform 0.3s ease;
+}
+.text-img {
+  width: 100%;
+  height: 260px; /* cố định chiều cao khung ảnh */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+/* Ảnh bên trong */
+.text-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* co ảnh lại để lấp đầy mà không méo */
+  transition: transform 0.3s ease;
+}
+/* Hiệu ứng khi hover (tùy chọn) */
+.img-img:hover img {
+  transform: scale(1.05);
+}
+
+/* Căn 3 div đều nhau */
+.img-container ul {
+  padding: 0;
+  margin: 0;
+}
+
+.img-container li {
+  flex: 1; /* mỗi phần tử chiếm đều */
+  max-width: 32%; /* đảm bảo vừa đủ 3 cột */
+}
+.img-1-container{
+  background-image: url("../../../../public/images/Frame 38.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 30vh;
+  background-position: center;
 }

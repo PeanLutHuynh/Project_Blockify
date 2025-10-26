@@ -143,7 +143,7 @@ body, html {
 .welcome-title {
   font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 69px;
+  font-size: 48px;
   color: #0096f4;
   margin-bottom: 10px;
   line-height: 1;
@@ -152,7 +152,7 @@ body, html {
 .signin-label {
   font-family: 'Inter', sans-serif;
   font-weight: 400;
-  font-size: 24px;
+  font-size: 18px;
   color: #969696;
   margin-bottom: 10px;
 }
@@ -217,7 +217,7 @@ body, html {
 
 .show-password-check .form-check-label {
   font-family: 'Inter', sans-serif;
-  font-size: 24px;
+  font-size: 18px;
   color: black;
   margin-left: 15px;
   cursor: pointer;
@@ -232,9 +232,9 @@ body, html {
   padding: 10px 50px;
   font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 20px;
-  min-width: 192px;
-  height: 55px;
+  font-size: 16px;
+  min-width: 160px;
+  height: 48px;
   transition: all 0.3s ease;
 }
 
@@ -275,12 +275,12 @@ body, html {
   border-radius: 7px;
   padding: 12px 27px;
   font-family: 'Inter', sans-serif;
-  font-size: 20px;
+  font-size: 16px;
   color: black;
   display: inline-flex;
   align-items: center;
   gap: 19px;
-  height: 55px;
+  height: 48px;
   transition: all 0.3s ease;
 }
 
@@ -300,7 +300,7 @@ body, html {
 /* Responsive Design */
 @media (max-width: 1500px) {
   .welcome-title {
-      font-size: 62px;
+      font-size: 44px;
   }
   
   .left-section {
@@ -310,7 +310,7 @@ body, html {
 
 @media (max-width: 1200px) {
   .welcome-title {
-      font-size: 60px;
+      font-size: 42px;
   }
   
   .signin-label,
@@ -318,11 +318,11 @@ body, html {
   .show-password-check .form-check-label,
   .btn-signin,
   .btn-google {
-      font-size: 20px;
+      font-size: 16px;
   }
   
   .form-control-custom {
-      height: 60px;
+      height: 50px;
   }
   .deco-bottom-2 {
     width: 80px;
@@ -346,7 +346,7 @@ body, html {
   }
   
   .welcome-title {
-      font-size: 56px;
+      font-size: 40px;
   }
   
   .brand-text {
@@ -394,7 +394,7 @@ body, html {
   }
   
   .welcome-title {
-      font-size: 48px;
+      font-size: 36px;
       margin-top: 20px;
   }
 
@@ -410,10 +410,10 @@ body, html {
   }
   .btn-signin{
     padding: 10px 15px;
-    height: 50px;
+    height: 45px;
   }
   .btn-google{
-    height: 59px;
+    height: 45px;
   }
 }
 /* --- Container input --- */
@@ -444,4 +444,3 @@ body, html {
   color: #aaa;
   opacity: 1;
 }
-

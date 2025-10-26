@@ -363,4 +363,48 @@ export class ProductController {
       });
     }
   };
+
+  /**
+   * POST /api/products/check-stock
+   * 
+   * @description Check stock availability for multiple products
+   * Used by cart to validate stock before checkout
+   */
+  checkStock = async (req: HttpRequest, res: HttpResponse): Promise<void> => {
+    try {
+      const { productIds } = req.body;
+
+      if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
+        res.status(400).json({
+          success: false,
+          message: 'Product IDs are required'
+        });
+        return;
+      }
+
+      // Get products by IDs
+      const products = await this.productService.getProductsByIds(productIds);
+
+      res.json({
+        success: true,
+        data: {
+          products: products.map((p: any) => ({
+            id: p.product_id || p.id,
+            name: p.product_name || p.name,
+            price: p.price,
+            stock: p.stock_quantity || p.stock,
+            available: (p.stock_quantity || p.stock || 0) > 0,
+            image: p.image || p.product_images?.[0]?.image_url || '/public/images/placeholder.jpg'
+          }))
+        }
+      });
+
+    } catch (error) {
+      logger.error('Check stock error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Có lỗi xảy ra khi kiểm tra tồn kho'
+      });
+    }
+  };
 }

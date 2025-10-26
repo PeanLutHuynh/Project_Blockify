@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xác Nhận Đơn Hàng</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/pages/HomePage.css">
+  <link rel="stylesheet" href="../assets/css/pages/OrderPage.css">
+  <!-- Supabase JS SDK from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+      <a class="navbar-brand" href="IntroductionPage.html">Blockify</a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="HomePage.html">Trang chủ</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="IntroductionPage.html">Giới thiệu</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="Service.html">Dịch vụ</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="Contact.html">Hỏi đáp</a>
+          </li>
+        </ul>
+        
+        <div class="navbar-right-icons">
+          <a href="#" class="search-icon">
+            <i class="bi bi-search" id="openSearch"></i>
+          </a>
+          <a href="CartPage.html" class="cart-icon">
+            <i class="bi bi-cart"></i>
+          </a>
+          <a href="SigninPage.html" class="btn-sign">Đăng nhập</a>
+          <a href="SignupPage.html" class="btn-sign">Đăng ký</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        
+        <!-- Success Message -->
+        <div class="card text-center mb-4">
+          <div class="card-body py-5">
+            <div class="mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-check-circle text-success" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+              </svg>
+            </div>
+            <h3 class="text-success">Đặt Hàng Thành Công!</h3>
+            <p class="text-muted">Cảm ơn bạn đã đặt hàng. Đơn hàng của bạn đang được xử lý.</p>
+            <div class="mt-4">
+              <p class="mb-1">Mã đơn hàng:</p>
+              <h4 class="text-primary" id="order-number">Loading...</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Details -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Thông Tin Đơn Hàng</h5>
+          </div>
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Trạng thái:</strong></div>
+              <div class="col-sm-8">
+                <span class="badge bg-warning" id="order-status">Đang xử lý</span>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Ngày đặt:</strong></div>
+              <div class="col-sm-8" id="order-date">-</div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Khách hàng:</strong></div>
+              <div class="col-sm-8" id="customer-name">-</div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Số điện thoại:</strong></div>
+              <div class="col-sm-8" id="customer-phone">-</div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Email:</strong></div>
+              <div class="col-sm-8" id="customer-email">-</div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Địa chỉ giao hàng:</strong></div>
+              <div class="col-sm-8" id="shipping-address">-</div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Phương thức thanh toán:</strong></div>
+              <div class="col-sm-8" id="payment-method">-</div>
+            </div>
+            <div class="row">
+              <div class="col-sm-4"><strong>Trạng thái thanh toán:</strong></div>
+              <div class="col-sm-8">
+                <span class="badge bg-secondary" id="payment-status">Chưa thanh toán</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Sản Phẩm Đã Đặt</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Sản phẩm</th>
+                    <th class="text-center">Số lượng</th>
+                    <th class="text-end">Đơn giá</th>
+                    <th class="text-end">Thành tiền</th>
+                  </tr>
+                </thead>
+                <tbody id="order-items">
+                  <tr>
+                    <td colspan="4" class="text-center">Đang tải...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+              <span>Tạm tính:</span>
+              <span id="subtotal">0 VND</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Phí vận chuyển:</span>
+              <span id="shipping-fee">0 VND</span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between">
+              <strong>Tổng cộng:</strong>
+              <strong class="text-primary" id="total-amount">0 VND</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="text-center">
+          <a href="HomePage.html" class="btn btn-outline-primary me-2">Tiếp tục mua sắm</a>
+          <a href="Account.html" class="btn btn-primary">Xem đơn hàng của tôi</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module">
+    import { initializeApp } from '/dist/src/core/config/init.js';
+    import { initializeNavbarAuth } from '/dist/src/shared/components/NavbarAuth.js';
+    import { OrderService } from '/dist/src/core/services/OrderService.js';
+    import { AuthService } from '/dist/src/core/services/AuthService.js';
+
+    class OrderConfirmationController {
+      constructor() {
+        this.orderService = new OrderService();
+        this.authService = new AuthService();
+      }
+
+      async init() {
+        // ✅ Initialize app first (loads config, Supabase, auth)
+        await initializeApp();
+        
+        // ✅ Initialize navbar auth (same as other pages)
+        initializeNavbarAuth('.navbar-right-icons');
+
+        // Get order number from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderNumber = urlParams.get('orderNumber');
+
+        if (!orderNumber) {
+          alert('Không tìm thấy mã đơn hàng');
+          window.location.href = '/src/pages/HomePage.html';
+          return;
+        }
+
+        // ✅ Add delay to allow database commit
+        await this.delay(1000); // Wait 1 second
+
+        // Load order details with retry
+        await this.loadOrderDetailsWithRetry(orderNumber, 3);
+      }
+
+      // Helper method to delay execution
+      delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+      // Retry logic for loading order details
+      async loadOrderDetailsWithRetry(orderNumber, maxRetries = 3) {
+        let attempt = 0;
+        let lastError = null;
+
+        while (attempt < maxRetries) {
+          try {
+            await this.loadOrderDetails(orderNumber);
+            return; // Success, exit
+          } catch (error) {
+            lastError = error;
+            attempt++;
+            console.warn(`Load order attempt ${attempt} failed:`, error);
+            
+            if (attempt < maxRetries) {
+              console.log(`Retrying in 1 second...`);
+              await this.delay(1000);
+            }
+          }
+        }
+
+        // All retries failed
+        console.error('Failed to load order after retries:', lastError);
+        alert('Không thể tải thông tin đơn hàng. Vui lòng thử lại sau.');
+      }
+
+      async loadOrderDetails(orderNumber) {
+        const order = await this.orderService.getOrderByNumber(orderNumber);
+
+        if (!order) {
+          throw new Error('Order not found');
+        }
+
+        // Update order info
+        document.getElementById('order-number').textContent = order.orderNumber;
+        document.getElementById('order-status').textContent = order.status;
+        document.getElementById('order-date').textContent = order.orderedAt ? new Date(order.orderedAt).toLocaleString('vi-VN') : '-';
+        document.getElementById('customer-name').textContent = order.customerName;
+        document.getElementById('customer-phone').textContent = order.customerPhone;
+        document.getElementById('customer-email').textContent = order.customerEmail;
+        document.getElementById('shipping-address').textContent = `${order.shippingAddress}, ${order.shippingCity}`;
+        document.getElementById('payment-method').textContent = this.formatPaymentMethod(order.paymentMethod);
+        document.getElementById('payment-status').textContent = this.formatPaymentStatus(order.paymentStatus);
+
+        // Update order items
+        this.renderOrderItems(order.items);
+
+        // Update totals
+        document.getElementById('subtotal').textContent = this.formatPrice(order.subtotal);
+        document.getElementById('shipping-fee').textContent = this.formatPrice(order.shippingFee);
+        document.getElementById('total-amount').textContent = this.formatPrice(order.totalAmount);
+      }
+
+      renderOrderItems(items) {
+        const tbody = document.getElementById('order-items');
+        if (!tbody || !items || items.length === 0) return;
+
+        tbody.innerHTML = items.map(item => `
+          <tr>
+            <td>${item.productName || item.product_name || '-'}</td>
+            <td class="text-center">${item.quantity || 0}</td>
+            <td class="text-end">${this.formatPrice(item.unitPrice || item.unit_price)}</td>
+            <td class="text-end">${this.formatPrice(item.totalPrice || item.total_price)}</td>
+          </tr>
+        `).join('');
+      }
+
+      formatPaymentMethod(method) {
+        const methods = {
+          'bank_transfer': 'Chuyển khoản ngân hàng',
+          'momo': 'MoMo',
+          'zalopay': 'ZaloPay',
+          'vnpay': 'VNPAY',
+          'cod': 'Thanh toán khi nhận hàng'
+        };
+        return methods[method] || method;
+      }
+
+      formatPaymentStatus(status) {
+        const statuses = {
+          'pending': 'Chưa thanh toán',
+          'paid': 'Đã thanh toán',
+          'failed': 'Thất bại',
+          'refunded': 'Đã hoàn tiền'
+        };
+        return statuses[status] || status;
+      }
+
+      // ✅ Add null safety for price formatting
+      formatPrice(price) {
+        if (price === null || price === undefined || isNaN(price)) {
+          return '0 VND';
+        }
+        return price.toLocaleString('vi-VN') + ' VND';
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      const controller = new OrderConfirmationController();
+      controller.init();
+    });
+  </script>
+</body>
+</html>

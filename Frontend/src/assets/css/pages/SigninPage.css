@@ -21,7 +21,7 @@ body, html {
 
 /* Left Section */
 .left-section {
-  width: 740px;
+  width: 700px;
   height: 100%;
   position: relative;
   flex-shrink: 0;
@@ -47,10 +47,10 @@ body, html {
 
 .brand-text {
   position: absolute;
-  top: 47px;
-  left: 41px;
+  top: 40px;
+  left: 35px;
   font-family: 'Montserrat';
-  font-size: 64px;
+  font-size: 48px;
   color: white;
   z-index: 2;
 }
@@ -124,64 +124,64 @@ body, html {
 }
 
 .deco-bottom-2 {
-  width: 110px;
-  height: 60px;
+  width: 90px;
+  height: 50px;
   right: 7%;
   bottom: 60px;
   transform: rotate(341.454deg);
 }
 
 .deco-bottom-3 {
-  width: 90px;
-  height: 45px;
+  width: 80px;
+  height: 40px;
   left: 15%;
   bottom: 20px;
-  transform: rotate();
 }
 
 /* Welcome Section */
 .welcome-title {
   font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 69px;
+  font-size: 48px;
   color: #0096f4;
-  margin-bottom: 30px;
-  line-height: 1;
+  margin-bottom: 20px;
+  line-height: 1.1;
 }
 
 .signin-label {
   font-family: 'Inter', sans-serif;
   font-weight: 400;
-  font-size: 24px;
+  font-size: 18px;
   color: #969696;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 /* Input Groups */
 .input-group-custom {
   position: relative;
+  margin-bottom: 20px;
 }
 
 .input-icon {
   position: absolute;
-  left: 16px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 5;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .form-control-custom {
-  height: 60px;
+  height: 48px;
   border: 2px solid #0096f4;
   border-radius: 7px;
-  padding-left: 60px;
+  padding-left: 50px;
   font-family: 'Inter', sans-serif;
-  font-size: 24px;
+  font-size: 18px;
   color: #828282;
   background: white;
 }
@@ -197,13 +197,13 @@ body, html {
 
 /* Show Password Checkbox */
 .show-password-check {
-  margin-left: 20px;
-  margin-top: 15px;
+  margin-left: 10px;
+  margin-top: 10px;
 }
 
 .show-password-check .form-check-input {
-  width: 30px;
-  height: 30px;
+  width: 22px;
+  height: 22px;
   border-radius: 6px;
   background-color: #d9d9d9;
   border: none;
@@ -217,9 +217,9 @@ body, html {
 
 .show-password-check .form-check-label {
   font-family: 'Inter', sans-serif;
-  font-size: 24px;
+  font-size: 18px;
   color: black;
-  margin-left: 15px;
+  margin-left: 10px;
   cursor: pointer;
 }
 
@@ -229,13 +229,16 @@ body, html {
   color: white;
   border: none;
   border-radius: 7px;
-  padding: 15px 50px;
+  padding: 10px 35px;
   font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 24px;
-  min-width: 192px;
-  height: 63px;
+  font-size: 18px;
+  min-width: 150px;
+  height: 50px;
   transition: all 0.3s ease;
+
+  /* 👇 tạo khoảng cách với phần "Hiện mật khẩu" */
+  margin-top: 25px;
 }
 
 .btn-signin:hover {
@@ -249,7 +252,7 @@ body, html {
 .or-divider {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
   margin: 10px 0;
 }
 
@@ -262,9 +265,9 @@ body, html {
 
 .or-text {
   background: white;
-  padding: 8px 16px;
+  padding: 6px 12px;
   font-family: 'Inter', sans-serif;
-  font-size: 20px;
+  font-size: 16px;
   color: #090909;
 }
 
@@ -273,14 +276,14 @@ body, html {
   background: white;
   border: 1px solid black;
   border-radius: 7px;
-  padding: 12px 27px;
+  padding: 8px 20px;
   font-family: 'Inter', sans-serif;
-  font-size: 24px;
+  font-size: 18px;
   color: black;
   display: inline-flex;
   align-items: center;
-  gap: 19px;
-  height: 63px;
+  gap: 12px;
+  height: 50px;
   transition: all 0.3s ease;
 }
 
@@ -292,104 +295,60 @@ body, html {
 }
 
 .google-icon {
-  width: 41px;
-  height: 44px;
+  width: 30px;
+  height: 32px;
   object-fit: contain;
 }
 
 /* Responsive Design */
 @media (max-width: 1500px) {
   .welcome-title {
-      font-size: 62px;
+    font-size: 42px;
   }
-  
   .left-section {
-      width: 500px;
+    width: 480px;
   }
 }
 
 @media (max-width: 1200px) {
   .welcome-title {
-      font-size: 60px;
+    font-size: 38px;
   }
-  
   .signin-label,
   .form-control-custom,
   .show-password-check .form-check-label,
   .btn-signin,
   .btn-google {
-      font-size: 20px;
+    font-size: 16px;
   }
-  
   .form-control-custom {
-      height: 60px;
-  }
-  .deco-bottom-2 {
-    width: 80px;
-    height: 40px;
-    right: 5%;
-    bottom: 5%;
-    transform: rotate(341.454deg);
-  }
-  .deco-bottom-3 {
-    width: 80px;
-    height: 40px;
-    right: 5%;
-    bottom: 2%;
-    transform: rotate(18.826deg);
-  }
-}
-
-@media (max-width: 1112px) {
-  .left-section {
-      width: 400px;
-  }
-  
-  .welcome-title {
-      font-size: 56px;
-  }
-  
-  .brand-text {
-      font-size: 48px;
-  }
-  
-  .deco-bottom-2 {
-    width: 90px;
-    height: 40px;
-    right: 7%;
-    bottom: 5%;
-    transform: rotate(341.454deg);
+    height: 44px;
   }
 }
 
 @media (max-width: 778px) {
   .signin-page {
-      flex-direction: column;
+    flex-direction: column;
   }
-  
   .left-section {
-      width: 100%;
-      height: 150px;
+    width: 100%;
+    height: 130px;
   }
-  
   .brand-text {
-      top: 20px;
-      left: 20px;
-      font-size: 36px;
+    top: 15px;
+    left: 15px;
+    font-size: 32px;
   }
-  
   .right-section {
-      flex: 1;
+    flex: 1;
   }
-  
   .welcome-title {
-      font-size: 48px;
-      margin-top: 20px;
+    font-size: 34px;
+    margin-top: 15px;
   }
-  
   .deco-bottom-1,
   .deco-bottom-2,
   .deco-bottom-3 {
-      display: none;
+    display: none;
   }
 }
