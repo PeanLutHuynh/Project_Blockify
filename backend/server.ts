@@ -19,6 +19,7 @@ import { setupAdminRoutes } from './src/modules/admin/presentation/adminRoutes';
 import { productRoutes } from './src/modules/products/presentation/productRoutes';
 import { categoryRoutes } from './src/modules/products/presentation/categoryRoutes';
 import cartRoutes from './src/modules/cart/presentation/cartRoutes';
+import { registerOrderRoutes } from './src/modules/order/presentation/orderRoutes';
 
 /**
  * Bootstrap application with custom HTTP server
@@ -212,6 +213,9 @@ async function bootstrap() {
     server.useRouter('/api/v1/products', productRoutes); // Product routes
     server.useRouter('/api/v1/categories', categoryRoutes); // Category routes
     server.useRouter('/api/v1/cart', cartRoutes); // Cart routes
+
+    // Register order routes
+    registerOrderRoutes(server.getRouter());
 
     // Debug: Log all registered routes
     console.log('📋 Registered routes:');

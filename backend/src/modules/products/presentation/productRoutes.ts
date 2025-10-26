@@ -13,6 +13,10 @@ export function createProductRoutes(): Router {
   // GET /api/v1/products?limit=10&featured=true
   router.get('/', controller.getAllProducts);
 
+  // Check stock for multiple products
+  // POST /api/products/check-stock
+  router.post('/check-stock', controller.checkStock);
+
   // UC3 - Thanh tìm kiếm
   // GET /api/v1/products/search?q=keyword
   router.get('/search', controller.searchProducts);

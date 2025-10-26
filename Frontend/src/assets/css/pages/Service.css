@@ -45,13 +45,20 @@ body {
     gap: 15px;
   }
   
-  .search-icon,
   .cart-icon {
       color: white;
       font-size: 1.2rem;
       text-decoration: none;
       transition: opacity 0.3s;
   }
+  .search-icon{
+    background-color: rgb(255, 255, 255);
+    font-size: 1.2rem;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: opacity 0.3s;
+    padding: 0 90px 0 5px;
+    }
   
   .search-icon:hover,
   .cart-icon:hover {
