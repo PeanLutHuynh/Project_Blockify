@@ -155,16 +155,55 @@ export class AccountController {
       }
     }
 
+    // Update birth date dropdowns
+    if (this.currentUser.birthDate) {
+      const birthDateStr = this.currentUser.birthDate instanceof Date 
+        ? this.currentUser.birthDate.toISOString() 
+        : this.currentUser.birthDate;
+      this.populateBirthDate(birthDateStr);
+    }
+
     // Update large avatar in the profile section
     const largeAvatar = document.querySelector('.large-avatar') as HTMLImageElement;
     if (largeAvatar) {
       largeAvatar.src = this.currentUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentUser.getDisplayName())}&background=random`;
     }
 
-    // Set all fields to editable by default (TODO: implement readonly mode properly)
-    // this.setProfileFieldsReadonly(true);
+    // Set fields to readonly mode by default
+    this.setProfileFieldsReadonly(true);
 
     console.log('✅ User data populated successfully');
+  }
+
+  /**
+   * Populate birth date into dropdowns
+   */
+  private populateBirthDate(birthDate: string): void {
+    try {
+      const date = new Date(birthDate);
+      const day = date.getDate();
+      const month = date.getMonth() + 1; // 0-indexed
+      const year = date.getFullYear();
+
+      const dayButton = document.getElementById('day-button');
+      const monthButton = document.getElementById('month-button');
+      const yearButton = document.getElementById('year-button');
+
+      if (dayButton) dayButton.textContent = day.toString();
+      
+      if (monthButton) {
+        const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                           'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+        monthButton.textContent = monthNames[month - 1];
+        monthButton.setAttribute('data-value', month.toString());
+      }
+      
+      if (yearButton) yearButton.textContent = year.toString();
+
+      console.log('✅ Birth date populated:', { day, month, year });
+    } catch (error) {
+      console.error('❌ Error parsing birth date:', error);
+    }
   }
 
   /**
@@ -212,8 +251,149 @@ export class AccountController {
    */
   public handleEditProfile(): void {
     console.log('🔓 Enabling edit mode');
-    // this.isEditingProfile = true; // TODO: Re-enable for readonly mode
     this.setProfileFieldsReadonly(false);
+  }
+
+  /**
+   * Handle avatar upload
+   */
+  public async handleAvatarUpload(): Promise<void> {
+    // Create file input element
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    
+    fileInput.onchange = async (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      
+      if (!file) return;
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Kích thước file không được vượt quá 5MB');
+        return;
+      }
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Vui lòng chọn file hình ảnh');
+        return;
+      }
+      
+      try {
+        // Show loading state
+        const avatars = document.querySelectorAll('.avatar, .large-avatar') as NodeListOf<HTMLImageElement>;
+        const originalSrcs: string[] = [];
+        
+        avatars.forEach((avatar, index) => {
+          originalSrcs[index] = avatar.src;
+          avatar.style.opacity = '0.5';
+        });
+        
+        // Show preview immediately
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const base64String = event.target?.result as string;
+          avatars.forEach(avatar => {
+            avatar.src = base64String;
+          });
+        };
+        reader.readAsDataURL(file);
+        
+        // Upload to backend
+        console.log('🔍 Checking authentication...');
+        console.log('  - currentUser:', this.currentUser);
+        console.log('  - currentUser.id:', this.currentUser?.id);
+        
+        if (!this.currentUser?.id) {
+          console.error('❌ No current user ID');
+          alert('Vui lòng đăng nhập lại');
+          avatars.forEach((avatar, index) => {
+            avatar.src = originalSrcs[index];
+            avatar.style.opacity = '1';
+          });
+          return;
+        }
+
+        console.log('📤 Uploading avatar for user:', this.currentUser.id);
+
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        const token = localStorage.getItem('blockify_auth_token');
+        console.log('🔑 Token exists:', !!token);
+        
+        if (!token) {
+          console.error('❌ No access token');
+          alert('Vui lòng đăng nhập lại');
+          avatars.forEach((avatar, index) => {
+            avatar.src = originalSrcs[index];
+            avatar.style.opacity = '1';
+          });
+          return;
+        }
+
+        const response = await fetch(`http://localhost:3001/api/v1/users/${this.currentUser.id}/avatar`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+
+        console.log('📡 Response status:', response.status);
+        console.log('📡 Response headers:', [...response.headers.entries()]);
+
+        const result = await response.json();
+        console.log('📡 Response body:', result);
+
+        if (result.success && response.ok) {
+          console.log('✅ Avatar uploaded successfully:', result.data);
+          
+          alert('Cập nhật ảnh đại diện thành công!');
+          
+          // Update user data from response
+          if (result.data && result.data.avatar_url) {
+            // Create new user object with updated avatar
+            const updatedUser = User.fromApiResponse(result.data);
+            this.currentUser = updatedUser;
+            authService['setCurrentUser'](updatedUser);
+            
+            // Update all avatars with new URL
+            avatars.forEach(avatar => {
+              avatar.src = result.data.avatar_url;
+            });
+          }
+        } else {
+          console.error('❌ Failed to upload avatar:', result.message);
+          alert(result.message || 'Không thể cập nhật ảnh đại diện');
+          
+          // Restore original images
+          avatars.forEach((avatar, index) => {
+            avatar.src = originalSrcs[index];
+          });
+        }
+        
+        // Restore opacity
+        avatars.forEach(avatar => {
+          avatar.style.opacity = '1';
+        });
+        
+      } catch (error: any) {
+        console.error('❌ Error uploading avatar:', error);
+        alert('Có lỗi xảy ra khi tải ảnh lên');
+        
+        // Restore opacity
+        const avatars = document.querySelectorAll('.avatar, .large-avatar') as NodeListOf<HTMLImageElement>;
+        avatars.forEach(avatar => {
+          avatar.style.opacity = '1';
+        });
+      }
+    };
+    
+    // Trigger file input click
+    fileInput.click();
   }
 
   /**
@@ -356,26 +536,79 @@ export class AccountController {
 
       const updateData: any = {};
 
-      if (nameInput?.value) {
-        updateData.fullName = nameInput.value.trim();
+      // Only include fields that have values
+      if (nameInput?.value?.trim()) {
+        const fullName = nameInput.value.trim();
+        if (fullName.length < 2) {
+          alert('Tên phải có ít nhất 2 ký tự');
+          return;
+        }
+        if (fullName.length > 100) {
+          alert('Tên không được vượt quá 100 ký tự');
+          return;
+        }
+        updateData.fullName = fullName;
       }
 
-      if (phoneInput?.value) {
-        updateData.phone = phoneInput.value.trim();
+      if (phoneInput?.value?.trim()) {
+        const phone = phoneInput.value.trim().replace(/\s/g, '');
+        // Validate Vietnam phone: 10 digits, starts with 0
+        const phoneRegex = /^0\d{9}$/;
+        if (!phoneRegex.test(phone)) {
+          alert('Số điện thoại không hợp lệ. Phải là số điện thoại Việt Nam (10 chữ số, bắt đầu bằng 0)');
+          return;
+        }
+        updateData.phone = phone;
       }
 
       if (genderRadio?.value) {
-        updateData.gender = genderRadio.value;
+        const gender = genderRadio.value.toLowerCase();
+        if (!['male', 'female', 'other'].includes(gender)) {
+          alert('Giới tính không hợp lệ');
+          return;
+        }
+        updateData.gender = gender;
       }
 
-      // Add birth date if all values are selected
-      if (day && month && year) {
+      // Add birth date only if ALL values are selected and valid
+      if (day && month && year && day > 0 && month > 0 && year > 0) {
+        // Validate date is not in future
         const birthDate = new Date(year, month - 1, day);
+        const today = new Date();
+        
+        if (birthDate > today) {
+          alert('Ngày sinh không thể là ngày trong tương lai');
+          return;
+        }
+        
+        // Validate user age >= 13
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const adjustedAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
+        
+        if (adjustedAge < 13) {
+          alert('Bạn phải ít nhất 13 tuổi');
+          return;
+        }
+        
+        // Validate reasonable date (not before 1900)
+        if (year < 1900 || adjustedAge > 150) {
+          alert('Ngày sinh không hợp lệ');
+          return;
+        }
+        
+        // Format as ISO string for backend
         updateData.birthDate = birthDate.toISOString();
       }
 
       console.log('📤 Updating profile with data:', updateData);
       console.log('📤 User ID:', this.currentUser.id);
+
+      // Validate that we have at least one field to update
+      if (Object.keys(updateData).length === 0) {
+        alert('Không có thông tin nào để cập nhật');
+        return;
+      }
 
       // Call backend API to update user profile
       const response = await httpClient.put<any>(`/api/v1/users/${this.currentUser.id}/profile`, updateData);
@@ -392,19 +625,29 @@ export class AccountController {
         
         alert('Cập nhật thông tin thành công!');
         
-        // Reset to readonly mode (TODO: Re-enable for readonly mode)
-        // this.isEditingProfile = false;
-        // this.setProfileFieldsReadonly(true);
+        // Reset to readonly mode
+        this.setProfileFieldsReadonly(true);
         
         // Refresh UI
         this.populateUserData();
       } else {
         console.error('❌ Failed to update profile:', response.message);
-        alert(response.message || 'Không thể cập nhật thông tin');
+        
+        // Show more specific error message
+        const errorMsg = response.message || response.error || 'Không thể cập nhật thông tin';
+        alert(errorMsg);
       }
     } catch (error: any) {
       console.error('❌ Error updating profile:', error);
-      alert(error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật thông tin');
+      console.error('Error details:', error.response?.data);
+      
+      // Show more specific error message
+      const errorMessage = error.response?.data?.message 
+        || error.response?.data?.error 
+        || error.message 
+        || 'Có lỗi xảy ra khi cập nhật thông tin';
+      
+      alert('Lỗi: ' + errorMessage);
     }
   }
 
@@ -429,7 +672,7 @@ export class AccountController {
     if (!this.currentUser || !this.currentUser.id) {
       console.error('❌ getUserId called but no currentUser or id');
       console.log('📊 currentUser:', this.currentUser);
-      throw new Error('No current user or user ID');
+      return 0; // Return 0 instead of throwing error
     }
     const userId = typeof this.currentUser.id === 'string' ? parseInt(this.currentUser.id) : this.currentUser.id;
     console.log('🆔 getUserId returning:', userId);
@@ -440,10 +683,18 @@ export class AccountController {
    * Load user addresses
    */
   private async loadAddresses(): Promise<void> {
-    if (!this.currentUser) return;
+    if (!this.currentUser || !this.currentUser.id) {
+      console.warn('⚠️ Cannot load addresses: no current user');
+      return;
+    }
 
     try {
       const userId = this.getUserId();
+      if (!userId) {
+        console.warn('⚠️ Cannot load addresses: invalid user ID');
+        return;
+      }
+      
       const response = await userProfileService.getUserAddresses(userId);
 
       if (response.success && response.data) {

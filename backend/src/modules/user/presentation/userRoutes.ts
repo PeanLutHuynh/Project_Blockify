@@ -5,6 +5,7 @@ import { UserRepository } from '../infrastructure/UserRepository';
 import { UserProfileController } from '../presentation/UserProfileController';
 import { UserProfileService } from '../application/UserProfileService';
 import { authenticateToken } from '../../../infrastructure/auth/authMiddleware';
+import { multipartMiddleware } from '../../../infrastructure/upload/MultipartParser';
 
 // Dependency injection
 const userRepository = new UserRepository();
@@ -76,6 +77,15 @@ export function createUserRouter(): Router {
   router.addRoute('PUT', '/:userId/profile', async (req, res) => {
     await authenticateToken(req, res, async () => {
       await userProfileController.updateProfile(req, res);
+    });
+  });
+
+  // Avatar Upload route - Protected (with multipart middleware)
+  router.addRoute('POST', '/:userId/avatar', async (req, res) => {
+    await authenticateToken(req, res, async () => {
+      await multipartMiddleware()(req, res, async () => {
+        await userProfileController.uploadAvatar(req, res);
+      });
     });
   });
   
