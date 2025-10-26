@@ -20,6 +20,7 @@ import { productRoutes } from './src/modules/products/presentation/productRoutes
 import { categoryRoutes } from './src/modules/products/presentation/categoryRoutes';
 import cartRoutes from './src/modules/cart/presentation/cartRoutes';
 import { registerOrderRoutes } from './src/modules/order/presentation/orderRoutes';
+import { registerPaymentProofRoutes } from './src/modules/order/presentation/paymentProofRoutes';
 
 /**
  * Bootstrap application with custom HTTP server
@@ -216,6 +217,9 @@ async function bootstrap() {
 
     // Register order routes
     registerOrderRoutes(server.getRouter());
+
+    // Register payment proof routes
+    registerPaymentProofRoutes(server.getRouter());
 
     // Debug: Log all registered routes
     console.log('📋 Registered routes:');
