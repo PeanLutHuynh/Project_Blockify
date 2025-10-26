@@ -299,7 +299,7 @@ body {
   
   .navbar-nav .nav-link:hover,
   .navbar-nav .nav-link.active {
-    color: white !important;
+    color: rgb(92, 92, 92) !important;
     opacity: 0.8;
   }
   
