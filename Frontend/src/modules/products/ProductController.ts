@@ -1,7 +1,6 @@
 // Import product service for real API calls
 import { productService } from '../../core/services/ProductService.js';
 import { Product } from '../../core/models/Product.js';
-import { cartService } from '../../core/services/CartService.js';
 
 /**
  * ProductController - MVC Controller
@@ -77,9 +76,6 @@ export class ProductController {
     const col = document.createElement('div');
     col.className = 'col-md-4 col-sm-6 mb-4';
     
-    const effectivePrice = product.salePrice && product.salePrice > 0 ? product.salePrice : product.price;
-    const hasSalePrice = product.salePrice && product.salePrice > 0 && product.salePrice < product.price;
-    
     col.innerHTML = `
       <div class="product-card shadow-sm">
         <div class="product-image position-relative">
@@ -87,13 +83,11 @@ export class ProductController {
           <img src="${product.imageUrl || '/public/images/2.jpg'}" 
                alt="${product.name}"
                style="width: 100%; height: 250px; object-fit: cover;">
-          ${hasSalePrice ? '<span class="badge bg-danger position-absolute top-0 end-0 m-2">Sale</span>' : ''}
         </div>
         <div class="product-info p-3">
           <div class="mb-2">
-            <span class="${product.isSoldOut() ? 'text-danger' : 'text-success'}">
-              <i class="bi bi-${product.isSoldOut() ? 'x-circle' : 'check-circle'}-fill"></i> 
-              ${product.isSoldOut() ? 'Hết hàng' : 'Còn hàng'}
+            <span class="text-success">
+              <i class="bi bi-check-circle-fill"></i> Còn hàng
             </span>
             <span class="mx-2">|</span>
             <span class="text-muted">Mã: #${product.id}</span>
@@ -104,25 +98,10 @@ export class ProductController {
         <div class="product-description px-3 text-muted small" style="height: 60px; overflow: hidden;">
           ${product.description}
         </div>
-        <div class="product-price px-3 py-2">
-          ${hasSalePrice ? 
-            `<span class="text-decoration-line-through text-muted me-2">${this.formatPrice(product.price)}</span>
-             <span class="text-danger fw-bold">${this.formatPrice(effectivePrice)}</span>` 
-            : this.formatPrice(product.price)
-          }
-        </div>
+        <div class="product-price px-3 py-2">${this.formatPrice(product.price)}</div>
         <div class="px-3 pb-3">
-          <button class="btn-cart w-100" 
-                  data-product-id="${product.id}"
-                  data-product-name="${product.name}"
-                  data-product-slug="${product.slug}"
-                  data-product-price="${product.price}"
-                  data-product-sale-price="${product.salePrice || 0}"
-                  data-product-image="${product.imageUrl}"
-                  data-stock-quantity="${product.stockQuantity}"
-                  data-min-stock-level="${product.minStockLevel}"
-                  ${product.isSoldOut() ? 'disabled' : ''}>
-            <i class="bi bi-cart-plus"></i> ${product.isSoldOut() ? 'Hết hàng' : 'Thêm vào giỏ'}
+          <button class="btn-cart w-100" data-product-id="${product.id}">
+            <i class="bi bi-cart-plus"></i> Thêm vào giỏ
           </button>
         </div>
       </div>
@@ -137,95 +116,7 @@ export class ProductController {
       }
     });
 
-    // Add click event for Add to Cart button
-    const addToCartBtn = col.querySelector('.btn-cart');
-    addToCartBtn?.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      await this.handleAddToCart(addToCartBtn as HTMLButtonElement);
-    });
-
     return col;
-  }
-
-  /**
-   * Handle Add to Cart click
-   */
-  private async handleAddToCart(button: HTMLButtonElement): Promise<void> {
-    try {
-      const productId = parseInt(button.dataset.productId || '0');
-      const productName = button.dataset.productName || '';
-      const productSlug = button.dataset.productSlug || '';
-      const price = parseFloat(button.dataset.productPrice || '0');
-      const salePrice = parseFloat(button.dataset.productSalePrice || '0');
-      const imageUrl = button.dataset.productImage || '';
-      const stockQuantity = parseInt(button.dataset.stockQuantity || '0');
-      const minStockLevel = parseInt(button.dataset.minStockLevel || '0');
-
-      // Show loading
-      const originalText = button.innerHTML;
-      button.innerHTML = '<i class="bi bi-arrow-repeat spinner-border spinner-border-sm"></i> Đang thêm...';
-      button.disabled = true;
-
-      const result = await cartService.addToCart({
-        productId,
-        productName,
-        productSlug,
-        imageUrl,
-        price,
-        salePrice: salePrice > 0 ? salePrice : null,
-        quantity: 1,
-        stockQuantity,
-        minStockLevel
-      });
-
-      button.disabled = false;
-
-      if (result.success) {
-        button.innerHTML = '<i class="bi bi-check-lg"></i> Đã thêm!';
-        button.classList.add('btn-success');
-        
-        setTimeout(() => {
-          button.innerHTML = originalText;
-          button.classList.remove('btn-success');
-        }, 2000);
-
-        // Update cart badge if exists
-        this.updateCartBadge();
-        
-        // Show notification
-        this.showNotification('success', result.message);
-      } else {
-        button.innerHTML = originalText;
-        this.showNotification('error', result.message);
-      }
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      button.innerHTML = '<i class="bi bi-cart-plus"></i> Thêm vào giỏ';
-      button.disabled = false;
-      this.showNotification('error', 'Có lỗi xảy ra khi thêm sản phẩm');
-    }
-  }
-
-  /**
-   * Update cart badge
-   */
-  private updateCartBadge(): void {
-    const badge = document.querySelector('.cart-badge');
-    if (badge) {
-      const count = cartService.getTotalItemsCount();
-      badge.textContent = count.toString();
-      if (count > 0) {
-        badge.classList.remove('d-none');
-      }
-    }
-  }
-
-  /**
-   * Show notification
-   */
-  private showNotification(type: 'success' | 'error' | 'warning', message: string): void {
-    console.log(`[${type.toUpperCase()}] ${message}`);
-    // You can integrate with Bootstrap toast or custom notification system
   }
 
   /**

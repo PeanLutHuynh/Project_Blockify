@@ -1,10 +1,9 @@
-import { initializeOnReady, updateCartBadge } from '../../../core/config/init.js';
+import { initializeOnReady } from '../../../core/config/init.js';
 import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
 import { initializeSearch } from '../../../shared/components/SearchInit.js';
 import { categoryService } from '../../../core/services/CategoryService.js';
 import { productService } from '../../../core/services/ProductService.js';
 import { supabaseService } from '../../../core/api/supabaseClient.js';
-import { cartService } from '../../../core/services/CartService.js';
 
 // State management for pagination and filtering
 let currentCategoryId: number | undefined = undefined;
@@ -446,7 +445,7 @@ function renderProductsToGrid(products: any[]) {
     
     return `
       <div class="col-6 col-md-3">
-        <div class="product-card position-relative" data-product-id="${product.id}" data-product-slug="${slug}" style="cursor: pointer;">
+        <div class="product-card position-relative" data-product-slug="${slug}" style="cursor: pointer;">
           <i class="far fa-heart icon-heart"></i>
           <div class="product-image">
             <img src="${product.imageUrl}" alt="${product.name}">
@@ -459,7 +458,7 @@ function renderProductsToGrid(products: any[]) {
           <div class="divider"></div>
           <div class="product-title" style="height:40px;">${product.name}</div>
           <div class="product-price">${formattedPrice} VNĐ</div>
-          <button class="btn-cart" onclick="event.stopPropagation();">Add to Cart</button>
+          <button class="btn-cart" data-product-id="${product.id}">Thêm vào giỏ</button>
         </div>
       </div>
     `;
@@ -470,59 +469,81 @@ function renderProductsToGrid(products: any[]) {
   console.log(`🖱️ Setting up click handlers for ${cards.length} cards`);
   
   cards.forEach((card, index) => {
-    // Add to Cart button handler
-    const addToCartBtn = card.querySelector('.btn-cart') as HTMLButtonElement;
+    // Add to cart button handler
+    const addToCartBtn = card.querySelector('.btn-cart');
     if (addToCartBtn) {
       addToCartBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        e.preventDefault();
+        const btn = e.currentTarget as HTMLElement;
+        const productId = parseInt(btn.getAttribute('data-product-id') || '0');
         
-        const productId = parseInt(card.getAttribute('data-product-id') || '0');
-        const productName = card.querySelector('.product-title')?.textContent || '';
-        const productSlug = card.getAttribute('data-product-slug') || '';
-        const imageUrl = (card.querySelector('.product-image img') as HTMLImageElement)?.src || '';
-        const priceText = card.querySelector('.product-price')?.textContent || '0';
-        const price = parseInt(priceText.replace(/[^\d]/g, ''));
+        console.log('🛒 [HomePage] Adding to cart, product ID:', productId);
         
-        // Get product from products array
-        const product = products[index];
+        // Validate productId
+        if (!productId || productId <= 0) {
+          console.error('❌ [HomePage] Invalid product ID:', productId);
+          alert('❌ Lỗi: Không tìm thấy thông tin sản phẩm');
+          return;
+        }
         
-        console.log('🛒 Adding to cart:', {
-          productId,
-          productName,
-          productSlug,
-          quantity: 1
-        });
-        
-        const result = await cartService.addToCart({
-          productId,
-          productName,
-          productSlug,
-          imageUrl,
-          price,
-          salePrice: product.sale_price,
-          quantity: 1,
-          stockQuantity: product.stock_quantity,
-          minStockLevel: product.min_stock_level
-        });
-        
-        if (result.success) {
-          addToCartBtn.textContent = 'Đã thêm!';
-          addToCartBtn.style.background = '#28a745';
-          setTimeout(() => {
-            addToCartBtn.textContent = 'Add to Cart';
-            addToCartBtn.style.background = '';
-          }, 2000);
+        // Import services
+        try {
+          const { cartService } = await import('../../../core/services/CartService.js');
+          const { productService } = await import('../../../core/services/ProductService.js');
           
-          // Update cart badge
-          updateCartBadge();
-        } else {
-          alert(result.message);
+          // Get full product data
+          console.log('📦 [HomePage] Fetching product details for ID:', productId);
+          const productResult = await productService.getProductById(productId.toString());
+          
+          if (!productResult.success || !productResult.product) {
+            console.error('❌ [HomePage] Product not found:', productId);
+            alert('Không tìm thấy sản phẩm');
+            return;
+          }
+          
+          const product = productResult.product;
+          console.log('✅ [HomePage] Product found:', {
+            id: product.id,
+            name: product.name,
+            price: product.price
+          });
+          
+          // Add to cart with full data
+          const result = await cartService.addToCart({
+            productId: parseInt(product.id),
+            productName: product.name,
+            productSlug: product.slug,
+            imageUrl: product.imageUrl,
+            price: product.price,
+            salePrice: product.salePrice,
+            quantity: 1,
+            stockQuantity: product.stockQuantity || 100,
+            minStockLevel: 0
+          });
+          
+          if (result.success) {
+            // Visual feedback
+            btn.textContent = '✓ Đã thêm';
+            btn.style.background = '#28a745';
+            setTimeout(() => {
+              btn.textContent = 'Thêm vào giỏ';
+              btn.style.background = '';
+            }, 2000);
+            
+            // Update cart badge
+            const { updateCartBadge } = await import('../../../core/config/init.js');
+            updateCartBadge();
+          } else {
+            alert(result.message || 'Không thể thêm vào giỏ hàng');
+          }
+        } catch (error) {
+          console.error('❌ Error adding to cart:', error);
+          alert('Lỗi khi thêm vào giỏ hàng');
         }
       });
     }
     
-    // Card click handler for navigation
+    // Product card click handler
     card.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       
@@ -614,4 +635,5 @@ function renderPaginationControls(pagination: any) {
     });
   });
 }
+
 
