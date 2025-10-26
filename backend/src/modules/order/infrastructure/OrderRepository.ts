@@ -149,6 +149,27 @@ export class OrderRepository implements IOrderRepository {
   }
 
   /**
+   * Find order by ID
+   */
+  async findById(orderId: number): Promise<Order | null> {
+    const { data, error } = await supabaseAdmin
+      .from("orders")
+      .select("*")
+      .eq("order_id", orderId)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    const items = await this.getOrderItems(data.order_id);
+    const order = this.mapToEntity(data);
+    order.setItems(items);
+
+    return order;
+  }
+
+  /**
    * Find all orders for a user
    */
   async findByUserId(userId: number): Promise<Order[]> {
@@ -206,31 +227,70 @@ export class OrderRepository implements IOrderRepository {
   }
 
   /**
-   * Get order items
+   * Get order items with product images
    */
   async getOrderItems(orderId: number): Promise<OrderItem[]> {
+    console.log(`🔍 Getting items for order ${orderId}...`);
+    
+    // Join with products and product_images tables (nested select like Cart)
     const { data, error } = await supabaseAdmin
       .from("order_items")
-      .select("*")
+      .select(`
+        *,
+        products:product_id (
+          product_id,
+          product_name,
+          product_images (
+            image_url,
+            is_primary
+          )
+        )
+      `)
       .eq("order_id", orderId);
 
     if (error || !data) {
+      console.error(`❌ Error getting order items for ${orderId}:`, error);
       return [];
     }
 
-    return data.map(
-      (item: any) =>
-        new OrderItem({
-          orderItemId: item.order_item_id,
-          orderId: item.order_id,
-          productId: item.product_id,
-          productName: item.product_name,
-          productSku: item.product_sku,
-          quantity: item.quantity,
-          unitPrice: parseFloat(item.unit_price),
-          totalPrice: parseFloat(item.total_price),
-        })
-    );
+    console.log(`✅ Found ${data.length} items for order ${orderId}`);
+
+    return data.map((item: any) => {
+      const orderItem = new OrderItem({
+        orderItemId: item.order_item_id,
+        orderId: item.order_id,
+        productId: item.product_id,
+        productName: item.product_name,
+        productSku: item.product_sku,
+        quantity: item.quantity,
+        unitPrice: parseFloat(item.unit_price),
+        totalPrice: parseFloat(item.total_price),
+      });
+      
+      // Get image from product_images array (same as Cart)
+      let imageUrl = '';
+      const product = item.products;
+      
+      if (product?.product_images && Array.isArray(product.product_images)) {
+        // Try to find primary image first
+        const primaryImage = product.product_images.find((img: any) => img.is_primary);
+        if (primaryImage?.image_url) {
+          imageUrl = primaryImage.image_url;
+        } else if (product.product_images.length > 0 && product.product_images[0]?.image_url) {
+          // Fallback to first image
+          imageUrl = product.product_images[0].image_url;
+        }
+      }
+      
+      if (imageUrl) {
+        (orderItem as any).imageUrl = imageUrl;
+        console.log(`  ✅ Product ${item.product_id}: ${imageUrl}`);
+      } else {
+        console.log(`  ⚠️ Product ${item.product_id}: No image found`);
+      }
+      
+      return orderItem;
+    });
   }
 
   /**
