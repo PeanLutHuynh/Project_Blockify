@@ -15,7 +15,7 @@
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-custom">
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
   <div class="container">
       <a class="navbar-brand" href="IntroductionPage.html">Blockify</a>
       
@@ -24,32 +24,39 @@
       </button>
       
       <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto">
-              <li class="nav-item">
-                  <a class="nav-link" href="HomePage.html">Trang chủ</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="IntroductionPage.html">Giới thiệu</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="Service.html">Dịch vụ</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="Contact.html">Câu hỏi</a>
-              </li>
-          </ul>
-          
-          <!-- Navbar right icons with authentication state -->
-          <div class="navbar-right-icons" id="navbarRightIcons">
-              <a href="#" class="search-icon">
-                  <i class="bi bi-search" id="openSearch"></i>
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="HomePage.html">
+              <i class="bi bi-house-door me-2"></i> Trang chủ
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="IntroductionPage.html">
+              <i class="bi bi-info-circle me-2"></i> Giới thiệu
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="Service.html">
+              <i class="bi bi-gear me-2"></i> Dịch vụ
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="Contact.html">
+              <i class="bi bi-question-circle me-2"></i> Hỏi đáp
+            </a>
+          </li>
+        </ul>    
+          <div class="navbar-right-icons">
+              <a href="#" class="search-icon d-flex justify-content-start align-items-center">
+                  <i class="bi bi-search text-secondary" id="openSearch"> </i>
               </a>
               <a href="CartPage.html" class="cart-icon">
                   <i class="bi bi-cart"></i>
               </a>
               <!-- Auth buttons will be rendered here by NavbarAuth component -->
           </div>
-      </div>
+
+      <!-- Tìm kiếm -->
       <div class="overlay" id="overlay">
         <div class="search-popup">
           <div class="search-header">
@@ -82,11 +89,22 @@
         <div class="username">QTLHH</div>
       </div>
       <nav class="nav nav-pills flex-column">
-        <a class="nav-link active" onclick="showTab('info', this)" href="#">Thông tin cá nhân</a>
-        <a class="nav-link" onclick="showTab('password', this)" href="#">Cài đặt mật khẩu</a>
-        <a class="nav-link" onclick="showTab('order', this)" href="#">Đơn hàng</a>
-        <a class="nav-link" onclick="showTab('wishlist', this)" href="#">Yêu thích</a>
-        <a class="nav-link" onclick="showTab('address', this)" href="#">Địa chỉ</a>
+        <a class="nav-link active" onclick="showTab('info', this)" href="#">
+          <i class="bi bi-person-circle me-2"></i>Thông tin cá nhân
+        </a>
+        <a class="nav-link" onclick="showTab('password', this)" href="#">
+          <i class="bi bi-shield-lock me-2"></i>Cài đặt mật khẩu
+        </a>
+        <a class="nav-link" onclick="showTab('order', this)" href="#">
+          <i class="bi bi-bag-check me-2"></i>Đơn hàng
+        </a>
+        <a class="nav-link" onclick="showTab('wishlist', this)" href="#">
+          <i class="bi bi-heart me-2"></i>Yêu thích
+        </a>
+        <a class="nav-link" onclick="showTab('address', this)" href="#">
+          <i class="bi bi-geo-alt me-2"></i>Địa chỉ
+        </a>
+        
       </nav>
     </div>
 

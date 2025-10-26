@@ -6,6 +6,8 @@
   <title>Bảng điều khiển quản trị</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/pages/Admin.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
   
   <!-- Supabase JS SDK từ CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -30,13 +32,29 @@
         <div class="name">QTLHH</div>
       </div>
       <ul class="menu nav flex-column">
-        <li class="active nav-item" data-target="dashboard">Bảng điều khiển</li>
-        <li class="nav-item" data-target="customer">Khách hàng</li>
-        <li class="nav-item" data-target="product">Sản phẩm</li>
-        <li class="nav-item" data-target="order">Đơn hàng</li>
-        <li class="nav-item" data-target="shop-info">Thông tin cửa hàng</li>
-        <li class="nav-item" data-target="feedback-manager">Đánh giá sản phẩm</li>
-        <li class="nav-item" data-target="notification">Thông báo</li>
+        <li class="active nav-item" data-target="dashboard">
+          <i class="bi bi-speedometer2 me-2"></i>Bảng điều khiển
+        </li>
+        
+        <li class="nav-item" data-target="customer">
+          <i class="bi bi-people-fill me-2 text-secondary"></i>Khách hàng
+        </li>        
+        <li class="nav-item" data-target="product">
+          <i class="bi bi-box-seam me-2"></i>Sản phẩm
+        </li>
+        <li class="nav-item" data-target="order">
+          <i class="bi bi-receipt-cutoff me-2"></i>Đơn hàng
+        </li>
+        <li class="nav-item" data-target="shop-info">
+          <i class="bi bi-shop me-2"></i>Thông tin cửa hàng
+        </li>
+        <li class="nav-item" data-target="feedback-manager">
+          <i class="bi bi-chat-dots me-2"></i>Đánh giá sản phẩm
+        </li>
+        <li class="nav-item" data-target="notification">
+          <i class="bi bi-bell-fill me-2 text-secondary"></i>Thông báo
+        </li>
+        
       </ul>
     </aside>
 
@@ -146,6 +164,7 @@
       <!-- Product -->
       <section id="product" class="section">
         <div class="bar-blue">Sản phẩm</div>
+        
         <div class="toolbar d-flex gap-2 mb-3">
           <input class="search form-control" placeholder="Tìm kiếm sản phẩm">
           <button class="btn" data-bs-toggle="modal" data-bs-target="#addProductModal">+ Thêm sản phẩm</button>
