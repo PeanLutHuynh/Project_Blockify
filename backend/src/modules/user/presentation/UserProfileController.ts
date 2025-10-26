@@ -97,8 +97,14 @@ export class UserProfileController {
       const requestingUserId = this.getUserId(req);
       const body = req.body as any;
 
+      console.log('📥 updateProfile - Received data:');
+      console.log('  - userId:', userId, 'type:', typeof userId);
+      console.log('  - requestingUserId:', requestingUserId, 'type:', typeof requestingUserId);
+      console.log('  - body:', JSON.stringify(body, null, 2));
+
       // Authorization: User can only update their own profile
       if (userId !== requestingUserId) {
+        console.error('❌ Authorization failed: userId !== requestingUserId');
         this.sendError(res, 403, 'Forbidden');
         return;
       }
@@ -107,6 +113,7 @@ export class UserProfileController {
       let birthDate: Date | undefined;
       if (body.birthDate) {
         birthDate = new Date(body.birthDate);
+        console.log('📅 Parsed birthDate:', birthDate.toISOString());
       }
 
       const command = new UpdateProfileCommand(
@@ -118,17 +125,87 @@ export class UserProfileController {
         body.avatarUrl
       );
 
+      console.log('🔍 Validating command...');
+      const validationErrors = command.validate();
+      if (validationErrors.length > 0) {
+        console.error('❌ Validation errors:', validationErrors);
+        this.sendError(res, 400, 'Validation failed', validationErrors);
+        return;
+      }
+
       const result = await this.userProfileService.updateProfile(command);
 
       if (result.success) {
+        console.log('✅ Profile updated successfully');
         this.sendSuccess(res, 200, result.data, result.message);
       } else {
         const statusCode = result.errors ? 400 : 500;
+        console.error('❌ Update failed:', result.message, result.errors);
         this.sendError(res, statusCode, result.message, result.errors);
       }
     } catch (error: any) {
       console.error('Error in updateProfile:', error);
       this.sendError(res, 500, error.message || 'Failed to update profile');
+    }
+  };
+
+  /**
+   * POST /api/v1/users/:userId/avatar
+   * Upload user avatar
+   */
+  public uploadAvatar = async (
+    req: HttpRequest,
+    res: HttpResponse
+  ): Promise<void> => {
+    console.log('🎯 [Controller] uploadAvatar CALLED!');
+    console.log('🎯 [Controller] Request URL:', req.url);
+    console.log('🎯 [Controller] Request method:', req.method);
+    console.log('🎯 [Controller] Headers:', JSON.stringify(req.headers, null, 2));
+    
+    try {
+      const { userId } = req.params as any;
+      const requestingUserId = this.getUserId(req);
+
+      console.log('📤 uploadAvatar - userId:', userId, 'requestingUserId:', requestingUserId);
+
+      // Authorization: User can only upload their own avatar
+      if (userId !== requestingUserId) {
+        console.error('❌ Authorization failed');
+        this.sendError(res, 403, 'Forbidden');
+        return;
+      }
+
+      // Get file data from request body (multipart/form-data parsed)
+      const fileData = (req as any).fileData;
+      
+      if (!fileData || !fileData.buffer || !fileData.mimetype) {
+        console.error('❌ No file uploaded');
+        this.sendError(res, 400, 'No file uploaded');
+        return;
+      }
+
+      console.log('📎 File received:', {
+        size: fileData.buffer.length,
+        type: fileData.mimetype
+      });
+
+      // Call service to upload
+      const result = await this.userProfileService.uploadAvatar(
+        userId,
+        fileData.buffer,
+        fileData.mimetype
+      );
+
+      if (result.success) {
+        console.log('✅ Avatar uploaded successfully');
+        this.sendSuccess(res, 200, result.data, result.message);
+      } else {
+        console.error('❌ Upload failed:', result.message);
+        this.sendError(res, 400, result.message, result.errors);
+      }
+    } catch (error: any) {
+      console.error('❌ Error in uploadAvatar:', error);
+      this.sendError(res, 500, error.message || 'Failed to upload avatar');
     }
   };
 
@@ -159,15 +236,18 @@ export class UserProfileController {
         return;
       }
 
+      console.log('✅ Authorization passed, fetching addresses for userId:', userId);
       const result = await this.userProfileService.getUserAddresses(userId);
+      console.log('📦 getUserAddresses result:', result);
 
       if (result.success) {
         this.sendSuccess(res, 200, result.data, result.message);
       } else {
+        console.error('❌ getUserAddresses failed:', result.message);
         this.sendError(res, 500, result.message);
       }
     } catch (error: any) {
-      console.error('Error in getAddresses:', error);
+      console.error('❌ Error in getAddresses:', error);
       this.sendError(res, 500, error.message || 'Failed to get addresses');
     }
   };

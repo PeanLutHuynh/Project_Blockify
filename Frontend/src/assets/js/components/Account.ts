@@ -1,8 +1,17 @@
 import { AccountController } from "../../../modules/user/AccountController.js";
 import { initializeOnReady } from '../../../core/config/init.js';
+import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
+import { initializeSearch } from '../../../shared/components/SearchInit.js';
 
 // Initialize AccountController when page loads
 initializeOnReady(() => {
+  // Initialize NavbarAuth component for authentication state in navbar
+  initializeNavbarAuth();
+  
+  // Initialize Search controller (UC3 - Thanh tìm kiếm)
+  initializeSearch();
+  
+  // Initialize AccountController
   new AccountController();
   
   // Make functions globally available for HTML onclick handlers  

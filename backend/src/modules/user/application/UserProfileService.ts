@@ -89,6 +89,75 @@ export class UserProfileService {
   }
 
   /**
+   * Upload avatar to Supabase Storage and update user profile
+   */
+  async uploadAvatar(userId: string, fileBuffer: Buffer, fileType: string): Promise<UserProfileResponse> {
+    try {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(fileType)) {
+        return UserProfileResponse.failure('Invalid file type. Only JPEG, PNG, GIF, WEBP are allowed.');
+      }
+
+      // Validate file size (max 5MB)
+      if (fileBuffer.length > 5 * 1024 * 1024) {
+        return UserProfileResponse.failure('File size exceeds 5MB limit');
+      }
+
+      // Generate unique file name
+      const fileExtension = fileType.split('/')[1];
+      const fileName = `avatars/${userId}_${Date.now()}.${fileExtension}`;
+
+      console.log(`📤 Uploading avatar for user ${userId}: ${fileName}`);
+
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+        .from('user-avatars')
+        .upload(fileName, fileBuffer, {
+          contentType: fileType,
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('❌ Supabase Storage upload error:', uploadError);
+        return UserProfileResponse.failure(`Failed to upload avatar: ${uploadError.message}`);
+      }
+
+      console.log('✅ File uploaded to storage:', uploadData.path);
+
+      // Get public URL
+      const { data: publicUrlData } = supabaseAdmin.storage
+        .from('user-avatars')
+        .getPublicUrl(fileName);
+
+      const avatarUrl = publicUrlData.publicUrl;
+      console.log('📸 Public avatar URL:', avatarUrl);
+
+      // Update user profile with new avatar URL
+      const { data: userData, error: updateError } = await supabaseAdmin
+        .from('users')
+        .update({ 
+          avatar_url: avatarUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', userId)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error('❌ Error updating user avatar URL:', updateError);
+        return UserProfileResponse.failure('Failed to update user avatar');
+      }
+
+      console.log('✅ Avatar uploaded and profile updated successfully');
+      return UserProfileResponse.success(userData, 'Avatar uploaded successfully');
+    } catch (error: any) {
+      console.error('❌ Error in uploadAvatar:', error);
+      return UserProfileResponse.failure(error.message || 'Failed to upload avatar');
+    }
+  }
+
+  /**
    * Get user addresses
    */
   async getUserAddresses(userId: string): Promise<UserProfileResponse> {
