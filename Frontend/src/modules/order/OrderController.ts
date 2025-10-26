@@ -1,4 +1,5 @@
 import { OrderService } from "../../core/services/OrderService.js";
+import { AuthService } from "../../core/services/AuthService.js";
 
 /**
  * Order Controller - Frontend MVC
@@ -6,6 +7,7 @@ import { OrderService } from "../../core/services/OrderService.js";
  */
 export class OrderController {
   private orderService: OrderService;
+  private authService: AuthService;
   private userId: number | null = null;
   private selectedAddressId: number = 1;
 
@@ -23,6 +25,7 @@ export class OrderController {
 
   constructor() {
     this.orderService = new OrderService();
+    this.authService = new AuthService();
   }
 
   /**
@@ -31,8 +34,12 @@ export class OrderController {
   async init(): Promise<void> {
     try {
       // Get user ID from session/localStorage
+      console.log('🔍 [OrderController] Checking authentication...');
       this.userId = this.getUserId();
+      console.log('🔍 [OrderController] UserId:', this.userId);
+      
       if (!this.userId) {
+        console.error('❌ [OrderController] No user ID found - redirecting to sign in');
         alert("Vui lòng đăng nhập để tiếp tục");
         window.location.href = "/src/pages/SigninPage.html";
         return;
@@ -506,12 +513,24 @@ export class OrderController {
    * Get user ID from session/localStorage
    */
   private getUserId(): number | null {
-    // TODO: Get from actual session/auth service
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      const user = JSON.parse(userStr);
-      return user.user_id || user.id;
+    console.log('🔍 [OrderController.getUserId] Checking user...');
+    const currentUser = this.authService.getUser();
+    console.log('🔍 [OrderController.getUserId] CurrentUser:', currentUser);
+    console.log('🔍 [OrderController.getUserId] currentUser?.id:', currentUser?.id);
+    console.log('🔍 [OrderController.getUserId] typeof currentUser?.id:', typeof currentUser?.id);
+    
+    if (currentUser && currentUser.id) {
+      const userId = parseInt(currentUser.id, 10);
+      console.log('🔍 [OrderController.getUserId] parseInt result:', userId);
+      console.log('🔍 [OrderController.getUserId] isNaN:', isNaN(userId));
+      
+      if (!isNaN(userId)) {
+        console.log('✅ [OrderController.getUserId] UserId:', userId);
+        return userId;
+      }
     }
+    
+    console.log('❌ [OrderController.getUserId] No valid user ID found');
     return null;
   }
 }

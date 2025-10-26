@@ -179,7 +179,7 @@ export class User {
   // Factory method for creating user from API response
   public static fromApiResponse(data: any): User {
     return new User({
-      id: data.id,
+      id: data.id || data.user_id?.toString() || data.userId?.toString(),
       email: data.email,
       fullName: data.fullName || data.full_name,
       username: data.username,

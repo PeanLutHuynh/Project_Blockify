@@ -416,13 +416,22 @@ export class AuthService {
    */
   private loadUserFromStorage(): void {
     try {
+      console.log('🔍 [AuthService] Loading user from storage...');
       const userData = localStorage.getItem(this.USER_KEY);
       const token = localStorage.getItem(this.AUTH_TOKEN_KEY);
+      
+      console.log('🔍 [AuthService] USER_KEY:', this.USER_KEY);
+      console.log('🔍 [AuthService] AUTH_TOKEN_KEY:', this.AUTH_TOKEN_KEY);
+      console.log('🔍 [AuthService] userData exists:', !!userData);
+      console.log('🔍 [AuthService] token exists:', !!token);
 
       if (userData && token) {
         const parsedData = JSON.parse(userData);
         this.currentUser = User.fromApiResponse(parsedData);
         httpClient.setAuthToken(token);
+        console.log('✅ [AuthService] User loaded:', this.currentUser?.id);
+      } else {
+        console.warn('⚠️ [AuthService] Missing userData or token');
       }
     } catch (error) {
       console.error("Error loading user from storage:", error);

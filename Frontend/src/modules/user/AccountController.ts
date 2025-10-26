@@ -12,6 +12,7 @@ export class AccountController {
   private currentUser: User | null = null;
   private addresses: UserAddress[] = [];
   public editingAddressId: number | null = null;
+  private isSavingProfile: boolean = false; // Flag to prevent duplicate saves
   // private isEditingProfile: boolean = false; // TODO: Re-enable for readonly mode
 
   constructor() {
@@ -400,27 +401,49 @@ export class AccountController {
    * Setup event listeners
    */
   private setupEventListeners(): void {
-    // Find all Save/Update buttons by text content (Vietnamese)
+    console.log('🔧 Setting up event listeners...');
+    
+    // Remove all existing listeners by cloning and replacing buttons
     const buttons = document.querySelectorAll('.btn-primary-custom');
-    buttons.forEach(btn => {
+    console.log('📋 Found buttons:', buttons.length);
+    
+    let saveButtonCount = 0;
+    let updateButtonCount = 0;
+    
+    buttons.forEach((btn, index) => {
       const btnText = btn.textContent?.trim();
-      // Lưu button
-      if (btnText === 'Lưu' || btnText === 'Save') {
-        btn.addEventListener('click', (e) => {
+      console.log(`Button ${index}: "${btnText}"`);
+      
+      // Clone button to remove all event listeners
+      const newBtn = btn.cloneNode(true) as HTMLElement;
+      btn.parentNode?.replaceChild(newBtn, btn);
+      
+      // Only bind to the FIRST "Lưu" button (profile save)
+      if ((btnText === 'Lưu' || btnText === 'Save') && saveButtonCount === 0) {
+        newBtn.addEventListener('click', (e) => {
           e.preventDefault();
+          e.stopPropagation();
+          console.log('💾 Save profile clicked');
           this.handleSaveProfile();
-        });
+        }, { once: true }); // Use 'once' to ensure it only fires once
+        saveButtonCount++;
+        console.log('✅ Bound Save handler to button', index);
       }
-      // Cập nhật button - enable editing
-      if (btnText === 'Cập nhật' || btnText === 'Update') {
-        btn.addEventListener('click', (e) => {
+      
+      // Only bind to the FIRST "Cập nhật" button (profile edit)
+      if ((btnText === 'Cập nhật' || btnText === 'Update') && updateButtonCount === 0) {
+        newBtn.addEventListener('click', (e) => {
           e.preventDefault();
+          e.stopPropagation();
+          console.log('✏️ Update profile clicked');
           this.handleEditProfile();
         });
+        updateButtonCount++;
+        console.log('✅ Bound Update handler to button', index);
       }
     });
 
-    console.log('✅ Event listeners setup complete');
+    console.log(`✅ Event listeners setup complete: ${saveButtonCount} Save, ${updateButtonCount} Update`);
   }
 
   /**
@@ -504,6 +527,26 @@ export class AccountController {
    * Handle save profile
    */
   private async handleSaveProfile(): Promise<void> {
+    console.log('💾 handleSaveProfile called');
+    
+    // Prevent duplicate saves
+    if (this.isSavingProfile) {
+      console.warn('⚠️ Save already in progress, ignoring duplicate call');
+      return;
+    }
+    
+    this.isSavingProfile = true;
+    console.log('🔒 Save locked');
+    
+    try {
+      await this._handleSaveProfileInternal();
+    } finally {
+      this.isSavingProfile = false;
+      console.log('🔓 Save unlocked');
+    }
+  }
+
+  private async _handleSaveProfileInternal(): Promise<void> {
     console.log('💾 handleSaveProfile called');
     console.log('📊 currentUser:', this.currentUser);
     console.log('🆔 currentUser?.id:', this.currentUser?.id);
