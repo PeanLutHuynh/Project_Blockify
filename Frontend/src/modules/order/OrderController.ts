@@ -1,5 +1,6 @@
 import { OrderService } from "../../core/services/OrderService.js";
 import { AuthService } from "../../core/services/AuthService.js";
+import { PaymentProofService } from "../../core/services/PaymentProofService.js";
 
 /**
  * Order Controller - Frontend MVC
@@ -8,8 +9,10 @@ import { AuthService } from "../../core/services/AuthService.js";
 export class OrderController {
   private orderService: OrderService;
   private authService: AuthService;
+  private paymentProofService: PaymentProofService;
   private userId: number | null = null;
   private selectedAddressId: number = 1;
+  private selectedFile: File | null = null;
 
   // DOM Elements
   private orderItemsContainer: HTMLElement | null = null;
@@ -20,12 +23,15 @@ export class OrderController {
   private grandTotalElement: HTMLElement | null = null;
   private checkoutButton: HTMLElement | null = null;
   private uploadBoxElement: HTMLElement | null = null;
+  private paymentProofInput: HTMLInputElement | null = null;
+  private uploadPreviewElement: HTMLElement | null = null;
   private paymentMethodRadios: NodeListOf<HTMLInputElement> | null = null;
   private shippingMethodRadios: NodeListOf<HTMLInputElement> | null = null;
 
   constructor() {
     this.orderService = new OrderService();
     this.authService = new AuthService();
+    this.paymentProofService = new PaymentProofService();
   }
 
   /**
@@ -184,6 +190,8 @@ export class OrderController {
     this.grandTotalElement = document.getElementById("grand-total");
     this.checkoutButton = document.querySelector(".btn-blue.w-100") as HTMLElement;
     this.uploadBoxElement = document.getElementById("upload-box");
+    this.paymentProofInput = document.getElementById("payment-proof") as HTMLInputElement;
+    this.uploadPreviewElement = document.getElementById("upload-preview");
     this.paymentMethodRadios = document.querySelectorAll('input[name="pm"]');
     this.shippingMethodRadios = document.querySelectorAll('input[name="shipping"]');
   }
@@ -209,6 +217,11 @@ export class OrderController {
       this.shippingMethodRadios.forEach((radio) => {
         radio.addEventListener("change", () => this.handleShippingMethodChange());
       });
+    }
+
+    // Payment proof file input
+    if (this.paymentProofInput) {
+      this.paymentProofInput.addEventListener("change", () => this.handleFileSelect());
     }
   }
 
@@ -334,6 +347,24 @@ export class OrderController {
       // Create order
       const order = await this.orderService.checkout(checkoutData);
 
+      // Upload payment proof if file selected and non-COD payment
+      if (this.selectedFile && checkoutData.payment_method !== 'cod') {
+        try {
+          await this.paymentProofService.uploadPaymentProof({
+            orderId: order.orderId,
+            userId: this.userId,
+            file: this.selectedFile,
+            note: `Minh chứng thanh toán cho đơn hàng ${order.orderNumber}`
+          });
+          console.log('✅ Payment proof uploaded successfully');
+        } catch (proofError: any) {
+          console.error('⚠️ Failed to upload payment proof:', proofError);
+          // Don't block the checkout flow if proof upload fails
+          // Order is already created, just notify user
+          alert(`Đơn hàng đã được tạo nhưng không thể tải lên minh chứng thanh toán: ${proofError.message}`);
+        }
+      }
+
       // Clear checkout items from sessionStorage
       sessionStorage.removeItem('checkoutItems');
 
@@ -365,6 +396,12 @@ export class OrderController {
     const shippingMethod = this.getSelectedShippingMethod();
     if (!shippingMethod) {
       alert("Vui lòng chọn phương thức vận chuyển");
+      return false;
+    }
+
+    // Check payment proof for non-COD payments
+    if (paymentMethod !== 'cod' && !this.selectedFile) {
+      alert("Vui lòng tải lên minh chứng thanh toán cho phương thức thanh toán đã chọn");
       return false;
     }
 
@@ -476,6 +513,108 @@ export class OrderController {
     // Recalculate totals when shipping method changes
     // We need to reload cart items to recalculate
     this.loadCartItems();
+  }
+
+  /**
+   * Handle file selection for payment proof
+   */
+  private handleFileSelect(): void {
+    const file = this.paymentProofInput?.files?.[0];
+    
+    if (!file) {
+      this.selectedFile = null;
+      this.clearFilePreview();
+      return;
+    }
+
+    // Validate file size (5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert("Kích thước file vượt quá 5MB. Vui lòng chọn file khác.");
+      if (this.paymentProofInput) this.paymentProofInput.value = '';
+      this.clearFilePreview();
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Chỉ chấp nhận file ảnh (JPEG, PNG, GIF, WebP) hoặc PDF.");
+      if (this.paymentProofInput) this.paymentProofInput.value = '';
+      this.clearFilePreview();
+      return;
+    }
+
+    // Store file and show preview
+    this.selectedFile = file;
+    this.showFilePreview(file);
+  }
+
+  /**
+   * Show file preview
+   */
+  private showFilePreview(file: File): void {
+    if (!this.uploadPreviewElement) return;
+
+    const fileSize = (file.size / 1024).toFixed(2); // Convert to KB
+    const isImage = file.type.startsWith('image/');
+    const isPDF = file.type === 'application/pdf';
+
+    let previewHTML = `
+      <div class="border rounded p-2 bg-light">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+    `;
+
+    if (isImage) {
+      // Create image preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (this.uploadPreviewElement) {
+          const imgElement = this.uploadPreviewElement.querySelector('img');
+          if (imgElement && e.target?.result) {
+            imgElement.setAttribute('src', e.target.result as string);
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+
+      previewHTML += `
+            <img src="" alt="Preview" class="me-2" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+            <div>
+              <div class="fw-bold">${file.name}</div>
+              <small class="text-muted">${fileSize} KB</small>
+            </div>
+      `;
+    } else if (isPDF) {
+      previewHTML += `
+            <i class="bi bi-file-pdf fs-2 me-2 text-danger"></i>
+            <div>
+              <div class="fw-bold">${file.name}</div>
+              <small class="text-muted">${fileSize} KB</small>
+            </div>
+      `;
+    }
+
+    previewHTML += `
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-danger" onclick="document.getElementById('payment-proof').value=''; this.parentElement.parentElement.parentElement.remove();">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+    `;
+
+    this.uploadPreviewElement.innerHTML = previewHTML;
+  }
+
+  /**
+   * Clear file preview
+   */
+  private clearFilePreview(): void {
+    if (this.uploadPreviewElement) {
+      this.uploadPreviewElement.innerHTML = '';
+    }
   }
 
   /**

@@ -196,9 +196,10 @@
                 <label class="form-check-label" for="pm-vnpay">VNPAY</label>
               </div>
               <div id="upload-box" class="mt-2 d-none">
-                <label class="form-label">Tải lên minh chứng thanh toán</label>
-                <input type="file" class="form-control" id="payment-proof" accept="image/*" title="Chọn ảnh minh chứng thanh toán">
-                <small class="text-muted">Chỉ yêu cầu khi thanh toán chuyển khoản, MoMo, ZaloPay hoặc VNPAY</small>
+                <label class="form-label">Tải lên minh chứng thanh toán <span class="text-danger">*</span></label>
+                <input type="file" class="form-control" id="payment-proof" accept="image/*,application/pdf" title="Chọn ảnh hoặc PDF minh chứng thanh toán">
+                <small class="text-muted">Chỉ chấp nhận ảnh (JPEG, JPG, PNG, GIF, WebP) hoặc PDF. Tối đa 5MB. Mỗi đơn hàng chỉ upload 1 file.</small>
+                <div id="upload-preview" class="mt-2"></div>
               </div>
             </div>
           </div>
