@@ -34,4 +34,10 @@ export function registerOrderRoutes(router: any): void {
     const orderId = urlParts[urlParts.length - 2] || "";
     await orderController.updatePaymentStatus(req, res, orderId);
   });
+
+  router.patch("/api/orders/:orderId/cancel", authenticateToken, async (req: HttpRequest, res: HttpResponse) => {
+    const urlParts = req.url?.split("/") || [];
+    const orderId = urlParts[urlParts.length - 2] || "";
+    await orderController.cancelOrder(req, res, orderId);
+  });
 }

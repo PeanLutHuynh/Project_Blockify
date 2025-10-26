@@ -22,6 +22,13 @@ export interface IOrderRepository {
   findByOrderNumber(orderNumber: string): Promise<Order | null>;
 
   /**
+   * Find order by ID
+   * @param orderId Order ID
+   * @returns Order or null
+   */
+  findById(orderId: number): Promise<Order | null>;
+
+  /**
    * Find all orders for a user
    * @param userId User ID
    * @returns Array of orders

@@ -2,6 +2,7 @@ import { authService } from '../../core/services/AuthService.js';
 import { httpClient } from '../../core/api/FetchHttpClient.js';
 import { User } from '../../core/models/User.js';
 import userProfileService, { UserAddress } from './UserProfileService.js';
+import orderTrackingService, { Order } from './OrderTrackingService.js';
 
 /**
  * AccountController
@@ -9,13 +10,24 @@ import userProfileService, { UserAddress } from './UserProfileService.js';
  * Following MVC pattern - this is the Controller
  */
 export class AccountController {
+  private static instance: AccountController | null = null;
   private currentUser: User | null = null;
   private addresses: UserAddress[] = [];
+  private orders: Order[] = [];
+  private currentOrderStatus: string = 'All';
   public editingAddressId: number | null = null;
   private isSavingProfile: boolean = false; // Flag to prevent duplicate saves
+  private eventListenersSetup: boolean = false; // Flag to prevent duplicate event listeners
   // private isEditingProfile: boolean = false; // TODO: Re-enable for readonly mode
 
   constructor() {
+    // Singleton pattern - prevent multiple instances
+    if (AccountController.instance) {
+      console.warn('⚠️ AccountController already exists, returning existing instance');
+      return AccountController.instance;
+    }
+    
+    AccountController.instance = this;
     this.initializePage();
     // Expose to window for HTML onclick handlers
     (window as any).accountControllerInstance = this;
@@ -44,6 +56,9 @@ export class AccountController {
 
     // Load addresses
     await this.loadAddresses();
+
+    // Load orders
+    await this.loadOrders();
 
     // Setup date dropdowns
     this.setupDateDropdowns();
@@ -170,7 +185,7 @@ export class AccountController {
       largeAvatar.src = this.currentUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentUser.getDisplayName())}&background=random`;
     }
 
-    // Set fields to readonly mode by default
+    // Set fields to readonly mode by default (only disables inputs, no button changes)
     this.setProfileFieldsReadonly(true);
 
     console.log('✅ User data populated successfully');
@@ -217,6 +232,7 @@ export class AccountController {
     const dayButton = document.getElementById('day-button') as HTMLButtonElement;
     const monthButton = document.getElementById('month-button') as HTMLButtonElement;
     const yearButton = document.getElementById('year-button') as HTMLButtonElement;
+    const saveBtn = document.getElementById('saveProfileBtn') as HTMLButtonElement;
 
     if (nameInput) nameInput.disabled = readonly;
     if (phoneInput) phoneInput.disabled = readonly;
@@ -227,24 +243,8 @@ export class AccountController {
     if (monthButton) monthButton.disabled = readonly;
     if (yearButton) yearButton.disabled = readonly;
 
-    // Update button visibility
-    this.updateProfileButtons(readonly);
-  }
-
-  /**
-   * Update profile buttons based on edit mode
-   */
-  private updateProfileButtons(readonly: boolean): void {
-    const buttons = document.querySelectorAll('.btn-primary-custom');
-    buttons.forEach(btn => {
-      const btnText = btn.textContent?.trim();
-      if (btnText === 'Lưu' || btnText === 'Save') {
-        (btn as HTMLButtonElement).style.display = readonly ? 'none' : 'inline-block';
-      }
-      if (btnText === 'Cập nhật' || btnText === 'Update') {
-        (btn as HTMLButtonElement).style.display = readonly ? 'inline-block' : 'none';
-      }
-    });
+    // Disable Save button when in readonly mode
+    if (saveBtn) saveBtn.disabled = readonly;
   }
 
   /**
@@ -253,6 +253,20 @@ export class AccountController {
   public handleEditProfile(): void {
     console.log('🔓 Enabling edit mode');
     this.setProfileFieldsReadonly(false);
+    
+    // Toggle button states
+    const saveBtn = document.getElementById('saveProfileBtn');
+    const updateBtn = document.getElementById('updateProfileBtn');
+    
+    if (saveBtn && updateBtn) {
+      // Save button becomes primary (active)
+      saveBtn.classList.remove('btn-secondary');
+      saveBtn.classList.add('btn-primary-custom');
+      
+      // Update button becomes secondary (inactive)
+      updateBtn.classList.remove('btn-primary-custom');
+      updateBtn.classList.add('btn-secondary');
+    }
   }
 
   /**
@@ -401,49 +415,39 @@ export class AccountController {
    * Setup event listeners
    */
   private setupEventListeners(): void {
+    // Prevent duplicate event listener binding
+    if (this.eventListenersSetup) {
+      console.log('⚠️ Event listeners already setup, skipping...');
+      return;
+    }
+    
     console.log('🔧 Setting up event listeners...');
     
-    // Remove all existing listeners by cloning and replacing buttons
-    const buttons = document.querySelectorAll('.btn-primary-custom');
-    console.log('📋 Found buttons:', buttons.length);
+    // Bind Save and Update buttons by ID
+    const saveBtn = document.getElementById('saveProfileBtn');
+    const updateBtn = document.getElementById('updateProfileBtn');
     
-    let saveButtonCount = 0;
-    let updateButtonCount = 0;
+    if (saveBtn) {
+      saveBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('💾 Save profile clicked');
+        this.handleSaveProfile();
+      });
+      console.log('✅ Bound Save handler');
+    }
     
-    buttons.forEach((btn, index) => {
-      const btnText = btn.textContent?.trim();
-      console.log(`Button ${index}: "${btnText}"`);
-      
-      // Clone button to remove all event listeners
-      const newBtn = btn.cloneNode(true) as HTMLElement;
-      btn.parentNode?.replaceChild(newBtn, btn);
-      
-      // Only bind to the FIRST "Lưu" button (profile save)
-      if ((btnText === 'Lưu' || btnText === 'Save') && saveButtonCount === 0) {
-        newBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('💾 Save profile clicked');
-          this.handleSaveProfile();
-        }, { once: true }); // Use 'once' to ensure it only fires once
-        saveButtonCount++;
-        console.log('✅ Bound Save handler to button', index);
-      }
-      
-      // Only bind to the FIRST "Cập nhật" button (profile edit)
-      if ((btnText === 'Cập nhật' || btnText === 'Update') && updateButtonCount === 0) {
-        newBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('✏️ Update profile clicked');
-          this.handleEditProfile();
-        });
-        updateButtonCount++;
-        console.log('✅ Bound Update handler to button', index);
-      }
-    });
+    if (updateBtn) {
+      updateBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('✏️ Update profile clicked');
+        this.handleEditProfile();
+      });
+      console.log('✅ Bound Update handler');
+    }
 
-    console.log(`✅ Event listeners setup complete: ${saveButtonCount} Save, ${updateButtonCount} Update`);
+    // Mark as setup
+    this.eventListenersSetup = true;
+    console.log(`✅ Event listeners setup complete: Save and Update buttons bound by ID`);
   }
 
   /**
@@ -640,8 +644,11 @@ export class AccountController {
           return;
         }
         
-        // Format as ISO string for backend
-        updateData.birthDate = birthDate.toISOString();
+        // Format as ISO date string (YYYY-MM-DD) without timezone conversion
+        // Pad month and day with leading zeros
+        const monthStr = month.toString().padStart(2, '0');
+        const dayStr = day.toString().padStart(2, '0');
+        updateData.birthDate = `${year}-${monthStr}-${dayStr}`;
       }
 
       console.log('📤 Updating profile with data:', updateData);
@@ -670,6 +677,20 @@ export class AccountController {
         
         // Reset to readonly mode
         this.setProfileFieldsReadonly(true);
+        
+        // Toggle button states back to view mode
+        const saveBtn = document.getElementById('saveProfileBtn');
+        const updateBtn = document.getElementById('updateProfileBtn');
+        
+        if (saveBtn && updateBtn) {
+          // Save button becomes secondary (inactive)
+          saveBtn.classList.remove('btn-primary-custom');
+          saveBtn.classList.add('btn-secondary');
+          
+          // Update button becomes primary (active)
+          updateBtn.classList.remove('btn-secondary');
+          updateBtn.classList.add('btn-primary-custom');
+        }
         
         // Refresh UI
         this.populateUserData();
@@ -917,6 +938,526 @@ export class AccountController {
       alert('Có lỗi xảy ra');
     }
   }
+
+  // ==================== ORDER TRACKING METHODS ====================
+
+  /**
+   * Load user orders
+   */
+  private async loadOrders(): Promise<void> {
+    if (!this.currentUser) return;
+
+    try {
+      const userId = this.getUserId();
+      console.log(`📦 Loading orders for user ${userId}...`);
+      
+      this.orders = await orderTrackingService.getUserOrders(userId);
+      console.log(`✅ Loaded ${this.orders.length} orders`);
+      
+      // Render orders
+      this.renderOrders();
+      
+      // Setup order tab listeners
+      this.setupOrderTabListeners();
+    } catch (error: any) {
+      console.error('❌ Error loading orders:', error);
+      this.renderEmptyOrders('Không thể tải danh sách đơn hàng');
+    }
+  }
+
+  /**
+   * Handle cancel order (called from HTML)
+   */
+  public async handleCancelOrder(orderId: string, orderNumber: string): Promise<void> {
+    // Show cancel reason modal
+    const reasons = [
+      'Muốn thay đổi địa chỉ giao hàng',
+      'Muốn nhập/thay đổi mã Voucher',
+      'Thủ tục thanh toán quá rắc rối',
+      'Tìm thấy giá rẻ hơn ở chỗ khác',
+      'Đổi ý, không muốn mua nữa',
+      'Khác'
+    ];
+
+    const reasonsHtml = reasons.map((reason, index) => `
+      <div class="form-check mb-2">
+        <input class="form-check-input" type="radio" name="cancelReason" id="reason${index}" value="${reason}" ${index === 0 ? 'checked' : ''}>
+        <label class="form-check-label" for="reason${index}">
+          ${reason}
+        </label>
+      </div>
+    `).join('');
+
+    // Create modal HTML
+    const modalHtml = `
+      <div class="modal fade" id="cancelOrderModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Chọn Lý Do Hủy</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <p class="text-muted mb-3">Đơn hàng: <strong>${orderNumber}</strong></p>
+              <div class="alert alert-warning mb-3" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i><strong>Vui lòng chọn lí do hủy đơn hàng.</strong> Lưu ý: Thao tác này sẽ hủy tất cả các sản phẩm có trong đơn hàng và không thể hoàn tác.
+              </div>
+              ${reasonsHtml}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">KHÔNG PHẢI BÂY GIỜ</button>
+              <button type="button" class="btn btn-danger" id="confirmCancelBtn">HỦY ĐƠN HÀNG</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Remove existing modal if any
+    const existingModal = document.getElementById('cancelOrderModal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Show modal
+    const modalElement = document.getElementById('cancelOrderModal');
+    if (!modalElement) return;
+
+    // Use Bootstrap's modal
+    const modal = new (window as any).bootstrap.Modal(modalElement);
+    modal.show();
+
+    // Handle confirm cancel
+    const confirmBtn = document.getElementById('confirmCancelBtn');
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', async () => {
+        const selectedReason = document.querySelector('input[name="cancelReason"]:checked') as HTMLInputElement;
+        if (!selectedReason) {
+          alert('Vui lòng chọn lý do hủy');
+          return;
+        }
+
+        const reason = selectedReason.value;
+
+        try {
+          // Call API to cancel order
+          await orderTrackingService.cancelOrder(parseInt(orderId), reason);
+          
+          alert('Đã hủy đơn hàng thành công!');
+          modal.hide();
+          
+          // Reload orders
+          await this.loadOrders();
+        } catch (error: any) {
+          console.error('Error canceling order:', error);
+          alert('Không thể hủy đơn hàng: ' + error.message);
+        }
+      });
+    }
+
+    // Clean up modal after hide
+    modalElement.addEventListener('hidden.bs.modal', () => {
+      modalElement.remove();
+    });
+  }
+
+  /**
+   * View order details in a modal (called from HTML)
+   */
+  public viewOrderDetails(orderId: string, orderNumber: string): void {
+    // Find the order
+    const order = this.orders.find(o => o.order_id.toString() === orderId);
+    if (!order) {
+      alert('Không tìm thấy đơn hàng');
+      return;
+    }
+
+    console.log('📦 Order details:', order);
+    console.log('📦 Order items:', order.items);
+
+    // Build items HTML
+    const itemsHtml = (order.items || []).map(item => {
+      console.log('🎁 Item:', item);
+      return `
+      <div class="d-flex align-items-start gap-3 mb-3 pb-3 border-bottom">
+        ${item.image_url 
+          ? `<img src="${this.escapeHtml(item.image_url)}" alt="${this.escapeHtml(item.product_name)}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #e0e0e0;">`
+          : `<div style="width: 80px; height: 80px; background: #f5f5f5; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e0e0;">
+               <i class="bi bi-image" style="font-size: 24px; color: #bbb;"></i>
+             </div>`
+        }
+        <div class="flex-grow-1">
+          <div class="fw-semibold">${this.escapeHtml(item.product_name)}</div>
+          <div class="text-muted small mt-1">Phân loại hàng: ${this.escapeHtml(item.product_sku || 'N/A')}</div>
+          <div class="text-muted small">x${item.quantity}</div>
+        </div>
+        <div class="text-end">
+          <div class="text-decoration-line-through text-muted small" style="font-size: 0.875rem;">
+            ${orderTrackingService.formatPrice(item.unit_price * 1.2)}
+          </div>
+          <div class="text-danger fw-semibold">
+            ${orderTrackingService.formatPrice(item.total_price)}
+          </div>
+        </div>
+      </div>
+    `;}).join('');
+
+    console.log('📝 Items HTML length:', itemsHtml.length);
+
+    // Show message if no items
+    const itemsDisplay = itemsHtml.length > 0 
+      ? itemsHtml 
+      : '<div class="text-center text-muted py-4">Không tìm thấy sản phẩm trong đơn hàng</div>';
+
+    // Build discount info
+    const discountHtml = order.discount_amount && order.discount_amount > 0 ? `
+      <div class="d-flex justify-content-between mb-2">
+        <span class="text-muted">
+          <i class="bi bi-ticket-perforated me-1"></i>Đã giảm
+        </span>
+        <span class="text-success">-${orderTrackingService.formatPrice(order.discount_amount)}</span>
+      </div>
+    ` : '';
+
+    // Create modal HTML
+    const modalHtml = `
+      <div class="modal fade" id="orderDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-light">
+              <div>
+                <h5 class="modal-title mb-1">Chi Tiết Đơn Hàng</h5>
+                <p class="mb-0 text-muted small">Mã đơn: <strong>${this.escapeHtml(orderNumber)}</strong></p>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-4">
+                <h6 class="fw-bold mb-3">Sản phẩm</h6>
+                ${itemsDisplay}
+              </div>
+              
+              <div class="border-top pt-3">
+                <h6 class="fw-bold mb-3">Thông tin thanh toán</h6>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted">Tổng tiền hàng</span>
+                  <span>${orderTrackingService.formatPrice(order.subtotal)}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted">Phí vận chuyển</span>
+                  <span>${orderTrackingService.formatPrice(order.shipping_fee)}</span>
+                </div>
+                ${discountHtml}
+                <div class="d-flex justify-content-between mb-3 border-top pt-2">
+                  <span class="fw-bold">Tổng thanh toán</span>
+                  <span class="fw-bold text-danger fs-5">${orderTrackingService.formatPrice(order.total_amount)}</span>
+                </div>
+              </div>
+
+              <div class="border-top pt-3">
+                <h6 class="fw-bold mb-3">Thông tin giao hàng</h6>
+                <div class="mb-2">
+                  <strong>${this.escapeHtml(order.customer_name || '')}</strong>
+                </div>
+                <div class="text-muted small mb-1">
+                  <i class="bi bi-telephone me-1"></i>${this.escapeHtml(order.customer_phone || '')}
+                </div>
+                <div class="text-muted small">
+                  <i class="bi bi-geo-alt me-1"></i>${this.escapeHtml(order.shipping_address || '')}
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Remove existing modal if any
+    const existingModal = document.getElementById('orderDetailsModal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Show modal
+    const modalElement = document.getElementById('orderDetailsModal');
+    if (!modalElement) return;
+
+    // Use Bootstrap's modal
+    const modal = new (window as any).bootstrap.Modal(modalElement);
+    modal.show();
+
+    // Clean up modal after hide
+    modalElement.addEventListener('hidden.bs.modal', () => {
+      modalElement.remove();
+    });
+  }
+
+  /**
+   * Reorder items - Add all items from this order to cart and redirect to cart page
+   */
+  public async reorderItems(orderId: string): Promise<void> {
+    try {
+      // Find the order
+      const order = this.orders.find(o => o.order_id.toString() === orderId);
+      if (!order || !order.items || order.items.length === 0) {
+        alert('Không tìm thấy sản phẩm trong đơn hàng');
+        return;
+      }
+
+      console.log('🔄 Re-ordering items from order:', order.order_number);
+
+      // Show loading
+      const loadingDiv = document.createElement('div');
+      loadingDiv.innerHTML = `
+        <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 10000;">
+          <div class="spinner-border text-primary me-3" role="status"></div>
+          <span class="fw-bold">Đang thêm sản phẩm vào giỏ hàng...</span>
+        </div>
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 9999;"></div>
+      `;
+      document.body.appendChild(loadingDiv);
+
+      // Import CartService dynamically
+      const { cartService } = await import('../../core/services/CartService.js');
+
+      let successCount = 0;
+      let failedItems: string[] = [];
+
+      // Add each item to cart
+      for (const item of order.items) {
+        try {
+          // Get product details to ensure we have all required data
+          const { productService } = await import('../../core/services/ProductService.js');
+          const productResult = await productService.getProductById(item.product_id.toString());
+
+          if (!productResult.success || !productResult.product) {
+            failedItems.push(item.product_name);
+            continue;
+          }
+
+          const product = productResult.product;
+
+          // Add to cart
+          const result = await cartService.addToCart({
+            productId: item.product_id,
+            productName: item.product_name,
+            productSlug: product.slug || `product-${item.product_id}`,
+            imageUrl: item.image_url || product.imageUrl || '',
+            price: product.price || item.unit_price,
+            salePrice: product.salePrice || null,
+            quantity: item.quantity,
+            stockQuantity: product.stockQuantity || 100,
+            minStockLevel: 0
+          });
+
+          if (result.success) {
+            successCount++;
+            console.log(`✅ Added ${item.product_name} to cart`);
+          } else {
+            failedItems.push(item.product_name);
+            console.error(`❌ Failed to add ${item.product_name}:`, result.message);
+          }
+        } catch (error) {
+          console.error(`❌ Error adding ${item.product_name}:`, error);
+          failedItems.push(item.product_name);
+        }
+      }
+
+      // Remove loading
+      document.body.removeChild(loadingDiv);
+
+      // Show result
+      if (successCount > 0) {
+        const message = failedItems.length > 0
+          ? `Đã thêm ${successCount}/${order.items.length} sản phẩm vào giỏ hàng.\n\nSản phẩm không thể thêm:\n${failedItems.join('\n')}`
+          : `Đã thêm ${successCount} sản phẩm vào giỏ hàng!`;
+        
+        alert(message);
+
+        // Redirect to cart page
+        window.location.href = '/src/pages/CartPage.html';
+      } else {
+        alert('Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại sau.');
+      }
+    } catch (error: any) {
+      console.error('❌ Error re-ordering items:', error);
+      alert('Đã xảy ra lỗi: ' + error.message);
+    }
+  }
+
+  /**
+   * Setup order status tab listeners
+   */
+  private setupOrderTabListeners(): void {
+    const orderTabs = document.querySelectorAll('.orders-tabs .nav-link');
+    
+    orderTabs.forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Remove active class from all tabs
+        orderTabs.forEach(t => t.classList.remove('active'));
+        
+        // Add active class to clicked tab
+        tab.classList.add('active');
+        
+        // Get status from data attribute
+        const status = (tab as HTMLElement).dataset.status || 'All';
+        this.currentOrderStatus = status;
+        
+        // Filter and render orders
+        this.renderOrders();
+      });
+    });
+  }
+
+  /**
+   * Render orders based on current filter
+   */
+  private renderOrders(): void {
+    const container = document.querySelector('#order .section-body');
+    
+    if (!container) {
+      console.warn('Order container not found');
+      return;
+    }
+
+    // Filter orders by status
+    const filteredOrders = this.currentOrderStatus === 'All'
+      ? this.orders
+      : this.orders.filter(order => order.status === this.currentOrderStatus);
+
+    if (filteredOrders.length === 0) {
+      const statusText = this.currentOrderStatus === 'All' 
+        ? 'Bạn chưa có đơn hàng nào'
+        : `Không có đơn hàng ${orderTrackingService.getStatusText(this.currentOrderStatus).toLowerCase()}`;
+      this.renderEmptyOrders(statusText);
+      return;
+    }
+
+    // Render orders
+    const html = filteredOrders.map(order => this.renderOrderCard(order)).join('');
+    container.innerHTML = html;
+  }
+
+  /**
+   * Render a single order card
+   */
+  private renderOrderCard(order: Order): string {
+    const statusClass = orderTrackingService.getStatusClass(order.status);
+    const statusText = orderTrackingService.getStatusText(order.status);
+    const formattedDate = orderTrackingService.formatDate(order.ordered_at);
+    const formattedTotal = orderTrackingService.formatPrice(order.total_amount);
+
+    // Render order items with images
+    const itemsHtml = (order.items || []).map(item => `
+      <div class="d-flex align-items-start gap-3 mb-3 pb-3 border-bottom">
+        ${item.image_url 
+          ? `<img src="${this.escapeHtml(item.image_url)}" alt="${this.escapeHtml(item.product_name)}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #e0e0e0;">`
+          : `<div style="width: 100px; height: 100px; background: #f5f5f5; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e0e0;">
+               <i class="bi bi-image" style="font-size: 32px; color: #bbb;"></i>
+             </div>`
+        }
+        <div class="flex-grow-1">
+          <div class="fw-semibold">${this.escapeHtml(item.product_name)}</div>
+          <div class="text-muted small mt-1">Phân loại hàng: ${this.escapeHtml(item.product_sku || 'N/A')}</div>
+          <div class="text-muted small">x${item.quantity}</div>
+        </div>
+        <div class="text-end">
+          <div class="text-decoration-line-through text-muted small" style="font-size: 0.875rem;">
+            ${orderTrackingService.formatPrice(item.unit_price * 1.2)}
+          </div>
+          <div class="text-danger fw-semibold">
+            ${orderTrackingService.formatPrice(item.total_price)}
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    // Show cancel button only for "Đang xử lý" status
+    const showCancelButton = order.status === 'Đang xử lý';
+    
+    // Show cancel reason for "Đã hủy" status
+    const showCancelReason = order.status === 'Đã hủy';
+    const cancelReason = order.notes || 'Không tìm thấy lý do hủy phù hợp';
+
+    return `
+      <div class="card mb-3 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+          <div>
+            <strong class="text-primary">Blockify</strong>
+            <span class="ms-3 text-muted small">Mã đơn: ${this.escapeHtml(order.order_number)}</span>
+          </div>
+          <div class="${statusClass} fw-bold">${statusText}</div>
+        </div>
+        <div class="card-body">
+          ${itemsHtml}
+          
+          ${showCancelReason ? `
+            <div class="alert alert-danger mb-3" role="alert">
+              <strong><i class="bi bi-x-circle me-2"></i>Lý do:</strong> ${this.escapeHtml(cancelReason)}
+            </div>
+          ` : ''}
+          
+          <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+            <div class="text-muted small">
+              <div><i class="bi bi-calendar me-2"></i>Ngày đặt: ${formattedDate}</div>
+              <div class="mt-1"><i class="bi bi-credit-card me-2"></i>${orderTrackingService.getPaymentMethodText(order.payment_method)}</div>
+            </div>
+            <div class="text-end">
+              <div class="text-muted small">Số tiền phải trả:</div>
+              <div class="fs-5 fw-bold text-danger">${formattedTotal}</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-white border-top d-flex justify-content-end gap-2 py-3">
+          ${showCancelButton ? `
+            <button class="btn btn-outline-danger" onclick="window.accountControllerInstance.handleCancelOrder('${order.order_id}', '${this.escapeHtml(order.order_number)}')">
+              <i class="bi bi-x-circle me-1"></i>Hủy Đơn Hàng
+            </button>
+          ` : ''}
+          <button class="btn btn-outline-primary" onclick="window.accountControllerInstance.viewOrderDetails('${order.order_id}', '${this.escapeHtml(order.order_number)}')">
+            <i class="bi bi-eye me-1"></i>Xem Chi Tiết
+          </button>
+          ${order.status === 'Đã giao' ? `
+            <button class="btn btn-primary" onclick="window.accountControllerInstance.reorderItems('${order.order_id}')">
+              <i class="bi bi-arrow-repeat me-1"></i>Mua Lại
+            </button>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Render empty orders message
+   */
+  private renderEmptyOrders(message: string): void {
+    const container = document.querySelector('#order .section-body');
+    
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="text-center py-5">
+        <i class="bi bi-bag-x" style="font-size: 48px; color: #ccc;"></i>
+        <p class="mt-3 text-muted">${this.escapeHtml(message)}</p>
+        <a href="/src/pages/HomePage.html" class="btn btn-primary-custom mt-3">
+          <i class="bi bi-house-door me-2"></i>Tiếp tục mua sắm
+        </a>
+      </div>
+    `;
+  }
+
+  // ==================== END ORDER TRACKING METHODS ====================
 
   /**
    * Escape HTML to prevent XSS
