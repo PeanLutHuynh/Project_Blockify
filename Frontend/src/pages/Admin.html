@@ -51,6 +51,9 @@
         <li class="nav-item" data-target="feedback-manager">
           <i class="bi bi-chat-dots me-2"></i>Đánh giá sản phẩm
         </li>
+        <li class="nav-item" data-target="voucher">
+          <i class="bi bi-ticket-perforated me-2"></i>Quản lý Voucher
+        </li>
         <li class="nav-item" data-target="notification">
           <i class="bi bi-bell-fill me-2 text-secondary"></i>Thông báo
         </li>
@@ -163,13 +166,21 @@
 
       <!-- Product -->
       <section id="product" class="section">
-        <div class="bar-blue">Sản phẩm</div>
-        
-        <div class="toolbar d-flex gap-2 mb-3">
-          <input class="search form-control" placeholder="Tìm kiếm sản phẩm">
-          <button class="btn" data-bs-toggle="modal" data-bs-target="#addProductModal">+ Thêm sản phẩm</button>
+        <!-- Product Navbar -->
+        <div class="product-navbar">
+          <h3 class="navbar-title">Quản lý sản phẩm</h3>
+          <div class="navbar-actions">
+            <input class="search form-control" placeholder="Tìm kiếm sản phẩm" id="productSearch">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+              <i class="bi bi-plus-circle me-1"></i>Thêm sản phẩm
+            </button>
+          </div>
         </div>
-        <div class="row g-3" id="productList"></div>
+        
+        <!-- Product List -->
+        <div class="row g-3" id="productList">
+          <!-- Products will be rendered here -->
+        </div>
       </section>
 
       <!-- Shop Info -->
@@ -256,7 +267,7 @@
               <td>Chuyển khoản</td>
               <td><span class="badge bg-warning text-dark order-status">Đang xử lý</span></td>
               <td>
-                <button type="button" class="btn btn-outline btn-sm show-order-detail" data-order-id="ODR001">Chi tiết</button>
+                <button type="button" class="btn btn-outline btn-sm show-order-detail" data-order-id="ODR001" data-bs-toggle="modal" data-bs-target="#orderDetailModal">Chi tiết</button>
                 <button type="button" class="btn btn-outline btn-sm action-next-status mt-2" data-order-id="ODR001">Cập nhật trạng thái</button>
                 <button type="button" class="btn btn-outline btn-sm check-payment-proof mt-2" data-order-id="ODR001">Kiểm minh chứng</button>
                 <button type="button" class="btn btn-outline btn-sm cancel-order-btn mt-2" data-order-id="ODR001">Huỷ đơn</button>
@@ -320,7 +331,7 @@
                 </div>
                 <div><i>"Sản phẩm rất tốt, giao hàng nhanh!"</i></div>
                 <div class="feedback-actions mt-1">
-                  <button type="button" class="btn btn-outline btn-sm view-feedback-btn" data-feedback-id="FB001">Xem</button>
+                  <button type="button" class="btn btn-outline btn-sm view-feedback-btn" data-feedback-id="FB001" data-bs-toggle="modal" data-bs-target="#feedbackDetailModal">Xem</button>
                   <button type="button" class="btn btn-outline-secondary btn-sm ms-2 acknowledge-feedback-btn" data-feedback-id="FB001">Ghi nhận</button>
                 </div>
               </div>
@@ -343,6 +354,25 @@
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- Voucher Management -->
+      <section id="voucher" class="section">
+        <!-- Voucher Navbar -->
+        <div class="voucher-navbar">
+          <h3 class="navbar-title">Quản lý Voucher</h3>
+          <div class="navbar-actions">
+            <input class="search form-control" placeholder="Tìm kiếm voucher" id="voucherSearch">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVoucherModal">
+              <i class="bi bi-plus-circle me-1"></i>Thêm Voucher
+            </button>
+          </div>
+        </div>
+        
+        <!-- Voucher List -->
+        <div class="row g-3" id="voucherList">
+          <!-- Vouchers will be rendered here -->
         </div>
       </section>
 
@@ -402,8 +432,25 @@
         <div class="modal-body">
           <form id="productForm">
             <div class="mb-3">
-              <label class="form-label">Ảnh</label>
-              <input type="file" class="form-control" id="productImage">
+              <label class="form-label">Hình ảnh sản phẩm (tối đa 4 hình)</label>
+              <div class="row g-2" id="productImagesContainer">
+                <div class="col-6">
+                  <input type="file" class="form-control product-image-input" accept="image/*" data-index="0">
+                  <div class="image-preview mt-2" id="preview-0"></div>
+                </div>
+                <div class="col-6">
+                  <input type="file" class="form-control product-image-input" accept="image/*" data-index="1">
+                  <div class="image-preview mt-2" id="preview-1"></div>
+                </div>
+                <div class="col-6">
+                  <input type="file" class="form-control product-image-input" accept="image/*" data-index="2">
+                  <div class="image-preview mt-2" id="preview-2"></div>
+                </div>
+                <div class="col-6">
+                  <input type="file" class="form-control product-image-input" accept="image/*" data-index="3">
+                  <div class="image-preview mt-2" id="preview-3"></div>
+                </div>
+              </div>
             </div>
             <div class="mb-3">
               <label class="form-label">Tên sản phẩm</label>
@@ -430,17 +477,1222 @@
               <input type="text" class="form-control" id="productAge">
             </div>
             <div class="mb-3">
-              <label class="form-label">Mô tả</label>
-              <textarea class="form-control" id="productDesc" rows="2"></textarea>
+              <label class="form-label">Giá (VND)</label>
+              <input type="number" class="form-control" id="productPrice" min="0" required>
             </div>
-            <button type="submit" class="btn btn-primary">Lưu</button>
+            <div class="mb-3">
+              <label class="form-label">Trạng thái</label>
+              <select class="form-control" id="productStatus" required>
+                <option value="active">Đang bán</option>
+                <option value="inactive">Ngừng bán</option>
+                <option value="out_of_stock">Hết hàng</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mô tả</label>
+              <textarea class="form-control" id="productDesc" rows="3"></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-primary">Lưu sản phẩm</button>
+            </div>
           </form>
         </div>
       </div>
     </div>
   </div>
-</div>
+  </div>
 
+  <!-- Edit Product Modal -->
+  <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editProductModalLabel">Chỉnh sửa sản phẩm</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editProductForm">
+            <input type="hidden" id="editProductId">
+            <div class="mb-3">
+              <label class="form-label">Hình ảnh sản phẩm (tối đa 4 hình)</label>
+              <div class="row g-2" id="editProductImagesContainer">
+                <div class="col-6">
+                  <input type="file" class="form-control edit-product-image-input" accept="image/*" data-index="0">
+                  <div class="image-preview mt-2" id="edit-preview-0"></div>
+                </div>
+                <div class="col-6">
+                  <input type="file" class="form-control edit-product-image-input" accept="image/*" data-index="1">
+                  <div class="image-preview mt-2" id="edit-preview-1"></div>
+                </div>
+                <div class="col-6">
+                  <input type="file" class="form-control edit-product-image-input" accept="image/*" data-index="2">
+                  <div class="image-preview mt-2" id="edit-preview-2"></div>
+                </div>
+                <div class="col-6">
+                  <input type="file" class="form-control edit-product-image-input" accept="image/*" data-index="3">
+                  <div class="image-preview mt-2" id="edit-preview-3"></div>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Tên sản phẩm</label>
+              <input type="text" class="form-control" id="editProductName" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Thương hiệu</label>
+              <input type="text" class="form-control" id="editProductBrand" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Chủ đề</label>
+              <input type="text" class="form-control" id="editProductTheme">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Số mảnh ghép</label>
+              <input type="number" class="form-control" id="editProductPieces">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Tồn kho</label>
+              <input type="number" class="form-control" id="editProductStock">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Độ tuổi</label>
+              <input type="text" class="form-control" id="editProductAge">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Giá (VND)</label>
+              <input type="number" class="form-control" id="editProductPrice" min="0" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Trạng thái</label>
+              <select class="form-control" id="editProductStatus" required>
+                <option value="active">Đang bán</option>
+                <option value="inactive">Ngừng bán</option>
+                <option value="out_of_stock">Hết hàng</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mô tả</label>
+              <textarea class="form-control" id="editProductDesc" rows="3"></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-primary">Cập nhật sản phẩm</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Voucher Modal -->
+  <div class="modal fade" id="addVoucherModal" tabindex="-1" aria-labelledby="addVoucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addVoucherModalLabel">Thêm Voucher</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <form id="voucherForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Tên phiếu giảm giá</label>
+                  <input type="text" class="form-control" id="voucherName" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Loại giảm giá</label>
+                  <select class="form-control" id="voucherType" required>
+                    <option value="">Chọn loại giảm giá</option>
+                    <option value="percentage">Giảm theo phần trăm (%)</option>
+                    <option value="fixed">Giảm cố định (VND)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Giá trị giảm</label>
+                  <input type="number" class="form-control" id="voucherValue" min="0" required>
+                  <small class="form-text text-muted" id="voucherValueHelp">Nhập số phần trăm hoặc số tiền</small>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Mức giảm tối đa (VND)</label>
+                  <input type="number" class="form-control" id="voucherMaxDiscount" min="0">
+                  <small class="form-text text-muted">Chỉ áp dụng cho giảm theo phần trăm</small>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Ngày bắt đầu áp dụng</label>
+                  <input type="datetime-local" class="form-control" id="voucherStartDate" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Ngày kết thúc áp dụng</label>
+                  <input type="datetime-local" class="form-control" id="voucherEndDate" required>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Giá trị đơn hàng tối thiểu (VND)</label>
+                  <input type="number" class="form-control" id="voucherMinOrder" min="0" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Số lần được phép sử dụng</label>
+                  <input type="number" class="form-control" id="voucherUsageLimit" min="1" required>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Mô tả chi tiết</label>
+              <textarea class="form-control" id="voucherDescription" rows="3" placeholder="Mô tả về voucher, điều kiện sử dụng..."></textarea>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Trạng thái hoạt động</label>
+              <select class="form-control" id="voucherStatus" required>
+                <option value="active">Đang bật</option>
+                <option value="inactive">Tắt</option>
+              </select>
+            </div>
+            
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-primary">Lưu Voucher</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Voucher Modal -->
+  <div class="modal fade" id="editVoucherModal" tabindex="-1" aria-labelledby="editVoucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editVoucherModalLabel">Chỉnh sửa Voucher</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editVoucherForm">
+            <input type="hidden" id="editVoucherId">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Tên phiếu giảm giá</label>
+                  <input type="text" class="form-control" id="editVoucherName" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Loại giảm giá</label>
+                  <select class="form-control" id="editVoucherType" required>
+                    <option value="">Chọn loại giảm giá</option>
+                    <option value="percentage">Giảm theo phần trăm (%)</option>
+                    <option value="fixed">Giảm cố định (VND)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Giá trị giảm</label>
+                  <input type="number" class="form-control" id="editVoucherValue" min="0" required>
+                  <small class="form-text text-muted" id="editVoucherValueHelp">Nhập số phần trăm hoặc số tiền</small>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Mức giảm tối đa (VND)</label>
+                  <input type="number" class="form-control" id="editVoucherMaxDiscount" min="0">
+                  <small class="form-text text-muted">Chỉ áp dụng cho giảm theo phần trăm</small>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Ngày bắt đầu áp dụng</label>
+                  <input type="datetime-local" class="form-control" id="editVoucherStartDate" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Ngày kết thúc áp dụng</label>
+                  <input type="datetime-local" class="form-control" id="editVoucherEndDate" required>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Giá trị đơn hàng tối thiểu (VND)</label>
+                  <input type="number" class="form-control" id="editVoucherMinOrder" min="0" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Số lần được phép sử dụng</label>
+                  <input type="number" class="form-control" id="editVoucherUsageLimit" min="1" required>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Mô tả chi tiết</label>
+              <textarea class="form-control" id="editVoucherDescription" rows="3" placeholder="Mô tả về voucher, điều kiện sử dụng..."></textarea>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Trạng thái hoạt động</label>
+              <select class="form-control" id="editVoucherStatus" required>
+                <option value="active">Đang bật</option>
+                <option value="inactive">Tắt</option>
+              </select>
+            </div>
+            
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-primary">Cập nhật Voucher</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Bootstrap JS first -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Tải cấu hình môi trường trước -->
+  <script type="module" src="/dist/src/core/config/env.js"></script>
+  <script type="module" src="/dist/src/assets/js/components/Admin.js"></script>
+  <script>
+     // PRODUCT MANAGEMENT
+     let productsData = [
+            {
+                id: 'PRD001',
+                name: 'Nhà để xe - 34 xe',
+                brand: 'Lego',
+                theme: 'City',
+                pieces: 34,
+                stock: 15,
+                age: '4+',
+                price: 245000,
+                status: 'active',
+                description: 'Nhà để xe với 34 xe đồ chơi',
+                images: ['img/Rectangle 108 (1).png', 'img/Rectangle 108 (2).png']
+            },
+            {
+                id: 'PRD002',
+                name: 'Xe cảnh sát',
+                brand: 'Lego',
+                theme: 'City',
+                pieces: 25,
+                stock: 8,
+                age: '3+',
+                price: 230000,
+                status: 'active',
+                description: 'Xe cảnh sát với đèn nhấp nháy',
+                images: ['img/Rectangle 108 (2).png']
+            },
+            {
+                id: 'PRD003',
+                name: 'Xe xây dựng màu vàng',
+                brand: 'Lego',
+                theme: 'City',
+                pieces: 45,
+                stock: 0,
+                age: '5+',
+                price: 199000,
+                status: 'out_of_stock',
+                description: 'Xe xây dựng màu vàng với cần cẩu',
+                images: ['img/Rectangle 108 (3).png']
+            },
+            {
+                id: 'PRD004',
+                name: 'Tàu hỏa tốc hành',
+                brand: 'Lego',
+                theme: 'City',
+                pieces: 67,
+                stock: 12,
+                age: '6+',
+                price: 350000,
+                status: 'active',
+                description: 'Tàu hỏa tốc hành với đường ray',
+                images: ['img/Rectangle 108 (1).png', 'img/Rectangle 108 (2).png', 'img/Rectangle 108 (3).png']
+            },
+            {
+                id: 'PRD005',
+                name: 'Máy bay phản lực',
+                brand: 'Lego',
+                theme: 'City',
+                pieces: 89,
+                stock: 5,
+                age: '8+',
+                price: 420000,
+                status: 'active',
+                description: 'Máy bay phản lực với cabin mở',
+                images: ['img/Rectangle 108 (2).png', 'img/Rectangle 108 (3).png']
+            },
+            {
+                id: 'PRD006',
+                name: 'Tàu ngầm thám hiểm',
+                brand: 'Lego',
+                theme: 'City',
+                pieces: 156,
+                stock: 0,
+                age: '9+',
+                price: 580000,
+                status: 'out_of_stock',
+                description: 'Tàu ngầm thám hiểm đại dương',
+                images: ['img/Rectangle 108 (1).png', 'img/Rectangle 108 (2).png', 'img/Rectangle 108 (3).png']
+            }
+        ];
+        
+        // Initialize product management
+        initializeProductManagement();
+        
+        function initializeProductManagement() {
+            renderProductList();
+            setupProductFormHandlers();
+            setupProductSearch();
+        }
+        
+        function renderProductList() {
+            const productList = document.getElementById('productList');
+            if (!productList) return;
+            
+            productList.innerHTML = productsData.map(product => `
+                <div class="col-md-6 col-lg-4">
+                    <div class="product-card panel">
+                        <div class="product-actions">
+                            <button class="btn btn-outline btn-sm edit-product-btn" data-product-id="${product.id}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm delete-product-btn" data-product-id="${product.id}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="product-images">
+                            ${product.images.map(img => `<img src="${img}" alt="${product.name}">`).join('')}
+                        </div>
+                        
+                        <div class="product-info">
+                            <h5 class="product-name">${product.name}</h5>
+                            <div class="product-details">
+                                <div><strong>Thương hiệu:</strong> ${product.brand}</div>
+                                <div><strong>Chủ đề:</strong> ${product.theme}</div>
+                                <div><strong>Số mảnh:</strong> ${product.pieces}</div>
+                                <div><strong>Tồn kho:</strong> ${product.stock}</div>
+                                <div><strong>Độ tuổi:</strong> ${product.age}</div>
+                                <div><strong>Giá:</strong> ${product.price.toLocaleString()} VND</div>
+                                <div><strong>Trạng thái:</strong> 
+                                    <span class="product-status ${product.status}">
+                                        ${product.status === 'active' ? 'Đang bán' : 
+                                          product.status === 'inactive' ? 'Ngừng bán' : 'Hết hàng'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="product-description mt-2">
+                                <small class="text-muted">${product.description}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            attachProductActionEvents();
+        }
+        
+        function attachProductActionEvents() {
+            // Edit product buttons
+            document.querySelectorAll('.edit-product-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const productId = btn.getAttribute('data-product-id');
+                    editProduct(productId);
+                });
+            });
+            
+            // Delete product buttons
+            document.querySelectorAll('.delete-product-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const productId = btn.getAttribute('data-product-id');
+                    deleteProduct(productId);
+                });
+            });
+        }
+        
+        function setupProductFormHandlers() {
+            // Add product form
+            const addProductForm = document.getElementById('productForm');
+            if (addProductForm) {
+                addProductForm.addEventListener('submit', handleAddProduct);
+            }
+            
+            // Edit product form
+            const editProductForm = document.getElementById('editProductForm');
+            if (editProductForm) {
+                editProductForm.addEventListener('submit', handleEditProduct);
+            }
+            
+            // Image preview handlers
+            setupImagePreviewHandlers();
+        }
+        
+        function setupImagePreviewHandlers() {
+            // Add product image previews
+            document.querySelectorAll('.product-image-input').forEach(input => {
+                input.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    const index = this.getAttribute('data-index');
+                    const preview = document.getElementById(`preview-${index}`);
+                    
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        preview.innerHTML = '<div class="empty">Chọn hình ảnh</div>';
+                    }
+                });
+            });
+            
+            // Edit product image previews
+            document.querySelectorAll('.edit-product-image-input').forEach(input => {
+                input.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    const index = this.getAttribute('data-index');
+                    const preview = document.getElementById(`edit-preview-${index}`);
+                    
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        preview.innerHTML = '<div class="empty">Chọn hình ảnh</div>';
+                    }
+                });
+            });
+        }
+        
+        function handleAddProduct(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: 'PRD' + String(productsData.length + 1).padStart(3, '0'),
+                name: document.getElementById('productName').value,
+                brand: document.getElementById('productBrand').value,
+                theme: document.getElementById('productTheme').value,
+                pieces: parseInt(document.getElementById('productPieces').value) || 0,
+                stock: parseInt(document.getElementById('productStock').value) || 0,
+                age: document.getElementById('productAge').value,
+                price: parseInt(document.getElementById('productPrice').value),
+                status: document.getElementById('productStatus').value,
+                description: document.getElementById('productDesc').value,
+                images: []
+            };
+            
+            // Get image files
+            const imageInputs = document.querySelectorAll('.product-image-input');
+            imageInputs.forEach(input => {
+                if (input.files[0]) {
+                    // In real app, you would upload files to server
+                    // For demo, we'll use placeholder
+                    formData.images.push('img/Rectangle 108 (1).png');
+                }
+            });
+            
+            productsData.push(formData);
+            renderProductList();
+            
+            // Reset form
+            document.getElementById('productForm').reset();
+            document.querySelectorAll('.image-preview').forEach(preview => {
+                preview.innerHTML = '<div class="empty">Chọn hình ảnh</div>';
+            });
+            
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('addProductModal'))?.hide();
+            
+            alert('Thêm sản phẩm thành công!');
+        }
+        
+        function editProduct(productId) {
+            const product = productsData.find(p => p.id === productId);
+            if (!product) return;
+            
+            // Fill edit form
+            document.getElementById('editProductId').value = product.id;
+            document.getElementById('editProductName').value = product.name;
+            document.getElementById('editProductBrand').value = product.brand;
+            document.getElementById('editProductTheme').value = product.theme;
+            document.getElementById('editProductPieces').value = product.pieces;
+            document.getElementById('editProductStock').value = product.stock;
+            document.getElementById('editProductAge').value = product.age;
+            document.getElementById('editProductPrice').value = product.price;
+            document.getElementById('editProductStatus').value = product.status;
+            document.getElementById('editProductDesc').value = product.description;
+            
+            // Reset image previews
+            document.querySelectorAll('.edit-product-image-input').forEach(input => {
+                input.value = '';
+            });
+            document.querySelectorAll('[id^="edit-preview-"]').forEach(preview => {
+                preview.innerHTML = '<div class="empty">Chọn hình ảnh</div>';
+            });
+            
+            // Show edit modal
+            const editModal = new bootstrap.Modal(document.getElementById('editProductModal'));
+            editModal.show();
+        }
+        
+        function handleEditProduct(e) {
+            e.preventDefault();
+            
+            const productId = document.getElementById('editProductId').value;
+            const productIndex = productsData.findIndex(p => p.id === productId);
+            
+            if (productIndex === -1) return;
+            
+            // Update product data
+            productsData[productIndex] = {
+                ...productsData[productIndex],
+                name: document.getElementById('editProductName').value,
+                brand: document.getElementById('editProductBrand').value,
+                theme: document.getElementById('editProductTheme').value,
+                pieces: parseInt(document.getElementById('editProductPieces').value) || 0,
+                stock: parseInt(document.getElementById('editProductStock').value) || 0,
+                age: document.getElementById('editProductAge').value,
+                price: parseInt(document.getElementById('editProductPrice').value),
+                status: document.getElementById('editProductStatus').value,
+                description: document.getElementById('editProductDesc').value
+            };
+            
+            renderProductList();
+            
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('editProductModal'))?.hide();
+            
+            alert('Cập nhật sản phẩm thành công!');
+        }
+        
+        function deleteProduct(productId) {
+            if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+                const productIndex = productsData.findIndex(p => p.id === productId);
+                if (productIndex !== -1) {
+                    productsData.splice(productIndex, 1);
+                    renderProductList();
+                    alert('Xóa sản phẩm thành công!');
+                }
+            }
+        }
+        
+        function setupProductSearch() {
+            const searchInput = document.getElementById('productSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const filteredProducts = productsData.filter(product => 
+                        product.name.toLowerCase().includes(searchTerm) ||
+                        product.brand.toLowerCase().includes(searchTerm) ||
+                        product.theme.toLowerCase().includes(searchTerm)
+                    );
+                    
+                    renderFilteredProductList(filteredProducts);
+                });
+            }
+        }
+        
+        function renderFilteredProductList(products) {
+            const productList = document.getElementById('productList');
+            if (!productList) return;
+            
+            if (products.length === 0) {
+                productList.innerHTML = '<div class="col-12"><div class="text-center text-muted">Không tìm thấy sản phẩm nào</div></div>';
+                return;
+            }
+            
+            productList.innerHTML = products.map(product => `
+    <div class="col-md-6 col-lg-4">
+        <div class="product-card panel">
+            <div class="product-actions">
+                <button class="btn btn-outline btn-sm edit-product-btn" data-product-id="${product.id}">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm delete-product-btn" data-product-id="${product.id}">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            
+            <div class="product-images">
+                ${product.images.map(img => `<img src="${img}" alt="${product.name}" style="width: 100%; height: auto; border-radius: 0px;">`).join('')}
+            </div>
+            
+            <div class="product-info">
+                <h5 class="product-name">${product.name}</h5>
+                <div class="product-details">
+                    <div><strong>Thương hiệu:</strong> ${product.brand}</div>
+                    <div><strong>Chủ đề:</strong> ${product.theme}</div>
+                    <div><strong>Số mảnh:</strong> ${product.pieces}</div>
+                    <div><strong>Tồn kho:</strong> ${product.stock}</div>
+                    <div><strong>Độ tuổi:</strong> ${product.age}</div>
+                    <div><strong>Giá:</strong> ${product.price.toLocaleString()} VND</div>
+                    <div><strong>Trạng thái:</strong> 
+                        <span class="product-status ${product.status}">
+                            ${product.status === 'active' ? 'Đang bán' : 
+                              product.status === 'inactive' ? 'Ngừng bán' : 'Hết hàng'}
+                        </span>
+                    </div>
+                </div>
+                <div class="product-description mt-2">
+                    <small class="text-muted">${product.description}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+`).join('');
+
+            
+            attachProductActionEvents();
+        }
+        // DEMO DATA PHẢN HỒI/ĐÁNH GIÁ
+        const feedbackListDemo = [
+            {
+                id: 'FB001',
+                product: 'Xe cảnh sát',
+                productImg: 'img/Rectangle 108 (2).png',
+                customer: 'Nguyễn Văn A',
+                customerEmail: 'vana@gmail.com',
+                stars: 5,
+                content: 'Sản phẩm rất tốt, giao hàng nhanh!',
+                replied: false,
+                adminReply: ''
+            },
+            {
+                id: 'FB002',
+                product: 'Xe xây dựng vàng',
+                productImg: 'img/Rectangle 108 (3).png',
+                customer: 'Trần Bảo B',
+                customerEmail: 'baobb@gmail.com',
+                stars: 4,
+                content: 'Đúng mô tả, bé nhà mình thích lắm.',
+                replied: false,
+                adminReply: ''
+            },
+        ];
+          // VOUCHER MANAGEMENT
+          let vouchersData = [
+            {
+                id: 'VCH001',
+                name: 'Giảm giá 20% cho đơn hàng đầu tiên',
+                code: 'WELCOME20',
+                type: 'percentage',
+                value: 20,
+                maxDiscount: 100000,
+                startDate: '2024-01-01T00:00',
+                endDate: '2024-12-31T23:59',
+                minOrder: 200000,
+                usageLimit: 1000,
+                usedCount: 156,
+                description: 'Voucher giảm giá 20% cho khách hàng mới, áp dụng cho đơn hàng đầu tiên',
+                status: 'active'
+            },
+            {
+                id: 'VCH002',
+                name: 'Giảm 50.000 VND cho đơn hàng từ 500.000 VND',
+                code: 'SAVE50K',
+                type: 'fixed',
+                value: 50000,
+                maxDiscount: 0,
+                startDate: '2024-01-15T00:00',
+                endDate: '2024-06-30T23:59',
+                minOrder: 500000,
+                usageLimit: 500,
+                usedCount: 89,
+                description: 'Giảm giá cố định 50.000 VND cho đơn hàng từ 500.000 VND trở lên',
+                status: 'active'
+            },
+            {
+                id: 'VCH003',
+                name: 'Giảm giá 15% cho ngày lễ',
+                code: 'HOLIDAY15',
+                type: 'percentage',
+                value: 15,
+                maxDiscount: 200000,
+                startDate: '2024-02-10T00:00',
+                endDate: '2024-02-15T23:59',
+                minOrder: 300000,
+                usageLimit: 200,
+                usedCount: 200,
+                description: 'Voucher đặc biệt cho dịp lễ Tết, giảm 15% tối đa 200.000 VND',
+                status: 'expired'
+            },
+            {
+                id: 'VCH004',
+                name: 'Giảm 30.000 VND cho sinh nhật',
+                code: 'BIRTHDAY30',
+                type: 'fixed',
+                value: 30000,
+                maxDiscount: 0,
+                startDate: '2024-03-01T00:00',
+                endDate: '2024-12-31T23:59',
+                minOrder: 150000,
+                usageLimit: 1,
+                usedCount: 0,
+                description: 'Voucher sinh nhật đặc biệt, mỗi khách hàng chỉ được sử dụng 1 lần',
+                status: 'inactive'
+            }
+        ];
+        
+        // Initialize voucher management
+        initializeVoucherManagement();
+        
+        function initializeVoucherManagement() {
+            renderVoucherList();
+            setupVoucherFormHandlers();
+            setupVoucherSearch();
+        }
+        
+        function renderVoucherList() {
+            const voucherList = document.getElementById('voucherList');
+            if (!voucherList) return;
+            
+            voucherList.innerHTML = vouchersData.map(voucher => {
+                const currentDate = new Date();
+                const startDate = new Date(voucher.startDate);
+                const endDate = new Date(voucher.endDate);
+                const isExpired = currentDate > endDate;
+                const isNotStarted = currentDate < startDate;
+                
+                let statusClass = voucher.status;
+                if (isExpired) statusClass = 'expired';
+                
+                // Calculate usage percentage
+                const usagePercentage = Math.round((voucher.usedCount / voucher.usageLimit) * 100);
+                
+                // Calculate time remaining
+                const timeRemaining = calculateTimeRemaining(endDate);
+                
+                // Get voucher icon based on type
+                const voucherIcon = voucher.type === 'percentage' ? '%' : '₫';
+                
+                return `
+                    <div class="col-6">
+                        <div class="voucher" onclick="editVoucher('${voucher.id}')">
+                            <div class="voucher-left">
+                                <span class="tag">Số lượng có hạn</span>
+                                <div class="voucher-img">${voucherIcon}</div>
+                            </div>
+                            <div class="voucher-right">
+                                <div class="voucher-title">
+                                    <span class="badge">${voucher.type === 'percentage' ? 'Giảm %' : 'Giảm tiền'}</span>
+                                    ${voucher.name}
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width:${usagePercentage}%"></div>
+                                </div>
+                                <div class="voucher-info">
+                                    <span>Còn ${100 - usagePercentage}%</span> - 
+                                    <span class="expire">${timeRemaining}</span>
+                                </div>
+                                <div class="voucher-code-display">Mã: ${voucher.code}</div>
+                                <div class="voucher-details-grid">
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Giá trị:</span>
+                                        <span class="voucher-detail-value">
+                                            ${voucher.type === 'percentage' ? `${voucher.value}%` : `${voucher.value.toLocaleString()} VND`}
+                                        </span>
+                                    </div>
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Tối thiểu:</span>
+                                        <span class="voucher-detail-value">${voucher.minOrder.toLocaleString()} VND</span>
+                                    </div>
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Đã dùng:</span>
+                                        <span class="voucher-detail-value">${voucher.usedCount}/${voucher.usageLimit}</span>
+                                    </div>
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Trạng thái:</span>
+                                        <span class="voucher-detail-value">
+                                            ${statusClass === 'active' ? 'Đang bật' : 
+                                              statusClass === 'inactive' ? 'Tắt' : 'Hết hạn'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="voucher-actions">
+                                    <button class="view-btn" onclick="event.stopPropagation(); editVoucher('${voucher.id}')">
+                                        Chỉnh sửa
+                                    </button>
+                                    <button class="delete-btn" onclick="event.stopPropagation(); deleteVoucher('${voucher.id}')">
+                                        Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            attachVoucherActionEvents();
+        }
+        
+        function attachVoucherActionEvents() {
+            // Edit voucher buttons
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const voucherId = btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+                    if (voucherId) {
+                        editVoucher(voucherId);
+                    }
+                });
+            });
+            
+            // Delete voucher buttons
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const voucherId = btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+                    if (voucherId) {
+                        deleteVoucher(voucherId);
+                    }
+                });
+            });
+        }
+        
+        function setupVoucherFormHandlers() {
+            // Add voucher form
+            const addVoucherForm = document.getElementById('voucherForm');
+            if (addVoucherForm) {
+                addVoucherForm.addEventListener('submit', handleAddVoucher);
+            }
+            
+            // Edit voucher form
+            const editVoucherForm = document.getElementById('editVoucherForm');
+            if (editVoucherForm) {
+                editVoucherForm.addEventListener('submit', handleEditVoucher);
+            }
+            
+            // Voucher type change handlers
+            setupVoucherTypeHandlers();
+        }
+        
+        function setupVoucherTypeHandlers() {
+            // Add voucher type handlers
+            const addVoucherType = document.getElementById('voucherType');
+            const addVoucherValueHelp = document.getElementById('voucherValueHelp');
+            const addVoucherMaxDiscount = document.getElementById('voucherMaxDiscount');
+            
+            if (addVoucherType) {
+                addVoucherType.addEventListener('change', function() {
+                    const type = this.value;
+                    if (type === 'percentage') {
+                        addVoucherValueHelp.textContent = 'Nhập số phần trăm (ví dụ: 20)';
+                        addVoucherMaxDiscount.parentElement.style.display = 'block';
+                    } else if (type === 'fixed') {
+                        addVoucherValueHelp.textContent = 'Nhập số tiền giảm (ví dụ: 50000)';
+                        addVoucherMaxDiscount.parentElement.style.display = 'none';
+                    } else {
+                        addVoucherValueHelp.textContent = 'Nhập số phần trăm hoặc số tiền';
+                        addVoucherMaxDiscount.parentElement.style.display = 'block';
+                    }
+                });
+            }
+            
+            // Edit voucher type handlers
+            const editVoucherType = document.getElementById('editVoucherType');
+            const editVoucherValueHelp = document.getElementById('editVoucherValueHelp');
+            const editVoucherMaxDiscount = document.getElementById('editVoucherMaxDiscount');
+            
+            if (editVoucherType) {
+                editVoucherType.addEventListener('change', function() {
+                    const type = this.value;
+                    if (type === 'percentage') {
+                        editVoucherValueHelp.textContent = 'Nhập số phần trăm (ví dụ: 20)';
+                        editVoucherMaxDiscount.parentElement.style.display = 'block';
+                    } else if (type === 'fixed') {
+                        editVoucherValueHelp.textContent = 'Nhập số tiền giảm (ví dụ: 50000)';
+                        editVoucherMaxDiscount.parentElement.style.display = 'none';
+                    } else {
+                        editVoucherValueHelp.textContent = 'Nhập số phần trăm hoặc số tiền';
+                        editVoucherMaxDiscount.parentElement.style.display = 'block';
+                    }
+                });
+            }
+        }
+        
+        function handleAddVoucher(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: 'VCH' + String(vouchersData.length + 1).padStart(3, '0'),
+                name: document.getElementById('voucherName').value,
+                code: generateVoucherCode(),
+                type: document.getElementById('voucherType').value,
+                value: parseInt(document.getElementById('voucherValue').value),
+                maxDiscount: parseInt(document.getElementById('voucherMaxDiscount').value) || 0,
+                startDate: document.getElementById('voucherStartDate').value,
+                endDate: document.getElementById('voucherEndDate').value,
+                minOrder: parseInt(document.getElementById('voucherMinOrder').value),
+                usageLimit: parseInt(document.getElementById('voucherUsageLimit').value),
+                usedCount: 0,
+                description: document.getElementById('voucherDescription').value,
+                status: document.getElementById('voucherStatus').value
+            };
+            
+            vouchersData.push(formData);
+            renderVoucherList();
+            
+            // Reset form
+            document.getElementById('voucherForm').reset();
+            
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('addVoucherModal'))?.hide();
+            
+            alert('Thêm voucher thành công!');
+        }
+        
+        function editVoucher(voucherId) {
+            const voucher = vouchersData.find(v => v.id === voucherId);
+            if (!voucher) return;
+            
+            // Fill edit form
+            document.getElementById('editVoucherId').value = voucher.id;
+            document.getElementById('editVoucherName').value = voucher.name;
+            document.getElementById('editVoucherType').value = voucher.type;
+            document.getElementById('editVoucherValue').value = voucher.value;
+            document.getElementById('editVoucherMaxDiscount').value = voucher.maxDiscount;
+            document.getElementById('editVoucherStartDate').value = voucher.startDate;
+            document.getElementById('editVoucherEndDate').value = voucher.endDate;
+            document.getElementById('editVoucherMinOrder').value = voucher.minOrder;
+            document.getElementById('editVoucherUsageLimit').value = voucher.usageLimit;
+            document.getElementById('editVoucherDescription').value = voucher.description;
+            document.getElementById('editVoucherStatus').value = voucher.status;
+            
+            // Trigger type change to update help text
+            document.getElementById('editVoucherType').dispatchEvent(new Event('change'));
+            
+            // Show edit modal
+            const editModal = new bootstrap.Modal(document.getElementById('editVoucherModal'));
+            editModal.show();
+        }
+        
+        function handleEditVoucher(e) {
+            e.preventDefault();
+            
+            const voucherId = document.getElementById('editVoucherId').value;
+            const voucherIndex = vouchersData.findIndex(v => v.id === voucherId);
+            
+            if (voucherIndex === -1) return;
+            
+            // Update voucher data
+            vouchersData[voucherIndex] = {
+                ...vouchersData[voucherIndex],
+                name: document.getElementById('editVoucherName').value,
+                type: document.getElementById('editVoucherType').value,
+                value: parseInt(document.getElementById('editVoucherValue').value),
+                maxDiscount: parseInt(document.getElementById('editVoucherMaxDiscount').value) || 0,
+                startDate: document.getElementById('editVoucherStartDate').value,
+                endDate: document.getElementById('editVoucherEndDate').value,
+                minOrder: parseInt(document.getElementById('editVoucherMinOrder').value),
+                usageLimit: parseInt(document.getElementById('editVoucherUsageLimit').value),
+                description: document.getElementById('editVoucherDescription').value,
+                status: document.getElementById('editVoucherStatus').value
+            };
+            
+            renderVoucherList();
+            
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('editVoucherModal'))?.hide();
+            
+            alert('Cập nhật voucher thành công!');
+        }
+        
+        function deleteVoucher(voucherId) {
+            if (confirm('Bạn có chắc chắn muốn xóa voucher này?')) {
+                const voucherIndex = vouchersData.findIndex(v => v.id === voucherId);
+                if (voucherIndex !== -1) {
+                    vouchersData.splice(voucherIndex, 1);
+                    renderVoucherList();
+                    alert('Xóa voucher thành công!');
+                }
+            }
+        }
+        
+        function setupVoucherSearch() {
+            const searchInput = document.getElementById('voucherSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const filteredVouchers = vouchersData.filter(voucher => 
+                        voucher.name.toLowerCase().includes(searchTerm) ||
+                        voucher.code.toLowerCase().includes(searchTerm) ||
+                        voucher.description.toLowerCase().includes(searchTerm)
+                    );
+                    
+                    renderFilteredVoucherList(filteredVouchers);
+                });
+            }
+        }
+        
+        function renderFilteredVoucherList(vouchers) {
+            const voucherList = document.getElementById('voucherList');
+            if (!voucherList) return;
+            
+            if (vouchers.length === 0) {
+                voucherList.innerHTML = '<div class="col-12"><div class="text-center text-muted">Không tìm thấy voucher nào</div></div>';
+                return;
+            }
+            
+            voucherList.innerHTML = vouchers.map(voucher => {
+                const currentDate = new Date();
+                const startDate = new Date(voucher.startDate);
+                const endDate = new Date(voucher.endDate);
+                const isExpired = currentDate > endDate;
+                
+                let statusClass = voucher.status;
+                if (isExpired) statusClass = 'expired';
+                
+                // Calculate usage percentage
+                const usagePercentage = Math.round((voucher.usedCount / voucher.usageLimit) * 100);
+                
+                // Calculate time remaining
+                const timeRemaining = calculateTimeRemaining(endDate);
+                
+                // Get voucher icon based on type
+                const voucherIcon = voucher.type === 'percentage' ? '%' : '₫';
+                
+                return `
+                    <div class="col-6">
+                        <div class="voucher" onclick="editVoucher('${voucher.id}')">
+                            <div class="voucher-left">
+                                <span class="tag">Số lượng có hạn</span>
+                                <div class="voucher-img">${voucherIcon}</div>
+                            </div>
+                            <div class="voucher-right">
+                                <div class="voucher-title">
+                                    <span class="badge">${voucher.type === 'percentage' ? 'Giảm %' : 'Giảm tiền'}</span>
+                                    ${voucher.name}
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width:${usagePercentage}%"></div>
+                                </div>
+                                <div class="voucher-info">
+                                    <span>Còn ${100 - usagePercentage}%</span> - 
+                                    <span class="expire">${timeRemaining}</span>
+                                </div>
+                                <div class="voucher-code-display">Mã: ${voucher.code}</div>
+                                <div class="voucher-details-grid">
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Giá trị:</span>
+                                        <span class="voucher-detail-value">
+                                            ${voucher.type === 'percentage' ? `${voucher.value}%` : `${voucher.value.toLocaleString()} VND`}
+                                        </span>
+                                    </div>
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Tối thiểu:</span>
+                                        <span class="voucher-detail-value">${voucher.minOrder.toLocaleString()} VND</span>
+                                    </div>
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Đã dùng:</span>
+                                        <span class="voucher-detail-value">${voucher.usedCount}/${voucher.usageLimit}</span>
+                                    </div>
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Trạng thái:</span>
+                                        <span class="voucher-detail-value">
+                                            ${statusClass === 'active' ? 'Đang bật' : 
+                                              statusClass === 'inactive' ? 'Tắt' : 'Hết hạn'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="voucher-actions">
+                                    <button class="view-btn" onclick="event.stopPropagation(); editVoucher('${voucher.id}')">
+                                        Chỉnh sửa
+                                    </button>
+                                    <button class="delete-btn" onclick="event.stopPropagation(); deleteVoucher('${voucher.id}')">
+                                        Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            attachVoucherActionEvents();
+        }
+        
+        function generateVoucherCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        function formatDateRange(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const startStr = start.toLocaleDateString('vi-VN');
+            const endStr = end.toLocaleDateString('vi-VN');
+            return `${startStr} - ${endStr}`;
+        }
+        
+        function calculateTimeRemaining(endDate) {
+            const now = new Date();
+            const end = new Date(endDate);
+            const diff = end - now;
+            
+            if (diff <= 0) {
+                return 'Đã hết hạn';
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (days > 0) {
+                return `Hết hạn sau ${days} ngày`;
+            } else if (hours > 0) {
+                return `Hết hạn sau ${hours} giờ`;
+            } else {
+                return `Hết hạn sau ${minutes} phút`;
+            }
+        }
+        
+  </script>
   <script>
     document.querySelectorAll('.menu li').forEach(item => {
       item.addEventListener('click', () => {
@@ -452,11 +1704,6 @@
       });
     });
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Tải cấu hình môi trường trước -->
-  <script type="module" src="/dist/src/core/config/env.js"></script>
-  <script type="module" src="/dist/src/assets/js/components/Admin.js"></script>
 </body>
 
 </html>
