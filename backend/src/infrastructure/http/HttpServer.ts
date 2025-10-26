@@ -154,6 +154,15 @@ export class HttpServer {
    */
   private parseBody(req: http.IncomingMessage): Promise<any> {
     return new Promise((resolve, reject) => {
+      const contentType = req.headers['content-type'] || '';
+      
+      // Don't parse multipart/form-data here - let middleware handle it
+      if (contentType.includes('multipart/form-data')) {
+        console.log('⏭️  Skipping parseBody for multipart/form-data');
+        resolve(null);
+        return;
+      }
+      
       let body = '';
       
       req.on('data', (chunk) => {
@@ -162,8 +171,6 @@ export class HttpServer {
 
       req.on('end', () => {
         try {
-          const contentType = req.headers['content-type'] || '';
-          
           if (contentType.includes('application/json')) {
             resolve(body ? JSON.parse(body) : {});
           } else if (contentType.includes('application/x-www-form-urlencoded')) {

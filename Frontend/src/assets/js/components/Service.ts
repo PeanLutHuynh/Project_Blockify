@@ -129,34 +129,12 @@ function renderProducts(products: any[]) {
   }
 
   productGrid.innerHTML = products.map(product => {
-    const price = parseFloat(product.price || 0);
-    const formattedPrice = price.toLocaleString('vi-VN');
-    
     return `
       <div class="product-card" data-slug="${product.slug}">
-        <div class="heart-icon">
-          <i class="bi bi-heart"></i>
-        </div>
-        <div class="product-image">
-          <img src="${product.imageUrl}" alt="${product.name}">
-        </div>
-        <div class="product-stats">
-          <div class="stat-item">
-            <i class="bi bi-person"></i>
-            <span>8+</span>
-          </div>
-          <div class="stat-item">
-            <i class="bi bi-box"></i>
-            <span>79</span>
-          </div>
-          <div class="stat-item">
-            <i class="bi bi-star-fill text-warning"></i>
-            <span>4.8</span>
-          </div>
-        </div>
-        <div class="product-name">${product.name}</div>
-        <div class="product-price">${formattedPrice} VND</div>
-        <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+        <img src="${product.imageUrl || 'https://via.placeholder.com/200'}" alt="${product.name}">
+        <h6>${product.name}</h6>
+        <p>${product.price || 'N/A'}</p>
+        <button class="btn btn-primary add-to-cart-btn">Thêm vào giỏ</button>
       </div>
     `;
   }).join('');
@@ -169,7 +147,8 @@ function renderProducts(products: any[]) {
       // Don't navigate if clicking add to cart button
       if (target.classList.contains('add-to-cart-btn')) {
         e.stopPropagation();
-        // Add to cart logic here
+        // Thêm vào giỏ hàng
+        console.log(`Thêm vào giỏ: ${card.getAttribute('data-slug')}`);
         return;
       }
       

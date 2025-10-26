@@ -363,23 +363,51 @@ export class CartService {
       const token = localStorage.getItem(this.AUTH_TOKEN_KEY);
       if (!token) {
         // User not logged in, only save to localStorage
-        console.log('User not logged in, cart saved to localStorage only');
+        console.log('⚠️ User not logged in, cart saved to localStorage only');
         return;
       }
 
-      // Call backend API to save cart item
-      const response = await httpClient.post('/api/v1/cart', {
+      // Prepare request data
+      const requestData = {
+        productId: Number(cartItem.productId), // Ensure it's a number
+        quantity: Number(cartItem.quantity)     // Ensure it's a number
+      };
+
+      // 🔍 DETAILED LOGGING FOR DEBUGGING
+      console.log('🔄 Syncing to backend...');
+      console.log('📤 CartItem:', {
         productId: cartItem.productId,
-        quantity: cartItem.quantity
+        productName: cartItem.productName,
+        quantity: cartItem.quantity,
+        productIdType: typeof cartItem.productId,
+        quantityType: typeof cartItem.quantity
+      });
+      console.log('📤 Request Data:', requestData);
+      console.log('📤 Request Data Types:', {
+        productId: typeof requestData.productId,
+        quantity: typeof requestData.quantity
       });
 
+      // Call backend API to save cart item
+      const response = await httpClient.post('/api/v1/cart', requestData);
+
+      console.log('📥 Backend Response:', response);
+
       if (response.success) {
-        console.log('✅ Cart synced to backend successfully:', response);
+        console.log('✅ Cart synced to backend successfully');
       } else {
-        console.warn('⚠️ Backend sync response:', response);
+        console.warn('⚠️ Backend sync failed:', {
+          message: response.message,
+          error: response.error
+        });
       }
     } catch (error: any) {
       console.error('❌ Error syncing to backend:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      });
       // Don't fail the add to cart operation if backend sync fails
       // Item is already saved to localStorage
     }
@@ -419,12 +447,15 @@ export class CartService {
     try {
       const token = localStorage.getItem(this.AUTH_TOKEN_KEY);
       if (!token) {
+        console.log('⚠️ User not logged in, skipping backend cart load');
         return;
       }
 
+      console.log('🔄 Loading cart from backend...');
       const response = await httpClient.get<any>('/api/v1/cart');
 
       if (response.success && response.data && response.data.items) {
+        console.log('✅ Cart loaded from backend successfully');
         const backendItems = response.data.items;
 
         // Clear local cart
@@ -449,11 +480,22 @@ export class CartService {
 
         // Save to localStorage
         this.cart.saveToLocalStorage(this.STORAGE_KEY);
-
-        console.log('Cart loaded from backend successfully');
+      } else if (!response.success && response.error?.includes('Invalid or expired token')) {
+        // Token expired, clear it
+        console.warn('⚠️ Token expired, clearing authentication');
+        localStorage.removeItem(this.AUTH_TOKEN_KEY);
+        localStorage.removeItem('user');
       }
     } catch (error: any) {
-      console.error('Error loading cart from backend:', error);
+      console.error('❌ Error loading cart from backend:', error);
+      
+      // If 401 Unauthorized, clear token
+      if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+        console.warn('⚠️ Token invalid, clearing authentication');
+        localStorage.removeItem(this.AUTH_TOKEN_KEY);
+        localStorage.removeItem('user');
+      }
+      
       // Keep local cart if backend load fails
     }
   }

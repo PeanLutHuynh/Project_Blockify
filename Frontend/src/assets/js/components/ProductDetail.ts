@@ -1,8 +1,9 @@
-import { initializeOnReady, updateCartBadge } from '../../../core/config/init.js';
+import { initializeOnReady } from '../../../core/config/init.js';
 import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
 import { initializeSearch } from '../../../shared/components/SearchInit.js';
 import { productService } from '../../../core/services/ProductService.js';
 import { cartService } from '../../../core/services/CartService.js';
+import { updateCartBadge } from '../../../core/config/init.js';
 
 // ❌ Removed mock data - now using Supabase for all product data
 
@@ -22,161 +23,65 @@ function toggleHeart(heart: HTMLElement): void {
   (icon as HTMLElement).style.color = isLiked ? '#999' : 'white';
 }
 
-async function addToCart(btn: HTMLElement): Promise<void> {
-  // Get current product data from DOM or state
-  const productData = getCurrentProductData();
-  
-  if (!productData) {
-    alert('Không thể lấy thông tin sản phẩm');
-    return;
-  }
-
-  // Add to cart using CartService
-  const result = await cartService.addToCart({
-    productId: productData.productId,
-    productName: productData.productName,
-    productSlug: productData.productSlug,
-    imageUrl: productData.imageUrl,
-    price: productData.price,
-    salePrice: productData.salePrice,
-    quantity: 1,
-    stockQuantity: productData.stockQuantity,
-    minStockLevel: productData.minStockLevel
-  });
-
-  if (result.success) {
-    btn.textContent = 'Đã thêm!';
-    btn.style.background = '#28a745';
-    setTimeout(() => {
-      btn.textContent = 'Add to cart';
-      btn.style.background = '';
-    }, 1500);
-    
-    // Update cart badge
-    updateCartBadge();
-  } else {
-    alert(result.message);
-  }
-}
-
-/**
- * Get current product data from DOM
- */
-function getCurrentProductData(): any | null {
+async function addToCart(productName: string, btn: HTMLElement): Promise<void> {
   try {
+    console.log('🛒 [ProductDetail] Adding to cart:', productName);
+    
+    // Get current product data from URL
     const urlParams = new URLSearchParams(window.location.search);
     const slug = urlParams.get('slug');
     
     if (!slug) {
-      return null;
+      alert('❌ Không tìm thấy thông tin sản phẩm!');
+      return;
     }
-
-    // Get product data from DOM elements
-    const titleEl = document.getElementById('pd-title');
-    const priceEl = document.getElementById('pd-price');
-    const imageEl = document.getElementById('pd-image') as HTMLImageElement;
     
-    if (!titleEl || !priceEl || !imageEl) {
-      return null;
+    // Load product details
+    const result = await productService.getProductBySlug(slug);
+    if (!result.success || !result.product) {
+      alert('❌ Không thể tải thông tin sản phẩm!');
+      return;
     }
-
-    // Parse price from text
-    const priceText = priceEl.textContent || '0';
-    const price = parseFloat(priceText.replace(/[^\d.-]/g, ''));
-
-    return {
-      productId: parseInt(titleEl.dataset.productId || '0'),
-      productName: titleEl.textContent || 'Unknown',
-      productSlug: slug,
-      imageUrl: imageEl.src,
-      price: price,
-      salePrice: null, // Will be added from backend
-      stockQuantity: parseInt(titleEl.dataset.stockQuantity || '100'),
-      minStockLevel: parseInt(titleEl.dataset.minStockLevel || '5')
-    };
-  } catch (error) {
-    console.error('Error getting product data:', error);
-    return null;
-  }
-}
-
-/**
- * Initialize Add to Cart button
- */
-function initializeAddToCartButton(): void {
-  const addToCartBtn = document.getElementById('btn-add-to-cart');
-  const quantityInput = document.getElementById('product-quantity') as HTMLInputElement;
-
-  if (addToCartBtn) {
-    addToCartBtn.addEventListener('click', async () => {
-      try {
-        const productData = getCurrentProductData();
-        
-        if (!productData) {
-          alert('Không thể lấy thông tin sản phẩm');
-          return;
-        }
-
-        const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
-
-        // Show loading state
-        const originalText = addToCartBtn.innerHTML;
-        addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang thêm...';
-        (addToCartBtn as HTMLButtonElement).disabled = true;
-
-        // Add to cart using CartService
-        const result = await cartService.addToCart({
-          productId: productData.productId,
-          productName: productData.productName,
-          productSlug: productData.productSlug,
-          imageUrl: productData.imageUrl,
-          price: productData.price,
-          salePrice: productData.salePrice,
-          quantity: quantity,
-          stockQuantity: productData.stockQuantity,
-          minStockLevel: productData.minStockLevel
-        });
-
-        // Reset button state
-        (addToCartBtn as HTMLButtonElement).disabled = false;
-
-        if (result.success) {
-          addToCartBtn.innerHTML = '<i class="fas fa-check"></i> Đã thêm vào giỏ!';
-          addToCartBtn.classList.add('btn-success');
-          
-          setTimeout(() => {
-            addToCartBtn.innerHTML = originalText;
-            addToCartBtn.classList.remove('btn-success');
-          }, 2000);
-          
-          // Update cart badge
-          updateCartBadge();
-          
-          // Show success notification
-          showNotification('success', result.message);
-        } else {
-          addToCartBtn.innerHTML = originalText;
-          alert(result.message);
-        }
-      } catch (error) {
-        console.error('Error adding to cart:', error);
-        alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
-        const btn = document.getElementById('btn-add-to-cart');
-        if (btn) {
-          btn.innerHTML = '<i class="fas fa-cart-plus"></i> Thêm vào giỏ';
-          (btn as HTMLButtonElement).disabled = false;
-        }
-      }
+    
+    const product = result.product;
+    console.log('📦 [ProductDetail] Product data:', product);
+    
+    // Add to cart using CartService
+    const cartResult = await cartService.addToCart({
+      productId: parseInt(product.product_id),
+      productName: product.product_name,
+      productSlug: product.slug,
+      imageUrl: product.product_images?.[0]?.image_url || product.imageUrl || '',
+      price: parseFloat(product.price),
+      salePrice: product.sale_price ? parseFloat(product.sale_price) : null,
+      quantity: 1,
+      stockQuantity: parseInt(product.stock_quantity) || 0,
+      minStockLevel: parseInt(product.min_stock_level) || 0
     });
+    
+    if (cartResult.success) {
+      console.log('✅ [ProductDetail] Added to cart successfully');
+      
+      // Visual feedback
+      btn.textContent = '✓ Đã thêm';
+      btn.style.background = '#28a745';
+      
+      // Update cart badge
+      updateCartBadge();
+      
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        btn.textContent = 'Thêm vào giỏ';
+        btn.style.background = '#007bff';
+      }, 2000);
+    } else {
+      console.error('❌ [ProductDetail] Failed to add to cart:', cartResult.message);
+      alert(cartResult.message || 'Không thể thêm vào giỏ hàng!');
+    }
+  } catch (error) {
+    console.error('❌ [ProductDetail] Error adding to cart:', error);
+    alert('Đã xảy ra lỗi khi thêm vào giỏ hàng!');
   }
-}
-
-/**
- * Show notification (simple version)
- */
-function showNotification(type: 'success' | 'error' | 'warning', message: string): void {
-  // You can integrate with your toast system here
-  console.log(`[${type.toUpperCase()}] ${message}`);
 }
 
 // Make functions available globally for HTML onclick handlers
@@ -295,7 +200,7 @@ async function loadRecommendedProducts(currentProductId?: number): Promise<void>
           </div>
           <div class="product-name">${product.name}</div>
           <div class="product-price">${formattedPrice} VND</div>
-          <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('${product.name}', this)">Add to cart</button>
+          <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('${product.name}', this)">Thêm vào giỏ</button>
         </div>
       `;
     }).join('');
@@ -348,10 +253,6 @@ function renderProductDetail(product: any): void {
   const pdTitle = document.getElementById('pd-title');
   if (pdTitle) {
     pdTitle.textContent = `Product Name: ${product.product_name || ''}`;
-    // Store product data in data attributes for cart functionality
-    pdTitle.dataset.productId = product.product_id?.toString() || '';
-    pdTitle.dataset.stockQuantity = product.stock_quantity?.toString() || '100';
-    pdTitle.dataset.minStockLevel = product.min_stock_level?.toString() || '5';
   }
 
   // Update brand
@@ -484,9 +385,6 @@ function renderProductDetail(product: any): void {
 
 function initializeProductDetailPage() {
   console.log('🎬 Initializing ProductDetail page...');
-
-  // Initialize Add to Cart button
-  initializeAddToCartButton();
 
   // Đổi ảnh chính khi click thumbnail
   (window as any).changeMainImage = function(src: string): void {
@@ -624,6 +522,19 @@ function initializeProductDetailPage() {
       }
     }
   }
+  // ✅ Add event listener for "Add to Cart" button
+  const addToCartBtn = document.querySelector('.btn-add-cart') as HTMLButtonElement | null;
+  if (addToCartBtn) {
+    addToCartBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const productNameEl = document.getElementById('pd-title');
+      const productName = productNameEl?.textContent?.replace('Product Name: ', '') || 'Product';
+      await addToCart(productName, addToCartBtn);
+    });
+  } else {
+    console.warn('⚠️ Add to Cart button not found in ProductDetail page');
+  }
+
   // Add review form
   (window as any).addReview = function(event: Event): void {
     event.preventDefault();
