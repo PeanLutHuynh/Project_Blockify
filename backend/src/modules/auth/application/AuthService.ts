@@ -391,18 +391,43 @@ export class AuthService {
 
       if (user) {
         console.log('✅ [GoogleAuth] User found in database:', user.id);
-        // User exists - update profile if needed
-        if (
-          user.fullName !== command.fullName ||
-          user.avatarUrl !== command.avatarUrl
-        ) {
-          console.log('🔄 [GoogleAuth] Updating user profile...');
-          user = await this.updateUserProfile(user, {
-            fullName: command.fullName,
-            avatarUrl: command.avatarUrl || user.avatarUrl,
-          });
+        console.log('📸 [GoogleAuth] User current avatar:', user.avatarUrl);
+        console.log('📸 [GoogleAuth] Google OAuth avatar:', command.avatarUrl);
+        
+        // CRITICAL: Always preserve user's avatar from database
+        // Only use Google avatar if user has NO avatar at all
+        const shouldUseGoogleAvatar = !user.avatarUrl && command.avatarUrl;
+        const finalAvatar = user.avatarUrl || command.avatarUrl;
+        
+        console.log('� [GoogleAuth] Should use Google avatar?', shouldUseGoogleAvatar);
+        console.log('📸 [GoogleAuth] Final avatar to use:', finalAvatar);
+        
+        // User exists - NEVER update avatar if user already has one
+        // Only update if fullName changed OR if user has no avatar yet
+        const needsUpdate = user.fullName !== command.fullName || shouldUseGoogleAvatar;
+        
+        if (needsUpdate) {
+          console.log('� [GoogleAuth] Updating user profile...');
+          const updateData: any = {};
+          
+          if (user.fullName !== command.fullName) {
+            updateData.fullName = command.fullName;
+            console.log('  → Updating fullName to:', command.fullName);
+          }
+          
+          if (shouldUseGoogleAvatar) {
+            updateData.avatarUrl = command.avatarUrl;
+            console.log('  → Setting Google avatar (user had no avatar)');
+          }
+          // If user already has avatar, DO NOT include avatarUrl in update
+          
+          user = await this.updateUserProfile(user, updateData);
           console.log('✅ [GoogleAuth] User profile updated');
+        } else {
+          console.log('ℹ️ [GoogleAuth] No update needed - user profile is current');
         }
+        
+        console.log('📸 [GoogleAuth] Final user avatar:', user.avatarUrl);
       } else {
         console.log('⚠️ [GoogleAuth] User not found in database, checking email...');
         // User doesn't exist yet - check for existing email first

@@ -93,6 +93,11 @@ export class UserProfileService {
    */
   async uploadAvatar(userId: string, fileBuffer: Buffer, fileType: string): Promise<UserProfileResponse> {
     try {
+      console.log(`\n🔥 ===== AVATAR UPLOAD STARTED =====`);
+      console.log(`🔥 User ID: ${userId}`);
+      console.log(`🔥 File type: ${fileType}`);
+      console.log(`🔥 File size: ${fileBuffer.length} bytes`);
+
       // Validate file type
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!allowedTypes.includes(fileType)) {
@@ -103,6 +108,15 @@ export class UserProfileService {
       if (fileBuffer.length > 5 * 1024 * 1024) {
         return UserProfileResponse.failure('File size exceeds 5MB limit');
       }
+
+      // Check if user has existing avatar in storage to delete later
+      const { data: oldUserData } = await supabaseAdmin
+        .from('users')
+        .select('avatar_url')
+        .eq('user_id', userId)
+        .single();
+      
+      console.log(`🔥 Old avatar URL: ${oldUserData?.avatar_url || 'None'}`);
 
       // Generate unique file name
       const fileExtension = fileType.split('/')[1];
@@ -134,6 +148,7 @@ export class UserProfileService {
       console.log('📸 Public avatar URL:', avatarUrl);
 
       // Update user profile with new avatar URL
+      console.log(`🔥 Updating database for user ${userId} with new avatar URL...`);
       const { data: userData, error: updateError } = await supabaseAdmin
         .from('users')
         .update({ 
@@ -149,7 +164,26 @@ export class UserProfileService {
         return UserProfileResponse.failure('Failed to update user avatar');
       }
 
-      console.log('✅ Avatar uploaded and profile updated successfully');
+      console.log('✅ Database updated successfully!');
+      console.log(`🔥 New user data:`, JSON.stringify(userData, null, 2));
+
+      // Delete old avatar from storage if it exists and is from Supabase
+      if (oldUserData?.avatar_url && oldUserData.avatar_url.includes('user-avatars/avatars/')) {
+        const oldFileName = oldUserData.avatar_url.split('user-avatars/')[1];
+        console.log(`🗑️ Deleting old avatar: ${oldFileName}`);
+        
+        const { error: deleteError } = await supabaseAdmin.storage
+          .from('user-avatars')
+          .remove([oldFileName]);
+        
+        if (deleteError) {
+          console.warn('⚠️ Could not delete old avatar:', deleteError);
+        } else {
+          console.log('✅ Old avatar deleted from storage');
+        }
+      }
+
+      console.log(`🔥 ===== AVATAR UPLOAD COMPLETED =====\n`);
       return UserProfileResponse.success(userData, 'Avatar uploaded successfully');
     } catch (error: any) {
       console.error('❌ Error in uploadAvatar:', error);
