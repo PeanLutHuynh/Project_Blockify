@@ -1,4 +1,5 @@
-body { background-color: #f5f5f5; }
+body { background-color: #f5f5f5;
+   }
 
 .banner { background: white; padding: 0 24px;}
 .banner img { width: 100%; height:40vh;}
@@ -13,6 +14,7 @@ body { background-color: #f5f5f5; }
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-align: center;
   background: #f8f9fa;
+  
 }
 :root {
   --primary-blue: #2196F3;
@@ -76,12 +78,21 @@ body {
   padding: 0 90px 0 5px;
   }
 
-.search-icon:hover,
+  .search-icon:hover{
+    color: gray;
+  }
 .cart-icon:hover {
     color: white;
     opacity: 0.8;
 }
-
+.category-item{
+  color: gray;
+  padding: 10px 0;
+  border-bottom: solid 1px black;
+}
+.category-item:hover{
+  background-color: #e4f3ff;
+}
 .btn-sign {
     color: white;
     border: 2px solid white;
@@ -212,12 +223,73 @@ gap: 20px; /* khoảng cách giữa các card */
 .product-card1 {
   position: relative;
   width: 250px;
-  overflow: hidden;
+  height: 300px;
+  background-color: white;
+  /* overflow: hidden; */
+  border-top: 6px solid #2196f3; /* 🔵 đường viền xanh phía trên */
+  border-radius: 8px;
 }
 
+/* Hình sản phẩm căn giữa */
 .product-img {
-  width: 100%;
-  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: auto;
+}
+
+
+/* 🔥 Tag “Hot” màu đỏ góc phải trên */
+.product-hot-tag {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  transform: translateX(10%); /* đẩy tag ra khỏi khung */
+  background-color: #ff3b30;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 4px 12px;
+  border-bottom-left-radius: 6px;
+  z-index: 5;
+}
+.product-sq {
+  position: absolute;
+  top: 0;
+  left: 15%;
+  transform: translateX(10%); /* đẩy tag ra khỏi khung */
+  background-color:  #0096F4;;
+  color: white;
+  padding: 4px 12px;
+  height:10px;
+  width:40px;
+  z-index: 5;
+}
+.product-line {
+  position: absolute;
+  top: 30px;
+  left: 15%;
+ 
+  border-bottom: solid 2px rgb(181, 181, 181);
+  color: white;
+  padding: 4px 12px;
+  height:10px;
+  width:60%;
+  z-index: 5;
+}
+
+.product-hot-tag::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -15px;
+  width: 0;
+  height: 0;
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  border-left: 15px solid #ff3b30;
 }
 
 /* Nhãn Hot */
@@ -247,7 +319,13 @@ gap: 20px; /* khoảng cách giữa các card */
   text-align: center;
   font-weight: bold;
   padding: 8px;
+
+  /* Căn giữa chữ theo chiều dọc và ngang */
+  display: flex;
+  justify-content: center; /* căn ngang */
+  align-items: center;     /* căn dọc */
 }
+
 .btn-cart {
   background-color: #0d99ff;
   border: none;
@@ -386,11 +464,22 @@ html { scroll-behavior: smooth; }
 }
 
 @media (max-width: 768px) {
+  .product-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px; /* khoảng cách giữa các card */
+  }
+
+  .product-card1 {
+    flex: 0 0 calc(50% - 10px); /* 2 card trên 1 hàng */
+  }
   .voucher {
     flex-direction: column;
     align-items: center;
     max-width: 100%; 
   }
+  .recommended{background-color: #0096F4;}
 
   .voucher-left {
     width: 100%;
@@ -437,9 +526,6 @@ html { scroll-behavior: smooth; }
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-.product-card1:hover .product-footer {
-  background-color: rgba(13, 155, 255, 0.9);
-}
 /* Slider container */
 .slider {
   position: relative;

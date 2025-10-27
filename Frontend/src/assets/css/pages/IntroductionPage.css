@@ -1,20 +1,10 @@
 body {
   background-color: #ffffff;
   margin: 0;
+  font-family: Arial, sans-serif;
   padding: 0;
   }
   
-  /* Navbar */
-  .navbar {
-  background-color: #0d9bff;
-  height: 10vh;
-  }
-  .navbar .nav-link, .navbar-brand {
-  color: #fff !important;
-  }
-  .navbar .nav-link:hover {
-  color: #000 !important;
-  }
   
   .navbar-custom {
   background-color: #0d9bff;
@@ -60,7 +50,9 @@ body {
     padding: 0 20px;
     color: white;
     }
-  .search-icon:hover,
+    .search-icon:hover{
+      color: gray;
+    }
   .cart-icon:hover {
   color: white;
   opacity: 0.8;
@@ -345,13 +337,72 @@ body {
   height: 200px;
   background-color: #000;
   }
-  
+ 
+
   /* Responsive */
   @media (max-width: 900px) {
   .blue-section {
   height: 70vh;
   padding: 2rem 1rem;
   background-size: contain;
+  }
+  .lego-listlist{
+  flex-wrap: nowrap !important;        /* không xuống hàng */
+  overflow-x: auto !important;         /* bật cuộn ngang */
+  justify-content: flex-start !important;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding-inline: 1rem;                /* cho khoảng cách 2 đầu */
+  box-sizing: border-box;
+}
+
+/* Spacer ảo để ảnh cuối không bị che bởi padding/margin */
+.lego-listlist::after {
+  content: "";
+  flex: 0 0 1rem; /* bạn có thể tăng nếu thấy ảnh cuối vẫn sát lề */
+}
+
+/* Thanh cuộn (tùy chỉnh) */
+.lego-listlist::-webkit-scrollbar {
+  height: 8px;
+}
+.lego-listlist::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.35);
+  border-radius: 4px;
+}
+
+/* Card: bắt buộc giữ kích thước cố định khi cuộn */
+.lego-listlist .card1 {
+  flex: 0 0 12rem;   /* cố định rộng = 12rem; thay đổi nếu cần */
+  width: 12rem;      /* đảm bảo trình duyệt tính đúng kích thước */
+  height: 15rem;
+  border: none;
+  box-sizing: border-box;
+}
+
+/* Ảnh đầy card nhưng giữ tỉ lệ */
+.lego-listlist .card1 img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+  .img-1-container{
+    height: 20%;
+  }
+  .hero{
+    height:300px;
+    
+  }
+  .text-img-p{
+   text-align: center;}
+
+  .text-img-1-container{
+    width: 100%;
+  }
+  .stripe-blue{
+    width: 100%;
+   
   }
   .stripe-text{
     font-size: 1.4ch;

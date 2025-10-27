@@ -328,7 +328,10 @@ body {
       transition: opacity 0.3s;
   }
   
-  .search-icon:hover,
+  
+  .search-icon:hover{
+    color: gray;
+  }
   .cart-icon:hover {
       color: white;
       opacity: 0.8;
@@ -380,12 +383,6 @@ body {
     font-size: 1.2rem;
     text-decoration: none;
     transition: opacity 0.3s;
-}
-
-.search-icon:hover,
-.cart-icon:hover {
-    color: white;
-    opacity: 0.8;
 }
 
 .btn-sign {
