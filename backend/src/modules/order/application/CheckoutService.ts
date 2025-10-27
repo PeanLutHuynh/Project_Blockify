@@ -292,6 +292,7 @@ export class CheckoutService {
         quantity: item.quantity,
         unit_price: item.unitPrice,
         total_price: item.totalPrice,
+        image_url: (item as any).imageUrl, // Include image_url from products
       })),
     };
   }
@@ -334,6 +335,47 @@ export class CheckoutService {
         note: "Thanh toán thành công, đơn hàng đang được giao",
       });
     }
+  }
+
+  /**
+   * Cancel an order
+   */
+  async cancelOrder(orderId: number, reason?: string): Promise<void> {
+    // Get order details first
+    const order = await this.orderRepository.findById(orderId);
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    // Only allow canceling orders with "Đang xử lý" (Processing) status
+    if (order.status !== "Đang xử lý") {
+      throw new Error(`Cannot cancel order with status "${order.status}". Only "Đang xử lý" orders can be canceled.`);
+    }
+
+    // Update order status to "Đã hủy" (Canceled)
+    await this.orderRepository.updateStatus(orderId, "Đã hủy");
+
+    // Update notes with cancel reason
+    if (reason) {
+      const { error } = await supabaseAdmin
+        .from("orders")
+        .update({ notes: reason })
+        .eq("order_id", orderId);
+
+      if (error) {
+        logger.error("Error updating cancel reason:", error);
+      }
+    }
+
+    // Create status history
+    await this.orderRepository.createStatusHistory({
+      orderId,
+      oldStatus: "Đang xử lý",
+      newStatus: "Đã hủy",
+      note: reason || "Đơn hàng đã bị hủy",
+    });
+
+    logger.info(`Order ${orderId} canceled. Reason: ${reason || "No reason provided"}`);
   }
 
   /**

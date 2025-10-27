@@ -171,4 +171,35 @@ export class OrderController {
       this.sendResponse(res, 500, this.error(err.message));
     }
   }
+
+  /**
+   * PATCH /api/orders/:orderId/cancel
+   * Cancel an order
+   */
+  async cancelOrder(
+    req: HttpRequest,
+    res: HttpResponse,
+    orderId: string
+  ): Promise<void> {
+    try {
+      const body = req.body as { reason?: string };
+      const orderIdNum = parseInt(orderId);
+
+      if (isNaN(orderIdNum)) {
+        this.sendResponse(res, 400, this.error("Invalid order ID"));
+        return;
+      }
+
+      await this.checkoutService.cancelOrder(orderIdNum, body.reason);
+
+      this.sendResponse(
+        res,
+        200,
+        this.success("Order canceled successfully")
+      );
+    } catch (err: any) {
+      logger.error("Cancel order error:", err);
+      this.sendResponse(res, 500, this.error(err.message));
+    }
+  }
 }
