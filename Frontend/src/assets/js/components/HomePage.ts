@@ -318,6 +318,9 @@ async function loadRecommendedProductsForSection() {
       
       productCard.innerHTML = `
         <div class="product-card1" data-product-slug="${product.slug}" style="cursor: pointer;">
+        <div class ="product-hot-tag">Hot</div>
+        <div class = "product-sq"></div>
+        <div class ="product-line"></div>
           <img src="${product.imageUrl}" 
                alt="${product.name}" 
                class="product-img"

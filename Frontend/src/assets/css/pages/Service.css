@@ -59,10 +59,11 @@ body {
     transition: opacity 0.3s;
     padding: 0 90px 0 5px;
     }
-  
-  .search-icon:hover,
+    .search-icon:hover{
+        color: gray;
+      }
   .cart-icon:hover {
-      color: white;
+      color: rgb(70, 69, 69);
       opacity: 0.8;
   }
   
@@ -114,11 +115,6 @@ body {
     transition: opacity 0.3s;
 }
 
-.search-icon:hover,
-.cart-icon:hover {
-    color: white;
-    opacity: 0.8;
-}
 
 .btn-sign {
     color: white;
