@@ -325,6 +325,42 @@ gap: 20px; /* khoảng cách giữa các card */
   justify-content: center; /* căn ngang */
   align-items: center;     /* căn dọc */
 }
+/* --- Mặc định trên desktop (đã ổn) --- */
+#product-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* --- Hiển thị dạng ngang khi ở mobile --- */
+@media (max-width: 900px) {
+  #product-list {
+    display: flex;
+    flex-wrap: nowrap;              /* Không xuống hàng */
+    overflow-x: auto;               /* Cho phép cuộn ngang */
+    gap: 1rem;
+    padding: 1rem;
+    scroll-snap-type: x mandatory;
+    justify-content: flex-start !important; /* Bỏ center để không bị bó */
+  }
+  .product-card1{
+    width: 100%;
+  }
+
+  #product-list::-webkit-scrollbar {
+    display: none; /* Ẩn thanh cuộn */
+  }
+
+  /* Ghi đè Bootstrap col-md / col-sm */
+  #product-list > div {
+    flex: 0 0 auto !important;      /* Không cho Bootstrap co giãn */
+    width: 75% !important;          /* Mỗi card chiếm 75% màn hình */
+    max-width: 300px;               /* Giới hạn kích thước để cuộn hết */
+    scroll-snap-align: start;
+  }
+}
+
+
 
 .btn-cart {
   background-color: #0d99ff;
@@ -340,7 +376,7 @@ gap: 20px; /* khoảng cách giữa các card */
   background-color: #007ad6;
 }
 .promo-item { background: white; border-radius: 10px; padding: 15px; }
-.promotion-box { background: #0d6efd; color: white; border-radius: 10px; padding: 20px; text-align: center; }
+.promotion-box { border-radius: 10px; padding: 20px; text-align: center; }
 .recommended { background-image: url("../../../../public/images/Rectangle 53.png"); background-repeat: round; background-size: contain; color: white; padding: 40px 20px; }
 .recommended .card { border-radius: 10px; }
 /* ===== Enhancements (non-intrusive) ===== */
@@ -471,9 +507,7 @@ html { scroll-behavior: smooth; }
     gap: 10px; /* khoảng cách giữa các card */
   }
 
-  .product-card1 {
-    flex: 0 0 calc(50% - 10px); /* 2 card trên 1 hàng */
-  }
+ 
   .voucher {
     flex-direction: column;
     align-items: center;
