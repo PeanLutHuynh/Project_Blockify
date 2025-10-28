@@ -98,6 +98,85 @@ declare global {
   }
 }
 
+/**
+ * Handle "Buy Now" button click
+ * Bypasses cart and goes directly to checkout with current product
+ */
+async function handleBuyNow(): Promise<void> {
+  try {
+    console.log('🛒 [ProductDetail] Buy Now clicked');
+    
+    // Get current product data from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const slug = urlParams.get('slug');
+    
+    if (!slug) {
+      alert('❌ Không tìm thấy thông tin sản phẩm!');
+      return;
+    }
+    
+    // Load product details
+    const result = await productService.getProductBySlug(slug);
+    if (!result.success || !result.product) {
+      alert('❌ Không thể tải thông tin sản phẩm!');
+      return;
+    }
+    
+    const product = result.product;
+    console.log('📦 [ProductDetail] Product data for Buy Now:', product);
+    
+    // Get quantity from input
+    const quantityInput = document.querySelector('.quantity-input') as HTMLInputElement;
+    const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+    
+    // Validate stock before proceeding
+    const stockQuantity = parseInt(product.stock_quantity) || 0;
+    const minStockLevel = parseInt(product.min_stock_level) || 0;
+    const availableStock = stockQuantity - minStockLevel;
+    
+    if (stockQuantity <= minStockLevel) {
+      alert('❌ Sản phẩm đã hết hàng!');
+      return;
+    }
+    
+    if (quantity > availableStock) {
+      alert(`❌ Chỉ còn ${availableStock} sản phẩm trong kho!`);
+      return;
+    }
+    
+    if (quantity < 1) {
+      alert('❌ Số lượng phải lớn hơn 0!');
+      return;
+    }
+    
+    // Create checkout item with the same structure as cart items
+    const checkoutItem = {
+      productId: parseInt(product.product_id),
+      productName: product.product_name,
+      productSlug: product.slug,
+      imageUrl: product.product_images?.[0]?.image_url || product.imageUrl || '',
+      price: parseFloat(product.price),
+      salePrice: product.sale_price ? parseFloat(product.sale_price) : null,
+      quantity: quantity,
+      stockQuantity: stockQuantity,
+      minStockLevel: minStockLevel
+    };
+    
+    console.log('✅ [ProductDetail] Created checkout item:', checkoutItem);
+    
+    // Store in sessionStorage for OrderPage to read
+    sessionStorage.setItem('checkoutItems', JSON.stringify([checkoutItem]));
+    sessionStorage.setItem('checkoutSource', 'buyNow'); // Mark as direct buy
+    
+    // Redirect to order page
+    window.location.href = '/src/pages/OrderPage.html';
+    
+  } catch (error) {
+    console.error('❌ [ProductDetail] Error in Buy Now:', error);
+    alert('Đã xảy ra lỗi khi mua hàng!');
+  }
+}
+
 // Initialize app and run page logic
 initializeOnReady(() => {
   // Initialize navbar authentication UI
@@ -333,6 +412,46 @@ function renderProductDetail(product: any): void {
     `;
   }
 
+  // Update stock status and quantity input
+  const stockQuantity = parseInt(product.stock_quantity) || 0;
+  const minStockLevel = parseInt(product.min_stock_level) || 0;
+  const availableStock = stockQuantity - minStockLevel;
+  
+  const stockStatus = document.getElementById('stock-status');
+  const quantityInput = document.querySelector('.quantity-input') as HTMLInputElement;
+  
+  if (availableStock <= 0) {
+    if (stockStatus) {
+      stockStatus.textContent = 'Hết hàng';
+      stockStatus.style.color = '#dc3545';
+    }
+    if (quantityInput) {
+      quantityInput.disabled = true;
+      quantityInput.value = '0';
+    }
+    
+    // Disable purchase buttons
+    const addToCartBtn = document.querySelector('.btn-add-cart') as HTMLButtonElement;
+    const buyNowBtn = document.querySelector('.btn-purchase') as HTMLButtonElement;
+    if (addToCartBtn) {
+      addToCartBtn.disabled = true;
+      addToCartBtn.textContent = 'Hết hàng';
+    }
+    if (buyNowBtn) {
+      buyNowBtn.disabled = true;
+      buyNowBtn.textContent = 'Hết hàng';
+    }
+  } else {
+    if (stockStatus) {
+      stockStatus.textContent = `Còn ${availableStock} sản phẩm`;
+      stockStatus.style.color = availableStock < 10 ? '#ff9800' : '#28a745';
+    }
+    if (quantityInput) {
+      quantityInput.max = availableStock.toString();
+      quantityInput.disabled = false;
+    }
+  }
+
   // Update images
   if (product.product_images && product.product_images.length > 0) {
     const images = product.product_images;
@@ -533,6 +652,17 @@ function initializeProductDetailPage() {
     });
   } else {
     console.warn('⚠️ Add to Cart button not found in ProductDetail page');
+  }
+
+  // ✅ Add event listener for "Buy Now" button
+  const buyNowBtn = document.querySelector('.btn-purchase') as HTMLButtonElement | null;
+  if (buyNowBtn) {
+    buyNowBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      await handleBuyNow();
+    });
+  } else {
+    console.warn('⚠️ Buy Now button not found in ProductDetail page');
   }
 
   // Add review form
