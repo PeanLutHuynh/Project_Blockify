@@ -21,6 +21,7 @@ import { categoryRoutes } from './src/modules/products/presentation/categoryRout
 import cartRoutes from './src/modules/cart/presentation/cartRoutes';
 import { registerOrderRoutes } from './src/modules/order/presentation/orderRoutes';
 import { registerPaymentProofRoutes } from './src/modules/order/presentation/paymentProofRoutes';
+import { wishlistRouter } from './src/modules/wishlist/presentation/wishlist.routes';
 
 /**
  * Bootstrap application with custom HTTP server
@@ -214,6 +215,7 @@ async function bootstrap() {
     server.useRouter('/api/v1/products', productRoutes); // Product routes
     server.useRouter('/api/v1/categories', categoryRoutes); // Category routes
     server.useRouter('/api/v1/cart', cartRoutes); // Cart routes
+    server.useRouter('/api/v1/wishlist', wishlistRouter); // Wishlist routes
 
     // Register order routes
     registerOrderRoutes(server.getRouter());

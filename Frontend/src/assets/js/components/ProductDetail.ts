@@ -4,8 +4,12 @@ import { initializeSearch } from '../../../shared/components/SearchInit.js';
 import { productService } from '../../../core/services/ProductService.js';
 import { cartService } from '../../../core/services/CartService.js';
 import { updateCartBadge } from '../../../core/config/init.js';
+import { WishlistService } from '../../../core/services/WishlistService.js';
+import { authService } from '../../../core/services/AuthService.js';
 
 // ❌ Removed mock data - now using Supabase for all product data
+
+const wishlistService = new WishlistService();
 
 function scrollProducts(direction: 'left' | 'right'): void {
   const container = document.getElementById('productScroll');
@@ -13,14 +17,107 @@ function scrollProducts(direction: 'left' | 'right'): void {
   if (container) container.scrollLeft += direction === 'left' ? -scrollAmount : scrollAmount;
 }
 
-function toggleHeart(heart: HTMLElement): void {
+async function toggleHeart(heart: HTMLElement): Promise<void> {
+  // Check if user is logged in
+  if (!authService.isAuthenticated()) {
+    alert('Vui lòng đăng nhập để thêm vào wishlist');
+    window.location.href = '/src/pages/SigninPage.html';
+    return;
+  }
+
   const icon = heart.querySelector('i');
   if (!icon) return;
+  
+  // Get product ID from data attribute or URL
+  const productIdAttr = heart.getAttribute('data-product-id');
+  let productId: number;
+  
+  if (productIdAttr) {
+    productId = parseInt(productIdAttr);
+  } else {
+    // Get from URL if not in attribute
+    const urlParams = new URLSearchParams(window.location.search);
+    const slug = urlParams.get('slug');
+    if (!slug) {
+      alert('Không tìm thấy thông tin sản phẩm');
+      return;
+    }
+    
+    // Get product details to get ID
+    try {
+      const result = await productService.getProductBySlug(slug);
+      if (!result.success || !result.product) {
+        alert('Không thể tải thông tin sản phẩm');
+        return;
+      }
+      productId = parseInt(result.product.product_id);
+      // Store for future use
+      heart.setAttribute('data-product-id', productId.toString());
+    } catch (error) {
+      console.error('❌ Error loading product:', error);
+      alert('Lỗi khi tải thông tin sản phẩm');
+      return;
+    }
+  }
+  
   const isLiked = icon.classList.contains('fas');
-  icon.className = isLiked ? 'far fa-heart' : 'fas fa-heart';
-  heart.style.background = isLiked ? 'white' : '#ff4757';
-  heart.style.borderColor = isLiked ? '#ddd' : '#ff4757';
-  (icon as HTMLElement).style.color = isLiked ? '#999' : 'white';
+  
+  try {
+    if (isLiked) {
+      // Remove from wishlist
+      console.log('💔 Removing from wishlist:', productId);
+      await wishlistService.removeFromWishlist(productId);
+      icon.className = 'far fa-heart';
+      heart.style.background = 'white';
+      heart.style.borderColor = '#ddd';
+      (icon as HTMLElement).style.color = '#999';
+      console.log('✅ Removed from wishlist');
+    } else {
+      // Add to wishlist
+      console.log('💖 Adding to wishlist:', productId);
+      await wishlistService.addToWishlist(productId);
+      icon.className = 'fas fa-heart';
+      heart.style.background = '#ff4757';
+      heart.style.borderColor = '#ff4757';
+      (icon as HTMLElement).style.color = 'white';
+      console.log('✅ Added to wishlist');
+    }
+  } catch (error: any) {
+    console.error('❌ Error toggling wishlist:', error);
+    alert(error.message || 'Lỗi khi cập nhật wishlist');
+  }
+}
+
+/**
+ * Check wishlist status and update heart icon
+ */
+async function checkAndUpdateWishlistStatus(productId: number): Promise<void> {
+  try {
+    if (!authService.isAuthenticated()) {
+      console.log('ℹ️ User not authenticated, skipping wishlist check');
+      return;
+    }
+
+    console.log('💖 Checking wishlist status for product:', productId);
+    const isInWishlist = await wishlistService.isInWishlist(productId);
+    
+    // Find heart button and update its state
+    const heartButton = document.querySelector('.heart-btn') as HTMLElement;
+    if (heartButton) {
+      const icon = heartButton.querySelector('i');
+      if (icon && isInWishlist) {
+        icon.className = 'fas fa-heart';
+        heartButton.style.background = '#ff4757';
+        heartButton.style.borderColor = '#ff4757';
+        (icon as HTMLElement).style.color = 'white';
+        console.log('✅ Product is in wishlist, heart updated');
+      }
+      // Store product ID for later use
+      heartButton.setAttribute('data-product-id', productId.toString());
+    }
+  } catch (error) {
+    console.error('❌ Error checking wishlist status:', error);
+  }
 }
 
 async function addToCart(productName: string, btn: HTMLElement): Promise<void> {
@@ -239,6 +336,18 @@ async function loadRecommendedProducts(currentProductId?: number): Promise<void>
 
     console.log(`✅ Loaded ${result.products.length} recommended products`);
     
+    // Check which products are in wishlist
+    let wishlistProductIds: number[] = [];
+    try {
+      if (authService.isAuthenticated()) {
+        const wishlist = await wishlistService.getUserWishlist();
+        wishlistProductIds = wishlist.map(item => item.product_id);
+        console.log('💖 Wishlist product IDs in recommended:', wishlistProductIds);
+      }
+    } catch (error) {
+      console.log('ℹ️ Could not load wishlist for recommended products');
+    }
+    
     // Render to grid
     const grid = document.getElementById('productGrid');
     if (!grid) {
@@ -246,17 +355,23 @@ async function loadRecommendedProducts(currentProductId?: number): Promise<void>
       return;
     }
 
-    // ✅ Render products with proper Supabase image URLs
+    // ✅ Render products with proper Supabase image URLs and wishlist status
     grid.innerHTML = result.products.map(product => {
       const price = typeof product.price === 'number' ? product.price : parseFloat(product.price || '0');
       const formattedPrice = price.toLocaleString('vi-VN');
       const rating = product.rating || 4.5;
       const pieceCount = product.pieceCount || 120;
       
+      // Check if product is in wishlist
+      const productId = parseInt(product.id);
+      const isInWishlist = wishlistProductIds.includes(productId);
+      const heartClass = isInWishlist ? 'fas fa-heart' : 'far fa-heart';
+      const heartStyle = isInWishlist ? 'color: #ff4757;' : '';
+      
       return `
         <div class="product-card" data-slug="${product.slug}" style="cursor: pointer;">
-          <div class="heart-icon" onclick="event.stopPropagation(); toggleHeart(this)">
-            <i class="far fa-heart"></i>
+          <div class="heart-icon" data-product-id="${productId}" style="${heartStyle}">
+            <i class="${heartClass}"></i>
           </div>
           <div class="product-image">
             <img src="${product.imageUrl}" 
@@ -286,6 +401,56 @@ async function loadRecommendedProducts(currentProductId?: number): Promise<void>
 
     // Add click handlers
     grid.querySelectorAll('.product-card').forEach(card => {
+      // Heart icon click handler
+      const heartIcon = card.querySelector('.heart-icon') as HTMLElement;
+      if (heartIcon) {
+        heartIcon.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          
+          // Check if user is logged in
+          if (!authService.isAuthenticated()) {
+            alert('Vui lòng đăng nhập để thêm vào wishlist');
+            window.location.href = '/src/pages/SigninPage.html';
+            return;
+          }
+          
+          const productId = parseInt(heartIcon.getAttribute('data-product-id') || '0');
+          if (!productId) {
+            console.error('❌ Invalid product ID for wishlist');
+            return;
+          }
+          
+          const icon = heartIcon.querySelector('i');
+          if (!icon) return;
+          
+          const isLiked = icon.classList.contains('fas');
+          
+          try {
+            if (isLiked) {
+              // Remove from wishlist
+              console.log('💔 Removing from wishlist:', productId);
+              await wishlistService.removeFromWishlist(productId);
+              icon.classList.remove('fas');
+              icon.classList.add('far');
+              heartIcon.style.color = '';
+              console.log('✅ Removed from wishlist');
+            } else {
+              // Add to wishlist
+              console.log('💖 Adding to wishlist:', productId);
+              await wishlistService.addToWishlist(productId);
+              icon.classList.remove('far');
+              icon.classList.add('fas');
+              heartIcon.style.color = '#ff4757';
+              console.log('✅ Added to wishlist');
+            }
+          } catch (error: any) {
+            console.error('❌ Error toggling wishlist:', error);
+            alert(error.message || 'Lỗi khi cập nhật wishlist');
+          }
+        });
+      }
+      
+      // Product card click handler
       card.addEventListener('click', () => {
         const slug = card.getAttribute('data-slug');
         if (slug) {
@@ -525,10 +690,13 @@ function initializeProductDetailPage() {
   if (slug) {
     console.log('✅ Slug found, loading product from Supabase...');
     // Load product from Supabase by slug
-    loadProductFromSupabase(slug).then(product => {
+    loadProductFromSupabase(slug).then(async product => {
       if (product) {
         console.log('✅ Product data received:', product.product_name);
         renderProductDetail(product);
+        
+        // Check if product is in wishlist and update heart icon
+        await checkAndUpdateWishlistStatus(product.product_id);
         
         // ✅ Load recommended products based on current product
         const productId = product.product_id;

@@ -244,26 +244,43 @@ body {
 
 /* Wishlist */
 .wishlist-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #fff;
-  text-align: center;
-  padding: 15px;
-  margin-bottom: 20px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 100%;
 }
 
-.wishlist-card img {
-  width: 100%;
-  height: 150px;
-  object-fit: contain;
-  border-radius: 6px;
-  background: #f8f9fa;
+.wishlist-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
 }
 
-.wishlist-card h5 {
-  margin: 15px 0 8px;
-  color: #333;
+.wishlist-card .btn-close {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.wishlist-card .btn-close:hover {
+  opacity: 1;
+}
+
+.wishlist-card .card-img-top {
+  transition: transform 0.3s;
+}
+
+.wishlist-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.wishlist-card .card-title {
+  font-size: 0.95rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.wishlist-card .btn-sm {
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
 }
 
 /* Address */
