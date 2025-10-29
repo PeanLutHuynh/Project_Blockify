@@ -244,7 +244,6 @@
             <tbody id="orderBody"></tbody>
           </table>
         </div>
-      </div>
       
       <!-- Modal Chi tiết Đơn hàng -->
       <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
@@ -317,41 +316,6 @@
         </div></div>
       </div>
       </section>
-      <!-- Modal Chi tiết Đơn hàng -->
-      <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="orderDetailLabel">Chi tiết đơn hàng</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-            </div>
-            <div class="modal-body">
-              <div class="container">
-                <div class="row mb-2"><div class="col-5 fw-semibold">Khách hàng:</div><div class="col" id="detailCustomerName"></div></div>
-                <div class="row mb-2"><div class="col-5 fw-semibold">Email:</div><div class="col" id="detailCustomerEmail"></div></div>
-                <div class="row mb-2"><div class="col-5 fw-semibold">SĐT:</div><div class="col" id="detailCustomerPhone"></div></div>
-                <div class="row mb-2"><div class="col-5 fw-semibold">Địa chỉ:</div><div class="col" id="detailCustomerAddress"></div></div>
-                <div class="row mb-2"><div class="col-5 fw-semibold">Phương thức:</div><div class="col" id="detailPaymentMethod"></div></div>
-                <div class="row mb-2"><div class="col-5 fw-semibold">Mã hóa đơn:</div><div class="col" id="detailOrderId"></div></div>
-                <div class="row mb-2"><div class="col-5 fw-semibold">Tên đơn:</div><div class="col" id="detailOrderName"></div></div>
-                <div class="row mb-2"><div class="col-5 fw-semibold">Số lượng:</div><div class="col" id="detailOrderQuantity"></div></div>
-                <div class="row mb-2"><div class="col-5 fw-semibold">Mẫu hàng:</div><div class="col" id="detailOrderVariant"></div></div>
-                <div class="row mb-2"><div class="col-5 fw-semibold">Tổng tiền:</div><div class="col" id="detailOrderTotal"></div></div>
-                <div class="row mb-2"><div class="col-5 fw-semibold">Trạng thái:</div><div class="col" id="detailOrderStatus"></div></div>
-                <div class="row mb-2"><div class="col-5 fw-semibold">Hình sản phẩm:</div><div class="col"><img id="detailProductImg" src="" class="img-fluid mb-2" style="width: 100px;"></div></div>
-                <div class="row mb-2"><div class="col-5 fw-semibold">Minh chứng thanh toán:</div><div class="col"><img id="detailPayProof" src="" class="img-fluid" style="width: 120px;"></div></div>
-              </div>
-            </div>
-            <div class="modal-footer order-action-footer">
-              <button type="button" class="btn btn-success next-status-btn">Cập nhật trạng thái</button>
-              <button type="button" class="btn btn-info check-proof-btn">Kiểm minh chứng thanh toán</button>
-              <button type="button" class="btn btn-warning refund-btn">Hoàn/Trả hàng</button>
-              <button type="button" class="btn btn-danger cancel-btn">Hủy đơn</button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- Feedback Manager -->
       <section id="feedback-manager" class="section">
