@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chi tiết đơn hàng - Admin</title>
+  <style>
+    :root{
+      --bg:#f6f8fa;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#0ea5e9;
+      --success:#10b981;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --glass: rgba(0,0,0,0.04);
+      --radius:12px;
+      font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,var(--bg),#eef2f7);
+      color:#111827;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:24px;
+    }
+
+    .container{
+      max-width:1100px;
+      margin:0 auto;
+      background:var(--card);
+      border-radius:16px;
+      padding:24px;
+      box-shadow:0 8px 30px rgba(15,23,42,0.06);
+    }
+
+    header.top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+    .order-id{
+      display:flex;
+      flex-direction:column;
+    }
+    .order-id h1{
+      margin:0;
+      font-size:20px;
+      letter-spacing:0.2px;
+    }
+    .meta{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .status-tag{
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:600;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:13px;
+      color:white;
+    }
+    .status-processing{ background:var(--warn); }
+    .status-shipping{ background:var(--accent); }
+    .status-delivered{ background:var(--success); }
+    .status-cancel{ background:var(--danger); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    .card{
+      background:linear-gradient(180deg,var(--card),#fff);
+      border-radius:12px;
+      padding:16px;
+      box-shadow:0 6px 18px rgba(12,18,30,0.03);
+    }
+
+    /* Left column (customer) */
+    .customer .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-bottom:12px;
+    }
+    .label{ width:120px; color:var(--muted); font-size:14px; }
+    .value{ font-weight:600; }
+
+    /* Right column (items, summary) */
+    .items table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+    }
+    .items th, .items td{
+      text-align:left;
+      padding:10px 8px;
+      border-bottom:1px solid #f0f3f7;
+    }
+    .items th{ color:var(--muted); font-weight:600; font-size:13px; }
+    .product-row{ display:flex; gap:12px; align-items:center; }
+    .thumb{
+      width:56px; height:56px; border-radius:8px; background:var(--glass);
+      object-fit:cover;
+    }
+
+    .summary{
+      margin-top:12px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-direction:column;
+    }
+    .summary .line{
+      display:flex; justify-content:space-between; color:var(--muted);
+      padding:6px 0;
+    }
+    .summary .total{
+      font-size:18px; font-weight:700;
+    }
+
+    /* payment proof */
+    .proofs{
+      display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;
+    }
+    .proof{
+      width:120px; border-radius:10px; overflow:hidden; background:var(--glass);
+      box-shadow:0 4px 12px rgba(2,6,23,0.04); position:relative;
+    }
+    .proof img{ width:100%; height:80px; object-fit:cover; display:block; }
+    .proof .badge{
+      position:absolute; left:8px; top:8px; background:rgba(0,0,0,0.6); color:white;
+      padding:4px 8px; border-radius:999px; font-size:12px;
+    }
+
+    /* history */
+    .history .item{ padding:10px 0; border-bottom:1px dashed #eef2f5; display:flex; gap:12px; align-items:flex-start;}
+    .history .time{ color:var(--muted); font-size:13px; width:160px; }
+
+    /* actions */
+    .actions{
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    button.btn{
+      border:0; padding:10px 14px; border-radius:10px; font-weight:700; cursor:pointer;
+      box-shadow:0 6px 18px rgba(10,20,40,0.06);
+    }
+    .btn-primary{ background:var(--accent); color:white; }
+    .btn-accept{ background:var(--success); color:white; }
+    .btn-danger{ background:var(--danger); color:white; }
+    .btn-ghost{ background:transparent; border:1px solid #e6eef6; color:var(--muted); }
+
+    /* sticky footer actions */
+    .sticky-actions{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:18px;
+      background:rgba(255,255,255,0.96);
+      padding:10px 16px;
+      border-radius:999px;
+      box-shadow:0 10px 30px rgba(2,6,23,0.08);
+      display:flex; gap:10px; z-index:60; align-items:center;
+    }
+
+    @media (max-width:980px){
+      .grid{ grid-template-columns: 1fr; }
+      .label{ width:110px; }
+      .sticky-actions{ left:12px; transform:none; right:12px; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container" role="main" aria-label="Chi tiết đơn hàng">
+    <header class="top">
+      <div class="order-id">
+        <h1>Chi tiết đơn hàng #301</h1>
+        <div class="meta">Đặt lúc: <strong>27/10/2025 14:52</strong> • Khách: <strong>Hà My</strong></div>
+      </div>
+
+      <div style="text-align:right">
+        <div style="margin-bottom:6px">
+          <span class="status-tag status-processing" id="orderStatusTag">Chờ xác nhận</span>
+        </div>
+        <div class="meta">Tổng: <strong>1.200.000₫</strong></div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: Customer + Address + Payment -->
+      <aside class="card customer" aria-label="Thông tin khách hàng">
+        <h3 style="margin-top:0;margin-bottom:12px">Thông tin khách hàng</h3>
+
+        <div class="row"><div class="label">Khách hàng</div><div class="value">Hà My</div></div>
+        <div class="row"><div class="label">Email</div><div class="value">hamy@email.com</div></div>
+        <div class="row"><div class="label">SĐT</div><div class="value">0912345678</div></div>
+
+        <hr style="border:none;border-top:1px solid #f0f3f7;margin:12px 0" />
+
+        <h4 style="margin:8px 0">Địa chỉ giao hàng</h4>
+        <div style="color:var(--muted);font-size:14px">123 Nguyễn Huệ, Q1, TP.HCM</div>
+
+        <hr style="border:none;border-top:1px solid #f0f3f7;margin:12px 0" />
+
+        <h4 style="margin:8px 0">Minh chứng thanh toán</h4>
+        <div class="proofs">
+          <div class="proof">
+            <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=60" alt="Minh chứng 1">
+            <div class="badge" id="proofStatus">Chưa kiểm tra</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <button class="btn btn-accept" id="btnConfirmPayment">✓ Xác nhận thanh toán</button>
+          <button class="btn btn-danger" id="btnRejectPayment" style="margin-left:8px">✕ Từ chối thanh toán</button>
+        </div>
+      </aside>
+
+      <!-- RIGHT: Items, summary, history -->
+      <main>
+        <section class="card items" aria-label="Chi tiết sản phẩm">
+          <h3 style="margin-top:0">Chi tiết sản phẩm</h3>
+          <table aria-label="Danh sách sản phẩm">
+            <thead>
+              <tr>
+                <th>Sản phẩm</th>
+                <th>SKU</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="product-row">
+                    <img class="thumb" src="https://images.unsplash.com/photo-1520975912978-9c5c0e3b3b7f?w=600&q=60" alt="Lego police">
+                    <div>
+                      <div style="font-weight:700">Lego police</div>
+                      <div style="color:var(--muted);font-size:13px">Size M - Trắng</div>
+                    </div>
+                  </div>
+                </td>
+                <td>DRESS-RED-M</td>
+                <td>1</td>
+                <td>1.200.000₫</td>
+                <td>1.200.000₫</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="summary" aria-hidden="false">
+            <div class="line"><div>Tạm tính</div><div class="muted">1.200.000₫</div></div>
+            <div class="line"><div>Phí vận chuyển</div><div class="muted">0₫</div></div>
+            <div class="line"><div>Giảm giá</div><div class="muted">0₫</div></div>
+            <div class="line total"><div>Tổng cộng</div><div>1.200.000₫</div></div>
+          </div>
+        </section>
+
+        <section class="card history" style="margin-top:16px" aria-label="Lịch sử trạng thái">
+          <h3 style="margin-top:0">Lịch sử trạng thái</h3>
+          <div class="item">
+            <div class="time">27/10/2025 14:52</div>
+            <div>
+              <div style="font-weight:700">Tạo đơn</div>
+              <div class="meta">Trạng thái: Đang xử lý — bởi hệ thống</div>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="time">27/10/2025 15:10</div>
+            <div>
+              <div style="font-weight:700">Thanh toán: Minh chứng tải lên</div>
+              <div class="meta">Trạng thái thanh toán: Chưa kiểm tra</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- sticky actions -->
+  <div class="sticky-actions" role="toolbar" aria-label="Hành động nhanh">
+    <button class="btn btn-primary" id="btnUpdateStatus">🔄 Cập nhật trạng thái</button>
+    <button class="btn btn-accept" id="btnMarkShipped">📦 Đang giao</button>
+    <button class="btn btn-accept" id="btnMarkDelivered">✅ Đã giao</button>
+    <button class="btn btn-danger" id="btnCancel">🗑️ Hủy đơn</button>
+    <button class="btn btn-ghost" id="btnClose">✖ Đóng</button>
+  </div>
+
+  <script>
+    // JS nhỏ để demo thay đổi trạng thái & trạng thái thanh toán (mô phỏng)
+    const orderStatusTag = document.getElementById('orderStatusTag');
+    const proofStatus = document.getElementById('proofStatus');
+
+    document.getElementById('btnConfirmPayment').addEventListener('click', () => {
+      proofStatus.textContent = 'Đã xác nhận';
+      proofStatus.style.background = 'var(--success)';
+      // Khi xác nhận thanh toán, có thể chuyển payment_status
+      alert('Thanh toán đã được xác nhận (demo). Nhớ gọi API để cập nhật DB.');
+    });
+
+    document.getElementById('btnRejectPayment').addEventListener('click', () => {
+      proofStatus.textContent = 'Từ chối';
+      proofStatus.style.background = 'var(--danger)';
+      alert('Thanh toán bị từ chối (demo). Nhớ gọi API để cập nhật DB.');
+    });
+
+    document.getElementById('btnMarkShipped').addEventListener('click', () => {
+      orderStatusTag.textContent = 'Đang giao';
+      orderStatusTag.className = 'status-tag status-shipping';
+      alert('Đã chuyển trạng thái: Đang giao (demo).');
+    });
+
+    document.getElementById('btnMarkDelivered').addEventListener('click', () => {
+      orderStatusTag.textContent = 'Đã giao';
+      orderStatusTag.className = 'status-tag status-delivered';
+      alert('Đã chuyển trạng thái: Đã giao (demo).');
+    });
+
+    document.getElementById('btnCancel').addEventListener('click', () => {
+      if (!confirm('Bạn chắc chắn muốn hủy đơn này?')) return;
+      orderStatusTag.textContent = 'Đã hủy';
+      orderStatusTag.className = 'status-tag status-cancel';
+      alert('Đơn đã được hủy (demo).');
+    });
+
+    document.getElementById('btnClose').addEventListener('click', () => {
+      window.history.back();
+    });
+
+    // add CSS vars to JS space (used inside handlers)
+    const styles = getComputedStyle(document.documentElement);
+    document.documentElement.style.setProperty('--success', styles.getPropertyValue('--success') || '#10b981');
+    document.documentElement.style.setProperty('--danger', styles.getPropertyValue('--danger') || '#ef4444');
+  </script>
+</body>
+</html>
