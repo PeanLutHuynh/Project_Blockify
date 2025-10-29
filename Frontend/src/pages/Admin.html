@@ -228,25 +228,26 @@
           <input class="search" placeholder="Tìm đơn hàng">
         </div>
         <div class="table-responsive">
-          <table class="table align-middle text-center" id="orderTable">
-            <thead>
+          <table class="table align-middle text-center table-hover" id="orderTable">
+            <thead class="table-light">
               <tr>
-                <th>#</th>
                 <th>Mã đơn</th>
                 <th>Khách hàng</th>
-                <th>Sản phẩm</th>
-                <th>Trạng thái</th>
-                <th>Ngày tạo</th>
+                <th>Email</th>
+                <th>SĐT</th>
+                <th>Ngày đặt</th>
                 <th>Tổng tiền</th>
+                <th>Trạng thái đơn</th>
+                <th>Thanh toán</th>
                 <th>Hành động</th>
               </tr>
             </thead>
-            <tbody id="orderBody"></tbody>
+            <tbody id="orderList"></tbody>
           </table>
         </div>
       
       <!-- Modal Chi tiết Đơn hàng -->
-      <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
+      <div class="modal fade" id="orderDetailModal" tabindex="-1">
         <div class="modal-dialog modal-lg"><div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Chi tiết đơn hàng</h5>
@@ -291,7 +292,7 @@
       </div>
       
       <!-- Modal Xử lý hoàn trả -->
-      <div class="modal fade" id="refundModal" tabindex="-1" aria-hidden="true">
+      <div class="modal fade" id="refundModal" tabindex="-1">
         <div class="modal-dialog"><div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Xử lý hoàn/trả hàng</h5>
@@ -793,6 +794,87 @@
   <!-- Tải cấu hình môi trường trước -->
   <script type="module" src="/dist/src/core/config/env.js"></script>
   <script type="module" src="/dist/src/assets/js/components/Admin.js"></script>
+  
+  <!-- Admin Order Management -->
+  <script type="module">
+    import { AdminOrderController } from '/dist/src/modules/admin/AdminOrderController.js';
+    
+    // Initialize Admin Order Controller
+    const adminOrderController = new AdminOrderController();
+    window.adminOrderController = adminOrderController;
+    
+    // Load orders when Order section is active
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load orders initially if order section is active
+      const orderSection = document.getElementById('order');
+      if (orderSection && orderSection.classList.contains('active')) {
+        adminOrderController.loadOrders();
+      }
+      
+      // Load orders when switching to order section
+      document.querySelectorAll('.menu li').forEach(item => {
+        item.addEventListener('click', () => {
+          const target = item.getAttribute('data-target');
+          if (target === 'order') {
+            adminOrderController.loadOrders();
+          }
+        });
+      });
+      
+      // Setup filter handlers
+      setupOrderFilters();
+    });
+    
+    function setupOrderFilters() {
+      // Add filter dropdowns to order section
+      const orderSection = document.getElementById('order');
+      if (!orderSection) return;
+      
+      const toolbar = orderSection.querySelector('.toolbar');
+      if (toolbar) {
+        // Add status filter
+        const statusFilter = document.createElement('select');
+        statusFilter.className = 'form-select d-inline-block w-auto ms-2';
+        statusFilter.innerHTML = `
+          <option value="">Tất cả trạng thái</option>
+          <option value="Đang xử lý">Đang xử lý</option>
+          <option value="Đang giao">Đang giao</option>
+          <option value="Đã giao">Đã giao</option>
+          <option value="Đã hủy">Đã hủy</option>
+          <option value="Đã trả">Đã trả</option>
+        `;
+        
+        // Add payment status filter
+        const paymentFilter = document.createElement('select');
+        paymentFilter.className = 'form-select d-inline-block w-auto ms-2';
+        paymentFilter.innerHTML = `
+          <option value="">Tất cả thanh toán</option>
+          <option value="pending">Chưa thanh toán</option>
+          <option value="paid">Đã thanh toán</option>
+          <option value="failed">Thất bại</option>
+          <option value="refunded">Đã hoàn tiền</option>
+        `;
+        
+        toolbar.appendChild(statusFilter);
+        toolbar.appendChild(paymentFilter);
+        
+        // Add event listeners
+        statusFilter.addEventListener('change', () => {
+          adminOrderController.loadOrders({
+            status: statusFilter.value || undefined,
+            paymentStatus: paymentFilter.value || undefined
+          });
+        });
+        
+        paymentFilter.addEventListener('change', () => {
+          adminOrderController.loadOrders({
+            status: statusFilter.value || undefined,
+            paymentStatus: paymentFilter.value || undefined
+          });
+        });
+      }
+    }
+  </script>
   <script>
      // PRODUCT MANAGEMENT
      let productsData = [
@@ -1706,193 +1788,6 @@
         document.getElementById(target).classList.add('active');
       });
     });
-    const orders = [
-  { 
-    id: 301, customer: "Hà My", product: "Lego police", status: "Chờ xác nhận", 
-    total: "1.200.000", date: "22/10/2025", returnReason: "",
-    email: "hamy@email.com", phone: "0912345678", address: "123 Nguyễn Huệ, Q1, TP.HCM",
-    payment: "Chuyển khoản", quantity: 1, variant: "Size M - Trắng",
-    productImg: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300",
-    payProof: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=300",
-    paymentStatus: "pending"
-  },
-  { 
-    id: 302, customer: "Phúc Lê", product: "Áo sơ mi nam công sở", status: "Đang giao", 
-    total: "450.000", date: "21/10/2025", returnReason: "",
-    email: "phucle@email.com", phone: "0987654321", address: "456 Lê Lợi, Q3, TP.HCM",
-    payment: "COD", quantity: 2, variant: "Size L - Xanh Navy",
-    productImg: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300",
-    payProof: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=300",
-    paymentStatus: "approved"
-  },
-  { 
-    id: 303, customer: "Trâm Anh", product: "Bộ thể thao nữ", status: "Đã giao", 
-    total: "780.000", date: "20/10/2025", returnReason: "",
-    email: "tramanh@email.com", phone: "0901234567", address: "789 Võ Văn Tần, Q3, TP.HCM",
-    payment: "Chuyển khoản", quantity: 1, variant: "Size S - Đen",
-    productImg: "https://images.unsplash.com/photo-1518002171953-a080ee817e1f?w=300",
-    payProof: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=300",
-    paymentStatus: "approved"
-  },
-  { 
-    id: 304, customer: "Tuấn Kiệt", product: "Giày thể thao Nike", status: "Đã huỷ", 
-    total: "1.500.000", date: "18/10/2025", returnReason: "",
-    email: "tuankiet@email.com", phone: "0923456789", address: "321 Hai Bà Trưng, Q1, TP.HCM",
-    payment: "Chuyển khoản", quantity: 1, variant: "Size 42 - Đen Trắng",
-    productImg: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300",
-    payProof: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=300",
-    paymentStatus: "rejected"
-  },
-  { 
-    id: 305, customer: "Lan Hương", product: "Túi xách da bò", status: "Hoàn trả", 
-    total: "2.100.000", date: "15/10/2025", returnReason: "Sản phẩm lỗi đường may",
-    email: "lanhuong@email.com", phone: "0934567890", address: "654 Trần Hưng Đạo, Q5, TP.HCM",
-    payment: "Chuyển khoản", quantity: 1, variant: "Màu Nâu - Da thật",
-    productImg: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300",
-    payProof: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=300",
-    paymentStatus: "approved"
-  }
-];
-
-const statusClass = {
-  "Chờ xác nhận": "status-confirm",
-  "Đang giao": "status-shipping",
-  "Đã giao": "status-done",
-  "Đã huỷ": "status-cancel",
-  "Hoàn trả": "status-return"
-};
-
-const orderBody = document.getElementById("orderBody");
-const detailModal = new bootstrap.Modal(document.getElementById("orderDetailModal"));
-const refundModal = new bootstrap.Modal(document.getElementById("refundModal"));
-
-function renderTable() {
-  orderBody.innerHTML = "";
-  orders.forEach((order, i) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${i + 1}</td>
-      <td>${order.id}</td>
-      <td>${order.customer}</td>
-      <td>${order.product}</td>
-      <td><span class="status ${statusClass[order.status]}">${order.status}</span></td>
-      <td>${order.date}</td>
-      <td>${order.total}</td>
-      <td><button class="btn btn-primary btn-sm view-btn">Xem</button></td>
-    `;
-
-    tr.querySelector(".view-btn").addEventListener("click", () => openDetail(order));
-    orderBody.appendChild(tr);
-  });
-}
-
-function openDetail(order) {
-  document.getElementById("detailCustomerName").textContent = order.customer;
-  document.getElementById("detailCustomerEmail").textContent = order.email;
-  document.getElementById("detailCustomerPhone").textContent = order.phone;
-  document.getElementById("detailCustomerAddress").textContent = order.address;
-  document.getElementById("detailPaymentMethod").textContent = order.payment;
-  document.getElementById("detailOrderId").textContent = order.id;
-  document.getElementById("detailOrderName").textContent = order.product;
-  document.getElementById("detailOrderQuantity").textContent = order.quantity;
-  document.getElementById("detailOrderVariant").textContent = order.variant;
-  document.getElementById("detailOrderTotal").textContent = order.total;
-  document.getElementById("detailOrderStatus").innerHTML = `<span class="status ${statusClass[order.status]}">${order.status}</span>`;
-  document.getElementById("detailProductImg").src = order.productImg;
-  document.getElementById("detailPayProof").src = order.payProof;
-
-  // Cập nhật trạng thái thanh toán
-  const paymentBadge = document.getElementById("paymentStatusBadge");
-  const verifyActions = document.getElementById("paymentVerifyActions");
-  
-  if (order.paymentStatus === "approved") {
-    paymentBadge.textContent = "✓ Đã xác nhận";
-    paymentBadge.className = "badge bg-success";
-    verifyActions.style.display = "none";
-  } else if (order.paymentStatus === "rejected") {
-    paymentBadge.textContent = "✗ Thanh toán bị từ chối";
-    paymentBadge.className = "badge bg-danger";
-    verifyActions.style.display = "none";
-  } else if (order.status === "Chờ xác nhận" && order.payment === "Chuyển khoản") {
-    paymentBadge.textContent = "⏳ Chưa kiểm tra";
-    paymentBadge.className = "badge bg-warning text-dark";
-    verifyActions.style.display = "block";
-  } else {
-    paymentBadge.textContent = order.payment === "COD" ? "💵 Thanh toán COD" : "Chưa kiểm tra";
-    paymentBadge.className = "badge bg-secondary";
-    verifyActions.style.display = "none";
-  }
-
-  // Xử lý nút xác nhận/từ chối thanh toán
-  document.getElementById("approvePaymentBtn").onclick = () => approvePayment(order);
-  document.getElementById("rejectPaymentBtn").onclick = () => rejectPayment(order);
-
-  const footer = document.querySelector(".order-action-footer");
-  footer.querySelector(".next-status-btn").onclick = () => updateStatus(order);
-  footer.querySelector(".refund-btn").onclick = () => handleRefund(order);
-  footer.querySelector(".cancel-btn").onclick = () => cancelOrder(order);
-
-  detailModal.show();
-}
-
-function updateStatus(order) {
-  if (order.status === "Chờ xác nhận") {
-    if (order.paymentStatus !== "approved") {
-      alert("Vui lòng xác nhận thanh toán trước khi cập nhật trạng thái đơn hàng!");
-      return;
-    }
-    order.status = "Đang giao";
-  }
-  else if (order.status === "Đang giao") order.status = "Đã giao";
-  else alert("Đơn hàng đã hoàn tất hoặc không thể cập nhật!");
-  renderTable();
-  openDetail(order);
-}
-
-function approvePayment(order) {
-  if (confirm("Xác nhận thanh toán hợp lệ cho đơn hàng #" + order.id + "?")) {
-    order.paymentStatus = "approved";
-    renderTable();
-    openDetail(order);
-    alert("✓ Đã xác nhận thanh toán thành công!");
-  }
-}
-
-function rejectPayment(order) {
-  if (confirm("Từ chối thanh toán cho đơn hàng #" + order.id + "?\nĐơn hàng sẽ bị hủy.")) {
-    order.paymentStatus = "rejected";
-    order.status = "Đã huỷ";
-    renderTable();
-    openDetail(order);
-    alert("✗ Đã từ chối thanh toán và hủy đơn hàng!");
-  }
-}
-
-function cancelOrder(order) {
-  if (confirm("Bạn có chắc muốn hủy đơn này không?")) {
-    order.status = "Đã huỷ";
-    renderTable();
-    openDetail(order);
-  }
-}
-
-function handleRefund(order) {
-  document.getElementById("refundProduct").value = order.product;
-  document.getElementById("refundReason").value = order.returnReason;
-  refundModal.show();
-
-  document.getElementById("confirmRefund").onclick = () => {
-    const reason = document.getElementById("refundReason").value.trim();
-    if (!reason) return alert("Vui lòng nhập lý do hoàn trả!");
-    order.status = "Hoàn trả";
-    order.returnReason = reason;
-    refundModal.hide();
-    renderTable();
-    openDetail(order);
-  };
-}
-
-renderTable();
   </script>
 </body>
 
