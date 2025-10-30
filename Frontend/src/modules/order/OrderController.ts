@@ -232,8 +232,10 @@ export class OrderController {
     try {
       if (!this.userId) return;
 
-      // Get items from sessionStorage (selected items from cart)
+      // Get items from sessionStorage (selected items from cart or direct buy)
       const checkoutItemsStr = sessionStorage.getItem('checkoutItems');
+      const checkoutSource = sessionStorage.getItem('checkoutSource') || 'cart';
+      
       if (!checkoutItemsStr) {
         this.showEmptyCart();
         return;
@@ -246,11 +248,34 @@ export class OrderController {
         return;
       }
 
+      // Add visual indicator for Buy Now
+      if (checkoutSource === 'buyNow') {
+        this.showBuyNowIndicator();
+      }
+
       this.renderCartItems(cartItems);
       this.calculateTotals(cartItems);
     } catch (error) {
       console.error("Failed to load cart items:", error);
       alert("Không thể tải giỏ hàng");
+    }
+  }
+
+  /**
+   * Show Buy Now indicator
+   */
+  private showBuyNowIndicator(): void {
+    const orderSummaryCard = document.querySelector('.order-summary');
+    if (orderSummaryCard) {
+      const indicator = document.createElement('div');
+      indicator.className = 'alert alert-info mb-3';
+      indicator.innerHTML = `
+        <div class="d-flex align-items-center">
+          <i class="bi bi-lightning-charge-fill me-2"></i>
+          <span>Mua ngay - Thanh toán nhanh</span>
+        </div>
+      `;
+      orderSummaryCard.insertBefore(indicator, orderSummaryCard.firstChild);
     }
   }
 
@@ -367,6 +392,7 @@ export class OrderController {
 
       // Clear checkout items from sessionStorage
       sessionStorage.removeItem('checkoutItems');
+      sessionStorage.removeItem('checkoutSource');
 
       // Show success message
       alert(`Đặt hàng thành công! Mã đơn hàng: ${order.orderNumber}`);

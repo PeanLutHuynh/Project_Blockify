@@ -4,9 +4,12 @@ import { initializeSearch } from '../../../shared/components/SearchInit.js';
 import { categoryService } from '../../../core/services/CategoryService.js';
 import { productService } from '../../../core/services/ProductService.js';
 import { supabaseService } from '../../../core/api/supabaseClient.js';
+import { WishlistService } from '../../../core/services/WishlistService.js';
+import { authService } from '../../../core/services/AuthService.js';
 
 // State management for pagination and filtering
 let currentCategoryId: number | undefined = undefined;
+const wishlistService = new WishlistService();
 
 // Initialize app and run page logic
 initializeOnReady(async () => {
@@ -414,7 +417,7 @@ function setupCategoryFilters() {
 /**
  * Render products to main product grid with consistent styling
  */
-function renderProductsToGrid(products: any[]) {
+async function renderProductsToGrid(products: any[]) {
   const mainList = document.getElementById('main-product-list');
   if (!mainList) {
     console.warn('main-product-list not found');
@@ -434,6 +437,18 @@ function renderProductsToGrid(products: any[]) {
     hasSlug: !!p.slug
   })));
 
+  // Check which products are in wishlist
+  let wishlistProductIds: number[] = [];
+  try {
+    if (authService.isAuthenticated()) {
+      const wishlist = await wishlistService.getUserWishlist();
+      wishlistProductIds = wishlist.map(item => item.product_id);
+      console.log('💖 Wishlist product IDs:', wishlistProductIds);
+    }
+  } catch (error) {
+    console.log('ℹ️ Could not load wishlist (user may not be logged in)');
+  }
+
   // Render products with consistent styling from HomePage
   mainList.innerHTML = products.map(product => {
     // ✅ Fallback nếu slug rỗng
@@ -446,10 +461,14 @@ function renderProductsToGrid(products: any[]) {
     const age = product.recommendedAge || '8+';
     const pieces = product.pieceCount || 120;
     
+    // Check if product is in wishlist
+    const isInWishlist = wishlistProductIds.includes(parseInt(product.id));
+    const heartClass = isInWishlist ? 'fas fa-heart icon-heart liked' : 'far fa-heart icon-heart';
+    
     return `
       <div class="col-6 col-md-3">
         <div class="product-card position-relative" data-product-slug="${slug}" style="cursor: pointer;">
-          <i class="far fa-heart icon-heart"></i>
+          <i class="${heartClass}" data-product-id="${product.id}"></i>
           <div class="product-image">
             <img src="${product.imageUrl}" alt="${product.name}">
           </div>
@@ -542,6 +561,50 @@ function renderProductsToGrid(products: any[]) {
         } catch (error) {
           console.error('❌ Error adding to cart:', error);
           alert('Lỗi khi thêm vào giỏ hàng');
+        }
+      });
+    }
+    
+    // Heart icon click handler - Add/Remove from wishlist
+    const heartIcon = card.querySelector('.icon-heart') as HTMLElement;
+    if (heartIcon) {
+      heartIcon.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        
+        // Check if user is logged in
+        if (!authService.isAuthenticated()) {
+          alert('Vui lòng đăng nhập để thêm vào wishlist');
+          window.location.href = '/src/pages/SigninPage.html';
+          return;
+        }
+        
+        const productId = parseInt(heartIcon.getAttribute('data-product-id') || '0');
+        if (!productId) {
+          console.error('❌ Invalid product ID for wishlist');
+          return;
+        }
+        
+        const isLiked = heartIcon.classList.contains('liked');
+        
+        try {
+          if (isLiked) {
+            // Remove from wishlist
+            console.log('💔 Removing from wishlist:', productId);
+            await wishlistService.removeFromWishlist(productId);
+            heartIcon.classList.remove('liked', 'fas');
+            heartIcon.classList.add('far');
+            console.log('✅ Removed from wishlist');
+          } else {
+            // Add to wishlist
+            console.log('💖 Adding to wishlist:', productId);
+            await wishlistService.addToWishlist(productId);
+            heartIcon.classList.remove('far');
+            heartIcon.classList.add('fas', 'liked');
+            console.log('✅ Added to wishlist');
+          }
+        } catch (error: any) {
+          console.error('❌ Error toggling wishlist:', error);
+          alert(error.message || 'Lỗi khi cập nhật wishlist');
         }
       });
     }

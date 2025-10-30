@@ -3,6 +3,8 @@ import { httpClient } from '../../core/api/FetchHttpClient.js';
 import { User } from '../../core/models/User.js';
 import userProfileService, { UserAddress } from './UserProfileService.js';
 import orderTrackingService, { Order } from './OrderTrackingService.js';
+import { WishlistService, WishlistItem } from '../../core/services/WishlistService.js';
+import { cartService } from '../../core/services/CartService.js';
 
 /**
  * AccountController
@@ -14,6 +16,8 @@ export class AccountController {
   private currentUser: User | null = null;
   private addresses: UserAddress[] = [];
   private orders: Order[] = [];
+  private wishlistItems: WishlistItem[] = [];
+  private wishlistService: WishlistService = new WishlistService();
   private currentOrderStatus: string = 'All';
   public editingAddressId: number | null = null;
   private isSavingProfile: boolean = false; // Flag to prevent duplicate saves
@@ -59,6 +63,9 @@ export class AccountController {
 
     // Load orders
     await this.loadOrders();
+    
+    // Load wishlist
+    await this.loadWishlist();
 
     // Setup date dropdowns
     this.setupDateDropdowns();
@@ -945,7 +952,15 @@ export class AccountController {
    * Load user orders
    */
   private async loadOrders(): Promise<void> {
-    if (!this.currentUser) return;
+    console.log('🔍 [loadOrders] Starting to load orders...');
+    console.log('🔍 [loadOrders] currentUser:', this.currentUser);
+    console.log('🔍 [loadOrders] currentUser?.id:', this.currentUser?.id);
+    
+    if (!this.currentUser) {
+      console.error('❌ [loadOrders] No current user, cannot load orders');
+      this.renderEmptyOrders('Vui lòng đăng nhập để xem đơn hàng');
+      return;
+    }
 
     try {
       const userId = this.getUserId();
@@ -1322,19 +1337,28 @@ export class AccountController {
 
   /**
    * Render orders based on current filter
+   * Made public to allow re-rendering when tab is activated
    */
-  private renderOrders(): void {
+  public renderOrders(): void {
+    console.log('🎨 [renderOrders] Starting to render orders...');
+    console.log('🎨 [renderOrders] Total orders:', this.orders.length);
+    console.log('🎨 [renderOrders] Current status filter:', this.currentOrderStatus);
+    
     const container = document.querySelector('#order .section-body');
     
     if (!container) {
-      console.warn('Order container not found');
+      console.error('❌ [renderOrders] Order container not found!');
       return;
     }
+    
+    console.log('✅ [renderOrders] Container found:', container);
 
     // Filter orders by status
     const filteredOrders = this.currentOrderStatus === 'All'
       ? this.orders
       : this.orders.filter(order => order.status === this.currentOrderStatus);
+      
+    console.log('🎨 [renderOrders] Filtered orders:', filteredOrders.length);
 
     if (filteredOrders.length === 0) {
       const statusText = this.currentOrderStatus === 'All' 
@@ -1458,6 +1482,212 @@ export class AccountController {
   }
 
   // ==================== END ORDER TRACKING METHODS ====================
+
+  /**
+   * Load wishlist items
+   */
+  async loadWishlist(): Promise<void> {
+    try {
+      console.log('📋 [loadWishlist] Starting to load wishlist...');
+      console.log('📋 [loadWishlist] Current user:', this.currentUser);
+      
+      this.wishlistItems = await this.wishlistService.getUserWishlist();
+      console.log(`✅ [loadWishlist] Loaded ${this.wishlistItems.length} wishlist items:`, this.wishlistItems);
+      
+      await this.renderWishlist();
+    } catch (error) {
+      console.error('❌ [loadWishlist] Error loading wishlist:', error);
+      this.wishlistItems = [];
+      await this.renderWishlist();
+    }
+  }
+
+  /**
+   * Render wishlist items
+   */
+  private async renderWishlist(): Promise<void> {
+    console.log('🎨 [renderWishlist] Starting to render wishlist...');
+    console.log('🎨 [renderWishlist] Wishlist items count:', this.wishlistItems.length);
+    
+    const container = document.getElementById('wishlist-container');
+    if (!container) {
+      console.error('❌ [renderWishlist] Wishlist container not found!');
+      return;
+    }
+    
+    console.log('✅ [renderWishlist] Container found:', container);
+
+    if (this.wishlistItems.length === 0) {
+      console.log('ℹ️ [renderWishlist] No wishlist items, showing empty state');
+      container.innerHTML = `
+        <div class="col-12 text-center py-5">
+          <i class="bi bi-heart" style="font-size: 3rem; color: #ccc;"></i>
+          <p class="mt-3 text-muted">Chưa có sản phẩm nào trong wishlist</p>
+        </div>
+      `;
+      return;
+    }
+
+    console.log('📦 [renderWishlist] Rendering wishlist items with product data from backend...');
+    
+    // Filter items that have product data
+    const validItems = this.wishlistItems.filter(item => item.product);
+    
+    if (validItems.length === 0) {
+      console.warn('⚠️ [renderWishlist] No valid items with product data');
+      container.innerHTML = `
+        <div class="col-12 text-center py-5">
+          <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: #ff9800;"></i>
+          <p class="mt-3 text-muted">Không thể tải thông tin sản phẩm</p>
+        </div>
+      `;
+      return;
+    }
+
+    const htmlParts = validItems.map((wishlistItem) => {
+      const product = wishlistItem.product!;
+      
+      console.log(`  ✓ Rendering product:`, product.name);
+      console.log(`  📷 Image URL:`, product.image_url);
+      console.log(`  🔗 Slug:`, product.slug);
+      
+      // Get proper data
+      const price = product.sale_price || product.price;
+      const formattedPrice = typeof price === 'number' 
+        ? price.toLocaleString('vi-VN') 
+        : parseFloat(price).toLocaleString('vi-VN');
+      
+      const age = '8+'; // Default age
+      const pieces = product.piece_count || 120;
+      const rating = product.rating || 4.8;
+      
+      // Fix image URL - ensure it's a proper URL
+      let imageUrl = product.image_url || '';
+      
+      // If image_url is a relative path, make it absolute
+      if (imageUrl && !imageUrl.startsWith('http')) {
+        // Check if it's a Supabase storage path
+        if (imageUrl.startsWith('/')) {
+          imageUrl = imageUrl; // Keep as is for absolute paths
+        } else {
+          // Relative path - might need to prepend domain
+          imageUrl = imageUrl;
+        }
+      }
+      
+      const fallbackImage = 'https://via.placeholder.com/200x200?text=No+Image';
+
+      return `
+        <div class="col-md-6 col-lg-3 mb-4">
+          <div class="card wishlist-card position-relative shadow-sm border-0 h-100">
+            <button class="btn-close position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm" 
+                    onclick="window.accountControllerInstance.removeFromWishlist(${wishlistItem.product_id})"
+                    style="z-index: 10;"
+                    aria-label="Remove from wishlist"></button>
+            <img src="${this.escapeHtml(imageUrl)}" 
+                 alt="${this.escapeHtml(product.name)}"
+                 class="card-img-top"
+                 style="height: 200px; object-fit: cover;"
+                 onerror="this.src='${fallbackImage}'">
+            <div class="card-body d-flex flex-column">
+              <h6 class="card-title fw-bold mb-2" style="min-height: 40px; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(product.name)}</h6>
+              <div class="text-muted small mb-2">
+                <i class="bi bi-person"></i> ${age} • 
+                <i class="bi bi-box"></i> ${pieces} • 
+                <i class="bi bi-star-fill text-warning"></i> ${rating}
+              </div>
+              <div class="fw-bold text-danger mb-3 fs-5">${formattedPrice} VNĐ</div>
+              <div class="mt-auto">
+                <div class="d-grid gap-2">
+                  <button class="btn btn-outline-primary btn-sm" 
+                          onclick="window.accountControllerInstance.viewProductDetail('${this.escapeHtml(product.slug || '')}', ${wishlistItem.product_id})">
+                    <i class="bi bi-eye"></i> Xem chi tiết
+                  </button>
+                  <button class="btn btn-primary btn-sm" 
+                          onclick="window.accountControllerInstance.addWishlistToCart(${wishlistItem.product_id})">
+                    <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    const html = htmlParts.filter(h => h).join('');
+    console.log('📝 [renderWishlist] Generated HTML length:', html.length);
+    
+    container.innerHTML = html;
+    console.log('✅ [renderWishlist] Wishlist rendered successfully!');
+  }
+
+  /**
+   * Remove product from wishlist
+   */
+  async removeFromWishlist(productId: number): Promise<void> {
+    try {
+      console.log(`🗑️ [removeFromWishlist] Removing product ${productId}...`);
+      await this.wishlistService.removeFromWishlist(productId);
+      console.log('✅ [removeFromWishlist] Product removed successfully');
+      await this.loadWishlist();
+    } catch (error) {
+      console.error('❌ [removeFromWishlist] Error removing from wishlist:', error);
+      alert('Có lỗi xảy ra khi xóa sản phẩm khỏi wishlist');
+    }
+  }
+
+  /**
+   * Add wishlist item to cart
+   */
+  async addWishlistToCart(productId: number): Promise<void> {
+    try {
+      console.log(`🛒 [addWishlistToCart] Adding product ${productId} to cart...`);
+      
+      // Find the wishlist item with product data
+      const wishlistItem = this.wishlistItems.find(item => item.product_id === productId);
+      
+      if (!wishlistItem || !wishlistItem.product) {
+        console.error('❌ [addWishlistToCart] Product data not found in wishlist');
+        alert('Không thể tìm thấy thông tin sản phẩm');
+        return;
+      }
+
+      const product = wishlistItem.product;
+      
+      await cartService.addToCart({
+        productId: product.product_id,
+        productName: product.name,
+        productSlug: product.slug,
+        imageUrl: product.image_url,
+        price: product.price,
+        salePrice: product.sale_price,
+        quantity: 1,
+        stockQuantity: product.stock_quantity,
+        minStockLevel: 0,
+      });
+
+      console.log('✅ [addWishlistToCart] Product added to cart successfully');
+      alert('Đã thêm sản phẩm vào giỏ hàng');
+    } catch (error) {
+      console.error('❌ [addWishlistToCart] Error adding to cart:', error);
+      alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ');
+    }
+  }
+
+  /**
+   * View product detail - navigate to ProductDetail page
+   */
+  viewProductDetail(slug: string, productId: number): void {
+    console.log(`🔍 [viewProductDetail] Navigating to product detail - slug: ${slug}, id: ${productId}`);
+    
+    if (slug && slug !== 'undefined' && slug.trim() !== '') {
+      window.location.href = `/src/pages/ProductDetail.html?slug=${encodeURIComponent(slug)}`;
+    } else {
+      console.error('❌ [viewProductDetail] Invalid slug, using product ID fallback');
+      alert('Không thể mở chi tiết sản phẩm - thiếu thông tin slug');
+    }
+  }
 
   /**
    * Escape HTML to prevent XSS
