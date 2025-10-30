@@ -1,9 +1,6 @@
-body {
-  background-color: #ffffff;
-  margin: 0;
-  font-family: Arial, sans-serif;
-  padding: 0;
-  }
+body, * {
+  font-family: Arial, sans-serif !important;
+}
   
   
   .navbar-custom {
