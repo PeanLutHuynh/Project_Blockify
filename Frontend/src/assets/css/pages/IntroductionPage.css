@@ -7,8 +7,8 @@ body {
   
   
   .navbar-custom {
-  background-color: #0d9bff;
-  padding: 15px 0;
+    background-color: #0d9bff;
+    padding: 7px 0;
   }
   .navbar-brand {
   color: white !important;
