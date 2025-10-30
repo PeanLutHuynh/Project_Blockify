@@ -167,8 +167,8 @@
       <!-- Product -->
       <section id="product" class="section">
         <!-- Product Navbar -->
-        <div class="product-navbar">
-          <h3 class="navbar-title">Quản lý sản phẩm</h3>
+        <div class="product-navbar ">
+          <h3 class="navbar-title text-white">Quản lý sản phẩm</h3>
           <div class="navbar-actions">
             <input class="search form-control" placeholder="Tìm kiếm sản phẩm" id="productSearch">
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
@@ -189,11 +189,8 @@
         <div class="shop-info-panel panel">
           <form id="shopInfoForm">
             <div class="row mb-3 align-items-center">
-              <div class="col-md-2 text-center mb-3 mb-md-0">
-                <img id="shopLogoPreview" src="../../public/images/Group 40.png" alt="Logo shop" class="shop-logo img-thumbnail">
-                <input type="file" id="shopLogo" class="form-control mt-2">
-              </div>
-              <div class="col-md-10">
+              
+              <div class="col-md-7">
                 <div class="mb-3">
                   <label class="form-label">Tên cửa hàng</label>
                   <input type="text" id="shopName" class="form-control" required>
@@ -214,7 +211,15 @@
                   <label class="form-label">Mô tả</label>
                   <textarea id="shopDesc" class="form-control" rows="2"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                <button type="submit" class="btn btn1 btn-primary">Lưu thay đổi</button>
+              </div>
+              <div class ="col-md-5 ">
+                <div class="row">
+                  <div class="col-md-6 mx-auto text-center d-flex flex-column align-items-center mb-3 mb-md-0">
+                    <img id="shopLogoPreview" src="../../public/images/Group 40.png" alt="Logo shop" class="shop-logo img-thumbnail">
+                    <input type="file" id="shopLogo" class="form-control mt-5">
+                  </div>
+                </div>
               </div>
             </div>
           </form>
@@ -364,10 +369,10 @@
       <section id="voucher" class="section">
         <!-- Voucher Navbar -->
         <div class="voucher-navbar">
-          <h3 class="navbar-title">Quản lý Voucher</h3>
+          <h3 class="navbar-title text-white">Quản lý Voucher</h3>
           <div class="navbar-actions">
             <input class="search form-control" placeholder="Tìm kiếm voucher" id="voucherSearch">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVoucherModal">
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addVoucherModal">
               <i class="bi bi-plus-circle me-1"></i>Thêm Voucher
             </button>
           </div>
@@ -1312,7 +1317,7 @@
                 
                 return `
                     <div class="col-6">
-                        <div class="voucher" onclick="editVoucher('${voucher.id}')">
+                        <div class="voucher w-100" onclick="editVoucher('${voucher.id}')">
                             <div class="voucher-left">
                                 <span class="tag">Số lượng có hạn</span>
                                 <div class="voucher-img">${voucherIcon}</div>
