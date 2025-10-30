@@ -427,85 +427,118 @@
 
   <!-- Product Modal -->
   <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addProductModalLabel">Thêm sản phẩm</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content shadow-lg rounded-4">
+        <div class="modal-header text-white rounded-top-4" style ="background-color:#0D9BFF;">
+          <h5 class="modal-title fw-bold" id="addProductModalLabel">
+            <i class="bi bi-box-seam me-2"></i> Thêm sản phẩm mới
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
         </div>
-        <div class="modal-body">
-          <form id="productForm">
-            <div class="mb-3">
-              <label class="form-label">Hình ảnh sản phẩm (tối đa 4 hình)</label>
-              <div class="row g-2" id="productImagesContainer">
-                <div class="col-6">
-                  <input type="file" class="form-control product-image-input" accept="image/*" data-index="0">
-                  <div class="image-preview mt-2" id="preview-0"></div>
+        <div class="modal-body bg-light">
+          <form id="productForm" class="p-2">
+            
+            <!-- Hình ảnh sản phẩm -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Hình ảnh sản phẩm (tối đa 4 hình)</label>
+              <div class="row g-3" id="productImagesContainer">
+                <!-- Mỗi ảnh -->
+                <div class="col-6 col-md-3 text-center">
+                  <div class="border border-2 rounded-3 p-2 bg-white">
+                    <input type="file" class="form-control product-image-input" accept="image/*" data-index="0">
+                    <div class="image-preview mt-2" id="preview-0"></div>
+                  </div>
                 </div>
-                <div class="col-6">
-                  <input type="file" class="form-control product-image-input" accept="image/*" data-index="1">
-                  <div class="image-preview mt-2" id="preview-1"></div>
+                <div class="col-6 col-md-3 text-center">
+                  <div class="border border-2 rounded-3 p-2 bg-white">
+                    <input type="file" class="form-control product-image-input" accept="image/*" data-index="1">
+                    <div class="image-preview mt-2" id="preview-1"></div>
+                  </div>
                 </div>
-                <div class="col-6">
-                  <input type="file" class="form-control product-image-input" accept="image/*" data-index="2">
-                  <div class="image-preview mt-2" id="preview-2"></div>
+                <div class="col-6 col-md-3 text-center">
+                  <div class="border border-2 rounded-3 p-2 bg-white">
+                    <input type="file" class="form-control product-image-input" accept="image/*" data-index="2">
+                    <div class="image-preview mt-2" id="preview-2"></div>
+                  </div>
                 </div>
-                <div class="col-6">
-                  <input type="file" class="form-control product-image-input" accept="image/*" data-index="3">
-                  <div class="image-preview mt-2" id="preview-3"></div>
+                <div class="col-6 col-md-3 text-center">
+                  <div class="border border-2 rounded-3 p-2 bg-white">
+                    <input type="file" class="form-control product-image-input" accept="image/*" data-index="3">
+                    <div class="image-preview mt-2" id="preview-3"></div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Tên sản phẩm</label>
-              <input type="text" class="form-control" id="productName" required>
+  
+            <!-- Thông tin cơ bản -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Tên sản phẩm</label>
+                <input type="text" class="form-control" id="productName" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Thương hiệu</label>
+                <input type="text" class="form-control" id="productBrand" required>
+              </div>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Thương hiệu</label>
-              <input type="text" class="form-control" id="productBrand" required>
+  
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Chủ đề</label>
+                <input type="text" class="form-control" id="productTheme">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Độ tuổi</label>
+                <input type="text" class="form-control" id="productAge">
+              </div>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Chủ đề</label>
-              <input type="text" class="form-control" id="productTheme">
+  
+            <!-- Thông tin kỹ thuật -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Số mảnh ghép</label>
+                <input type="number" class="form-control" id="productPieces">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Tồn kho</label>
+                <input type="number" class="form-control" id="productStock">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Trạng thái</label>
+                <select class="form-select" id="productStatus" required>
+                  <option value="active">Đang bán</option>
+                  <option value="inactive">Ngừng bán</option>
+                  <option value="out_of_stock">Hết hàng</option>
+                </select>
+              </div>
             </div>
+  
+            <!-- Giá và mô tả -->
             <div class="mb-3">
-              <label class="form-label">Số mảnh ghép</label>
-              <input type="number" class="form-control" id="productPieces">
+              <label class="form-label fw-semibold">Giá (VND)</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-cash"></i></span>
+                <input type="number" class="form-control" id="productPrice" min="0" required>
+              </div>
             </div>
+  
             <div class="mb-3">
-              <label class="form-label">Tồn kho</label>
-              <input type="number" class="form-control" id="productStock">
+              <label class="form-label fw-semibold">Mô tả sản phẩm</label>
+              <textarea class="form-control" id="productDesc" rows="3" placeholder="Nhập mô tả chi tiết..."></textarea>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Độ tuổi</label>
-              <input type="text" class="form-control" id="productAge">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Giá (VND)</label>
-              <input type="number" class="form-control" id="productPrice" min="0" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Trạng thái</label>
-              <select class="form-control" id="productStatus" required>
-                <option value="active">Đang bán</option>
-                <option value="inactive">Ngừng bán</option>
-                <option value="out_of_stock">Hết hàng</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Mô tả</label>
-              <textarea class="form-control" id="productDesc" rows="3"></textarea>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-              <button type="submit" class="btn btn-primary">Lưu sản phẩm</button>
+  
+            <div class="modal-footer border-0">
+              <button type="button" class=" btn-danger rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-primary rounded-pill px-4">
+                <i class="bi bi-save me-1"></i> Lưu sản phẩm
+              </button>
             </div>
           </form>
         </div>
       </div>
     </div>
   </div>
-  </div>
+  
 
   <!-- Edit Product Modal -->
   <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
