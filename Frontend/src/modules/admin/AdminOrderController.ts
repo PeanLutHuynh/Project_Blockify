@@ -316,9 +316,9 @@ export class AdminOrderController {
             <div class="modal-header">
               <div>
                 <h5 class="modal-title">Chi tiết đơn hàng #${order.order_number}</h5>
-                <small class="text-muted">Đặt lúc: ${new Date(order.ordered_at).toLocaleString("vi-VN")}</small>
+                <small >Đặt lúc: ${new Date(order.ordered_at).toLocaleString("vi-VN")}</small>
               </div>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
               <div class="row">
@@ -326,7 +326,7 @@ export class AdminOrderController {
                 <div class="col-md-4">
                   <div class="card mb-3">
                     <div class="card-body">
-                      <h6 class="card-title">Thông tin khách hàng</h6>
+                      <h6 class="card-title text-primary">Thông tin khách hàng</h6>
                       <p><strong>Khách hàng:</strong> ${order.customer_name}</p>
                       <p><strong>Email:</strong> ${order.customer_email}</p>
                       <p><strong>SĐT:</strong> ${order.customer_phone}</p>
@@ -358,8 +358,8 @@ export class AdminOrderController {
                 <div class="col-md-8">
                   <div class="card mb-3">
                     <div class="card-body">
-                      <h6 class="card-title">Chi tiết sản phẩm</h6>
-                      <table class="table">
+                      <h6 class="card-title text-primary">Chi tiết sản phẩm</h6>
+                      <table class="table1">
                         <thead>
                           <tr>
                             <th>Sản phẩm</th>
@@ -392,7 +392,7 @@ export class AdminOrderController {
 
                   <div class="card">
                     <div class="card-body">
-                      <h6 class="card-title">Lịch sử trạng thái</h6>
+                      <h6 class="card-title text-primary">Lịch sử trạng thái</h6>
                       ${order.order_status_history?.map((history: any) => `
                         <div class="border-bottom pb-2 mb-2">
                           <small class="text-muted">${new Date(history.created_at).toLocaleString("vi-VN")}</small>
