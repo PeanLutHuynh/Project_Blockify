@@ -128,6 +128,32 @@ export class AccountController {
       }
     }
 
+    // Fetch FULL profile data from backend API (includes phone, gender, birthDate)
+    if (this.currentUser && this.currentUser.id) {
+      try {
+        console.log('🔄 [loadUserProfile] Fetching full profile from API for user:', this.currentUser.id);
+        const response = await userProfileService.getUserProfile(parseInt(this.currentUser.id, 10));
+        
+        if (response.success && response.data) {
+          console.log('✅ [loadUserProfile] Full profile loaded:', {
+            fullName: response.data.full_name,
+            email: response.data.email,
+            phone: response.data.phone,
+            gender: response.data.gender,
+            birthDate: response.data.birth_date
+          });
+          
+          // Create a new User object with complete profile data from API
+          this.currentUser = User.fromApiResponse(response.data);
+        } else {
+          console.warn('⚠️ [loadUserProfile] Profile fetch failed:', response.message);
+        }
+      } catch (error) {
+        console.error('⚠️ [loadUserProfile] Could not fetch full profile:', error);
+        // Continue anyway with basic user data
+      }
+    }
+
     // Populate user data in the UI
     this.populateUserData();
   }
@@ -136,9 +162,18 @@ export class AccountController {
    * Populate user data into form fields
    */
   private populateUserData(): void {
-    if (!this.currentUser) return;
+    if (!this.currentUser) {
+      console.error('❌ [populateUserData] No current user data available');
+      return;
+    }
 
-    console.log('📋 Populating user data:', this.currentUser);
+    console.log('📋 [populateUserData] Populating user data:', {
+      fullName: this.currentUser.fullName,
+      email: this.currentUser.email,
+      phone: this.currentUser.phone,
+      gender: this.currentUser.gender,
+      birthDate: this.currentUser.birthDate
+    });
 
     // Update sidebar avatar and username
     const sidebarAvatar = document.querySelector('.user-info .avatar') as HTMLImageElement;
@@ -152,38 +187,65 @@ export class AccountController {
       sidebarUsername.textContent = this.currentUser.username || this.currentUser.email;
     }
 
-    // Update form inputs
+    // Update form inputs - use same selectors as handleSaveProfile
     const nameInput = document.querySelector('input[placeholder="Enter your name"]') as HTMLInputElement;
     const emailInput = document.querySelector('input[placeholder="Enter your email"]') as HTMLInputElement;
     const phoneInput = document.querySelector('input[placeholder="Enter your phone number"]') as HTMLInputElement;
     
+    console.log('🔍 [populateUserData] Form elements found:', {
+      nameInput: !!nameInput,
+      emailInput: !!emailInput,
+      phoneInput: !!phoneInput
+    });
+    
     if (nameInput) {
       nameInput.value = this.currentUser.fullName || '';
+      console.log('✅ Name input populated:', nameInput.value);
+    } else {
+      console.warn('⚠️ Name input not found');
     }
     
     if (emailInput) {
       emailInput.value = this.currentUser.email || '';
       emailInput.disabled = true; // Email cannot be changed
+      console.log('✅ Email input populated:', emailInput.value);
+    } else {
+      console.warn('⚠️ Email input not found');
     }
     
     if (phoneInput) {
       phoneInput.value = this.currentUser.phone || '';
+      console.log('✅ Phone input populated:', phoneInput.value);
+    } else {
+      console.warn('⚠️ Phone input not found');
     }
 
     // Update gender radio buttons
+    console.log('🔍 [populateUserData] Gender value:', this.currentUser.gender);
     if (this.currentUser.gender) {
-      const genderRadio = document.querySelector(`input[name="sex"][value="${this.currentUser.gender}"]`) as HTMLInputElement;
+      const genderValue = this.currentUser.gender.toLowerCase();
+      const genderRadio = document.querySelector(`input[name="sex"][value="${genderValue}"]`) as HTMLInputElement;
+      console.log('🔍 [populateUserData] Gender radio found:', !!genderRadio, 'for value:', genderValue);
       if (genderRadio) {
         genderRadio.checked = true;
+        console.log('✅ Gender radio checked:', genderValue);
+      } else {
+        console.warn('⚠️ Gender radio not found for value:', genderValue);
       }
+    } else {
+      console.warn('⚠️ No gender value in currentUser');
     }
 
     // Update birth date dropdowns
+    console.log('🔍 [populateUserData] BirthDate value:', this.currentUser.birthDate);
     if (this.currentUser.birthDate) {
       const birthDateStr = this.currentUser.birthDate instanceof Date 
         ? this.currentUser.birthDate.toISOString() 
         : this.currentUser.birthDate;
+      console.log('🔍 [populateUserData] Calling populateBirthDate with:', birthDateStr);
       this.populateBirthDate(birthDateStr);
+    } else {
+      console.warn('⚠️ No birthDate value in currentUser');
     }
 
     // Update large avatar in the profile section
@@ -203,27 +265,49 @@ export class AccountController {
    */
   private populateBirthDate(birthDate: string): void {
     try {
+      console.log('📅 [populateBirthDate] Input birthDate:', birthDate);
       const date = new Date(birthDate);
       const day = date.getDate();
       const month = date.getMonth() + 1; // 0-indexed
       const year = date.getFullYear();
 
+      console.log('📅 [populateBirthDate] Parsed date:', { day, month, year });
+
       const dayButton = document.getElementById('day-button');
       const monthButton = document.getElementById('month-button');
       const yearButton = document.getElementById('year-button');
 
-      if (dayButton) dayButton.textContent = day.toString();
+      console.log('📅 [populateBirthDate] Buttons found:', {
+        dayButton: !!dayButton,
+        monthButton: !!monthButton,
+        yearButton: !!yearButton
+      });
+
+      if (dayButton) {
+        dayButton.textContent = day.toString();
+        console.log('✅ Day button updated:', day);
+      } else {
+        console.warn('⚠️ Day button not found');
+      }
       
       if (monthButton) {
         const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
                            'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
         monthButton.textContent = monthNames[month - 1];
         monthButton.setAttribute('data-value', month.toString());
+        console.log('✅ Month button updated:', monthNames[month - 1]);
+      } else {
+        console.warn('⚠️ Month button not found');
       }
       
-      if (yearButton) yearButton.textContent = year.toString();
+      if (yearButton) {
+        yearButton.textContent = year.toString();
+        console.log('✅ Year button updated:', year);
+      } else {
+        console.warn('⚠️ Year button not found');
+      }
 
-      console.log('✅ Birth date populated:', { day, month, year });
+      console.log('✅ Birth date populated successfully:', { day, month, year });
     } catch (error) {
       console.error('❌ Error parsing birth date:', error);
     }
