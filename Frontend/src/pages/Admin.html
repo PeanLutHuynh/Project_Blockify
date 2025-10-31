@@ -184,16 +184,13 @@
       </section>
 
       <!-- Shop Info -->
-      <section id="shop-info" class="section">
+      <section id="shop-info" class="section h-100">
         <div class="bar-blue mb-4">Thông tin cửa hàng</div>
         <div class="shop-info-panel panel">
           <form id="shopInfoForm">
             <div class="row mb-3 align-items-center">
-              <div class="col-md-2 text-center mb-3 mb-md-0">
-                <img id="shopLogoPreview" src="../../public/images/Group 40.png" alt="Logo shop" class="shop-logo img-thumbnail">
-                <input type="file" id="shopLogo" class="form-control mt-2">
-              </div>
-              <div class="col-md-10">
+              
+              <div class="col-md-6">
                 <div class="mb-3">
                   <label class="form-label">Tên cửa hàng</label>
                   <input type="text" id="shopName" class="form-control" required>
@@ -215,6 +212,15 @@
                   <textarea id="shopDesc" class="form-control" rows="2"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+              </div>
+              <div class="col-md-6 text-center mb-3 mb-md-0">
+                <div class ="row">
+                  <div class ="col-md-6 mx-auto">
+                    <img id="shopLogoPreview" src="../../public/images/Group 40.png" alt="Logo shop" class="shop-logo img-thumbnail">
+                <input type="file" id="shopLogo" class="form-control mt-5">
+                  </div>
+                </div>
+                
               </div>
             </div>
           </form>
