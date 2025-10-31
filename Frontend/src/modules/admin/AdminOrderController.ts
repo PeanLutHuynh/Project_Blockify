@@ -7,7 +7,7 @@ import { httpClient } from "../../core/api/FetchHttpClient.js";
 export class AdminOrderController {
   private currentOrders: any[] = [];
   private currentOrderDetail: any = null;
-  private currentFilters?: { status?: string; paymentStatus?: string };
+  private currentFilters?: { status?: string; paymentStatus?: string; search?: string };
 
   /**
    * Load all orders
@@ -15,6 +15,7 @@ export class AdminOrderController {
   async loadOrders(filters?: {
     status?: string;
     paymentStatus?: string;
+    search?: string;
   }): Promise<void> {
     try {
       // Store filters for later use
@@ -35,10 +36,14 @@ export class AdminOrderController {
         url += `&paymentStatus=${encodeURIComponent(activeFilters.paymentStatus)}`;
       }
 
+      if (activeFilters?.search) {
+        url += `&search=${encodeURIComponent(activeFilters.search)}`;
+      }
+
       const response = await httpClient.get<any>(url);
 
       if (response.success && response.data) {
-        this.currentOrders = response.data;
+        this.currentOrders = this.sortOrdersByUrgency(response.data);
         this.renderOrdersTable();
       } else {
         console.error("Failed to load orders:", response.message);
@@ -226,10 +231,23 @@ export class AdminOrderController {
       .map((order) => {
         const statusBadge = this.getStatusBadge(order.status);
         const paymentBadge = this.getPaymentBadge(order.payment_status);
+        
+        // Calculate time remaining for pending orders
+        let countdownHtml = '';
+        let rowClass = '';
+        if (order.status === "Đang xử lý") {
+          const timeRemaining = this.getTimeRemaining(order.ordered_at);
+          countdownHtml = `<br><small>${this.formatCountdown(timeRemaining)}</small>`;
+          
+          // Highlight urgent orders
+          if (timeRemaining.isUrgent) {
+            rowClass = 'table-danger';
+          }
+        }
 
         return `
-          <tr>
-            <td>#${order.order_number}</td>
+          <tr class="${rowClass}">
+            <td>#${order.order_number}${countdownHtml}</td>
             <td>${order.users?.full_name || "N/A"}</td>
             <td>${order.customer_email}</td>
             <td>${order.customer_phone}</td>
@@ -249,6 +267,13 @@ export class AdminOrderController {
         `;
       })
       .join("");
+    
+    // Update countdown every minute
+    setTimeout(() => {
+      if (this.currentOrders.some(o => o.status === "Đang xử lý")) {
+        this.renderOrdersTable();
+      }
+    }, 60000); // 1 minute
   }
 
   /**
@@ -306,6 +331,19 @@ export class AdminOrderController {
     const paymentBadge = this.getPaymentBadge(order.payment_status);
     const paymentProof = order.payment_proofs?.[0];
 
+    // Generate countdown for pending orders
+    let countdownHtml = '';
+    if (order.status === "Đang xử lý") {
+      const timeRemaining = this.getTimeRemaining(order.ordered_at);
+      countdownHtml = `
+        <div class="mt-2">
+          <span class="badge ${timeRemaining.isUrgent ? 'bg-danger' : 'bg-warning'} fs-6">
+            ⏰ Thời gian xác nhận còn: ${this.formatCountdown(timeRemaining, true)}
+          </span>
+        </div>
+      `;
+    }
+
     // Generate action buttons based on status
     const actionButtons = this.generateActionButtons(order);
 
@@ -317,6 +355,7 @@ export class AdminOrderController {
               <div>
                 <h5 class="modal-title">Chi tiết đơn hàng #${order.order_number}</h5>
                 <small class="text-muted">Đặt lúc: ${new Date(order.ordered_at).toLocaleString("vi-VN")}</small>
+                ${countdownHtml}
               </div>
               <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -523,20 +562,108 @@ export class AdminOrderController {
   private closeOrderDetailModal(): void {
     const modalElement = document.getElementById("orderDetailModal");
     if (modalElement) {
-      // Remove focus from any focused element inside modal before closing
-      const focusedElement = modalElement.querySelector(':focus') as HTMLElement;
-      if (focusedElement) {
-        focusedElement.blur();
-      }
-      
       const bootstrap = (window as any).bootstrap;
       if (bootstrap) {
         const modal = bootstrap.Modal.getInstance(modalElement);
         if (modal) {
+          // Remove focus from any focused element inside modal BEFORE hiding
+          const focusedElement = modalElement.querySelector(':focus') as HTMLElement;
+          if (focusedElement) {
+            focusedElement.blur();
+          }
+          
+          // Hide modal
           modal.hide();
+          
+          // Cleanup: Remove modal and backdrop after animation completes
+          modalElement.addEventListener('hidden.bs.modal', () => {
+            modalElement.remove();
+            // Remove any leftover backdrops
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+            // Restore body scroll
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('padding-right');
+          }, { once: true });
         }
       }
     }
+  }
+
+  /**
+   * Sort orders by urgency (orders with <12h remaining first, then by time remaining)
+   */
+  private sortOrdersByUrgency(orders: any[]): any[] {
+    return orders.sort((a, b) => {
+      // Only prioritize orders in "Đang xử lý" status
+      const aIsPending = a.status === "Đang xử lý";
+      const bIsPending = b.status === "Đang xử lý";
+
+      if (!aIsPending && !bIsPending) {
+        return 0; // Keep original order
+      }
+
+      if (aIsPending && !bIsPending) return -1;
+      if (!aIsPending && bIsPending) return 1;
+
+      // Both are pending, calculate time remaining
+      const aTime = this.getTimeRemaining(a.ordered_at);
+      const bTime = this.getTimeRemaining(b.ordered_at);
+
+      // Urgent orders first (less than 12h)
+      const aIsUrgent = aTime.totalHours <= 12;
+      const bIsUrgent = bTime.totalHours <= 12;
+
+      if (aIsUrgent && !bIsUrgent) return -1;
+      if (!aIsUrgent && bIsUrgent) return 1;
+
+      // Both urgent or both not urgent, sort by time remaining (less time = higher priority)
+      return aTime.totalMinutes - bTime.totalMinutes;
+    });
+  }
+
+  /**
+   * Calculate time remaining for order confirmation (24h from order time)
+   */
+  private getTimeRemaining(orderedAt: string): { 
+    totalHours: number; 
+    totalMinutes: number; 
+    hours: number; 
+    minutes: number; 
+    isExpired: boolean;
+    isUrgent: boolean;
+  } {
+    const orderTime = new Date(orderedAt).getTime();
+    const deadline = orderTime + (24 * 60 * 60 * 1000); // 24 hours
+    const now = Date.now();
+    const remaining = deadline - now;
+
+    if (remaining <= 0) {
+      return { totalHours: 0, totalMinutes: 0, hours: 0, minutes: 0, isExpired: true, isUrgent: true };
+    }
+
+    const totalMinutes = Math.floor(remaining / (60 * 1000));
+    const totalHours = totalMinutes / 60;
+    const hours = Math.floor(totalHours);
+    const minutes = totalMinutes % 60;
+    const isUrgent = totalHours <= 12;
+
+    return { totalHours, totalMinutes, hours, minutes, isExpired: false, isUrgent };
+  }
+
+  /**
+   * Format countdown display
+   * @param timeRemaining Time remaining object
+   * @param isInBadge If true, uses white text (for badges with colored backgrounds). If false, uses colored text (for table rows)
+   */
+  private formatCountdown(timeRemaining: ReturnType<typeof this.getTimeRemaining>, isInBadge: boolean = false): string {
+    if (timeRemaining.isExpired) {
+      const colorClass = isInBadge ? 'text-white' : 'text-danger';
+      return `<span class="${colorClass} fw-bold">Hết hạn</span>`;
+    }
+
+    const colorClass = isInBadge ? 'text-white' : (timeRemaining.isUrgent ? 'text-danger' : 'text-warning');
+    return `<span class="${colorClass} fw-bold">${timeRemaining.hours}h ${timeRemaining.minutes}m</span>`;
   }
 
   /**
