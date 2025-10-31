@@ -832,6 +832,9 @@
       
       const toolbar = orderSection.querySelector('.toolbar');
       if (toolbar) {
+        // Get existing search input
+        const searchInput = toolbar.querySelector('.search');
+        
         // Add status filter
         const statusFilter = document.createElement('select');
         statusFilter.className = 'form-select d-inline-block w-auto ms-2';
@@ -858,20 +861,37 @@
         toolbar.appendChild(statusFilter);
         toolbar.appendChild(paymentFilter);
         
-        // Add event listeners
-        statusFilter.addEventListener('change', () => {
+        // Helper function to load with all filters
+        const loadWithFilters = () => {
           adminOrderController.loadOrders({
             status: statusFilter.value || undefined,
-            paymentStatus: paymentFilter.value || undefined
+            paymentStatus: paymentFilter.value || undefined,
+            search: searchInput?.value.trim() || undefined
           });
-        });
+        };
         
-        paymentFilter.addEventListener('change', () => {
-          adminOrderController.loadOrders({
-            status: statusFilter.value || undefined,
-            paymentStatus: paymentFilter.value || undefined
+        // Add event listeners
+        statusFilter.addEventListener('change', loadWithFilters);
+        paymentFilter.addEventListener('change', loadWithFilters);
+        
+        // Search input event listener
+        if (searchInput) {
+          let searchTimeout;
+          searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+              loadWithFilters();
+            }, 500); // Debounce 500ms
           });
-        });
+          
+          // Also search on Enter key
+          searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              clearTimeout(searchTimeout);
+              loadWithFilters();
+            }
+          });
+        }
       }
     }
   </script>
