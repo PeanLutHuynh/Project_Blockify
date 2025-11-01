@@ -198,6 +198,10 @@ gap: 20px; /* khoảng cách giữa các card */
   color: #666;
   cursor: pointer;
 }
+
+.icon-heart.liked {
+  color: red;
+}
 .product-info {
   font-size: 14px;
   margin: 10px 0;

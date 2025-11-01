@@ -371,7 +371,7 @@ async function loadRecommendedProducts(currentProductId?: number): Promise<void>
       const productId = parseInt(product.id);
       const isInWishlist = wishlistProductIds.includes(productId);
       const heartClass = isInWishlist ? 'fas fa-heart' : 'far fa-heart';
-      const heartStyle = isInWishlist ? 'color: #ff4757;' : '';
+      const heartStyle = isInWishlist ? 'color: rgb(232, 0, 0);' : '';
       
       return `
         <div class="product-card" data-slug="${product.slug}" style="cursor: pointer;">
