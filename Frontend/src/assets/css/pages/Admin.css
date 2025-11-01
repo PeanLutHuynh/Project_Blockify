@@ -234,16 +234,27 @@ body {
   background: #fff;
   font-size: 14px;
 }
-.btn {
+
+.btn1 {
+  background-color: #0094ff;
+  border: 1px solid #0094ff;
   padding: 10px 16px;
   border-radius: 8px;
-  border: 1px solid #0d9bff;
-  background: #0d9bff;
   color: #fff;
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
 }
+/* .btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #0d9bff;
+  background: #96d3ff;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+} */
 .btn-outline {
   background: #fff;
   color: #0d9bff;
@@ -252,19 +263,22 @@ table {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
-  border: 1px solid #e6e6e6;
+  border: 1px solid #000000;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+ 
 }
 th, td {
   padding: 16px;
   border-bottom: 1px solid #eee;
   text-align: left;
   font-size: 14px;
+  
 }
 thead th {
-  background: #f6f8fb;
+  background:#0094ff;
+  color: white;
+
   font-weight: 700;
 }
 tr:last-child td { border-bottom: none; }
@@ -308,14 +322,14 @@ tr:last-child td { border-bottom: none; }
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);
   padding: 32px;
-  max-width: 900px;
+  max-width: 100%;
   margin-bottom: 20px;
 }
 .shop-logo {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
+  width: 240px;
+  height: 240px;
   border-radius: 50%;
+  object-fit: cover;
   border: 2px solid #e6e6e6;
 }
 .shop-info-panel .form-label {
@@ -330,22 +344,7 @@ tr:last-child td { border-bottom: none; }
   min-width: 130px;
 }
 /* Order table extra */
-#orderList img {
-  border-radius: 6px;
-  background: #f2f2f2;
-}
-/* Order detail modal */
-#orderDetailModal .modal-body {
-  font-size: 15px;
-}
-#orderDetailModal strong {
-  color: #255ba1;
-}
-#orderDetailModal img {
-  margin-bottom: 8px;
-  border: 1px solid #e2e2e2;
-  border-radius: 8px;
-}
+
 .feedback-list {
   display: flex;
   flex-direction: column;
@@ -391,7 +390,7 @@ tr:last-child td { border-bottom: none; }
 }
 /* Product Management Styles */
 .product-navbar {
-  background: #fff;
+ background-color: #0094ff;
   border: 1px solid #e6e6e6;
   border-radius: 8px;
   padding: 15px 20px;
@@ -408,7 +407,6 @@ tr:last-child td { border-bottom: none; }
   color: #333;
   margin: 0;
 }
-
 .product-navbar .navbar-actions {
   display: flex;
   gap: 10px;
@@ -507,7 +505,8 @@ tr:last-child td { border-bottom: none; }
 
 /* Voucher Management Styles */
 .voucher-navbar {
-  background: #fff;
+  background-color: #0094ff;
+  
   border: 1px solid #e6e6e6;
   border-radius: 8px;
   padding: 15px 20px;
@@ -706,7 +705,7 @@ tr:last-child td { border-bottom: none; }
   border: 1px solid #ddd;
   border-radius: 6px;
   overflow: hidden;
-  width: 90%; 
+  width: 100%; 
   max-width: 700px; 
   font-family: Arial, sans-serif;
   background: #ffffff;
@@ -722,7 +721,7 @@ tr:last-child td { border-bottom: none; }
 
 .voucher-left {
   position: relative;
-  width: 120px;
+  width: 40%;
   background: #0d9bff;
   display: flex;
   justify-content: center;
@@ -759,6 +758,7 @@ tr:last-child td { border-bottom: none; }
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
 }
 
 .voucher-title {
@@ -868,6 +868,14 @@ tr:last-child td { border-bottom: none; }
 .voucher-detail-value {
   color: #333;
 }
+.modal-header{
+  background-color: #0094ff;
+  color: white;
+}
+.modal-body{
+  background-color: #f5f5f5;
+}
+
 
 @media (max-width: 768px) {
   .sidebar { width: 250px; }

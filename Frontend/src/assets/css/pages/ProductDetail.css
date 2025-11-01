@@ -17,7 +17,7 @@ body {
   
   .navbar-custom {
     background-color: #0d9bff;
-    padding: 15px 0;
+    padding: 7px 0;
   }
   
   .navbar-brand {
@@ -737,4 +737,53 @@ footer {
   color: #999;
   text-decoration: none;
   font-size: 0.9rem;
+}
+.footer-section {
+  background: rgb(37, 37, 37);
+  color: white;
+  margin-top: 60px;
+  font-size: 0.95rem;
+}
+
+.footer-links li {
+  margin-bottom: 8px;
+}
+
+.footer-links a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  color: white;
+  transition: all 0.3s;
+  font-size: 1.1rem;
+}
+
+.social-icon:hover {
+  background: #fff;
+  color: #0d9bff;
+  transform: translateY(-3px);
+}
+
+.footer-bottom {
+  background: rgba(0, 0, 0, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.footer-bottom a {
+  color: rgba(255, 255, 255, 0.9);
 }
