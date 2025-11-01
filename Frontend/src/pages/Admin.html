@@ -142,45 +142,141 @@
 
       <!-- Customer -->
       <section id="customer" class="section">
-        <div class="bar-blue">Khách hàng</div>
-        <div class="toolbar d-flex gap-2 mb-3">
-          <input class="search form-control" placeholder="Tìm kiếm khách hàng">
-          
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="mb-0"><i class="bi bi-people-fill me-2"></i>Quản lý Khách hàng</h4>
         </div>
-        <div class="table-responsive">
-          <table class="table table-bordered table-hover align-middle">
-            <thead class="table-light">
-              <tr>
-                <th style="width:40px;"><input type="checkbox"></th>
-                <th>Tên</th>
-                <th>Email</th>
-                <th>Số điện thoại</th>
-                <th>Trạng thái</th>
-                <th>Hành động</th>
-              </tr>
-            </thead>
-            <tbody id="customerList"></tbody>
-          </table>
+        <div class="card">
+          <div class="card-body">
+            <div class="toolbar d-flex gap-2 mb-3">
+              <input class="search form-control" placeholder="Tìm kiếm khách hàng">
+            </div>
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width:40px;"><input type="checkbox"></th>
+                    <th>Tên</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="customerList"></tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- Product -->
+      <!-- Product Management - Shopee Style -->
       <section id="product" class="section">
-        <!-- Product Navbar -->
-        <div class="product-navbar">
-          <h3 class="navbar-title text-white">Quản lý sản phẩm</h3>
-          <div class="navbar-actions">
-            <input class="search form-control" placeholder="Tìm kiếm sản phẩm" id="productSearch">
-            <button class="btn btn-outline-light" style = "background-color: rgb(159, 206, 250);color: white;" data-bs-toggle="modal" data-bs-target="#addProductModal">
-              <i class="bi bi-plus-circle me-1"></i>Thêm sản phẩm
-            </button>
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="mb-0"><i class="bi bi-box-seam me-2"></i>Quản lý Sản Phẩm</h4>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="input-group">
+                  <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" placeholder="Vui lòng nhập tối thiểu 2 ký tự" id="productSearch">
+                </div>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="categoryFilter">
+                  <option value="">Danh mục</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="stockFilter">
+                  <option value="">Kho hàng</option>
+                  <option value="in_stock">Còn hàng</option>
+                  <option value="out_of_stock">Hết hàng</option>
+                  <option value="low_stock">Sắp hết</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="statusFilter">
+                  <option value="">Trạng thái</option>
+                  <option value="active">Đang bán</option>
+                  <option value="inactive">Ngừng bán</option>
+
+                </select>
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-primary w-100" onclick="window.adminProductController?.applyFilters()">
+                  <i class="bi bi-funnel me-1"></i>Tìm
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-        
+
         <!-- Product List -->
-        <div class="row g-3" id="productList">
-          <!-- Products will be rendered here -->
-        </div>
+        <div class="card">
+              <div class="card-body">
+                <!-- Action Bar -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <span class="text-muted" id="productCountText">0 Sản Phẩm</span>
+                  </div>
+                  <div>
+                    <button class="btn btn-link text-primary" onclick="window.location.reload()">
+                      <i class="bi bi-arrow-clockwise me-1"></i>Tối ưu sản phẩm
+                    </button>
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                      <i class="bi bi-plus-circle me-1"></i>Thêm 1 sản phẩm mới
+                    </button>
+                    <div class="btn-group ms-2">
+                      <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" id="bulkActionDropdown">
+                        Công cụ Xử lý hàng loạt
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" id="bulkEditBtn"><i class="bi bi-pencil me-2"></i>Chỉnh sửa hàng loạt</a></li>
+                        <li><a class="dropdown-item" href="#" id="bulkDeleteBtn"><i class="bi bi-trash me-2"></i>Xóa hàng loạt</a></li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Product Table -->
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th width="40"><input type="checkbox" class="form-check-input" id="selectAllCheckbox"></th>
+                        <th width="350">Tên sản phẩm</th>
+                        <th width="120">SKU phân loại</th>
+                        <th width="120">Phân loại hàng</th>
+                        <th width="120">Giá <i class="bi bi-sort-down"></i></th>
+                        <th width="100">Kho hàng <i class="bi bi-info-circle"></i> <i class="bi bi-sort-down"></i></th>
+                        <th width="100">Doanh số</th>
+                        <th width="100">Thao tác</th>
+                      </tr>
+                    </thead>
+                    <tbody id="productList">
+                      <!-- Products will be rendered here -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div>
+                    <span class="text-muted">Hiển thị 1-20 của <span id="totalProducts">0</span> sản phẩm</span>
+                  </div>
+                  <nav>
+                    <ul class="pagination mb-0" id="productPagination">
+                      <!-- Pagination will be rendered here -->
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
       </section>
 
       <!-- Shop Info -->
@@ -251,6 +347,7 @@
             <tbody id="orderList"></tbody>
           </table>
         </div>
+      </section>
       
       <!-- Modal Chi tiết Đơn hàng -->
       <div class="modal fade" id="orderDetailModal" tabindex="-1">
@@ -322,49 +419,48 @@
           </div>
         </div></div>
       </div>
-      </section>
 
       <!-- Feedback Manager -->
       <section id="feedback-manager" class="section">
         <div class="bar-blue">Quản lý đánh giá sản phẩm</div>
         <div class="panel">
-          <div class="feedback-list">
-            <div class="feedback-item d-flex align-items-start gap-3">
-              <img src="img/Rectangle 108 (2).png" class="feedback-thumb" alt="">
-              <div class="flex-fill">
-                <div class="d-flex justify-content-between align-items-center">
-                  <strong class="feedback-product">Xe cảnh sát</strong>
-                  <span class="badge bg-primary ms-2">Mới</span>
-                </div>
-                <div><b>Tên khách:</b> Nguyễn Văn A · <b>Email:</b> vana@gmail.com · <b>Đánh giá:</b>
-                  <span class="text-warning">★★★★★</span>
-                </div>
-                <div><i>"Sản phẩm rất tốt, giao hàng nhanh!"</i></div>
-                <div class="feedback-actions mt-1">
-                  <button type="button" class="btn btn-outline btn-sm view-feedback-btn" data-feedback-id="FB001" data-bs-toggle="modal" data-bs-target="#feedbackDetailModal">Xem</button>
-                  <button type="button" class="btn btn-outline-secondary btn-sm ms-2 acknowledge-feedback-btn" data-feedback-id="FB001">Ghi nhận</button>
+            <div class="feedback-list">
+              <div class="feedback-item d-flex align-items-start gap-3">
+                <img src="img/Rectangle 108 (2).png" class="feedback-thumb" alt="">
+                <div class="flex-fill">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <strong class="feedback-product">Xe cảnh sát</strong>
+                    <span class="badge bg-primary ms-2">Mới</span>
+                  </div>
+                  <div><b>Tên khách:</b> Nguyễn Văn A · <b>Email:</b> vana@gmail.com · <b>Đánh giá:</b>
+                    <span class="text-warning">★★★★★</span>
+                  </div>
+                  <div><i>"Sản phẩm rất tốt, giao hàng nhanh!"</i></div>
+                  <div class="feedback-actions mt-1">
+                    <button type="button" class="btn btn-outline btn-sm view-feedback-btn" data-feedback-id="FB001" data-bs-toggle="modal" data-bs-target="#feedbackDetailModal">Xem</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm ms-2 acknowledge-feedback-btn" data-feedback-id="FB001">Ghi nhận</button>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="feedback-item d-flex align-items-start gap-3 mt-3">
-              <img src="img/Rectangle 108 (3).png" class="feedback-thumb" alt="">
-              <div class="flex-fill">
-                <div class="d-flex justify-content-between align-items-center">
-                  <strong class="feedback-product">Xe xây dựng vàng</strong>
-                  <span class="badge bg-primary ms-2">Mới</span>
-                </div>
-                <div><b>Tên khách:</b> Trần Bảo B · <b>Email:</b> baobb@gmail.com · <b>Đánh giá:</b>
-                  <span class="text-warning">★★★★☆</span>
-                </div>
-                <div><i>"Đúng mô tả, bé nhà mình thích lắm."</i></div>
-                <div class="feedback-actions mt-1">
-                  <button type="button" class="btn btn-outline btn-sm view-feedback-btn" data-feedback-id="FB002">Xem</button>
-                  <button type="button" class="btn btn-outline-secondary btn-sm ms-2 acknowledge-feedback-btn" data-feedback-id="FB002">Ghi nhận</button>
+              <div class="feedback-item d-flex align-items-start gap-3 mt-3">
+                <img src="img/Rectangle 108 (3).png" class="feedback-thumb" alt="">
+                <div class="flex-fill">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <strong class="feedback-product">Xe xây dựng vàng</strong>
+                    <span class="badge bg-primary ms-2">Mới</span>
+                  </div>
+                  <div><b>Tên khách:</b> Trần Bảo B · <b>Email:</b> baobb@gmail.com · <b>Đánh giá:</b>
+                    <span class="text-warning">★★★★☆</span>
+                  </div>
+                  <div><i>"Đúng mô tả, bé nhà mình thích lắm."</i></div>
+                  <div class="feedback-actions mt-1">
+                    <button type="button" class="btn btn-outline btn-sm view-feedback-btn" data-feedback-id="FB002">Xem</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm ms-2 acknowledge-feedback-btn" data-feedback-id="FB002">Ghi nhận</button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
       </section>
 
       <!-- Voucher Management -->
@@ -483,38 +579,36 @@
                 <input type="text" class="form-control" id="productName" required>
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-semibold">Thương hiệu</label>
-                <input type="text" class="form-control" id="productBrand" required>
+                <label class="form-label fw-semibold">Danh mục</label>
+                <select class="form-select" id="productCategory" required>
+                  <option value="">-- Chọn danh mục --</option>
+                </select>
               </div>
             </div>
   
             <div class="row g-3 mb-3">
               <div class="col-md-6">
-                <label class="form-label fw-semibold">Chủ đề</label>
-                <input type="text" class="form-control" id="productTheme">
+                <label class="form-label fw-semibold">Độ khó</label>
+                <input type="text" class="form-control" id="productAge" placeholder="VD: 6+, 12+, 18+">
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-semibold">Độ tuổi</label>
-                <input type="text" class="form-control" id="productAge">
+                <label class="form-label fw-semibold">Số mảnh ghép</label>
+                <input type="number" class="form-control" id="productPieces">
               </div>
             </div>
   
             <!-- Thông tin kỹ thuật -->
             <div class="row g-3 mb-3">
-              <div class="col-md-4">
-                <label class="form-label fw-semibold">Số mảnh ghép</label>
-                <input type="number" class="form-control" id="productPieces">
-              </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label fw-semibold">Tồn kho</label>
-                <input type="number" class="form-control" id="productStock">
+                <input type="number" class="form-control" id="productStock" min="0" value="0">
               </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label fw-semibold">Trạng thái</label>
                 <select class="form-select" id="productStatus" required>
                   <option value="active">Đang bán</option>
                   <option value="inactive">Ngừng bán</option>
-                  <option value="out_of_stock">Hết hàng</option>
+              
                 </select>
               </div>
             </div>
@@ -602,38 +696,35 @@
                 <input type="text" class="form-control" id="editProductName" required>
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-semibold">Thương hiệu</label>
-                <input type="text" class="form-control" id="editProductBrand" required>
+                <label class="form-label fw-semibold">Danh mục</label>
+                <select class="form-select" id="editProductCategory" required>
+                  <option value="">-- Chọn danh mục --</option>
+                </select>
               </div>
             </div>
   
             <div class="row g-3 mb-3">
               <div class="col-md-6">
-                <label class="form-label fw-semibold">Chủ đề</label>
-                <input type="text" class="form-control" id="editProductTheme">
+                <label class="form-label fw-semibold">Độ khó</label>
+                <input type="text" class="form-control" id="editProductAge" placeholder="VD: 6+, 12+, 18+">
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-semibold">Độ tuổi</label>
-                <input type="text" class="form-control" id="editProductAge">
+                <label class="form-label fw-semibold">Số mảnh ghép</label>
+                <input type="number" class="form-control" id="editProductPieces">
               </div>
             </div>
   
             <!-- Thông tin kỹ thuật -->
             <div class="row g-3 mb-3">
-              <div class="col-md-4">
-                <label class="form-label fw-semibold">Số mảnh ghép</label>
-                <input type="number" class="form-control" id="editProductPieces">
-              </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label fw-semibold">Tồn kho</label>
-                <input type="number" class="form-control" id="editProductStock">
+                <input type="number" class="form-control" id="editProductStock" min="0">
               </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label fw-semibold">Trạng thái</label>
                 <select class="form-select" id="editProductStatus" required>
                   <option value="active">Đang bán</option>
                   <option value="inactive">Ngừng bán</option>
-                  <option value="out_of_stock">Hết hàng</option>
                 </select>
               </div>
             </div>
@@ -875,6 +966,15 @@
   <script type="module" src="/dist/src/core/config/env.js"></script>
   <script type="module" src="/dist/src/assets/js/components/Admin.js"></script>
   
+  <!-- Admin Product Management -->
+  <script type="module">
+    import { AdminProductController } from '/dist/src/modules/admin/AdminProductController.js';
+    
+    // Initialize Admin Product Controller
+    const adminProductController = new AdminProductController();
+    window.adminProductController = adminProductController;
+  </script>
+
   <!-- Admin Order Management -->
   <script type="module">
     import { AdminOrderController } from '/dist/src/modules/admin/AdminOrderController.js';
@@ -882,495 +982,147 @@
     // Initialize Admin Order Controller
     const adminOrderController = new AdminOrderController();
     window.adminOrderController = adminOrderController;
-    
-    // Load orders when Order section is active
-    document.addEventListener('DOMContentLoaded', () => {
-      // Load orders initially if order section is active
-      const orderSection = document.getElementById('order');
-      if (orderSection && orderSection.classList.contains('active')) {
-        adminOrderController.loadOrders();
-      }
-      
-      // Load orders when switching to order section
-      document.querySelectorAll('.menu li').forEach(item => {
-        item.addEventListener('click', () => {
-          const target = item.getAttribute('data-target');
-          if (target === 'order') {
-            adminOrderController.loadOrders();
-          }
-        });
-      });
-      
-      // Setup filter handlers
-      setupOrderFilters();
-    });
-    
-    function setupOrderFilters() {
-      // Add filter dropdowns to order section
-      const orderSection = document.getElementById('order');
-      if (!orderSection) return;
-      
-      const toolbar = orderSection.querySelector('.toolbar');
-      if (toolbar) {
-        // Get existing search input
-        const searchInput = toolbar.querySelector('.search');
-        
-        // Add status filter
-        const statusFilter = document.createElement('select');
-        statusFilter.className = 'form-select d-inline-block w-auto ms-2';
-        statusFilter.innerHTML = `
-          <option value="">Tất cả trạng thái</option>
-          <option value="Đang xử lý">Đang xử lý</option>
-          <option value="Đang giao">Đang giao</option>
-          <option value="Đã giao">Đã giao</option>
-          <option value="Đã hủy">Đã hủy</option>
-          <option value="Đã trả">Đã trả</option>
-        `;
-        
-        // Add payment status filter
-        const paymentFilter = document.createElement('select');
-        paymentFilter.className = 'form-select d-inline-block w-auto ms-2';
-        paymentFilter.innerHTML = `
-          <option value="">Tất cả thanh toán</option>
-          <option value="pending">Chưa thanh toán</option>
-          <option value="paid">Đã thanh toán</option>
-          <option value="failed">Thất bại</option>
-          <option value="refunded">Đã hoàn tiền</option>
-        `;
-        
-        toolbar.appendChild(statusFilter);
-        toolbar.appendChild(paymentFilter);
-        
-        // Helper function to load with all filters
-        const loadWithFilters = () => {
-          adminOrderController.loadOrders({
-            status: statusFilter.value || undefined,
-            paymentStatus: paymentFilter.value || undefined,
-            search: searchInput?.value.trim() || undefined
-          });
-        };
-        
-        // Add event listeners
-        statusFilter.addEventListener('change', loadWithFilters);
-        paymentFilter.addEventListener('change', loadWithFilters);
-        
-        // Search input event listener
-        if (searchInput) {
-          let searchTimeout;
-          searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-              loadWithFilters();
-            }, 500); // Debounce 500ms
-          });
-          
-          // Also search on Enter key
-          searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-              clearTimeout(searchTimeout);
-              loadWithFilters();
-            }
-          });
-        }
-      }
-    }
   </script>
+  
+  <!-- ORDER MANAGEMENT INITIALIZATION -->
   <script>
-     // PRODUCT MANAGEMENT
-     let productsData = [
-            {
-                id: 'PRD001',
-                name: 'Nhà để xe - 34 xe',
-                brand: 'Lego',
-                theme: 'City',
-                pieces: 34,
-                stock: 15,
-                age: '4+',
-                price: 245000,
-                status: 'active',
-                description: 'Nhà để xe với 34 xe đồ chơi',
-                images: ['img/Rectangle 108 (1).png', 'img/Rectangle 108 (2).png']
-            },
-            {
-                id: 'PRD002',
-                name: 'Xe cảnh sát',
-                brand: 'Lego',
-                theme: 'City',
-                pieces: 25,
-                stock: 8,
-                age: '3+',
-                price: 230000,
-                status: 'active',
-                description: 'Xe cảnh sát với đèn nhấp nháy',
-                images: ['img/Rectangle 108 (2).png']
-            },
-            {
-                id: 'PRD003',
-                name: 'Xe xây dựng màu vàng',
-                brand: 'Lego',
-                theme: 'City',
-                pieces: 45,
-                stock: 0,
-                age: '5+',
-                price: 199000,
-                status: 'out_of_stock',
-                description: 'Xe xây dựng màu vàng với cần cẩu',
-                images: ['img/Rectangle 108 (3).png']
-            },
-            {
-                id: 'PRD004',
-                name: 'Tàu hỏa tốc hành',
-                brand: 'Lego',
-                theme: 'City',
-                pieces: 67,
-                stock: 12,
-                age: '6+',
-                price: 350000,
-                status: 'active',
-                description: 'Tàu hỏa tốc hành với đường ray',
-                images: ['img/Rectangle 108 (1).png', 'img/Rectangle 108 (2).png', 'img/Rectangle 108 (3).png']
-            },
-            {
-                id: 'PRD005',
-                name: 'Máy bay phản lực',
-                brand: 'Lego',
-                theme: 'City',
-                pieces: 89,
-                stock: 5,
-                age: '8+',
-                price: 420000,
-                status: 'active',
-                description: 'Máy bay phản lực với cabin mở',
-                images: ['img/Rectangle 108 (2).png', 'img/Rectangle 108 (3).png']
-            },
-            {
-                id: 'PRD006',
-                name: 'Tàu ngầm thám hiểm',
-                brand: 'Lego',
-                theme: 'City',
-                pieces: 156,
-                stock: 0,
-                age: '9+',
-                price: 580000,
-                status: 'out_of_stock',
-                description: 'Tàu ngầm thám hiểm đại dương',
-                images: ['img/Rectangle 108 (1).png', 'img/Rectangle 108 (2).png', 'img/Rectangle 108 (3).png']
-            }
-        ];
-        
-        // Initialize product management
-        initializeProductManagement();
-        
-        function initializeProductManagement() {
-            renderProductList();
-            setupProductFormHandlers();
-            setupProductSearch();
-        }
-        
-        function renderProductList() {
-            const productList = document.getElementById('productList');
-            if (!productList) return;
-            
-            productList.innerHTML = productsData.map(product => `
-                <div class="col-md-6 col-lg-4">
-                    <div class="product-card panel">
-                        <div class="product-actions">
-                            <button class="btn btn-outline btn-sm edit-product-btn" data-product-id="${product.id}">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm delete-product-btn" data-product-id="${product.id}">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                        
-                        <div class="product-images">
-                            ${product.images.map(img => `<img src="${img}" alt="${product.name}">`).join('')}
-                        </div>
-                        
-                        <div class="product-info">
-                            <h5 class="product-name">${product.name}</h5>
-                            <div class="product-details">
-                                <div><strong>Thương hiệu:</strong> ${product.brand}</div>
-                                <div><strong>Chủ đề:</strong> ${product.theme}</div>
-                                <div><strong>Số mảnh:</strong> ${product.pieces}</div>
-                                <div><strong>Tồn kho:</strong> ${product.stock}</div>
-                                <div><strong>Độ tuổi:</strong> ${product.age}</div>
-                                <div><strong>Giá:</strong> ${product.price.toLocaleString()} VND</div>
-                                <div><strong>Trạng thái:</strong> 
-                                    <span class="product-status ${product.status}">
-                                        ${product.status === 'active' ? 'Đang bán' : 
-                                          product.status === 'inactive' ? 'Ngừng bán' : 'Hết hàng'}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="product-description mt-2">
-                                <small class="text-muted">${product.description}</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            attachProductActionEvents();
-        }
-        
-        function attachProductActionEvents() {
-            // Edit product buttons
-            document.querySelectorAll('.edit-product-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const productId = btn.getAttribute('data-product-id');
-                    editProduct(productId);
-                });
-            });
-            
-            // Delete product buttons
-            document.querySelectorAll('.delete-product-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const productId = btn.getAttribute('data-product-id');
-                    deleteProduct(productId);
-                });
-            });
-        }
-        
-        function setupProductFormHandlers() {
-            // Add product form
-            const addProductForm = document.getElementById('productForm');
-            if (addProductForm) {
-                addProductForm.addEventListener('submit', handleAddProduct);
-            }
-            
-            // Edit product form
-            const editProductForm = document.getElementById('editProductForm');
-            if (editProductForm) {
-                editProductForm.addEventListener('submit', handleEditProduct);
-            }
-            
-            // Image preview handlers
-            setupImagePreviewHandlers();
-        }
-        
-        function setupImagePreviewHandlers() {
-            // Add product image previews
-            document.querySelectorAll('.product-image-input').forEach(input => {
-                input.addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    const index = this.getAttribute('data-index');
-                    const preview = document.getElementById(`preview-${index}`);
-                    
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        preview.innerHTML = '<div class="empty">Chọn hình ảnh</div>';
-                    }
-                });
-            });
-            
-            // Edit product image previews
-            document.querySelectorAll('.edit-product-image-input').forEach(input => {
-                input.addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    const index = this.getAttribute('data-index');
-                    const preview = document.getElementById(`edit-preview-${index}`);
-                    
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        preview.innerHTML = '<div class="empty">Chọn hình ảnh</div>';
-                    }
-                });
-            });
-        }
-        
-        function handleAddProduct(e) {
-            e.preventDefault();
-            
-            const formData = {
-                id: 'PRD' + String(productsData.length + 1).padStart(3, '0'),
-                name: document.getElementById('productName').value,
-                brand: document.getElementById('productBrand').value,
-                theme: document.getElementById('productTheme').value,
-                pieces: parseInt(document.getElementById('productPieces').value) || 0,
-                stock: parseInt(document.getElementById('productStock').value) || 0,
-                age: document.getElementById('productAge').value,
-                price: parseInt(document.getElementById('productPrice').value),
-                status: document.getElementById('productStatus').value,
-                description: document.getElementById('productDesc').value,
-                images: []
-            };
-            
-            // Get image files
-            const imageInputs = document.querySelectorAll('.product-image-input');
-            imageInputs.forEach(input => {
-                if (input.files[0]) {
-                    // In real app, you would upload files to server
-                    // For demo, we'll use placeholder
-                    formData.images.push('img/Rectangle 108 (1).png');
-                }
-            });
-            
-            productsData.push(formData);
-            renderProductList();
-            
-            // Reset form
-            document.getElementById('productForm').reset();
-            document.querySelectorAll('.image-preview').forEach(preview => {
-                preview.innerHTML = '<div class="empty">Chọn hình ảnh</div>';
-            });
-            
-            // Close modal
-            bootstrap.Modal.getInstance(document.getElementById('addProductModal'))?.hide();
-            
-            alert('Thêm sản phẩm thành công!');
-        }
-        
-        function editProduct(productId) {
-            const product = productsData.find(p => p.id === productId);
-            if (!product) return;
-            
-            // Fill edit form
-            document.getElementById('editProductId').value = product.id;
-            document.getElementById('editProductName').value = product.name;
-            document.getElementById('editProductBrand').value = product.brand;
-            document.getElementById('editProductTheme').value = product.theme;
-            document.getElementById('editProductPieces').value = product.pieces;
-            document.getElementById('editProductStock').value = product.stock;
-            document.getElementById('editProductAge').value = product.age;
-            document.getElementById('editProductPrice').value = product.price;
-            document.getElementById('editProductStatus').value = product.status;
-            document.getElementById('editProductDesc').value = product.description;
-            
-            // Reset image previews
-            document.querySelectorAll('.edit-product-image-input').forEach(input => {
-                input.value = '';
-            });
-            document.querySelectorAll('[id^="edit-preview-"]').forEach(preview => {
-                preview.innerHTML = '<div class="empty">Chọn hình ảnh</div>';
-            });
-            
-            // Show edit modal
-            const editModal = new bootstrap.Modal(document.getElementById('editProductModal'));
-            editModal.show();
-        }
-        
-        function handleEditProduct(e) {
-            e.preventDefault();
-            
-            const productId = document.getElementById('editProductId').value;
-            const productIndex = productsData.findIndex(p => p.id === productId);
-            
-            if (productIndex === -1) return;
-            
-            // Update product data
-            productsData[productIndex] = {
-                ...productsData[productIndex],
-                name: document.getElementById('editProductName').value,
-                brand: document.getElementById('editProductBrand').value,
-                theme: document.getElementById('editProductTheme').value,
-                pieces: parseInt(document.getElementById('editProductPieces').value) || 0,
-                stock: parseInt(document.getElementById('editProductStock').value) || 0,
-                age: document.getElementById('editProductAge').value,
-                price: parseInt(document.getElementById('editProductPrice').value),
-                status: document.getElementById('editProductStatus').value,
-                description: document.getElementById('editProductDesc').value
-            };
-            
-            renderProductList();
-            
-            // Close modal
-            bootstrap.Modal.getInstance(document.getElementById('editProductModal'))?.hide();
-            
-            alert('Cập nhật sản phẩm thành công!');
-        }
-        
-        function deleteProduct(productId) {
-            if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-                const productIndex = productsData.findIndex(p => p.id === productId);
-                if (productIndex !== -1) {
-                    productsData.splice(productIndex, 1);
-                    renderProductList();
-                    alert('Xóa sản phẩm thành công!');
-                }
-            }
-        }
-        
-        function setupProductSearch() {
-            const searchInput = document.getElementById('productSearch');
-            if (searchInput) {
-                searchInput.addEventListener('input', function(e) {
-                    const searchTerm = e.target.value.toLowerCase();
-                    const filteredProducts = productsData.filter(product => 
-                        product.name.toLowerCase().includes(searchTerm) ||
-                        product.brand.toLowerCase().includes(searchTerm) ||
-                        product.theme.toLowerCase().includes(searchTerm)
-                    );
-                    
-                    renderFilteredProductList(filteredProducts);
-                });
-            }
-        }
-        
-        function renderFilteredProductList(products) {
-            const productList = document.getElementById('productList');
-            if (!productList) return;
-            
-            if (products.length === 0) {
-                productList.innerHTML = '<div class="col-12"><div class="text-center text-muted">Không tìm thấy sản phẩm nào</div></div>';
-                return;
-            }
-            
-            productList.innerHTML = products.map(product => `
-    <div class="col-md-6 col-lg-4">
-        <div class="product-card panel">
-            <div class="product-actions">
-                <button class="btn btn-outline btn-sm edit-product-btn" data-product-id="${product.id}">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-outline-danger btn-sm delete-product-btn" data-product-id="${product.id}">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
-            
-            <div class="product-images">
-                ${product.images.map(img => `<img src="${img}" alt="${product.name}" style="width: 100%; height: auto; border-radius: 0px;">`).join('')}
-            </div>
-            
-            <div class="product-info">
-                <h5 class="product-name">${product.name}</h5>
-                <div class="product-details">
-                    <div><strong>Thương hiệu:</strong> ${product.brand}</div>
-                    <div><strong>Chủ đề:</strong> ${product.theme}</div>
-                    <div><strong>Số mảnh:</strong> ${product.pieces}</div>
-                    <div><strong>Tồn kho:</strong> ${product.stock}</div>
-                    <div><strong>Độ tuổi:</strong> ${product.age}</div>
-                    <div><strong>Giá:</strong> ${product.price.toLocaleString()} VND</div>
-                    <div><strong>Trạng thái:</strong> 
-                        <span class="product-status ${product.status}">
-                            ${product.status === 'active' ? 'Đang bán' : 
-                              product.status === 'inactive' ? 'Ngừng bán' : 'Hết hàng'}
-                        </span>
-                    </div>
-                </div>
-                <div class="product-description mt-2">
-                    <small class="text-muted">${product.description}</small>
-                </div>
-            </div>
-        </div>
-    </div>
-`).join('');
-
-            
-            attachProductActionEvents();
-        }
+     // Initialize Admin Order Controller when ready
+     document.addEventListener('DOMContentLoaded', () => {
+       // Wait for controller to be ready
+       const waitForOrderController = setInterval(() => {
+         if (window.adminOrderController) {
+           clearInterval(waitForOrderController);
+           initializeOrderSection();
+         }
+       }, 100);
+     });
+     
+     function initializeOrderSection() {
+       const orderSection = document.getElementById('order');
+       
+       // Setup order filters first
+       setupOrderFilters();
+       
+       // LUÔN load orders khi page load (không phụ thuộc vào class active)
+       // Điều này đảm bảo data luôn sẵn sàng, giống như trước khi thêm Product Management
+       window.adminOrderController.loadOrders();
+       console.log('📦 Loading orders (always on page load)');
+       
+       // Load lại orders khi switching to order section (để refresh data nếu cần)
+       document.querySelectorAll('.menu li').forEach(item => {
+         item.addEventListener('click', () => {
+           const target = item.getAttribute('data-target');
+           if (target === 'order') {
+             window.adminOrderController.loadOrders();
+             console.log('📦 Loading orders (clicked order tab - refreshing)');
+           }
+         });
+       });
+     }
+     
+     function setupOrderFilters() {
+       const orderSection = document.getElementById('order');
+       if (!orderSection) return;
+       
+       const toolbar = orderSection.querySelector('.toolbar');
+       if (toolbar) {
+         const searchInput = toolbar.querySelector('.search');
+         
+         // Add status filter
+         const statusFilter = document.createElement('select');
+         statusFilter.className = 'form-select d-inline-block w-auto ms-2';
+         statusFilter.innerHTML = `
+           <option value="">Tất cả trạng thái</option>
+           <option value="Đang xử lý">Đang xử lý</option>
+           <option value="Đang giao">Đang giao</option>
+           <option value="Đã giao">Đã giao</option>
+           <option value="Đã hủy">Đã hủy</option>
+           <option value="Đã trả">Đã trả</option>
+         `;
+         
+         // Add payment status filter
+         const paymentFilter = document.createElement('select');
+         paymentFilter.className = 'form-select d-inline-block w-auto ms-2';
+         paymentFilter.innerHTML = `
+           <option value="">Tất cả thanh toán</option>
+           <option value="pending">Chưa thanh toán</option>
+           <option value="paid">Đã thanh toán</option>
+           <option value="failed">Thất bại</option>
+           <option value="refunded">Đã hoàn tiền</option>
+         `;
+         
+         toolbar.appendChild(statusFilter);
+         toolbar.appendChild(paymentFilter);
+         
+         // Helper function to load with all filters
+         const loadWithFilters = () => {
+           window.adminOrderController.loadOrders({
+             status: statusFilter.value || undefined,
+             paymentStatus: paymentFilter.value || undefined,
+             search: searchInput?.value.trim() || undefined
+           });
+         };
+         
+         // Add event listeners
+         statusFilter.addEventListener('change', loadWithFilters);
+         paymentFilter.addEventListener('change', loadWithFilters);
+         
+         // Search input event listener
+         if (searchInput) {
+           let searchTimeout;
+           searchInput.addEventListener('input', (e) => {
+             clearTimeout(searchTimeout);
+             searchTimeout = setTimeout(() => {
+               loadWithFilters();
+             }, 500);
+           });
+           
+           searchInput.addEventListener('keypress', (e) => {
+             if (e.key === 'Enter') {
+               clearTimeout(searchTimeout);
+               loadWithFilters();
+             }
+           });
+         }
+       }
+     }
+  </script>
+  
+  <!-- PRODUCT MANAGEMENT INITIALIZATION -->
+  <script>
+     // Initialize Admin Product Controller when ready
+     document.addEventListener('DOMContentLoaded', () => {
+       // Wait for controller to be ready
+       const waitForProductController = setInterval(() => {
+         if (window.adminProductController) {
+           clearInterval(waitForProductController);
+           initializeProductSection();
+         }
+       }, 100);
+     });
+     
+     function initializeProductSection() {
+       const productSection = document.getElementById('product');
+       
+       // Load categories first
+       window.adminProductController.loadCategories();
+       
+       // Load products when product section is active
+       if (productSection && productSection.classList.contains('active')) {
+         window.adminProductController.loadProducts();
+       }
+       
+       // Load products when switching to product section
+       document.querySelectorAll('.menu li').forEach(item => {
+         item.addEventListener('click', () => {
+           const target = item.getAttribute('data-target');
+           if (target === 'product') {
+             window.adminProductController.loadProducts();
+             window.adminProductController.loadCategories();
+           }
+         });
+       });
+     }
         // DEMO DATA PHẢN HỒI/ĐÁNH GIÁ
         const feedbackListDemo = [
             {
