@@ -433,13 +433,11 @@
 
   <!-- Product Modal -->
   <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content shadow-lg rounded-4">
-        <div class="modal-header text-white rounded-top-4" style ="background-color: #0D9BFF;">
-          <h5 class="modal-title fw-bold" id="addProductModalLabel">
-            <i class="bi bi-box-seam me-2"></i> Thêm sản phẩm mới
-          </h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addProductModalLabel">Thêm sản phẩm</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
         </div>
         <div class="modal-body bg-light">
           <form id="productForm" class="p-2">
@@ -527,22 +525,11 @@
                 <input type="number" class="form-control" id="productPrice" min="0" required>
               </div>
             </div>
-  
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Mô tả sản phẩm</label>
-              <textarea class="form-control" id="productDesc" rows="3" placeholder="Nhập mô tả chi tiết..."></textarea>
-            </div>
-  
-            <div class="modal-footer border-0">
-              <button type="button" class="btn btn-danger rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
-              <button type="submit" class="btn btn-primary rounded-pill px-4">
-                <i class="bi bi-save me-1"></i> Lưu sản phẩm
-              </button>
-            </div>
           </form>
         </div>
       </div>
     </div>
+  </div>
   </div>
   
 

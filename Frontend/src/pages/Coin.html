@@ -16,15 +16,15 @@
 <div class="hero-section text-dark">
   <div class="container">
     <div class ="row">
-        <h4 class="fw-bold fs-1 text-weight-20 text-center text-white">Blockify xu</h4>
+        <h4 class="row-text">Blockify xu</h4>
     </div>
     <div class="row justify-content-center">
       <div class="col-lg-6">
         <div class="coin-balance">
-          <div class="coin-icon">
-            <i class="bi bi-coin"></i>
+          <div class="coin-icon mb-5">
+            <img src ="../../public/images/Group 73.png" alt="Coin Icon">
           </div>
-          <h2>Xu của bạn</h2>
+          <h2 >Xu của bạn</h2>
           <div class="balance-amount text-danger">10,000</div>
           <p class="mb-0">Sử dụng xu để đổi voucher giảm giá với nhiều ưu đãi hấp dẫn!</p>
         </div>
@@ -34,196 +34,164 @@
 </div>
 
 <div class="container">
-  <!-- <div class="filter-section">
-    <div class="filter-tabs">
-      <ul class="nav nav-pills justify-content-center">
-        <li class="nav-item">
-          <a class="nav-link active" href="#" data-filter="all">Tất cả</a>
+  <div class="py-5">
+   
+    <div class="p-4 rounded-3" style="background-color: #e4f3ff; border: solid 1px rgb(0, 140, 255);">
+      <h3 class="section-title">Voucher giảm giá phần trăm</h3>
+      <div class="row g-4" id="discount-vouchers"></div>
+      
+    </div>
+    <nav>
+      <ul class="pagination justify-content-center mt-4">
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">Trước</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#" data-filter="discount">Giảm giá phần trăm</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#" data-filter="freeship">Giảm giá cố định</a>
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item">
+          <a class="page-link" href="#">Tiếp</a>
         </li>
       </ul>
-    </div>
-  </div> -->
-
-  <!-- Vouchers Section -->
-  <div class="py-5">
-    <h3 class="section-title">Voucher giảm giá</h3>
-    <div class="row g-4 mb-5" id="discount-vouchers"></div>
+    </nav>
   </div>
 </div>
 
-<!-- Footer -->
-<footer class="footer-section ">
-  <div class="footer-top py-5">
-    <div class="container">
-      <div class="row gy-4">
-        <!-- Logo & Intro -->
-        <div class="col-md-4">
-          <div class="d-flex align-items-center mb-3">
-          
-            <h4 class="fw-bold mb-0 text-white">Blockify</h4>
-          </div>
-          <p class="text-light small">
-            Blockify là nền tảng mua sắm trực tuyến thông minh giúp bạn tận hưởng hàng ngàn ưu đãi, 
-            tích xu và đổi quà cực hấp dẫn mỗi ngày.
-          </p>
-         
-        </div>
-
-        <!-- Quick Links -->
-        <div class="col-md-2 col-6">
-          <h6 class="fw-bold text-uppercase mb-3 text-white">Liên kết</h6>
-          <ul class="list-unstyled footer-links">
-            <li><a href="#">Trang chủ</a></li>
-            <li><a href="#">Giới thiệu</a></li>
-            <li><a href="#">Dịch vụ</a></li>
-            <li><a href="#">Hỏi đáp</a></li>
-            <li><a href="#">Liên hệ</a></li>
-          </ul>
-        </div>
-
-        <!-- Customer Service -->
-        <div class="col-md-3 col-6">
-          <h6 class="fw-bold text-uppercase mb-3 text-white">Hỗ trợ khách hàng</h6>
-          <ul class="list-unstyled footer-links">
-            <li><a href="#">Chính sách bảo mật</a></li>
-            <li><a href="#">Điều khoản sử dụng</a></li>
-            <li><a href="#">Chính sách hoàn tiền</a></li>
-            <li><a href="#">Trung tâm trợ giúp</a></li>
-            <li><a href="#">Vận chuyển & giao hàng</a></li>
-          </ul>
-        </div>
-
-        <!-- Contact & Social -->
-        <div class="col-md-3">
-          <h6 class="fw-bold text-uppercase mb-3 text-white">Liên hệ</h6>
-          <ul class="list-unstyled small text-light mb-3">
-            <li><i class="bi bi-geo-alt-fill me-2"></i> 123 Nguyễn Huệ, Q.1, TP.HCM</li>
-            <li><i class="bi bi-telephone-fill me-2"></i> (028) 1234 5678</li>
-            <li><i class="bi bi-envelope-fill me-2"></i> support@blockify.vn</li>
-          </ul>
-          <div class="d-flex gap-3 mt-3">
-            <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
-            <a href="#" class="social-icon"><i class="bi bi-twitter"></i></a>
-            <a href="#" class="social-icon"><i class="bi bi-youtube"></i></a>
-          </div>
-        </div>
-      </div>
+<!-- Voucher giảm giá cố định -->
+<div class="container">
+  <div class="py-5">
+   
+    <div class="p-4 rounded-3" style="background-color: #e4f3ff; border: solid 1px rgb(0, 140, 255);">
+      <h3 class="section-title">Voucher giảm giá cố định</h3>
+      <div class="row g-4" id="fixed-vouchers"></div>
     </div>
+    <nav>
+      <ul class="pagination justify-content-center mt-4">
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">Trước</a>
+        </li>
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item">
+          <a class="page-link" href="#">Tiếp</a>
+        </li>
+      </ul>
+    </nav>
   </div>
-
-  <!-- Bottom Bar -->
-  <div class="footer-bottom text-center py-3 mt-4">
-    <div class="container">
-      <hr style="border-color: rgba(255,255,255,0.2);">
-      <p class="mb-0 small text-light">
-        &copy; 2025 <strong>Blockify</strong>. All rights reserved. |
-        <a href="#" class="text-white text-decoration-underline">Chính sách bảo mật</a> |
-        <a href="#" class="text-white text-decoration-underline">Điều khoản dịch vụ</a>
-      </p>
-    </div>
-  </div>
-</footer>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  // Dữ liệu voucher (chỉ có 2 loại: PERCENTAGE và FIXED)
+  // Dữ liệu voucher
   const vouchers = [
-    {
-      id: 1,
-      name: "Giảm 20%",
-      type: "PERCENTAGE",
-      value: 20,
-      minOrder: 50000,
-      cost: 5000,
+    { id: 1, name: "Giảm 20%", type: "PERCENTAGE", value: 20, minOrder: 50000, cost: 5000,
       image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=200&fit=crop",
-      badge: "HOT",
-      remaining: 44,
-      expireHours: 23
-    },
-    {
-      id: 2,
-      name: "Giảm 15%",
-      type: "PERCENTAGE",
-      value: 15,
-      minOrder: 30000,
-      cost: 3500,
+      badge: "HOT", remaining: 44, expireHours: 23 },
+    { id: 2, name: "Giảm 15%", type: "PERCENTAGE", value: 15, minOrder: 30000, cost: 3500,
       image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=200&fit=crop",
-      badge: "SALE",
-      remaining: 62,
-      expireHours: 15
-    },
-    {
-      id: 3,
-      name: "Giảm 50K",
-      type: "FIXED",
-      value: 50000,
-      minOrder: 200000,
-      cost: 8000,
+      badge: "SALE", remaining: 62, expireHours: 15 },
+    { id: 3, name: "Giảm 50K", type: "FIXED", value: 50000, minOrder: 200000, cost: 8000,
       image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=200&fit=crop",
-      badge: "NEW",
-      remaining: 28,
-      expireHours: 48
-    },
-    {
-      id: 4,
-      name: "Giảm 30K",
-      type: "FIXED",
-      value: 30000,
-      minOrder: 100000,
-      cost: 6000,
+      badge: "NEW", remaining: 28, expireHours: 48 },
+    { id: 4, name: "Giảm 30K", type: "FIXED", value: 30000, minOrder: 100000, cost: 6000,
       image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=200&fit=crop",
-      badge: "VIP",
-      remaining: 35,
-      expireHours: 12
-    }
+      badge: "VIP", remaining: 35, expireHours: 12 },
+      { id: 1, name: "Giảm 20%", type: "PERCENTAGE", value: 20, minOrder: 50000, cost: 5000,
+      image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=200&fit=crop",
+      badge: "HOT", remaining: 44, expireHours: 23 },
+    { id: 2, name: "Giảm 15%", type: "PERCENTAGE", value: 15, minOrder: 30000, cost: 3500,
+      image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=200&fit=crop",
+      badge: "SALE", remaining: 62, expireHours: 15 },
+    { id: 3, name: "Giảm 50K", type: "FIXED", value: 50000, minOrder: 200000, cost: 8000,
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=200&fit=crop",
+      badge: "NEW", remaining: 28, expireHours: 48 },
+    { id: 4, name: "Giảm 30K", type: "FIXED", value: 30000, minOrder: 100000, cost: 6000,
+      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=200&fit=crop",
+      badge: "VIP", remaining: 35, expireHours: 12 },
+      { id: 1, name: "Giảm 20%", type: "PERCENTAGE", value: 20, minOrder: 50000, cost: 5000,
+      image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=200&fit=crop",
+      badge: "HOT", remaining: 44, expireHours: 23 },
+    { id: 2, name: "Giảm 15%", type: "PERCENTAGE", value: 15, minOrder: 30000, cost: 3500,
+      image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=200&fit=crop",
+      badge: "SALE", remaining: 62, expireHours: 15 },
+    { id: 3, name: "Giảm 50K", type: "FIXED", value: 50000, minOrder: 200000, cost: 8000,
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=200&fit=crop",
+      badge: "NEW", remaining: 28, expireHours: 48 },
+    { id: 4, name: "Giảm 30K", type: "FIXED", value: 30000, minOrder: 100000, cost: 6000,
+      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=200&fit=crop",
+      badge: "VIP", remaining: 35, expireHours: 12 }
   ];
 
-  // Render vouchers
+  // Render voucher phần trăm
   function renderVouchers() {
     const container = document.getElementById("discount-vouchers");
     container.innerHTML = "";
 
-    vouchers.forEach(voucher => {
-      const discountText = voucher.type === "PERCENTAGE"
-        ? `${voucher.value}%`
-        : `${(voucher.value / 1000)}K`;
-
+    vouchers.filter(v => v.type === "PERCENTAGE").forEach(voucher => {
       const card = `
         <div class="col-md-6 col-lg-6">
           <div class="voucher">
             <div class="voucher-left">
-              <span class="tag">Số lượng có hạn</span>
+              <span class="tag">${voucher.badge}</span>
               <div class="voucher-img" style="background-image: url('${voucher.image}')"></div>
             </div>
             <div class="voucher-right">
               <div class="voucher-title">
-                <span class="badge">Giảm giá</span>
+                <span class="badge bg-danger">Giảm giá</span>
                 ${voucher.name} cho đơn hàng trên ${(voucher.minOrder / 1000)}k
               </div>
               <div class="progress-bar">
                 <div class="progress" style="width:${voucher.remaining}%"></div>
               </div>
               <div class="voucher-info">
-                <span>Còn ${voucher.remaining}%</span> - <span class="expire">Hết hạn sau ${voucher.expireHours} giờ</span>
+                <span>Còn ${voucher.remaining}%</span> - 
+                <span class="expire">Hết hạn sau ${voucher.expireHours} giờ</span>
               </div>
               <div class="voucher-footer">
-                <span class="voucher-price">
-                  <i class="bi bi-coin"></i> ${voucher.cost.toLocaleString()}
-                </span>
+                <span class="voucher-price"><i class="bi bi-coin"></i> ${voucher.cost.toLocaleString()}</span>
                 <button class="view-btn" onclick="redeemVoucher(${voucher.id})">Đổi ngay</button>
               </div>
             </div>
           </div>
-        </div>
-      `;
+        </div>`;
+      container.insertAdjacentHTML("beforeend", card);
+    });
+  }
+
+  // Render voucher cố định
+  function renderFixedVouchers() {
+    const container = document.getElementById("fixed-vouchers");
+    container.innerHTML = "";
+
+    vouchers.filter(v => v.type === "FIXED").forEach(voucher => {
+      const card = `
+        <div class="col-md-6 col-lg-6">
+          <div class="voucher">
+            <div class="voucher-left">
+              <span class="tag">${voucher.badge}</span>
+              <div class="voucher-img" style="background-image: url('${voucher.image}')"></div>
+            </div>
+            <div class="voucher-right">
+              <div class="voucher-title">
+                <span class="badge bg-primary">Giảm giá</span>
+                ${voucher.name} cho đơn hàng trên ${(voucher.minOrder / 1000)}k
+              </div>
+              <div class="progress-bar">
+                <div class="progress" style="width:${voucher.remaining}%"></div>
+              </div>
+              <div class="voucher-info">
+                <span>Còn ${voucher.remaining}%</span> - 
+                <span class="expire">Hết hạn sau ${voucher.expireHours} giờ</span>
+              </div>
+              <div class="voucher-footer">
+                <span class="voucher-price"><i class="bi bi-coin"></i> ${voucher.cost.toLocaleString()}</span>
+                <button class="view-btn" onclick="redeemVoucher(${voucher.id})">Đổi ngay</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
       container.insertAdjacentHTML("beforeend", card);
     });
   }
@@ -232,31 +200,15 @@
   function redeemVoucher(id) {
     const voucher = vouchers.find(v => v.id === id);
     if (!voucher) return;
-
     const confirmRedeem = confirm(`Bạn có muốn đổi "${voucher.name}" với ${voucher.cost.toLocaleString()} xu không?`);
-    if (confirmRedeem) {
-      alert(`Đổi voucher "${voucher.name}" thành công! 🎉`);
-    }
+    if (confirmRedeem) alert(`Đổi voucher "${voucher.name}" thành công! 🎉`);
   }
 
-  // Xử lý filter
-  document.querySelectorAll('.filter-tabs .nav-link').forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
-      
-      // Update active state
-      document.querySelectorAll('.filter-tabs .nav-link').forEach(l => l.classList.remove('active'));
-      this.classList.add('active');
-      
-      // Filter logic can be added here
-      const filter = this.getAttribute('data-filter');
-      // For now, just re-render all
-      renderVouchers();
-    });
+  // Khi trang load
+  document.addEventListener("DOMContentLoaded", () => {
+    renderVouchers();
+    renderFixedVouchers();
   });
-
-  // Gọi khi trang load
-  document.addEventListener("DOMContentLoaded", renderVouchers);
 </script>
 
 </body>
