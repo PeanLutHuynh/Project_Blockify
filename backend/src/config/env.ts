@@ -33,7 +33,13 @@ export const ENV = {
   JWT_SECRET: process.env.JWT_SECRET || 'default-secret',
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'default-refresh-secret',
   JWT_EXPIRES_IN: process.env.JWT_EXPIRE_IN || '24h',
-  JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRE_IN || '7d'
+  JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRE_IN || '7d',
+
+  // Payment Configuration (VietQR)
+  PAYMENT_BANK_ID: process.env.PAYMENT_BANK_ID || 'VCB',
+  PAYMENT_BANK_BIN: process.env.PAYMENT_BANK_BIN || '970436',
+  PAYMENT_ACCOUNT_NO: process.env.PAYMENT_ACCOUNT_NO || '7935205238',
+  PAYMENT_ACCOUNT_NAME: process.env.PAYMENT_ACCOUNT_NAME || 'BLOCKIFY'
 };
 
 export const isDevelopment = ENV.NODE_ENV === 'development';

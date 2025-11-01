@@ -1,6 +1,7 @@
 import { HttpRequest, HttpResponse } from "../../../infrastructure/http/types";
 import { OrderController } from "./OrderController";
 import { CheckoutService } from "../application/CheckoutService";
+import { GeneratePaymentQRUseCase } from "../application/GeneratePaymentQRUseCase";
 import { OrderRepository } from "../infrastructure/OrderRepository";
 import { authenticateToken } from "../../../infrastructure/auth";
 
@@ -12,7 +13,8 @@ export function registerOrderRoutes(router: any): void {
   // Initialize dependencies
   const orderRepository = new OrderRepository();
   const checkoutService = new CheckoutService(orderRepository);
-  const orderController = new OrderController(checkoutService);
+  const generatePaymentQRUseCase = new GeneratePaymentQRUseCase(orderRepository);
+  const orderController = new OrderController(checkoutService, generatePaymentQRUseCase);
 
   // Protected routes - require authentication
   router.post("/api/orders/checkout", authenticateToken, async (req: HttpRequest, res: HttpResponse) => {
@@ -39,5 +41,18 @@ export function registerOrderRoutes(router: any): void {
     const urlParts = req.url?.split("/") || [];
     const orderId = urlParts[urlParts.length - 2] || "";
     await orderController.cancelOrder(req, res, orderId);
+  });
+
+  // Payment QR routes
+  router.get("/api/orders/:orderId/payment-qr", authenticateToken, async (req: HttpRequest, res: HttpResponse) => {
+    const urlParts = req.url?.split("/") || [];
+    const orderId = urlParts[urlParts.length - 2] || "";
+    await orderController.getPaymentQR(req, res, orderId);
+  });
+
+  router.get("/api/orders/number/:orderNumber/payment-qr", authenticateToken, async (req: HttpRequest, res: HttpResponse) => {
+    const urlParts = req.url?.split("/") || [];
+    const orderNumber = urlParts[urlParts.length - 2] || "";
+    await orderController.getPaymentQRByOrderNumber(req, res, orderNumber);
   });
 }
