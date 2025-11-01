@@ -1,6 +1,7 @@
 import { OrderService } from "../../core/services/OrderService.js";
 import { AuthService } from "../../core/services/AuthService.js";
 import { PaymentProofService } from "../../core/services/PaymentProofService.js";
+import { PaymentQR } from "../../core/models/PaymentQR.js";
 
 /**
  * Order Controller - Frontend MVC
@@ -223,6 +224,9 @@ export class OrderController {
     if (this.paymentProofInput) {
       this.paymentProofInput.addEventListener("change", () => this.handleFileSelect());
     }
+
+    // Show QR button - will be set up dynamically when payment method changes
+    this.setupQRButtonListener();
   }
 
   /**
@@ -390,14 +394,14 @@ export class OrderController {
         }
       }
 
+      // Show success message
+      alert(`Đặt hàng thành công! Mã đơn hàng: ${order.orderNumber}`);
+
       // Clear checkout items from sessionStorage
       sessionStorage.removeItem('checkoutItems');
       sessionStorage.removeItem('checkoutSource');
 
-      // Show success message
-      alert(`Đặt hàng thành công! Mã đơn hàng: ${order.orderNumber}`);
-
-      // Redirect to order confirmation or user orders page
+      // Redirect to order confirmation page
       window.location.href = `/src/pages/OrderConfirmation.html?orderNumber=${order.orderNumber}`;
     } catch (error: any) {
       console.error("Checkout failed:", error);
@@ -526,10 +530,111 @@ export class OrderController {
     if (this.uploadBoxElement) {
       if (selectedMethod && selectedMethod !== 'cod') {
         this.uploadBoxElement.classList.remove('d-none');
+        // Re-setup QR button listener when upload box is shown
+        this.setupQRButtonListener();
       } else {
         this.uploadBoxElement.classList.add('d-none');
       }
     }
+  }
+
+  /**
+   * Setup QR button listener
+   */
+  private setupQRButtonListener(): void {
+    const qrButton = document.getElementById('show-qr-btn');
+    
+    if (qrButton) {
+      // Remove existing listeners
+      const newButton = qrButton.cloneNode(true);
+      qrButton.parentNode?.replaceChild(newButton, qrButton);
+      
+      // Add new listener
+      newButton.addEventListener('click', () => {
+        this.handleShowQRClick();
+      });
+    }
+  }
+
+  /**
+   * Handle Show QR button click
+   * Generate temporary order info and show QR for payment
+   */
+  private async handleShowQRClick(): Promise<void> {
+    try {
+      // Get form data to generate QR
+      const checkoutData = this.getCheckoutFormData();
+      
+      if (!checkoutData || !checkoutData.total) {
+        alert('Không thể tạo mã QR. Vui lòng kiểm tra lại giỏ hàng.');
+        return;
+      }
+
+      // Generate temporary order number for QR display
+      const tempOrderNumber = this.generateTempOrderNumber();
+      
+      // Show QR modal with payment info
+      this.showTemporaryPaymentQR(checkoutData.total, tempOrderNumber);
+    } catch (error: any) {
+      console.error('Failed to show QR:', error);
+      alert('Không thể hiển thị mã QR: ' + error.message);
+    }
+  }
+
+  /**
+   * Generate temporary order number for QR display
+   */
+  private generateTempOrderNumber(): string {
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 1000);
+    return `TEMP${timestamp}${random}`;
+  }
+
+  /**
+   * Show temporary payment QR before order creation
+   */
+  private showTemporaryPaymentQR(amount: number, tempOrderNumber: string): void {
+    // Get payment config from env
+    const bankBin = '970436'; // VCB
+    const accountNo = '7935205238';
+    const accountName = 'BLOCKIFY';
+    const template = 'MND4rau';
+    const bankName = 'Vietcombank';
+    
+    const description = `Thanh toan don hang ${tempOrderNumber}`;
+    
+    // Build VietQR URL
+    const params = new URLSearchParams({
+      accountName: accountName,
+      amount: amount.toString(),
+      addInfo: description,
+    });
+    
+    const qrUrl = `https://api.vietqr.io/image/${bankBin}-${accountNo}-${template}.jpg?${params.toString()}`;
+
+    // Create payment QR object
+    const paymentQR = {
+      qrUrl,
+      amount,
+      description,
+      bankName,
+      accountNo,
+      accountName,
+      formatAmount: () => new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      }).format(amount),
+      getInstructions: () => [
+        "Bước 1: Mở ứng dụng ngân hàng của bạn",
+        "Bước 2: Quét mã QR hoặc chuyển khoản thủ công",
+        "Bước 3: Kiểm tra thông tin và xác nhận thanh toán",
+        "Bước 4: Chụp ảnh hoặc chờ xác nhận từ ngân hàng",
+        "Bước 5: Quay lại trang này và tải lên minh chứng thanh toán"
+      ]
+    };
+
+    // Render QR modal
+    this.renderTemporaryPaymentQRModal(paymentQR);
   }
 
   /**
@@ -697,5 +802,310 @@ export class OrderController {
     
     console.log('❌ [OrderController.getUserId] No valid user ID found');
     return null;
+  }
+
+  /**
+   * Show VietQR Payment Modal
+   * Display QR code for bank transfer payment
+   */
+  async showPaymentQR(orderId: number): Promise<void> {
+    try {
+      console.log('📱 Loading VietQR payment code for order:', orderId);
+
+      // Fetch payment QR from backend
+      const paymentQR = await this.orderService.getPaymentQR(orderId);
+
+      // Create and show modal
+      this.renderPaymentQRModal(paymentQR, orderId);
+    } catch (error: any) {
+      console.error('❌ Failed to load payment QR:', error);
+      alert(error.message || 'Không thể tải mã QR thanh toán');
+    }
+  }
+
+  /**
+   * Render Payment QR Modal
+   */
+  private renderPaymentQRModal(paymentQR: PaymentQR, orderId: number): void {
+    // Check if modal already exists
+    let modal = document.getElementById('paymentQRModal');
+    
+    if (!modal) {
+      // Create modal
+      modal = document.createElement('div');
+      modal.id = 'paymentQRModal';
+      modal.className = 'modal fade';
+      modal.setAttribute('tabindex', '-1');
+      modal.innerHTML = `
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">
+                <i class="bi bi-qr-code"></i> Quét mã QR để thanh toán
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!-- QR Code Image -->
+              <div class="text-center mb-4">
+                <img id="qrImage" src="${paymentQR.qrUrl}" alt="QR Code" class="img-fluid rounded shadow" style="max-width: 350px; border: 2px solid #0d6efd;">
+              </div>
+
+              <!-- Payment Information -->
+              <div class="payment-info bg-light p-3 rounded">
+                <h6 class="fw-bold mb-3 text-primary">
+                  <i class="bi bi-info-circle"></i> Thông tin chuyển khoản:
+                </h6>
+                <div class="row mb-2">
+                  <div class="col-5 text-muted">Ngân hàng:</div>
+                  <div class="col-7 fw-bold" id="bankName">${paymentQR.bankName}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-5 text-muted">Số tài khoản:</div>
+                  <div class="col-7 fw-bold text-primary" id="accountNo">${paymentQR.accountNo}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-5 text-muted">Chủ tài khoản:</div>
+                  <div class="col-7 fw-bold" id="accountName">${paymentQR.accountName}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-5 text-muted">Số tiền:</div>
+                  <div class="col-7 fw-bold text-danger fs-5" id="amount">${paymentQR.formatAmount()}</div>
+                </div>
+                <div class="row">
+                  <div class="col-5 text-muted">Nội dung:</div>
+                  <div class="col-7 fw-bold text-success" id="description">${paymentQR.description}</div>
+                </div>
+              </div>
+
+              <!-- Important Notice -->
+              <div class="alert alert-warning mt-3 mb-0">
+                <small>
+                  <i class="bi bi-exclamation-triangle-fill"></i>
+                  <strong>Lưu ý:</strong> Vui lòng nhập chính xác nội dung chuyển khoản "<strong>${paymentQR.description}</strong>" để hệ thống tự động xác nhận thanh toán.
+                </small>
+              </div>
+
+              <!-- Upload Proof Section -->
+              <div id="uploadProofSection" class="mt-4">
+                <hr>
+                <h6 class="fw-bold mb-3">
+                  <i class="bi bi-cloud-upload"></i> Hoặc tải ảnh minh chứng:
+                </h6>
+                <input type="file" class="form-control mb-2" id="proofFileInput" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,application/pdf">
+                <small class="text-muted">
+                  Chấp nhận ảnh (JPEG, JPG, PNG, GIF, WebP) hoặc PDF. Tối đa 5MB.
+                </small>
+                <button class="btn btn-primary w-100 mt-3" id="uploadProofBtn">
+                  <i class="bi bi-upload"></i> Gửi minh chứng
+                </button>
+              </div>
+
+              <!-- Instructions -->
+              <div class="mt-4">
+                <h6 class="fw-bold mb-2">
+                  <i class="bi bi-list-check"></i> Hướng dẫn thanh toán:
+                </h6>
+                <ol class="small text-muted ps-3">
+                  ${paymentQR.getInstructions().map(instruction => `<li>${instruction}</li>`).join('')}
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    // Show modal using Bootstrap
+    const bsModal = new (window as any).bootstrap.Modal(modal);
+    bsModal.show();
+
+    // Setup upload proof handler
+    this.setupUploadProofHandler(orderId);
+  }
+
+  /**
+   * Render Temporary Payment QR Modal (before order creation)
+   */
+  private renderTemporaryPaymentQRModal(paymentQR: any): void {
+    // Check if modal already exists
+    let modal = document.getElementById('tempPaymentQRModal');
+    
+    if (modal) {
+      // Remove existing modal
+      modal.remove();
+    }
+
+    // Create modal
+    modal = document.createElement('div');
+    modal.id = 'tempPaymentQRModal';
+    modal.className = 'modal fade';
+    modal.setAttribute('tabindex', '-1');
+    modal.innerHTML = `
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">
+              <i class="bi bi-qr-code-scan"></i> Thanh toán đơn hàng
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle-fill"></i>
+              <strong>Hướng dẫn:</strong> Vui lòng thanh toán và tải lên minh chứng trước khi hoàn tất đơn hàng.
+            </div>
+
+            <!-- QR Code Image -->
+            <div class="text-center mb-4">
+              <img src="${paymentQR.qrUrl}" alt="QR Code" class="img-fluid rounded shadow" style="max-width: 400px; border: 3px solid #0d6efd;">
+            </div>
+
+            <!-- Payment Information -->
+            <div class="payment-info bg-light p-4 rounded mb-3">
+              <h6 class="fw-bold mb-3 text-primary border-bottom pb-2">
+                <i class="bi bi-bank"></i> Thông tin chuyển khoản
+              </h6>
+              <div class="row mb-2">
+                <div class="col-4 text-muted">Ngân hàng:</div>
+                <div class="col-8 fw-bold">${paymentQR.bankName}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-4 text-muted">Số tài khoản:</div>
+                <div class="col-8">
+                  <span class="fw-bold text-primary fs-5">${paymentQR.accountNo}</span>
+                  <button class="btn btn-sm btn-outline-secondary ms-2" onclick="navigator.clipboard.writeText('${paymentQR.accountNo}')">
+                    <i class="bi bi-clipboard"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-4 text-muted">Chủ tài khoản:</div>
+                <div class="col-8 fw-bold">${paymentQR.accountName}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-4 text-muted">Số tiền:</div>
+                <div class="col-8">
+                  <span class="fw-bold text-danger fs-4">${paymentQR.formatAmount()}</span>
+                  <button class="btn btn-sm btn-outline-secondary ms-2" onclick="navigator.clipboard.writeText('${paymentQR.amount}')">
+                    <i class="bi bi-clipboard"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-4 text-muted">Nội dung:</div>
+                <div class="col-8">
+                  <span class="fw-bold text-success">${paymentQR.description}</span>
+                  <button class="btn btn-sm btn-outline-secondary ms-2" onclick="navigator.clipboard.writeText('${paymentQR.description}')">
+                    <i class="bi bi-clipboard"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Important Notice -->
+            <div class="alert alert-warning">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <strong>Quan trọng:</strong> Sau khi chuyển khoản, vui lòng đóng cửa sổ này và tải lên minh chứng thanh toán ở form bên dưới, sau đó nhấn "Thanh Toán Ngay".
+            </div>
+
+            <!-- Instructions -->
+            <div class="mt-3">
+              <h6 class="fw-bold mb-2">
+                <i class="bi bi-list-check"></i> Các bước thực hiện:
+              </h6>
+              <ol class="ps-3">
+                ${paymentQR.getInstructions().map((instruction: string) => `<li class="mb-2">${instruction}</li>`).join('')}
+              </ol>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="bi bi-x-circle"></i> Đóng
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+              <i class="bi bi-check-circle"></i> Đã chuyển khoản, tải minh chứng
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Show modal using Bootstrap
+    const bsModal = new (window as any).bootstrap.Modal(modal);
+    bsModal.show();
+
+    // Auto focus on file input after modal closes
+    modal.addEventListener('hidden.bs.modal', () => {
+      const fileInput = document.getElementById('payment-proof') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        fileInput.focus();
+      }
+    });
+  }
+
+  /**
+   * Setup upload proof button handler
+   */
+  private setupUploadProofHandler(orderId: number): void {
+    const uploadBtn = document.getElementById('uploadProofBtn');
+    const fileInput = document.getElementById('proofFileInput') as HTMLInputElement;
+
+    if (uploadBtn && fileInput) {
+      uploadBtn.onclick = async () => {
+        const file = fileInput.files?.[0];
+
+        if (!file) {
+          alert('Vui lòng chọn file minh chứng');
+          return;
+        }
+
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          alert('File quá lớn. Vui lòng chọn file dưới 5MB');
+          return;
+        }
+
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+        if (!allowedTypes.includes(file.type)) {
+          alert('Định dạng file không hợp lệ. Vui lòng chọn ảnh hoặc PDF');
+          return;
+        }
+
+        try {
+          uploadBtn.textContent = 'Đang gửi...';
+          (uploadBtn as HTMLButtonElement).disabled = true;
+
+          // Upload using PaymentProofService
+          if (this.userId) {
+            await this.paymentProofService.uploadPaymentProof({
+              orderId,
+              userId: this.userId,
+              file,
+              note: 'Minh chứng thanh toán từ VietQR'
+            });
+            
+            alert('✅ Đã gửi minh chứng thành công! Chúng tôi sẽ xác nhận trong thời gian sớm nhất.');
+            
+            // Close modal
+            const modal = document.getElementById('paymentQRModal');
+            const bsModal = (window as any).bootstrap.Modal.getInstance(modal);
+            if (bsModal) {
+              bsModal.hide();
+            }
+          }
+        } catch (error: any) {
+          console.error('Upload proof error:', error);
+          alert('❌ Không thể gửi minh chứng: ' + error.message);
+        } finally {
+          uploadBtn.textContent = 'Gửi minh chứng';
+          (uploadBtn as HTMLButtonElement).disabled = false;
+        }
+      };
+    }
   }
 }

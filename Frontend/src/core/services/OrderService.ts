@@ -1,5 +1,6 @@
 import { FetchHttpClient } from "../api/FetchHttpClient.js";
 import { Order } from "../models/Order.js";
+import { PaymentQR } from "../models/PaymentQR.js";
 import { ENV } from "../config/env.js";
 
 /**
@@ -116,6 +117,46 @@ export class OrderService {
     // TODO: Implement file upload
     console.log("Upload payment proof:", orderId, file);
     throw new Error("Not implemented yet");
+  }
+
+  /**
+   * Get VietQR payment code for an order
+   */
+  async getPaymentQR(orderId: number): Promise<PaymentQR> {
+    try {
+      const response = await this.httpClient.get(
+        `${this.baseUrl}/${orderId}/payment-qr`
+      );
+
+      if (!response.success) {
+        throw new Error(response.message || "Failed to get payment QR");
+      }
+
+      return PaymentQR.fromJSON(response.data);
+    } catch (error: any) {
+      console.error("Get payment QR error:", error);
+      throw new Error(error.message || "Failed to retrieve payment QR");
+    }
+  }
+
+  /**
+   * Get VietQR payment code by order number
+   */
+  async getPaymentQRByOrderNumber(orderNumber: string): Promise<PaymentQR> {
+    try {
+      const response = await this.httpClient.get(
+        `${this.baseUrl}/number/${orderNumber}/payment-qr`
+      );
+
+      if (!response.success) {
+        throw new Error(response.message || "Failed to get payment QR");
+      }
+
+      return PaymentQR.fromJSON(response.data);
+    } catch (error: any) {
+      console.error("Get payment QR by order number error:", error);
+      throw new Error(error.message || "Failed to retrieve payment QR");
+    }
   }
 
   /**

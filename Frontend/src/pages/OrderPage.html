@@ -198,7 +198,18 @@
                 <label class="form-check-label" for="pm-vnpay">VNPAY</label>
               </div>
               <div id="upload-box" class="mt-2 d-none">
-                <label class="form-label">Tải lên minh chứng thanh toán <span class="text-danger">*</span></label>
+                <div class="alert alert-info mb-3">
+                  <small>
+                    <i class="bi bi-info-circle-fill"></i>
+                    <strong>Lưu ý:</strong> Nhấn nút "Xem mã QR" để thanh toán trước, sau đó tải lên minh chứng và nhấn "Thanh Toán Ngay" để hoàn tất đơn hàng.
+                  </small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <label class="form-label mb-0">Tải lên minh chứng thanh toán <span class="text-danger">*</span></label>
+                  <button type="button" class="btn btn-sm btn-primary" id="show-qr-btn" title="Xem mã QR để thanh toán">
+                    <i class="bi bi-qr-code-scan"></i> Xem mã QR
+                  </button>
+                </div>
                 <input type="file" class="form-control" id="payment-proof" accept="image/*,application/pdf" title="Chọn ảnh hoặc PDF minh chứng thanh toán">
                 <small class="text-muted">Chỉ chấp nhận ảnh (JPEG, JPG, PNG, GIF, WebP) hoặc PDF. Tối đa 5MB. Mỗi đơn hàng chỉ upload 1 file.</small>
                 <div id="upload-preview" class="mt-2"></div>
