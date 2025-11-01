@@ -18,6 +18,8 @@ export class AdminOrderController {
     search?: string;
   }): Promise<void> {
     try {
+      console.log('🔵 AdminOrderController.loadOrders() called with filters:', filters);
+      
       // Store filters for later use
       if (filters) {
         this.currentFilters = filters;
@@ -27,6 +29,7 @@ export class AdminOrderController {
       const activeFilters = filters || this.currentFilters;
       
       let url = "/api/admin/orders?limit=100";
+      console.log('🔵 Base URL:', url);
       
       if (activeFilters?.status) {
         url += `&status=${encodeURIComponent(activeFilters.status)}`;
@@ -40,7 +43,10 @@ export class AdminOrderController {
         url += `&search=${encodeURIComponent(activeFilters.search)}`;
       }
 
+      console.log('🔵 Final URL:', url);
+      console.log('🔵 Calling httpClient.get()...');
       const response = await httpClient.get<any>(url);
+      console.log('🔵 Response received:', response);
 
       if (response.success && response.data) {
         this.currentOrders = this.sortOrdersByUrgency(response.data);

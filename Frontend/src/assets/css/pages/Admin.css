@@ -238,6 +238,9 @@ body {
 .btn1 {
   background-color: #0094ff;
   border: 1px solid #0094ff;
+
+/* .btn {
+>>>>>>> Back-end
   padding: 10px 16px;
   border-radius: 8px;
   color: #fff;
@@ -254,6 +257,8 @@ body {
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
+=======
+>>>>>>> Back-end
 } */
 .btn-outline {
   background: #fff;
@@ -877,7 +882,8 @@ tr:last-child td { border-bottom: none; }
 }
 
 
-@media (max-width: 768px) {
+@media (max-width: 768px) 
+{
   .sidebar { width: 250px; }
   .main { margin-left: 250px; }
   .metrics-grid { grid-template-columns: 1fr; }
@@ -889,4 +895,5 @@ tr:last-child td { border-bottom: none; }
   .product-navbar .navbar-actions {
     justify-content: center;
   }
+}
 }
