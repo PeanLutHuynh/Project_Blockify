@@ -221,20 +221,6 @@ body {
   object-fit: contain;
 }
 
-.social-icons {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-}
-.social-icons .btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .product-info-section h1 {
   font-size: 1.5rem;
   font-weight: bold;
@@ -525,22 +511,9 @@ body {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 5; /* 💥 thêm dòng này để icon nổi lên trên ảnh */
+  z-index: 5; 
 }
 
-.heart-icon:hover {
-  background: #ff4757;
-  border-color: #ff4757;
-}
-
-.heart-icon:hover i {
-  color: white;
-}
-
-.heart-icon i {
-  font-size: 12px;
-  color: #999;
-}
 
 .product-image {
   width: 100%;
@@ -659,9 +632,11 @@ body {
   cursor: pointer;
   transition: color 0.3s;
 }
-.icon-heart:hover {
-  color: #dc3545;
+
+.icon-heart.liked {
+  color: red;
 }
+
 .product-image {
   height: 150px;
   display: flex;
@@ -719,14 +694,6 @@ body {
   padding: 8px 16px;
   font-weight: 500;
   margin-top: auto;
-}
-
-footer {
-  background-color: #333;
-  color: white;
-  text-align: center;
-  padding: 20px 0;
-  margin-top: 50px;
 }
 
 .view-more-btn {
