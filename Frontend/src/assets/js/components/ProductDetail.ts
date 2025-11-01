@@ -143,6 +143,11 @@ async function addToCart(productName: string, btn: HTMLElement): Promise<void> {
     const product = result.product;
     console.log('📦 [ProductDetail] Product data:', product);
     
+    // Get quantity from input field
+    const quantityInput = document.querySelector('.quantity-input') as HTMLInputElement;
+    const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+    console.log('🔢 [ProductDetail] Quantity from input:', quantity);
+    
     // Add to cart using CartService
     const cartResult = await cartService.addToCart({
       productId: parseInt(product.product_id),
@@ -151,7 +156,7 @@ async function addToCart(productName: string, btn: HTMLElement): Promise<void> {
       imageUrl: product.product_images?.[0]?.image_url || product.imageUrl || '',
       price: parseFloat(product.price),
       salePrice: product.sale_price ? parseFloat(product.sale_price) : null,
-      quantity: 1,
+      quantity: quantity,
       stockQuantity: parseInt(product.stock_quantity) || 0,
       minStockLevel: parseInt(product.min_stock_level) || 0
     });

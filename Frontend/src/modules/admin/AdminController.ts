@@ -115,7 +115,7 @@ export class AdminController {
   /**
    * Update UI with admin information
    */
-  private updateAdminUI(): void {
+  private async updateAdminUI(): Promise<void> {
     if (!this.currentAdmin) return;
 
     // Update admin name in header
@@ -128,6 +128,23 @@ export class AdminController {
     const nameElement = document.querySelector(".user .name");
     if (nameElement) {
       nameElement.textContent = this.currentAdmin.fullName || this.currentAdmin.email;
+    }
+
+    // Update admin avatar in sidebar
+    const avatarElement = document.querySelector(".user img") as HTMLImageElement;
+    if (avatarElement) {
+      // Get avatar from Supabase user (Google OAuth avatar)
+      const { data: { user } } = await supabaseService.getUser();
+      
+      if (user?.user_metadata?.avatar_url) {
+        avatarElement.src = user.user_metadata.avatar_url;
+        avatarElement.alt = this.currentAdmin.fullName || 'Admin avatar';
+      } else if (this.currentAdmin.avatarUrl) {
+        // Fallback to avatar from admin table
+        avatarElement.src = this.currentAdmin.avatarUrl;
+        avatarElement.alt = this.currentAdmin.fullName || 'Admin avatar';
+      }
+      // If no avatar, keep default image
     }
   }
 

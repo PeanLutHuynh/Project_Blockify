@@ -6,6 +6,7 @@
 import { cartService } from '../../core/services/CartService.js';
 import { CartItem } from '../../core/models/Cart.js';
 import { updateCartBadge } from '../../core/config/init.js';
+import { toastStore } from '../../core/services/index.js';
 
 export class CartController {
   private cartTableBody: HTMLElement | null = null;
@@ -300,14 +301,19 @@ export class CartController {
   /**
    * Handle clear cart
    */
-  private handleClearCart(): void {
+  private async handleClearCart(): Promise<void> {
     if (!confirm('Bạn có chắc muốn xóa tất cả sản phẩm trong giỏ hàng?')) {
       return;
     }
 
-    cartService.clearCart();
+    const result = await cartService.clearCart();
     this.renderCart();
-    this.showToast('success', 'Đã xóa tất cả sản phẩm khỏi giỏ hàng');
+    
+    if (result.success) {
+      this.showToast('success', result.message);
+    } else {
+      this.showToast('error', result.message);
+    }
   }
 
   /**
@@ -421,12 +427,14 @@ export class CartController {
    * Show toast notification
    */
   private showToast(type: 'success' | 'error' | 'warning', message: string): void {
-    // Use Bootstrap toast or custom toast implementation
-    // For now, just use alert
-    console.log(`[${type.toUpperCase()}] ${message}`);
-    
-    // You can integrate with your existing toast system here
-    // Example: toastStore.show(message, type);
+    // Use toastStore for consistent notifications
+    if (type === 'success') {
+      toastStore.success('Thành công', message);
+    } else if (type === 'error') {
+      toastStore.error('Lỗi', message);
+    } else {
+      toastStore.warning('Cảnh báo', message);
+    }
   }
 
   /**
@@ -436,11 +444,3 @@ export class CartController {
     this.renderCart();
   }
 }
-
-// Auto-initialize if on cart page
-document.addEventListener('DOMContentLoaded', () => {
-  const cartContainer = document.getElementById('cart-container');
-  if (cartContainer) {
-    new CartController();
-  }
-});

@@ -228,9 +228,35 @@ export class CartService {
   /**
    * Clear cart
    */
-  clearCart(): void {
-    this.cart.clear();
-    this.cart.saveToLocalStorage(this.STORAGE_KEY);
+  async clearCart(): Promise<{ success: boolean; message: string }> {
+    try {
+      // Clear local cart first
+      this.cart.clear();
+      this.cart.saveToLocalStorage(this.STORAGE_KEY);
+
+      // Try to sync with backend if user is logged in
+      const token = localStorage.getItem(this.AUTH_TOKEN_KEY);
+      if (token) {
+        try {
+          const response = await httpClient.post<any>('/api/v1/cart/clear', {});
+          if (response.success) {
+            console.log('✅ Cart cleared on backend');
+          }
+        } catch (error) {
+          console.warn('⚠️ Failed to clear cart on backend, but local cart cleared:', error);
+        }
+      }
+
+      return {
+        success: true,
+        message: 'Đã xóa tất cả sản phẩm khỏi giỏ hàng'
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || 'Không thể xóa giỏ hàng'
+      };
+    }
   }
 
   /**
