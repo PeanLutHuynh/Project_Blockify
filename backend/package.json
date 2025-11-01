@@ -8,7 +8,7 @@
   },
   "scripts": {
     "update-types": "npx supabase gen types typescript --project-id oxpvtqghrksdhhouhbij > src/types/supabase.ts",
-    "dev": "nodemon",                      
+    "dev": "nodemon",
     "dev:with-types": "npm run update-types && nodemon",
     "build": "tsc",
     "start": "node dist/server.js",
@@ -29,6 +29,7 @@
     "@types/node": "^24.5.2",
     "jest": "^30.2.0",
     "nodemon": "^3.1.10",
+    "supabase": "^2.54.11",
     "ts-jest": "^29.4.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"

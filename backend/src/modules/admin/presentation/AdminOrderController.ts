@@ -50,6 +50,7 @@ export class AdminOrderController {
       const filters = {
         status: params.get("status") || undefined,
         paymentStatus: params.get("paymentStatus") || undefined,
+        search: params.get("search") || undefined,
         limit: params.get("limit") ? parseInt(params.get("limit")!) : 50,
         offset: params.get("offset") ? parseInt(params.get("offset")!) : 0,
       };

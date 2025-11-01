@@ -20,6 +20,7 @@ export class AdminOrderService {
   async getAllOrders(filters?: {
     status?: string;
     paymentStatus?: string;
+    search?: string;
     limit?: number;
     offset?: number;
   }): Promise<any> {
@@ -42,6 +43,11 @@ export class AdminOrderService {
 
       if (filters?.paymentStatus) {
         query = query.eq("payment_status", filters.paymentStatus);
+      }
+
+      // Search by order number (partial match)
+      if (filters?.search) {
+        query = query.ilike("order_number", `%${filters.search}%`);
       }
 
       if (filters?.limit) {
@@ -110,7 +116,7 @@ export class AdminOrderService {
       // Get current order
       const { data: currentOrder, error: fetchError } = await supabaseAdmin
         .from("orders")
-        .select("status")
+        .select("status, payment_method, payment_status")
         .eq("order_id", orderId)
         .single();
 
@@ -120,12 +126,26 @@ export class AdminOrderService {
 
       const oldStatus = currentOrder.status;
 
-      // Update order status
+      // If confirming order (from "Đang xử lý" to "Đang giao"), reduce stock
+      if (oldStatus === "Đang xử lý" && newStatus === "Đang giao") {
+        await this.reduceStockForOrder(orderId);
+      }
+
+      // Prepare update data
+      const updateData: any = {
+        status: newStatus,
+      };
+
+      // If COD order delivered, auto-update payment status to paid
+      if (newStatus === "Đã giao" && currentOrder.payment_method === "cod" && currentOrder.payment_status === "pending") {
+        updateData.payment_status = "paid";
+        logger.info(`Auto-updating COD order ${orderId} payment status to paid`);
+      }
+
+      // Update order status (and payment status if COD delivered)
       const { error: updateError } = await supabaseAdmin
         .from("orders")
-        .update({
-          status: newStatus,
-        })
+        .update(updateData)
         .eq("order_id", orderId);
 
       if (updateError) {
@@ -153,6 +173,7 @@ export class AdminOrderService {
         oldStatus,
         newStatus,
         note,
+        autoPaymentUpdate: updateData.payment_status ? true : false,
       });
 
       logger.info(`Order ${orderId} status updated from ${oldStatus} to ${newStatus} by admin ${adminId}`);
@@ -342,6 +363,66 @@ export class AdminOrderService {
   /**
    * Log admin action
    */
+  /**
+   * Reduce stock quantity for order items when order is confirmed
+   */
+  private async reduceStockForOrder(orderId: number): Promise<void> {
+    try {
+      // Get order items
+      const { data: orderItems, error: itemsError } = await supabaseAdmin
+        .from("order_items")
+        .select("product_id, quantity")
+        .eq("order_id", orderId);
+
+      if (itemsError) {
+        throw new Error(`Failed to fetch order items: ${itemsError.message}`);
+      }
+
+      if (!orderItems || orderItems.length === 0) {
+        logger.warn(`No order items found for order ${orderId}`);
+        return;
+      }
+
+      // Update stock for each product
+      for (const item of orderItems) {
+        // Get current stock
+        const { data: product, error: fetchError } = await supabaseAdmin
+          .from("products")
+          .select("stock_quantity")
+          .eq("product_id", item.product_id)
+          .single();
+
+        if (fetchError || !product) {
+          logger.error(`Failed to fetch product ${item.product_id}:`, fetchError);
+          throw new Error(`Failed to fetch product ${item.product_id}`);
+        }
+
+        // Calculate new stock
+        const newStock = (product.stock_quantity || 0) - item.quantity;
+
+        // Update stock
+        const { error: updateError } = await supabaseAdmin
+          .from("products")
+          .update({
+            stock_quantity: newStock
+          })
+          .eq("product_id", item.product_id);
+
+        if (updateError) {
+          logger.error(`Failed to update stock for product ${item.product_id}:`, updateError);
+          throw new Error(`Failed to update stock for product ${item.product_id}`);
+        }
+
+        logger.info(`Reduced stock for product ${item.product_id} by ${item.quantity} units (${product.stock_quantity} -> ${newStock})`);
+      }
+
+      logger.info(`Successfully reduced stock for order ${orderId}`);
+    } catch (error: any) {
+      logger.error("Error reducing stock for order:", error);
+      throw error;
+    }
+  }
+
   private async logAdminAction(
     adminId: number,
     action: AdminAction,
