@@ -22,6 +22,7 @@ import cartRoutes from './src/modules/cart/presentation/cartRoutes';
 import { registerOrderRoutes } from './src/modules/order/presentation/orderRoutes';
 import { registerPaymentProofRoutes } from './src/modules/order/presentation/paymentProofRoutes';
 import { registerAdminOrderRoutes } from './src/modules/admin/presentation/adminOrderRoutes';
+import { registerAdminProductRoutes } from './src/modules/admin/presentation/adminProductRoutes';
 import { wishlistRouter } from './src/modules/wishlist/presentation/wishlist.routes';
 
 /**
@@ -226,6 +227,9 @@ async function bootstrap() {
 
     // Register admin order routes
     registerAdminOrderRoutes(server.getRouter());
+
+    // Register admin product routes
+    registerAdminProductRoutes(server.getRouter());
 
     // Debug: Log all registered routes
     console.log('📋 Registered routes:');
