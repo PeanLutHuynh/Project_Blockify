@@ -234,6 +234,7 @@ export type Database = {
           discount_type: string
           discount_value: number
           end_date: string
+          image_url: string | null
           is_active: boolean | null
           maximum_discount_amount: number | null
           minimum_order_amount: number | null
@@ -251,6 +252,7 @@ export type Database = {
           discount_type: string
           discount_value: number
           end_date: string
+          image_url?: string | null
           is_active?: boolean | null
           maximum_discount_amount?: number | null
           minimum_order_amount?: number | null
@@ -268,6 +270,7 @@ export type Database = {
           discount_type?: string
           discount_value?: number
           end_date?: string
+          image_url?: string | null
           is_active?: boolean | null
           maximum_discount_amount?: number | null
           minimum_order_amount?: number | null
@@ -964,7 +967,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_abandoned_orders: {
+        Args: never
+        Returns: {
+          order_numbers: string[]
+          updated_count: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
