@@ -14,6 +14,7 @@ import {
   CartResponse,
 } from "./dto/CartDTO";
 import { supabaseAdmin } from "../../../config/database";
+import { logger } from "../../../config/logger";
 
 export class CartService {
   constructor(private readonly cartRepository: ICartRepository) {}
@@ -231,9 +232,22 @@ export class CartService {
         return CartResponse.failure("Validation failed", validationErrors);
       }
 
+      logger.info(`🛒 [getUserCart] Fetching cart for userId:`, { userId: query.userId });
+
       const cartItems = await this.cartRepository.findByUserIdWithProducts(
         query.userId
       );
+
+      logger.info(`📦 [getUserCart] Raw cart items from DB:`, { 
+        userId: query.userId,
+        cart_items_count: cartItems.length,
+        cart_items_details: cartItems.map(item => ({
+          cart_id: item.cart_id,
+          product_id: item.product_id,
+          quantity: item.quantity,
+          added_at: item.added_at
+        }))
+      });
 
       // Format response
       const formattedItems = cartItems.map((item) => {

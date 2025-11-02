@@ -166,11 +166,12 @@ export class Order extends BaseEntity {
 
   public updateStatus(newStatus: OrderStatus): void {
     const validTransitions: Record<OrderStatus, OrderStatus[]> = {
-      "Đang xử lý": ["Đang giao", "Đã hủy"],
+      "Đang xử lý": ["Đang giao", "Đã hủy", "Thất bại"],
       "Đang giao": ["Đã giao", "Đã hủy"],
       "Đã giao": ["Đã trả"],
-      "Đã hủy": [],
+      "Đã hủy": [], // Khách chủ động hủy - không thể chuyển
       "Đã trả": [],
+      "Thất bại": [], // Hệ thống tự động hủy - không thể chuyển
     };
 
     if (!validTransitions[this._status].includes(newStatus)) {
@@ -268,6 +269,6 @@ export class Order extends BaseEntity {
 }
 
 // Types
-export type OrderStatus = "Đang xử lý" | "Đang giao" | "Đã giao" | "Đã hủy" | "Đã trả";
+export type OrderStatus = "Đang xử lý" | "Đang giao" | "Đã giao" | "Đã hủy" | "Đã trả" | "Thất bại";
 export type PaymentMethod = "cod" | "bank_transfer" | "momo" | "zalopay" | "vnpay";
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";

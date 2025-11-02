@@ -21,6 +21,7 @@ import { categoryRoutes } from './src/modules/products/presentation/categoryRout
 import cartRoutes from './src/modules/cart/presentation/cartRoutes';
 import { registerOrderRoutes } from './src/modules/order/presentation/orderRoutes';
 import { registerPaymentProofRoutes } from './src/modules/order/presentation/paymentProofRoutes';
+import { setupPaymentWebhookRoutes } from './src/modules/order/presentation/paymentWebhookRoutes';
 import { registerAdminOrderRoutes } from './src/modules/admin/presentation/adminOrderRoutes';
 import { registerAdminProductRoutes } from './src/modules/admin/presentation/adminProductRoutes';
 import { wishlistRouter } from './src/modules/wishlist/presentation/wishlist.routes';
@@ -224,6 +225,9 @@ async function bootstrap() {
 
     // Register payment proof routes
     registerPaymentProofRoutes(server.getRouter());
+
+    // Register payment webhook routes (NO AUTH for webhook endpoint)
+    setupPaymentWebhookRoutes(server.getRouter());
 
     // Register admin order routes
     registerAdminOrderRoutes(server.getRouter());

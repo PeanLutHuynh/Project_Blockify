@@ -19,6 +19,14 @@ export class CheckoutService {
    */
   async checkout(dto: CreateOrderDTO): Promise<OrderResponseDTO> {
     try {
+      // 🔍 DEBUG: Log incoming DTO
+      logger.info(`📥 [CheckoutService] Received checkout request:`, {
+        user_id: dto.user_id,
+        payment_method: dto.payment_method,
+        items_count: dto.items?.length || 0,
+        items: dto.items?.map(item => ({ product_id: item.product_id, quantity: item.quantity }))
+      });
+
       // 1. Get user address
       const address = await this.getUserAddress(dto.address_id, dto.user_id);
       if (!address) {
@@ -31,81 +39,51 @@ export class CheckoutService {
         throw new Error("User not found");
       }
 
-      // 3. Check if items are provided in DTO (from frontend)
+      // 3. Validate items from frontend
+      if (!dto.items || dto.items.length === 0) {
+        throw new Error("Không có sản phẩm nào được chọn để đặt hàng");
+      }
+
       let orderItems: OrderItem[] = [];
       let subtotal = 0; // Tổng sale_price
       let originalTotal = 0; // Tổng price gốc
 
-      if (dto.items && dto.items.length > 0) {
-        // Use items from DTO (selected items from cart page)
-        for (const item of dto.items) {
-          const product = await this.getProduct(item.product_id);
-          if (!product) {
-            throw new Error(`Product ${item.product_id} not found`);
-          }
-
-          // Check stock availability
-          if (product.stock_quantity < item.quantity) {
-            throw new Error(`Product "${product.product_name}" không đủ hàng. Còn lại: ${product.stock_quantity}`);
-          }
-
-          // Calculate prices
-          const salePrice = product.sale_price ? parseFloat(product.sale_price) : parseFloat(product.price);
-          const originalPrice = parseFloat(product.price);
-
-          // Generate SKU if not exists (products table doesn't have sku field)
-          const productSku = product.sku || `SKU-${product.product_id}`;
-
-          const orderItem = new OrderItem({
-            productId: product.product_id,
-            productName: product.product_name,
-            productSku: productSku,
-            quantity: item.quantity,
-            unitPrice: salePrice, // unit_price = sale_price
-          });
-
-          orderItems.push(orderItem);
-          subtotal += salePrice * item.quantity; // Tổng sale_price
-          originalTotal += originalPrice * item.quantity; // Tổng price gốc
-        }
-      } else {
-        // Fallback: Get all cart items
-        const cartItems = await this.getCartItems(dto.user_id);
-        if (cartItems.length === 0) {
-          throw new Error("Cart is empty");
+      // Process ONLY items from frontend DTO (selected items)
+      for (const item of dto.items) {
+        const product = await this.getProduct(item.product_id);
+        if (!product) {
+          throw new Error(`Product ${item.product_id} not found`);
         }
 
-        for (const cartItem of cartItems) {
-          const product = await this.getProduct(cartItem.product_id);
-          if (!product) {
-            throw new Error(`Product ${cartItem.product_id} not found`);
-          }
-
-          // Check stock
-          if (product.stock_quantity < cartItem.quantity) {
-            throw new Error(`Product "${product.product_name}" không đủ hàng`);
-          }
-
-          // Use sale price if available, otherwise regular price
-          const salePrice = product.sale_price ? parseFloat(product.sale_price) : parseFloat(product.price);
-          const originalPrice = parseFloat(product.price);
-
-          // Generate SKU if not exists (products table doesn't have sku field)
-          const productSku = product.sku || `SKU-${product.product_id}`;
-
-          const orderItem = new OrderItem({
-            productId: product.product_id,
-            productName: product.product_name,
-            productSku: productSku,
-            quantity: cartItem.quantity,
-            unitPrice: salePrice, // unit_price = sale_price
-          });
-
-          orderItems.push(orderItem);
-          subtotal += salePrice * cartItem.quantity;
-          originalTotal += originalPrice * cartItem.quantity;
+        // Check stock availability
+        if (product.stock_quantity < item.quantity) {
+          throw new Error(`Product "${product.product_name}" không đủ hàng. Còn lại: ${product.stock_quantity}`);
         }
+
+        // Calculate prices
+        const salePrice = product.sale_price ? parseFloat(product.sale_price) : parseFloat(product.price);
+        const originalPrice = parseFloat(product.price);
+
+        // Generate SKU if not exists (products table doesn't have sku field)
+        const productSku = product.sku || `SKU-${product.product_id}`;
+
+        const orderItem = new OrderItem({
+          productId: product.product_id,
+          productName: product.product_name,
+          productSku: productSku,
+          quantity: item.quantity,
+          unitPrice: salePrice, // unit_price = sale_price
+        });
+
+        orderItems.push(orderItem);
+        subtotal += salePrice * item.quantity; // Tổng sale_price
+        originalTotal += originalPrice * item.quantity; // Tổng price gốc
       }
+
+      logger.info(`📦 Processing ${orderItems.length} selected items for checkout`, {
+        user_id: dto.user_id,
+        product_ids: orderItems.map(item => item.productId)
+      });
 
       // 4. Calculate totals
       // subtotal = tổng sale_price
@@ -148,13 +126,82 @@ export class CheckoutService {
         orderItems
       );
 
+      // 🔍 CRITICAL DEBUG: Log order creation result
+      logger.info(`✅ [CheckoutService] Order created successfully:`, {
+        order_number: createdOrder.orderNumber,
+        order_id: createdOrder.orderId,
+        user_id: dto.user_id,
+        payment_method: dto.payment_method,
+        total_items_in_order: orderItems.length,
+        order_items_details: orderItems.map(item => ({
+          productId: item.productId,
+          productName: item.productName,
+          quantity: item.quantity
+        }))
+      });
+
       // 9. Clear cart items after successful checkout
-      if (dto.items && dto.items.length > 0) {
-        // Clear specific items that were checked out
-        await this.clearCartItems(dto.user_id, dto.items.map(item => item.product_id));
+      logger.info(`🔍 [CheckoutService] Checking cart clearing logic:`, {
+        payment_method: dto.payment_method,
+        order_number: createdOrder.orderNumber,
+        should_clear_now: dto.payment_method === 'cod',
+        items_in_order: orderItems.length
+      });
+
+      if (dto.payment_method === 'cod') {
+        const productIdsToRemove = orderItems.map(item => item.productId);
+        
+        // 🔍 CRITICAL: Log what we're about to remove
+        logger.info(`🗑️ [COD] PREPARING TO DELETE cart items:`, {
+          user_id: dto.user_id,
+          order_number: createdOrder.orderNumber,
+          order_items_count: orderItems.length,
+          product_ids_from_order_items: productIdsToRemove,
+          product_ids_count: productIdsToRemove.length,
+          product_ids_types: productIdsToRemove.map(id => typeof id)
+        });
+        
+        // 🔍 DEBUG: Get current cart items BEFORE deletion
+        const currentCartItems = await this.getCartItems(dto.user_id);
+        logger.info(`📊 [COD] Cart state BEFORE deletion:`, {
+          user_id: dto.user_id,
+          total_cart_items: currentCartItems.length,
+          cart_items_details: currentCartItems.map((item: any) => ({
+            cart_id: item.cart_id,
+            product_id: item.product_id,
+            quantity: item.quantity,
+            product_id_type: typeof item.product_id
+          })),
+          items_to_remove: productIdsToRemove,
+          items_to_remove_count: productIdsToRemove.length
+        });
+        
+        if (productIdsToRemove.length > 0) {
+          await this.clearCartItems(dto.user_id, productIdsToRemove);
+          
+          // 🔍 DEBUG: Verify cart items AFTER deletion
+          const remainingCartItems = await this.getCartItems(dto.user_id);
+          logger.info(`📊 [COD] Cart state AFTER deletion:`, {
+            user_id: dto.user_id,
+            remaining_items: remainingCartItems.length,
+            remaining_product_ids: remainingCartItems.map((item: any) => item.product_id),
+            expected_remaining: currentCartItems.length - productIdsToRemove.length,
+            actual_remaining: remainingCartItems.length,
+            match: remainingCartItems.length === (currentCartItems.length - productIdsToRemove.length)
+          });
+          
+          logger.info(`✅ [COD] Cleared ${productIdsToRemove.length} items from cart`, {
+            order_number: createdOrder.orderNumber,
+            removed_product_ids: productIdsToRemove
+          });
+        }
       } else {
-        // Clear all cart items
-        await this.clearAllCartItems(dto.user_id);
+        // ⏳ Non-COD: KHÔNG xóa cart items ở đây
+        // Sẽ xóa sau khi thanh toán thành công (payment_status = 'paid')
+        logger.info(`⏳ [${dto.payment_method.toUpperCase()}] Cart items NOT cleared yet`, {
+          order_number: createdOrder.orderNumber,
+          reason: 'Waiting for payment confirmation (payment_status = paid)'
+        });
       }
 
       // 10. Return response
@@ -318,22 +365,75 @@ export class CheckoutService {
 
   /**
    * Update payment status
+   * ✅ Xóa cart items khi payment_status = 'paid' cho non-COD orders
    */
   async updatePaymentStatus(
     orderId: number,
     paymentStatus: string
   ): Promise<void> {
+    // Get order details first to check payment method and get items
+    const order = await this.orderRepository.findById(orderId);
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    // Update payment status
     await this.orderRepository.updatePaymentStatus(orderId, paymentStatus);
 
-    // If paid, update order status to "Đang giao"
+    // If paid, clear cart items but KEEP status as "Đang xử lý" (wait for admin confirmation)
     if (paymentStatus === "paid") {
-      await this.orderRepository.updateStatus(orderId, "Đang giao");
-      await this.orderRepository.createStatusHistory({
-        orderId,
-        oldStatus: "Đang xử lý",
-        newStatus: "Đang giao",
-        note: "Thanh toán thành công, đơn hàng đang được giao",
+      // Admin must manually confirm order after payment is verified
+      logger.info(`✅ [updatePaymentStatus] Payment confirmed, order remains "Đang xử lý" for admin approval:`, {
+        order_id: orderId,
+        order_number: order.orderNumber,
+        payment_method: order.paymentMethod,
+        payment_status: paymentStatus,
+        current_status: order.status
       });
+
+      // ✅ Clear cart items for non-COD orders after payment confirmed
+      if (order.paymentMethod !== 'cod') {
+        logger.info(`🔍 [updatePaymentStatus] Payment confirmed for non-COD order:`, {
+          order_id: orderId,
+          order_number: order.orderNumber,
+          payment_method: order.paymentMethod,
+          user_id: order.userId
+        });
+
+        // Get order items to know which products to remove from cart
+        const orderItems = await this.orderRepository.getOrderItems(orderId);
+        const productIds = orderItems.map(item => item.productId);
+
+        if (productIds.length > 0) {
+          // 🔍 DEBUG: Get current cart items BEFORE deletion
+          const currentCartItems = await this.getCartItems(order.userId);
+          logger.info(`📊 [${order.paymentMethod.toUpperCase()}] Cart state BEFORE deletion:`, {
+            user_id: order.userId,
+            total_cart_items: currentCartItems.length,
+            cart_product_ids: currentCartItems.map((item: any) => item.product_id),
+            items_to_remove: productIds,
+            items_to_remove_count: productIds.length
+          });
+
+          await this.clearCartItems(order.userId, productIds);
+
+          // 🔍 DEBUG: Verify cart items AFTER deletion
+          const remainingCartItems = await this.getCartItems(order.userId);
+          logger.info(`📊 [${order.paymentMethod.toUpperCase()}] Cart state AFTER deletion:`, {
+            user_id: order.userId,
+            remaining_items: remainingCartItems.length,
+            remaining_product_ids: remainingCartItems.map((item: any) => item.product_id),
+            expected_remaining: currentCartItems.length - productIds.length,
+            actual_remaining: remainingCartItems.length,
+            match: remainingCartItems.length === (currentCartItems.length - productIds.length)
+          });
+
+          logger.info(`✅ [${order.paymentMethod.toUpperCase()}] Cleared ${productIds.length} items from cart after payment`, {
+            order_number: order.orderNumber,
+            removed_product_ids: productIds
+          });
+        }
+      }
     }
   }
 
@@ -383,20 +483,50 @@ export class CheckoutService {
    */
   private async clearCartItems(userId: number, productIds: number[]): Promise<void> {
     try {
-      const { error } = await supabaseAdmin
+      logger.info(`🗑️ [clearCartItems] Attempting to delete cart items:`, {
+        user_id: userId,
+        user_id_type: typeof userId,
+        product_ids: productIds,
+        product_ids_types: productIds.map(id => typeof id),
+        count: productIds.length
+      });
+
+      // 🔍 CRITICAL: Log exact DELETE query
+      logger.info(`📝 [clearCartItems] DELETE QUERY:`, {
+        table: 'cart_items',
+        conditions: {
+          user_id: `= ${userId}`,
+          product_id: `IN [${productIds.join(', ')}]`
+        },
+        sql_equivalent: `DELETE FROM cart_items WHERE user_id = ${userId} AND product_id IN (${productIds.join(', ')})`
+      });
+
+      const { data, error, count } = await supabaseAdmin
         .from("cart_items")
-        .delete()
+        .delete({ count: 'exact' })
         .eq("user_id", userId)
-        .in("product_id", productIds);
+        .in("product_id", productIds)
+        .select();
 
       if (error) {
-        logger.error("Error clearing cart items:", error);
+        logger.error("❌ [clearCartItems] Error clearing cart items:", {
+          error: error,
+          error_message: error.message,
+          error_details: error.details,
+          error_hint: error.hint
+        });
         // Don't throw error - cart clearing failure shouldn't fail checkout
       } else {
-        logger.info(`Cleared ${productIds.length} items from cart for user ${userId}`);
+        logger.info(`✅ [clearCartItems] Successfully deleted cart items:`, {
+          user_id: userId,
+          deleted_count: count,
+          deleted_rows: data,
+          expected_count: productIds.length,
+          match: count === productIds.length
+        });
       }
     } catch (error: any) {
-      logger.error("Exception clearing cart items:", error);
+      logger.error("❌ [clearCartItems] Exception clearing cart items:", error);
       // Don't throw - this is not critical
     }
   }
