@@ -2,6 +2,7 @@ import { OrderService } from "../../core/services/OrderService.js";
 import { AuthService } from "../../core/services/AuthService.js";
 import { PaymentProofService } from "../../core/services/PaymentProofService.js";
 import { PaymentQR } from "../../core/models/PaymentQR.js";
+import { cartService } from "../../core/services/CartService.js";
 
 /**
  * Order Controller - Frontend MVC
@@ -13,7 +14,8 @@ export class OrderController {
   private paymentProofService: PaymentProofService;
   private userId: number | null = null;
   private selectedAddressId: number = 1;
-  private selectedFile: File | null = null;
+  // ⚠️ COMMENTED OUT: Old flow - manual payment proof file
+  // private selectedFile: File | null = null;
 
   // DOM Elements
   private orderItemsContainer: HTMLElement | null = null;
@@ -24,8 +26,9 @@ export class OrderController {
   private grandTotalElement: HTMLElement | null = null;
   private checkoutButton: HTMLElement | null = null;
   private uploadBoxElement: HTMLElement | null = null;
-  private paymentProofInput: HTMLInputElement | null = null;
-  private uploadPreviewElement: HTMLElement | null = null;
+  // ⚠️ COMMENTED OUT: Old flow properties - manual payment proof upload
+  // private paymentProofInput: HTMLInputElement | null = null;
+  // private uploadPreviewElement: HTMLElement | null = null;
   private paymentMethodRadios: NodeListOf<HTMLInputElement> | null = null;
   private shippingMethodRadios: NodeListOf<HTMLInputElement> | null = null;
 
@@ -191,8 +194,9 @@ export class OrderController {
     this.grandTotalElement = document.getElementById("grand-total");
     this.checkoutButton = document.querySelector(".btn-blue.w-100") as HTMLElement;
     this.uploadBoxElement = document.getElementById("upload-box");
-    this.paymentProofInput = document.getElementById("payment-proof") as HTMLInputElement;
-    this.uploadPreviewElement = document.getElementById("upload-preview");
+    // ⚠️ COMMENTED OUT: Old flow - manual payment proof upload elements
+    // this.paymentProofInput = document.getElementById("payment-proof") as HTMLInputElement;
+    // this.uploadPreviewElement = document.getElementById("upload-preview");
     this.paymentMethodRadios = document.querySelectorAll('input[name="pm"]');
     this.shippingMethodRadios = document.querySelectorAll('input[name="shipping"]');
   }
@@ -221,12 +225,16 @@ export class OrderController {
     }
 
     // Payment proof file input
+    // ⚠️ COMMENTED OUT: Old flow - manual upload proof before checkout
+    // New flow: Auto-verify payment via webhook, no manual upload needed
+    /*
     if (this.paymentProofInput) {
       this.paymentProofInput.addEventListener("change", () => this.handleFileSelect());
     }
+    */
 
-    // Show QR button - will be set up dynamically when payment method changes
-    this.setupQRButtonListener();
+    // Show QR button - COMMENTED OUT: Old flow
+    // this.setupQRButtonListener();
   }
 
   /**
@@ -376,6 +384,20 @@ export class OrderController {
       // Create order
       const order = await this.orderService.checkout(checkoutData);
 
+      console.log('✅ Order created:', order.orderNumber);
+
+      // ✅ Show QR and auto-verification for ALL non-COD payment methods
+      if (checkoutData.payment_method !== 'cod') {
+        this.setLoading(false);
+        // ⚠️ IMPORTANT: KHÔNG xóa sessionStorage ở đây
+        // Chỉ xóa sau khi thanh toán thành công (trong showPaymentWaitingModal)
+        this.showPaymentWaitingModal(order.orderNumber, order.totalAmount);
+        return; // Don't redirect yet, wait for payment confirmation
+      }
+
+      /* ⚠️ COMMENTED OUT: Old flow - Manual payment proof upload
+       * New flow: Automatic verification via webhook after payment
+       *
       // Upload payment proof if file selected and non-COD payment
       if (this.selectedFile && checkoutData.payment_method !== 'cod') {
         try {
@@ -393,13 +415,24 @@ export class OrderController {
           alert(`Đơn hàng đã được tạo nhưng không thể tải lên minh chứng thanh toán: ${proofError.message}`);
         }
       }
+      */
 
-      // Show success message
-      alert(`Đặt hàng thành công! Mã đơn hàng: ${order.orderNumber}`);
+      // ✅ COD: Reload cart from backend FIRST to sync with database (items removed by backend)
+      console.log('🔄 [COD] Reloading cart from backend after successful checkout...');
+      try {
+        await cartService.loadFromBackend();
+        console.log('✅ [COD] Cart reloaded from backend successfully');
+      } catch (error) {
+        console.error('❌ [COD] Failed to reload cart from backend:', error);
+        // Continue anyway, don't block checkout success
+      }
 
       // Clear checkout items from sessionStorage
       sessionStorage.removeItem('checkoutItems');
       sessionStorage.removeItem('checkoutSource');
+
+      // Show success message AFTER cart reload
+      alert(`Đặt hàng thành công! Mã đơn hàng: ${order.orderNumber}`);
 
       // Redirect to order confirmation page
       window.location.href = `/src/pages/OrderConfirmation.html?orderNumber=${order.orderNumber}`;
@@ -429,11 +462,15 @@ export class OrderController {
       return false;
     }
 
+    /* ⚠️ COMMENTED OUT: Old flow - Manual payment proof required
+     * New flow: Automatic verification, no file needed
+     *
     // Check payment proof for non-COD payments
     if (paymentMethod !== 'cod' && !this.selectedFile) {
       alert("Vui lòng tải lên minh chứng thanh toán cho phương thức thanh toán đã chọn");
       return false;
     }
+    */
 
     // TODO: Validate other fields (address, phone, etc.)
 
@@ -524,23 +561,20 @@ export class OrderController {
    * Handle payment method change
    */
   private handlePaymentMethodChange(): void {
-    const selectedMethod = this.getSelectedPaymentMethod();
-    
-    // Show upload box for non-COD payments
+    // ⚠️ COMMENTED OUT: Old flow - show upload box for non-COD
+    // New flow: Direct checkout with QR modal, no upload box needed
+    // Keep upload box hidden for all payment methods
     if (this.uploadBoxElement) {
-      if (selectedMethod && selectedMethod !== 'cod') {
-        this.uploadBoxElement.classList.remove('d-none');
-        // Re-setup QR button listener when upload box is shown
-        this.setupQRButtonListener();
-      } else {
-        this.uploadBoxElement.classList.add('d-none');
-      }
+      this.uploadBoxElement.classList.add('d-none');
     }
   }
 
+  /* ⚠️ COMMENTED OUT: Old flow methods - View QR before checkout + Manual upload
+   * New flow: Checkout → Auto show QR → Auto verify → Done
+   * 
   /**
    * Setup QR button listener
-   */
+   * /
   private setupQRButtonListener(): void {
     const qrButton = document.getElementById('show-qr-btn');
     
@@ -559,7 +593,7 @@ export class OrderController {
   /**
    * Handle Show QR button click
    * Generate temporary order info and show QR for payment
-   */
+   * /
   private async handleShowQRClick(): Promise<void> {
     try {
       // Get form data to generate QR
@@ -583,7 +617,7 @@ export class OrderController {
 
   /**
    * Generate temporary order number for QR display
-   */
+   * /
   private generateTempOrderNumber(): string {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 1000);
@@ -592,14 +626,14 @@ export class OrderController {
 
   /**
    * Show temporary payment QR before order creation
-   */
+   * /
   private showTemporaryPaymentQR(amount: number, tempOrderNumber: string): void {
     // Get payment config from env
-    const bankBin = '970436'; // VCB
-    const accountNo = '7935205238';
+    const bankBin = '970422'; // MB
+    const accountNo = '0935205238';
     const accountName = 'BLOCKIFY';
     const template = 'MND4rau';
-    const bankName = 'Vietcombank';
+    const bankName = 'MB Bank';
     
     const description = `Thanh toan don hang ${tempOrderNumber}`;
     
@@ -636,6 +670,7 @@ export class OrderController {
     // Render QR modal
     this.renderTemporaryPaymentQRModal(paymentQR);
   }
+  */ // END COMMENTED OUT OLD FLOW METHODS
 
   /**
    * Handle shipping method change
@@ -646,9 +681,12 @@ export class OrderController {
     this.loadCartItems();
   }
 
+  /* ⚠️ COMMENTED OUT: Old flow - Manual payment proof upload
+   * New flow: Automatic verification via webhook, no file upload needed
+   *
   /**
    * Handle file selection for payment proof
-   */
+   * /
   private handleFileSelect(): void {
     const file = this.paymentProofInput?.files?.[0];
     
@@ -683,7 +721,7 @@ export class OrderController {
 
   /**
    * Show file preview
-   */
+   * /
   private showFilePreview(file: File): void {
     if (!this.uploadPreviewElement) return;
 
@@ -741,12 +779,13 @@ export class OrderController {
 
   /**
    * Clear file preview
-   */
+   * /
   private clearFilePreview(): void {
     if (this.uploadPreviewElement) {
       this.uploadPreviewElement.innerHTML = '';
     }
   }
+  */ // END COMMENTED OUT FILE UPLOAD METHODS
 
   /**
    * Show empty cart message
@@ -925,9 +964,12 @@ export class OrderController {
     this.setupUploadProofHandler(orderId);
   }
 
+  /* ⚠️ COMMENTED OUT: Old flow - Temporary QR modal before order creation
+   * New flow: Order created first, then automatic QR modal with verification
+   *
   /**
    * Render Temporary Payment QR Modal (before order creation)
-   */
+   * /
   private renderTemporaryPaymentQRModal(paymentQR: any): void {
     // Check if modal already exists
     let modal = document.getElementById('tempPaymentQRModal');
@@ -957,12 +999,12 @@ export class OrderController {
               <strong>Hướng dẫn:</strong> Vui lòng thanh toán và tải lên minh chứng trước khi hoàn tất đơn hàng.
             </div>
 
-            <!-- QR Code Image -->
+            <!-- QR Code Image -- >
             <div class="text-center mb-4">
               <img src="${paymentQR.qrUrl}" alt="QR Code" class="img-fluid rounded shadow" style="max-width: 400px; border: 3px solid #0d6efd;">
             </div>
 
-            <!-- Payment Information -->
+            <!-- Payment Information -- >
             <div class="payment-info bg-light p-4 rounded mb-3">
               <h6 class="fw-bold mb-3 text-primary border-bottom pb-2">
                 <i class="bi bi-bank"></i> Thông tin chuyển khoản
@@ -1004,13 +1046,13 @@ export class OrderController {
               </div>
             </div>
 
-            <!-- Important Notice -->
+            <!-- Important Notice -- >
             <div class="alert alert-warning">
               <i class="bi bi-exclamation-triangle-fill"></i>
               <strong>Quan trọng:</strong> Sau khi chuyển khoản, vui lòng đóng cửa sổ này và tải lên minh chứng thanh toán ở form bên dưới, sau đó nhấn "Thanh Toán Ngay".
             </div>
 
-            <!-- Instructions -->
+            <!-- Instructions -- >
             <div class="mt-3">
               <h6 class="fw-bold mb-2">
                 <i class="bi bi-list-check"></i> Các bước thực hiện:
@@ -1045,6 +1087,248 @@ export class OrderController {
         fileInput.focus();
       }
     });
+  }
+  */ // END COMMENTED OUT TEMPORARY QR MODAL
+
+  /**
+   * Show payment waiting modal with QR code and automatic verification
+   */
+  private async showPaymentWaitingModal(orderNumber: string, _amount: number): Promise<void> {
+    try {
+      // Fetch QR code
+      const paymentQR = await this.orderService.getPaymentQRByOrderNumber(orderNumber);
+
+      // Create modal
+      const modal = document.createElement('div');
+      modal.className = 'modal fade';
+      modal.id = 'paymentWaitingModal';
+      modal.setAttribute('data-bs-backdrop', 'static');
+      modal.setAttribute('data-bs-keyboard', 'false');
+      modal.innerHTML = `
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+              <h5 class="modal-title">
+                <i class="bi bi-qr-code-scan"></i> Chờ xác nhận thanh toán
+              </h5>
+            </div>
+            <div class="modal-body">
+              <!-- Status Alert -->
+              <div class="alert alert-info" id="payment-status-alert">
+                <div class="d-flex align-items-center">
+                  <div class="spinner-border spinner-border-sm me-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <div>
+                    <strong>Đang chờ thanh toán...</strong>
+                    <p class="mb-0 small">Hệ thống đang tự động kiểm tra thanh toán của bạn</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- QR Code Image -->
+              <div class="text-center mb-4">
+                <img src="${paymentQR.qrUrl}" alt="QR Code" class="img-fluid rounded shadow" style="max-width: 350px; border: 3px solid #0d6efd;">
+              </div>
+
+              <!-- Payment Information -->
+              <div class="payment-info bg-light p-4 rounded mb-3">
+                <h6 class="fw-bold mb-3 text-primary border-bottom pb-2">
+                  <i class="bi bi-bank"></i> Thông tin chuyển khoản
+                </h6>
+                <div class="row mb-2">
+                  <div class="col-4 text-muted">Ngân hàng:</div>
+                  <div class="col-8 fw-bold">${paymentQR.bankName}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-4 text-muted">Số tài khoản:</div>
+                  <div class="col-8">
+                    <span class="fw-bold text-primary fs-5">${paymentQR.accountNo}</span>
+                    <button class="btn btn-sm btn-outline-secondary ms-2 copy-btn" data-copy="${paymentQR.accountNo}">
+                      <i class="bi bi-clipboard"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-4 text-muted">Chủ tài khoản:</div>
+                  <div class="col-8 fw-bold">${paymentQR.accountName}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-4 text-muted">Số tiền:</div>
+                  <div class="col-8">
+                    <span class="fw-bold text-danger fs-4">${paymentQR.formatAmount()}</span>
+                    <button class="btn btn-sm btn-outline-secondary ms-2 copy-btn" data-copy="${paymentQR.amount}">
+                      <i class="bi bi-clipboard"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-4 text-muted">Nội dung:</div>
+                  <div class="col-8">
+                    <span class="fw-bold text-success">${paymentQR.description}</span>
+                    <button class="btn btn-sm btn-outline-secondary ms-2 copy-btn" data-copy="${paymentQR.description}">
+                      <i class="bi bi-clipboard"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Instructions -->
+              <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <strong>Lưu ý:</strong> Vui lòng chuyển khoản CHÍNH XÁC số tiền và nội dung để hệ thống tự động xác nhận thanh toán.
+              </div>
+
+              <!-- Timer -->
+              <div class="text-center">
+                <small class="text-muted">
+                  <i class="bi bi-clock"></i> Thời gian chờ: <span id="payment-timer">15:00</span>
+                </small>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" id="cancel-payment-btn">
+                <i class="bi bi-x-circle"></i> Hủy đơn hàng
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      // Show modal
+      const bsModal = new (window as any).bootstrap.Modal(modal);
+      bsModal.show();
+
+      // Setup copy buttons
+      modal.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const target = e.currentTarget as HTMLElement;
+          const textToCopy = target.getAttribute('data-copy') || '';
+          navigator.clipboard.writeText(textToCopy);
+          
+          // Show feedback
+          const originalHTML = target.innerHTML;
+          target.innerHTML = '<i class="bi bi-check"></i>';
+          setTimeout(() => {
+            target.innerHTML = originalHTML;
+          }, 1000);
+        });
+      });
+
+      // Start timer countdown (15 minutes)
+      let timeLeft = 15 * 60; // 900 seconds
+      const timerElement = modal.querySelector('#payment-timer') as HTMLElement;
+      const timerInterval = setInterval(() => {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        if (timerElement) {
+          timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+        }
+      }, 1000);
+
+      // Setup cancel button
+      const cancelBtn = modal.querySelector('#cancel-payment-btn');
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+          if (confirm('Bạn có chắc muốn hủy đơn hàng này?')) {
+            stopPolling();
+            clearInterval(timerInterval);
+            bsModal.hide();
+            modal.remove();
+            window.location.href = '/src/pages/OrderPage.html';
+          }
+        });
+      }
+
+      // Start payment polling
+      const statusAlert = modal.querySelector('#payment-status-alert') as HTMLElement;
+      
+      const stopPolling = this.orderService.startPaymentPolling(
+        orderNumber,
+        async (result) => {
+          // Payment confirmed!
+          console.log('✅ Payment confirmed:', result);
+          clearInterval(timerInterval);
+          
+          // Update UI
+          if (statusAlert) {
+            statusAlert.className = 'alert alert-success';
+            statusAlert.innerHTML = `
+              <div class="d-flex align-items-center">
+                <i class="bi bi-check-circle-fill fs-3 me-3"></i>
+                <div>
+                  <strong>Thanh toán thành công!</strong>
+                  <p class="mb-0 small">Đơn hàng của bạn đã được xác nhận. Đang chuyển hướng...</p>
+                </div>
+              </div>
+            `;
+          }
+
+          // ✅ Reload cart from backend IMMEDIATELY (await before redirect)
+          console.log('🔄 Reloading cart from backend after successful payment...');
+          try {
+            await cartService.loadFromBackend();
+            console.log('✅ Cart reloaded from backend');
+          } catch (error) {
+            console.error('❌ Failed to reload cart from backend:', error);
+          }
+
+          // ✅ Xóa sessionStorage SAU KHI reload cart
+          sessionStorage.removeItem('checkout_items');
+          sessionStorage.removeItem('checkoutItems');
+          sessionStorage.removeItem('checkoutSource');
+
+          // Wait 2 seconds THEN redirect
+          setTimeout(() => {
+            bsModal.hide();
+            modal.remove();
+            window.location.href = `/src/pages/OrderConfirmation.html?orderNumber=${orderNumber}`;
+          }, 2000);
+        },
+        () => {
+          // Timeout
+          console.log('⏱️ Payment polling timeout');
+          clearInterval(timerInterval);
+          
+          if (statusAlert) {
+            statusAlert.className = 'alert alert-warning';
+            statusAlert.innerHTML = `
+              <div>
+                <strong>Hết thời gian chờ</strong>
+                <p class="mb-0">Đơn hàng đã được tạo nhưng chưa nhận được thanh toán. Bạn có thể thanh toán sau trong trang "Đơn hàng của tôi".</p>
+                <p class="mb-0 mt-2"><small>💡 <strong>Lưu ý:</strong> Giỏ hàng của bạn vẫn được giữ nguyên để bạn có thể thử lại.</small></p>
+              </div>
+            `;
+          }
+
+          // Enable cancel button to become "Go to orders"
+          if (cancelBtn) {
+            cancelBtn.textContent = 'Xem đơn hàng';
+            (cancelBtn as HTMLButtonElement).onclick = () => {
+              window.location.href = '/src/pages/Account.html?tab=orders';
+            };
+          }
+        },
+        5000 // Poll every 5 seconds
+      );
+
+      // Cleanup when modal is closed manually
+      modal.addEventListener('hidden.bs.modal', () => {
+        stopPolling();
+        clearInterval(timerInterval);
+        modal.remove();
+      });
+
+    } catch (error) {
+      console.error('Error showing payment waiting modal:', error);
+      alert('Không thể hiển thị mã QR thanh toán');
+    }
   }
 
   /**

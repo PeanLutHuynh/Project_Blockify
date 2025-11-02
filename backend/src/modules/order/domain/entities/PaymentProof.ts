@@ -141,6 +141,8 @@ export class PaymentProof extends BaseEntity {
       "image/gif",
       "image/webp",
       "application/pdf",
+      "application/json", // Allow JSON for automatic payment proofs
+      "text/plain", // Allow text files for logs
     ];
     return allowedTypes.includes(fileType.toLowerCase());
   }

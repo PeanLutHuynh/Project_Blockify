@@ -10,6 +10,11 @@ if (result.error) {
   console.warn('Warning: Could not load .env file:', result.error.message);
 } else {
   console.log('✅ Successfully loaded shared environment configuration');
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.log('✅ SUPABASE_SERVICE_ROLE_KEY loaded');
+  } else {
+    console.error('❌ SUPABASE_SERVICE_ROLE_KEY is missing!');
+  }
 }
 
 export const ENV = {
@@ -37,9 +42,18 @@ export const ENV = {
 
   // Payment Configuration (VietQR)
   PAYMENT_BANK_ID: process.env.PAYMENT_BANK_ID || 'VCB',
-  PAYMENT_BANK_BIN: process.env.PAYMENT_BANK_BIN || '970436',
-  PAYMENT_ACCOUNT_NO: process.env.PAYMENT_ACCOUNT_NO || '7935205238',
-  PAYMENT_ACCOUNT_NAME: process.env.PAYMENT_ACCOUNT_NAME || 'BLOCKIFY'
+  PAYMENT_BANK_BIN: process.env.PAYMENT_BANK_BIN || '970422',
+  PAYMENT_ACCOUNT_NO: process.env.PAYMENT_ACCOUNT_NO || '0935205238',
+  PAYMENT_ACCOUNT_NAME: process.env.PAYMENT_ACCOUNT_NAME || 'BLOCKIFY',
+
+  // Sepay Configuration
+  SEPAY_API_KEY: process.env.SEPAY_API_KEY || '',
+  SEPAY_WEBHOOK_SECRET: process.env.SEPAY_WEBHOOK_SECRET || '',
+  SEPAY_MERCHANT_ID: process.env.SEPAY_MERCHANT_ID || '',
+  SEPAY_SECRET_KEY: process.env.SEPAY_SECRET_KEY || '',
+
+  // Ngrok URL for webhooks
+  NGROK_URL: process.env.NGROK_URL || ''
 };
 
 export const isDevelopment = ENV.NODE_ENV === 'development';

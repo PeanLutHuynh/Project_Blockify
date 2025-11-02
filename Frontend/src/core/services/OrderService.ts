@@ -4,6 +4,20 @@ import { PaymentQR } from "../models/PaymentQR.js";
 import { ENV } from "../config/env.js";
 
 /**
+ * Payment Status Check Result Interface
+ */
+export interface PaymentStatusResult {
+  paid: boolean;
+  message: string;
+  transaction?: {
+    transactionId: string;
+    amount: number;
+    description: string;
+    transactionDate: Date;
+  };
+}
+
+/**
  * Order Service - Frontend
  * Handles all order-related API calls using custom Fetch wrapper
  */
@@ -157,6 +171,85 @@ export class OrderService {
       console.error("Get payment QR by order number error:", error);
       throw new Error(error.message || "Failed to retrieve payment QR");
     }
+  }
+
+  /**
+   * Check payment status for an order (polling for Sepay verification)
+   */
+  async checkPaymentStatus(orderNumber: string): Promise<PaymentStatusResult> {
+    try {
+      const response = await this.httpClient.get(
+        `/api/payment/check/${orderNumber}`
+      );
+
+      if (!response.success) {
+        throw new Error(response.message || "Failed to check payment status");
+      }
+
+      return response.data;
+    } catch (error: any) {
+      console.error("Check payment status error:", error);
+      throw new Error(error.message || "Failed to check payment status");
+    }
+  }
+
+  /**
+   * Start polling for payment confirmation
+   * @param orderNumber - Order number to monitor
+   * @param onSuccess - Callback when payment is confirmed
+   * @param onTimeout - Callback when polling times out (default: 15 minutes)
+   * @param interval - Polling interval in milliseconds (default: 5 seconds)
+   * @returns Stop function to cancel polling
+   */
+  startPaymentPolling(
+    orderNumber: string,
+    onSuccess: (result: PaymentStatusResult) => void,
+    onTimeout?: () => void,
+    interval: number = 5000
+  ): () => void {
+    const maxDuration = 15 * 60 * 1000; // 15 minutes
+    const startTime = Date.now();
+    let isActive = true;
+
+    const poll = async () => {
+      if (!isActive) return;
+
+      try {
+        const result = await this.checkPaymentStatus(orderNumber);
+
+        if (result.paid) {
+          isActive = false;
+          onSuccess(result);
+          return;
+        }
+
+        // Check if timeout reached
+        if (Date.now() - startTime > maxDuration) {
+          isActive = false;
+          if (onTimeout) {
+            onTimeout();
+          }
+          return;
+        }
+
+        // Continue polling
+        setTimeout(poll, interval);
+      } catch (error) {
+        console.error("Payment polling error:", error);
+        // Continue polling even on error
+        if (isActive && Date.now() - startTime < maxDuration) {
+          setTimeout(poll, interval);
+        }
+      }
+    };
+
+    // Start polling
+    poll();
+
+    // Return stop function
+    return () => {
+      isActive = false;
+    };
   }
 
   /**

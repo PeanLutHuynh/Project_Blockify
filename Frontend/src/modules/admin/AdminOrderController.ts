@@ -386,8 +386,8 @@ export class AdminOrderController {
                       ${paymentProof ? `
                         <hr>
                         <h6>Minh chứng thanh toán</h6>
-                        <img src="${paymentProof.file_url}" class="img-fluid mb-2" alt="Minh chứng" style="cursor: pointer;" onclick="window.open('${paymentProof.file_url}', '_blank')">
-                        <p><span class="badge ${this.getProofBadge(paymentProof.status).class}">${this.getProofBadge(paymentProof.status).text}</span></p>
+                        ${this.renderPaymentProofDetails(paymentProof)}
+                        <p class="mt-2"><span class="badge ${this.getProofBadge(paymentProof.status).class}">${this.getProofBadge(paymentProof.status).text}</span></p>
                         ${paymentProof.status === 'pending' && order.status === 'Đang xử lý' ? `
                           <div class="mt-2">
                             <button class="btn btn-sm btn-success" id="acceptProofBtn">✓ Xác nhận</button>
@@ -465,7 +465,6 @@ export class AdminOrderController {
    */
   private generateActionButtons(order: any): string {
     const status = order.status;
-    const paymentProof = order.payment_proofs?.[0];
     const paymentMethod = order.payment_method;
     let buttons = "";
 
@@ -473,10 +472,15 @@ export class AdminOrderController {
       case "Đang xử lý":
         // Show confirm order button
         // For COD, always allow confirmation
-        // For bank transfer, require payment proof to be accepted
+        // For non-COD, require payment_status = 'paid' (regardless of payment_proof)
         const isCOD = paymentMethod === 'cod' || paymentMethod === 'COD';
-        const isPaymentVerified = isCOD || (paymentProof && paymentProof.status === "accepted");
-        buttons += `<button class="btn btn-primary" id="confirmOrderBtn" ${!isPaymentVerified ? 'disabled' : ''}>✓ Xác nhận đơn hàng</button>`;
+        const isPaymentVerified = isCOD || order.payment_status === 'paid';
+        
+        const disabledReason = !isPaymentVerified 
+          ? 'title="Chỉ có thể xác nhận khi đơn hàng đã thanh toán (payment_status = paid)"' 
+          : '';
+        
+        buttons += `<button class="btn btn-primary" id="confirmOrderBtn" ${!isPaymentVerified ? 'disabled' : ''} ${disabledReason}>✓ Xác nhận đơn hàng</button>`;
         buttons += `<button class="btn btn-danger ms-2" id="cancelOrderBtn">✕ Hủy đơn</button>`;
         break;
 
@@ -673,6 +677,171 @@ export class AdminOrderController {
   }
 
   /**
+   * Render payment proof details based on file type
+   */
+  private renderPaymentProofDetails(paymentProof: any): string {
+    const fileUrl = paymentProof.file_url || '';
+    const fileType = paymentProof.file_type || '';
+
+    // Check if it's JSON
+    if (fileType === 'application/json' || fileUrl.endsWith('.json')) {
+      return `
+        <div class="alert alert-info">
+          <i class="bi bi-file-earmark-code"></i> Minh chứng tự động (JSON)
+          <button class="btn btn-sm btn-primary ms-2" onclick="window.adminOrderController.showPaymentProofModal('${paymentProof.proof_id}', '${fileUrl}')">
+            <i class="bi bi-eye"></i> Xem chi tiết
+          </button>
+        </div>
+      `;
+    }
+
+    // Image
+    return `
+      <img src="${fileUrl}" class="img-fluid mb-2" alt="Minh chứng" style="cursor: pointer; max-height: 300px;" onclick="window.open('${fileUrl}', '_blank')">
+    `;
+  }
+
+  /**
+   * Show payment proof modal (for JSON)
+   */
+  async showPaymentProofModal(_proofId: string, fileUrl: string): Promise<void> {
+    try {
+      // Fetch JSON content
+      const response = await fetch(fileUrl);
+      const jsonData = await response.json();
+
+      // Get current order's payment method
+      const paymentMethod = this.currentOrderDetail?.payment_method || 'unknown';
+
+      // Create modal with payment method
+      const modalHtml = this.generatePaymentProofModal(jsonData, paymentMethod);
+      
+      // Remove existing modal
+      const existingModal = document.getElementById('paymentProofModal');
+      if (existingModal) {
+        const bootstrap = (window as any).bootstrap;
+        const modalInstance = bootstrap?.Modal.getInstance(existingModal);
+        modalInstance?.hide();
+        existingModal.remove();
+      }
+
+      // Add new modal
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+      // Show modal
+      const modalElement = document.getElementById('paymentProofModal');
+      if (modalElement) {
+        const bootstrap = (window as any).bootstrap;
+        if (bootstrap) {
+          const modal = new bootstrap.Modal(modalElement);
+          modal.show();
+
+          // Cleanup
+          modalElement.addEventListener('hidden.bs.modal', () => {
+            modalElement.remove();
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading payment proof:', error);
+      alert('Không thể tải minh chứng thanh toán');
+    }
+  }
+
+  /**
+   * Generate payment proof modal HTML
+   */
+  private generatePaymentProofModal(data: any, paymentMethod: string): string {
+    const orderInfo = data.order_information || {};
+    const transactionDetails = data.transaction_details || {};
+    const verificationStatus = data.verification_status || {};
+
+    return `
+      <div class="modal fade" id="paymentProofModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+              <div>
+                <h5 class="modal-title">
+                  <i class="bi bi-check-circle"></i> Minh Chứng Thanh Toán Tự Động
+                </h5>
+                <small>Đơn hàng: ${orderInfo.order_number || 'N/A'}</small>
+              </div>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <!-- Verification Status -->
+              <div class="card mb-3 border-success">
+                <div class="card-header bg-success text-white">
+                  <h6 class="mb-0"><i class="bi bi-shield-check"></i> Trạng Thái Xác Minh</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <p><strong>Trạng thái:</strong> <span class="badge bg-success">${verificationStatus.status || 'N/A'}</span></p>
+                      <p><strong>Phương thức thanh toán:</strong> ${this.formatPaymentMethod(paymentMethod)}</p>
+                      <p><strong>Cổng xác minh:</strong> ${this.formatPaymentGateway(verificationStatus.payment_gateway || 'N/A')} (${verificationStatus.verification_method || 'N/A'})</p>
+                    </div>
+                    <div class="col-md-6">
+                      <p><strong>Thời gian xác minh:</strong><br>${new Date(verificationStatus.verified_at || '').toLocaleString('vi-VN')}</p>
+                    </div>
+                  </div>
+                  ${verificationStatus.notes && verificationStatus.notes.length > 0 ? `
+                    <div class="alert alert-info mt-2">
+                      <strong>Ghi chú:</strong>
+                      <ul class="mb-0">
+                        ${verificationStatus.notes.map((note: string) => `<li>${note}</li>`).join('')}
+                      </ul>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+
+              <!-- Transaction Details -->
+              <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                  <h6 class="mb-0"><i class="bi bi-receipt"></i> Chi Tiết Giao Dịch</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <p><strong>Mã giao dịch:</strong><br><code>${transactionDetails.transaction_id || 'N/A'}</code></p>
+                      <p><strong>Số tiền:</strong><br><span class="text-success fs-5">${transactionDetails.amount_formatted || transactionDetails.amount || 'N/A'}</span></p>
+                      <p><strong>Ngân hàng:</strong> ${transactionDetails.bank_brand_name || transactionDetails.bank_code || 'N/A'}</p>
+                      <p><strong>Số tài khoản:</strong> ${transactionDetails.account_number || 'N/A'}</p>
+                    </div>
+                    <div class="col-md-6">
+                      <p><strong>Thời gian giao dịch:</strong><br>${transactionDetails.transaction_date_vn || new Date(transactionDetails.transaction_date || '').toLocaleString('vi-VN')}</p>
+                      <p><strong>Mã tham chiếu:</strong> ${transactionDetails.reference_number || 'N/A'}</p>
+                      <p><strong>Nội dung:</strong><br><em>"${transactionDetails.description || 'N/A'}"</em></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Order Information -->
+              <div class="card">
+                <div class="card-header bg-info text-white">
+                  <h6 class="mb-0"><i class="bi bi-box-seam"></i> Thông Tin Đơn Hàng</h6>
+                </div>
+                <div class="card-body">
+                  <p><strong>Số đơn hàng:</strong> <code>${orderInfo.order_number || 'N/A'}</code></p>
+                  <p><strong>Thời gian xác minh:</strong> ${orderInfo.verification_timestamp_vn || new Date(orderInfo.verification_timestamp || '').toLocaleString('vi-VN')}</p>
+                  <p><strong>Loại minh chứng:</strong> <span class="badge bg-secondary">${data.payment_proof_type || 'N/A'}</span></p>
+                  <p><strong>Phương thức xác minh:</strong> ${data.verification_method || 'N/A'}</p>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
    * Helper: Get status badge
    */
   private getStatusBadge(status: string): { text: string; class: string } {
@@ -723,6 +892,26 @@ export class AdminOrderController {
       vnpay: "VNPAY",
     };
     return methodMap[method] || method;
+  }
+
+  /**
+   * Helper: Format payment gateway (for JSON proof modal)
+   */
+  private formatPaymentGateway(gateway: string): string {
+    const gatewayMap: Record<string, string> = {
+      'Sepay': 'Sepay (Tự động)',
+      'sepay': 'Sepay (Tự động)',
+      'momo': 'Ví MoMo',
+      'MoMo': 'Ví MoMo',
+      'zalopay': 'Ví ZaloPay',
+      'ZaloPay': 'Ví ZaloPay',
+      'vnpay': 'VNPAY',
+      'VNPAY': 'VNPAY',
+      'bank_transfer': 'Chuyển khoản ngân hàng',
+      'automatic': 'Tự động qua Webhook',
+      'Sepay Webhook': 'Sepay (Webhook tự động)',
+    };
+    return gatewayMap[gateway] || gateway;
   }
 
   /**

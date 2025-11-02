@@ -87,15 +87,11 @@ export class OrderRepository implements IOrderRepository {
         note: "Đơn hàng được tạo",
       });
 
-      // 4. Delete cart items
-      const { error: deleteCartError } = await supabaseAdmin
-        .from("cart_items")
-        .delete()
-        .eq("user_id", order.userId);
-
-      if (deleteCartError) {
-        logger.warn("Failed to clear cart:", deleteCartError);
-      }
+      // ❌ REMOVED: Don't delete ALL cart items here!
+      // Cart clearing is now handled by CheckoutService based on payment method:
+      // - COD: Delete only checked-out items immediately
+      // - Non-COD: Delete only checked-out items after payment confirmed
+      // This allows users to checkout selected items, not entire cart!
 
       // Return created order with items
       const createdOrder = new Order({
