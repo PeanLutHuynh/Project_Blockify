@@ -112,7 +112,7 @@ export class NavbarAuth {
         <span class="user-greeting" style="color: white; font-size: 14px;">
           Xin chào, <strong>${displayName}</strong>
         </span>
-        <a href="#" class="btn-sign" id="logoutBtn">Log out</a>
+        <a href="#" class="btn-sign" id="logoutBtn">Đăng xuất</a>
       </div>
     `;
   }

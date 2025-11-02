@@ -109,7 +109,7 @@
       <div class="col-md-8">
         
         <!-- Success Message -->
-        <div class="card text-center mb-4">
+        <div class="card text-center mb-4" style="background-color: #e6f5ff;">
           <div class="card-body py-5">
             <div class="mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-check-circle text-success" viewBox="0 0 16 16">
@@ -127,100 +127,104 @@
         </div>
 
         <!-- Order Details -->
-        <div class="card mb-4">
-          <div class="card-header text-white" style ="background-color: #0D9BFF;">
-            <h5 class="mb-0">Thông Tin Đơn Hàng</h5>
-          </div>
-          <div class="card-body">
-            <div class="row mb-3">
-              <div class="col-sm-4"><strong>Trạng thái:</strong></div>
-              <div class="col-sm-8">
-                <span class="badge bg-warning" id="order-status">Đang xử lý</span>
+         <div class ="p-3 card rounded-2" style="background-color: #D4EEFF;">
+          <div class="card shadow-none mb-4">
+            <div class="card-header text-white" style ="background-color: #0D9BFF;">
+              <h5 class="mb-0">Thông Tin Đơn Hàng</h5>
+            </div>
+            <div class="card-body">
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Trạng thái:</strong></div>
+                <div class="col-sm-8">
+                  <span class="badge bg-warning" id="order-status">Đang xử lý</span>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Ngày đặt:</strong></div>
+                <div class="col-sm-8" id="order-date">-</div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Khách hàng:</strong></div>
+                <div class="col-sm-8" id="customer-name">-</div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Số điện thoại:</strong></div>
+                <div class="col-sm-8" id="customer-phone">-</div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Email:</strong></div>
+                <div class="col-sm-8" id="customer-email">-</div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Địa chỉ giao hàng:</strong></div>
+                <div class="col-sm-8" id="shipping-address">-</div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Phương thức thanh toán:</strong></div>
+                <div class="col-sm-8" id="payment-method">-</div>
+              </div>
+              <div class="row">
+                <div class="col-sm-4"><strong>Trạng thái thanh toán:</strong></div>
+                <div class="col-sm-8">
+                  <span class="badge bg-secondary" id="payment-status">Chưa thanh toán</span>
+                </div>
               </div>
             </div>
-            <div class="row mb-3">
-              <div class="col-sm-4"><strong>Ngày đặt:</strong></div>
-              <div class="col-sm-8" id="order-date">-</div>
+          </div>
+  
+          <!-- Order Items -->
+          <div class="card shadow-none  mb-4">
+            <div class="card-header text-white" style = "background-color: #0D9BFF;">
+              <h5 class="mb-0">Sản Phẩm Đã Đặt</h5>
             </div>
-            <div class="row mb-3">
-              <div class="col-sm-4"><strong>Khách hàng:</strong></div>
-              <div class="col-sm-8" id="customer-name">-</div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-sm-4"><strong>Số điện thoại:</strong></div>
-              <div class="col-sm-8" id="customer-phone">-</div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-sm-4"><strong>Email:</strong></div>
-              <div class="col-sm-8" id="customer-email">-</div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-sm-4"><strong>Địa chỉ giao hàng:</strong></div>
-              <div class="col-sm-8" id="shipping-address">-</div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-sm-4"><strong>Phương thức thanh toán:</strong></div>
-              <div class="col-sm-8" id="payment-method">-</div>
-            </div>
-            <div class="row">
-              <div class="col-sm-4"><strong>Trạng thái thanh toán:</strong></div>
-              <div class="col-sm-8">
-                <span class="badge bg-secondary" id="payment-status">Chưa thanh toán</span>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Sản phẩm</th>
+                      <th class="text-center">Số lượng</th>
+                      <th class="text-end">Đơn giá</th>
+                      <th class="text-end">Thành tiền</th>
+                    </tr>
+                  </thead>
+                  <tbody id="order-items">
+                    <tr>
+                      <td colspan="4" class="text-center">Đang tải...</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Order Items -->
-        <div class="card mb-4">
-          <div class="card-header text-white" style = "background-color: #0D9BFF;">
-            <h5 class="mb-0">Sản Phẩm Đã Đặt</h5>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Sản phẩm</th>
-                    <th class="text-center">Số lượng</th>
-                    <th class="text-end">Đơn giá</th>
-                    <th class="text-end">Thành tiền</th>
-                  </tr>
-                </thead>
-                <tbody id="order-items">
-                  <tr>
-                    <td colspan="4" class="text-center">Đang tải...</td>
-                  </tr>
-                </tbody>
-              </table>
+  
+          <!-- Order Summary -->
+          <div class="card shadow-none mb-4">
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-2">
+                <span>Tạm tính:</span>
+                <span id="subtotal">0 VND</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Phí vận chuyển:</span>
+                <span id="shipping-fee">0 VND</span>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between">
+                <strong class="text-danger">Tổng cộng:</strong>
+                <strong class="text-primary" id="total-amount">0 VND</strong>
+              </div>
             </div>
           </div>
-        </div>
-
-        <!-- Order Summary -->
-        <div class="card mb-4">
-          <div class="card-body">
-            <div class="d-flex justify-content-between mb-2">
-              <span>Tạm tính:</span>
-              <span id="subtotal">0 VND</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-              <span>Phí vận chuyển:</span>
-              <span id="shipping-fee">0 VND</span>
-            </div>
-            <hr>
-            <div class="d-flex justify-content-between">
-              <strong class="text-danger">Tổng cộng:</strong>
-              <strong class="text-primary" id="total-amount">0 VND</strong>
-            </div>
-          </div>
-        </div>
-
-        <!-- Actions -->
+          <!-- Actions -->
         <div class="text-center">
-          <a href="HomePage.html" class="btn btn-outline-primary me-2">Tiếp tục mua sắm</a>
+          <a href="HomePage.html" class="btn btn-light btn-outline-primary me-2">Tiếp tục mua sắm</a>
           <a href="Account.html" class="btn btn-primary">Xem đơn hàng của tôi</a>
         </div>
+         </div>
+        
+
+        
 
       </div>
     </div>

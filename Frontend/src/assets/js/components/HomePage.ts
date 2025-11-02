@@ -658,7 +658,7 @@ function renderPaginationControls(pagination: any) {
   // Previous button
   html += `
     <li class="page-item ${page <= 1 ? 'disabled' : ''}">
-      <a class="page-link" href="#" data-page="${page - 1}">Previous</a>
+      <a class="page-link" href="#" data-page="${page - 1}">Trước</a>
     </li>
   `;
   
@@ -678,12 +678,12 @@ function renderPaginationControls(pagination: any) {
   // Next button
   html += `
     <li class="page-item ${page >= totalPages ? 'disabled' : ''}">
-      <a class="page-link" href="#" data-page="${page + 1}">Next</a>
+      <a class="page-link" href="#" data-page="${page + 1}">Sau</a>
     </li>
   `;
   
   html += '</ul></nav>';
-  html += `<p class="text-center mt-2">Page ${page} of ${totalPages} (Total: ${total} products)</p>`;
+  html += `<p class="text-center mt-2">Trang ${page} trong ${totalPages} (Tổng: ${total} sản phẩm)</p>`;
   
   paginationContainer.innerHTML = html;
   
