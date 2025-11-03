@@ -317,13 +317,21 @@ export class AdminProductService {
     adminId: number
   ): Promise<ProductResponseDTO> {
     try {
+      console.log('🚀🚀🚀 [Service] CREATE PRODUCT STARTED 🚀🚀🚀');
+      console.log('DTO:', JSON.stringify(dto, null, 2));
+      
       // Validate category exists
+      logger.info(`🔍 [CreateProduct] Checking category with ID: ${dto.category_id}`);
       const category = await this.categoryRepo.findById(
         dto.category_id.toString()
       );
       if (!category) {
-        throw new Error('Danh mục không tồn tại');
+        console.error(`❌❌❌ CATEGORY NOT FOUND: ${dto.category_id}`);
+        logger.error(`❌ [CreateProduct] Category not found: ${dto.category_id}`);
+        throw new Error(`Danh mục với ID ${dto.category_id} không tồn tại`);
       }
+      console.log(`✅ Category found: ${category.categoryName}`);
+      logger.info(`✅ [CreateProduct] Category found: ${category.categoryName}`);
 
       // Create product entity
       const product = new AdminProduct({
@@ -351,8 +359,12 @@ export class AdminProductService {
       // Validate product
       const errors = product.validate();
       if (errors.length > 0) {
-        throw new Error(errors.join(', '));
+        logger.error('❌ [CreateProduct] Validation errors:', errors);
+        throw new Error('Validation failed: ' + errors.join(', '));
       }
+      
+      logger.info('✅ [CreateProduct] Product validation passed');
+
 
       // Add images if provided - group all images into one row
       if (dto.images && dto.images.length > 0) {
@@ -382,8 +394,15 @@ export class AdminProductService {
         product_name: createdProduct.productName,
       });
 
-      return await this.toProductResponse(createdProduct);
-    } catch (error) {
+      console.log('✅✅✅ Product created in DB, converting to response...');
+      const response = await this.toProductResponse(createdProduct);
+      console.log('✅✅✅ [Service] CREATE PRODUCT SUCCESS ✅✅✅');
+      return response;
+    } catch (error: any) {
+      console.error('❌❌❌ [Service] CREATE PRODUCT FAILED ❌❌❌');
+      console.error('Service Error:', error);
+      console.error('Service Error message:', error.message);
+      console.error('Service Error stack:', error.stack);
       logger.error('Error creating product:', error);
       throw error;
     }
@@ -580,6 +599,33 @@ export class AdminProductService {
     } catch (error) {
       logger.error('Error getting products needing restock:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Get category by ID
+   */
+  async getCategoryById(categoryId: number): Promise<CategoryResponseDTO | null> {
+    try {
+      const category = await this.categoryRepo.findById(categoryId.toString());
+      if (!category) {
+        return null;
+      }
+
+      return {
+        category_id: category.categoryId!,
+        category_name: category.categoryName,
+        category_slug: category.categorySlug,
+        description: category.description,
+        image_url: category.imageUrl,
+        parent_category_id: category.parentCategoryId,
+        sort_order: category.sortOrder,
+        is_active: category.isActive,
+        created_at: category.createdAt?.toISOString(),
+      };
+    } catch (error) {
+      logger.error('Error getting category by ID:', error);
+      return null;
     }
   }
 
@@ -786,10 +832,36 @@ export class AdminProductService {
       const timestamp = Date.now();
       const randomStr = Math.random().toString(36).substring(7);
       
+      // Sanitize product name only (for subfolder)
+      // Keep category name AS-IS to match existing folders in Storage
+      const sanitizeProductName = (name: string): string => {
+        return name
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '') // Remove accents
+          .replace(/[đĐ]/g, 'd')
+          .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+          .trim()
+          .replace(/\s+/g, '-') // Replace spaces with hyphens
+          .replace(/-+/g, '-'); // Remove duplicate hyphens
+      };
+      
       // Create folder path: category/product/filename
-      const folderPath = categoryName && productName 
-        ? `${categoryName}/${productName}`
-        : 'uncategorized';
+      // ✅ Category name must match EXACTLY with existing folders in Storage:
+      //    Airport, Construction, Fire Fighter, Police, Seaport, 
+      //    Service & Transportation, Train, uncategorized
+      let folderPath = 'uncategorized';
+      if (categoryName && productName) {
+        // Use category name AS-IS (with spaces and capitals)
+        const sanitizedProduct = sanitizeProductName(productName);
+        folderPath = `${categoryName}/${sanitizedProduct}`;
+        console.log(`📁 Folder structure: ${folderPath}`);
+        console.log(`   ├─ Category (original): "${categoryName}"`);
+        console.log(`   └─ Product (sanitized): "${sanitizedProduct}"`);
+      } else {
+        console.warn('⚠️ Missing category or product name, using uncategorized folder');
+        console.warn(`   categoryName: ${categoryName}, productName: ${productName}`);
+      }
       
       const imageName = imageIndex !== undefined 
         ? `image${imageIndex}.${fileExtension}`

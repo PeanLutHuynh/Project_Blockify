@@ -570,7 +570,13 @@
             <div class="row g-3 mb-3">
               <div class="col-md-6">
                 <label class="form-label fw-semibold">Độ khó</label>
-                <input type="text" class="form-control" id="productAge" placeholder="VD: 6+, 12+, 18+">
+                <select class="form-select" id="productAge">
+                  <option value="">-- Chọn độ khó --</option>
+                  <option value="Easy">Dễ (Easy)</option>
+                  <option value="Medium">Trung bình (Medium)</option>
+                  <option value="Hard">Khó (Hard)</option>
+                  <option value="Expert">Chuyên gia (Expert)</option>
+                </select>
               </div>
               <div class="col-md-6">
                 <label class="form-label fw-semibold">Số mảnh ghép</label>
@@ -594,18 +600,74 @@
               </div>
             </div>
   
-            <!-- Giá và mô tả -->
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Giá (VND)</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-cash"></i></span>
-                <input type="number" class="form-control" id="productPrice" min="0" required>
+            <!-- Giá -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Giá gốc (VND)</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-cash"></i></span>
+                  <input type="number" class="form-control" id="productPrice" min="0" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Giá khuyến mãi (VND)</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                  <input type="number" class="form-control" id="productSalePrice" min="0" placeholder="Để trống nếu không giảm giá">
+                </div>
               </div>
             </div>
-  
+
+            <!-- Kích thước & Trọng lượng -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Kích thước (cm)</label>
+                <input type="text" class="form-control" id="productDimensions" placeholder="VD: 30x40x5">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Trọng lượng (kg)</label>
+                <input type="number" class="form-control" id="productWeight" min="0" step="0.01" placeholder="VD: 1.5">
+              </div>
+            </div>
+
+            <!-- Tồn kho tối thiểu -->
             <div class="mb-3">
-              <label class="form-label fw-semibold">Mô tả sản phẩm</label>
-              <textarea class="form-control" id="productDesc" rows="3" placeholder="Nhập mô tả chi tiết..."></textarea>
+              <label class="form-label fw-semibold">Mức tồn kho tối thiểu</label>
+              <input type="number" class="form-control" id="productMinStock" min="0" placeholder="Cảnh báo khi tồn kho dưới mức này">
+            </div>
+
+            <!-- Mô tả -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Mô tả ngắn</label>
+              <textarea class="form-control" id="productShortDesc" rows="2" placeholder="Mô tả ngắn gọn (1-2 dòng)"></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Mô tả chi tiết</label>
+              <textarea class="form-control" id="productDesc" rows="4" placeholder="Nhập mô tả chi tiết..."></textarea>
+            </div>
+
+            <!-- Thuộc tính đặc biệt -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Thuộc tính đặc biệt</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="productIsFeatured">
+                <label class="form-check-label" for="productIsFeatured">
+                  Sản phẩm nổi bật (Featured)
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="productIsBestseller">
+                <label class="form-check-label" for="productIsBestseller">
+                  Bán chạy nhất (Bestseller)
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="productIsNew">
+                <label class="form-check-label" for="productIsNew">
+                  Sản phẩm mới (New)
+                </label>
+              </div>
             </div>
   
             <div class="modal-footer border-0">
@@ -688,7 +750,13 @@
             <div class="row g-3 mb-3">
               <div class="col-md-6">
                 <label class="form-label fw-semibold">Độ khó</label>
-                <input type="text" class="form-control" id="editProductAge" placeholder="VD: 6+, 12+, 18+">
+                <select class="form-select" id="editProductAge">
+                  <option value="">-- Chọn độ khó --</option>
+                  <option value="Easy">Dễ (Easy)</option>
+                  <option value="Medium">Trung bình (Medium)</option>
+                  <option value="Hard">Khó (Hard)</option>
+                  <option value="Expert">Chuyên gia (Expert)</option>
+                </select>
               </div>
               <div class="col-md-6">
                 <label class="form-label fw-semibold">Số mảnh ghép</label>
@@ -711,18 +779,74 @@
               </div>
             </div>
   
-            <!-- Giá và mô tả -->
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Giá (VND)</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-cash"></i></span>
-                <input type="number" class="form-control" id="editProductPrice" min="0" required>
+            <!-- Giá -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Giá gốc (VND)</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-cash"></i></span>
+                  <input type="number" class="form-control" id="editProductPrice" min="0" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Giá khuyến mãi (VND)</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                  <input type="number" class="form-control" id="editProductSalePrice" min="0" placeholder="Để trống nếu không giảm giá">
+                </div>
               </div>
             </div>
-  
+
+            <!-- Kích thước & Trọng lượng -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Kích thước (cm)</label>
+                <input type="text" class="form-control" id="editProductDimensions" placeholder="VD: 30x40x5">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Trọng lượng (kg)</label>
+                <input type="number" class="form-control" id="editProductWeight" min="0" step="0.01" placeholder="VD: 1.5">
+              </div>
+            </div>
+
+            <!-- Tồn kho tối thiểu -->
             <div class="mb-3">
-              <label class="form-label fw-semibold">Mô tả</label>
-              <textarea class="form-control" id="editProductDesc" rows="3" placeholder="Nhập mô tả sản phẩm..."></textarea>
+              <label class="form-label fw-semibold">Mức tồn kho tối thiểu</label>
+              <input type="number" class="form-control" id="editProductMinStock" min="0" placeholder="Cảnh báo khi tồn kho dưới mức này">
+            </div>
+
+            <!-- Mô tả -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Mô tả ngắn</label>
+              <textarea class="form-control" id="editProductShortDesc" rows="2" placeholder="Mô tả ngắn gọn (1-2 dòng)"></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Mô tả chi tiết</label>
+              <textarea class="form-control" id="editProductDesc" rows="4" placeholder="Nhập mô tả chi tiết..."></textarea>
+            </div>
+
+            <!-- Thuộc tính đặc biệt -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Thuộc tính đặc biệt</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="editProductIsFeatured">
+                <label class="form-check-label" for="editProductIsFeatured">
+                  Sản phẩm nổi bật (Featured)
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="editProductIsBestseller">
+                <label class="form-check-label" for="editProductIsBestseller">
+                  Bán chạy nhất (Bestseller)
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="editProductIsNew">
+                <label class="form-check-label" for="editProductIsNew">
+                  Sản phẩm mới (New)
+                </label>
+              </div>
             </div>
   
             <!-- Footer -->
