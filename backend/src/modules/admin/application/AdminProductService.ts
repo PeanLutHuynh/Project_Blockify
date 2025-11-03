@@ -752,6 +752,68 @@ export class AdminProductService {
   }
 
   /**
+   * Upload product image to Supabase Storage
+   */
+  async uploadProductImage(fileBuffer: Buffer, fileType: string): Promise<string> {
+    try {
+      console.log(`🔥 ===== PRODUCT IMAGE UPLOAD STARTED =====`);
+      console.log(`🔥 File type: ${fileType}`);
+      console.log(`🔥 File size: ${fileBuffer.length} bytes`);
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(fileType)) {
+        throw new Error('Invalid file type. Only JPEG, PNG, GIF, WEBP are allowed.');
+      }
+
+      // Validate file size (max 5MB)
+      if (fileBuffer.length > 5 * 1024 * 1024) {
+        throw new Error('File size exceeds 5MB limit');
+      }
+
+      // Generate unique file name
+      const fileExtension = fileType.split('/')[1];
+      const fileName = `product-img/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
+
+      console.log(`📤 Uploading product image: ${fileName}`);
+
+      // Upload to Supabase Storage bucket 'product-img'
+      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+        .from('product-img')
+        .upload(fileName, fileBuffer, {
+          contentType: fileType,
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('❌ Supabase Storage upload error:', uploadError);
+        throw new Error(`Failed to upload image: ${uploadError.message}`);
+      }
+
+      console.log('✅ File uploaded to storage:', uploadData.path);
+
+      // Create signed URL (valid for 1 year) for private bucket
+      const { data: signedUrlData, error: signedUrlError } = await supabaseAdmin.storage
+        .from('product-img')
+        .createSignedUrl(fileName, 31536000); // 1 year in seconds
+
+      if (signedUrlError) {
+        console.error('❌ Failed to create signed URL:', signedUrlError);
+        throw new Error(`Failed to create signed URL: ${signedUrlError.message}`);
+      }
+
+      const imageUrl = signedUrlData.signedUrl;
+      console.log('📸 Signed image URL:', imageUrl);
+
+      console.log(`🔥 ===== PRODUCT IMAGE UPLOAD COMPLETED =====\n`);
+      return imageUrl;
+    } catch (error: any) {
+      console.error('❌ Error in uploadProductImage:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Add images to product
    */
   async addProductImages(

@@ -551,6 +551,55 @@ export class AdminProductController {
   }
 
   /**
+   * POST /api/admin/products/upload-image
+   * Upload product image to Supabase Storage
+   */
+  async uploadProductImage(
+    req: AdminRequest,
+    res: HttpResponse,
+    fileData: { buffer: Buffer; mimetype: string; filename: string; size: number }
+  ): Promise<void> {
+    try {
+      console.log('📤 [Controller] uploadProductImage CALLED');
+      console.log('  - File:', fileData.filename);
+      console.log('  - Type:', fileData.mimetype);
+      console.log('  - Size:', fileData.size);
+
+      const adminId = await this.getAdminId(req);
+      if (!adminId) {
+        this.sendError(res, 401, 'Unauthorized');
+        return;
+      }
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(fileData.mimetype)) {
+        this.sendError(res, 400, 'Invalid file type. Only JPEG, PNG, GIF, WEBP are allowed');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (fileData.size > 5 * 1024 * 1024) {
+        this.sendError(res, 400, 'File size exceeds 5MB limit');
+        return;
+      }
+
+      // Upload to Supabase Storage
+      const imageUrl = await this.productService.uploadProductImage(
+        fileData.buffer,
+        fileData.mimetype
+      );
+
+      console.log('✅ Image uploaded:', imageUrl);
+
+      this.sendSuccess(res, 'Image uploaded successfully', { imageUrl });
+    } catch (error: any) {
+      logger.error('Upload product image error:', error);
+      this.sendError(res, 500, error.message || 'Failed to upload image');
+    }
+  }
+
+  /**
    * POST /api/admin/products/:id/images
    * Add images to product
    */

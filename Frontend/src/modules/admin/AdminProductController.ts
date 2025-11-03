@@ -481,18 +481,21 @@ export class AdminProductController {
         images: [],
       };
 
-      // Collect image URLs from inputs
+      // Collect image URLs from uploaded images
       const imageInputs = document.querySelectorAll('.product-image-input');
       imageInputs.forEach((_input: any, index) => {
         const previewDiv = document.getElementById(`preview-${index}`);
-        if (previewDiv && previewDiv.querySelector('img')) {
-          const imgSrc = previewDiv.querySelector('img')?.src;
-          if (imgSrc && !imgSrc.includes('placeholder')) {
-            formData.images.push({
-              image_url: imgSrc,
-              is_primary: index === 0,
-              sort_order: index,
-            });
+        if (previewDiv) {
+          const imgElement = previewDiv.querySelector('img[data-uploaded-url]');
+          if (imgElement) {
+            const uploadedUrl = imgElement.getAttribute('data-uploaded-url');
+            if (uploadedUrl) {
+              formData.images.push({
+                image_url: uploadedUrl,
+                is_primary: index === 0,
+                sort_order: index,
+              });
+            }
           }
         }
       });
@@ -749,48 +752,58 @@ export class AdminProductController {
   }
 
   /**
-   * Handle image upload - Show preview from local file
+   * Handle image upload - Upload to Supabase Storage and show preview
    */
   private async handleImageUpload(file: File, index: number, previewPrefix: string): Promise<void> {
     try {
       // Show loading state
       const previewDiv = document.getElementById(`${previewPrefix}-${index}`);
       if (previewDiv) {
-        previewDiv.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
+        previewDiv.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Đang tải...</span></div>';
       }
 
-      // Read file as Data URL for preview
-      const reader = new FileReader();
+      // Upload to server
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const token = localStorage.getItem('blockify_auth_token');
       
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
+      console.log(`📤 Uploading image ${index} to server...`);
+
+      const response = await fetch('http://localhost:3001/api/admin/products/upload-image', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      const result = await response.json();
+      console.log(`📡 Upload response:`, result);
+
+      if (result.success && result.data?.imageUrl) {
+        const imageUrl = result.data.imageUrl;
         
-        // Show preview
-        if (previewDiv && imageUrl) {
+        // Show preview with uploaded URL
+        if (previewDiv) {
           previewDiv.innerHTML = `
-            <img src="${imageUrl}" alt="Preview ${index + 1}" style="max-width: 100%; max-height: 150px; object-fit: cover; border-radius: 4px;">
-            <div class="mt-1 small text-muted">⚠️ Chỉ xem trước. Vui lòng dán URL ảnh từ Supabase Storage</div>
+            <img src="${imageUrl}" alt="Image ${index + 1}" style="max-width: 100%; max-height: 150px; object-fit: cover; border-radius: 4px;" data-uploaded-url="${imageUrl}">
+            <div class="mt-1 small text-success">✅ Đã tải lên</div>
           `;
         }
         
-        console.log(`✅ Preview image ${index} loaded`);
-      };
-
-      reader.onerror = () => {
-        if (previewDiv) {
-          previewDiv.innerHTML = '<div class="text-danger small">❌ Không thể đọc file</div>';
-        }
-      };
-
-      reader.readAsDataURL(file);
+        console.log(`✅ Image ${index} uploaded: ${imageUrl}`);
+      } else {
+        throw new Error(result.error || 'Upload failed');
+      }
     } catch (error: any) {
-      console.error('❌ Image preview error:', error);
-      this.showError(error.message || 'Không thể xem trước ảnh');
+      console.error('❌ Image upload error:', error);
+      this.showError(error.message || 'Không thể tải ảnh lên');
       
-      // Clear loading state
+      // Show error state
       const previewDiv = document.getElementById(`${previewPrefix}-${index}`);
       if (previewDiv) {
-        previewDiv.innerHTML = '';
+        previewDiv.innerHTML = '<div class="text-danger small">❌ Upload thất bại</div>';
       }
     }
   }
