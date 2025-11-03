@@ -2,6 +2,7 @@ import { HttpRequest, HttpResponse } from "../../../infrastructure/http/types";
 import { AdminProductController } from "./AdminProductController";
 import { AdminProductService } from "../application/AdminProductService";
 import { authenticateToken } from "../../../infrastructure/auth";
+import { parseMultipartData } from "../../../infrastructure/upload/MultipartParser";
 
 /**
  * Admin Product Routes Configuration
@@ -68,6 +69,25 @@ export function registerAdminProductRoutes(router: any): void {
     const urlParts = req.url?.split("/") || [];
     const productId = urlParts[urlParts.length - 2] || "";
     await adminProductController.updateStatus(req, res, productId);
+  });
+
+  // Upload product image - With multipart parser
+  router.post("/api/admin/products/upload-image", authenticateToken, async (req: HttpRequest, res: HttpResponse) => {
+    try {
+      console.log('📤 [Route] Upload product image');
+      
+      // Parse multipart data
+      const fileData = await parseMultipartData(req);
+      
+      if (!fileData) {
+        return res.status(400).json({ success: false, error: 'No file uploaded' });
+      }
+      
+      await adminProductController.uploadProductImage(req, res, fileData);
+    } catch (error: any) {
+      console.error('❌ [Route] Error uploading product image:', error);
+      return res.status(500).json({ success: false, error: error.message });
+    }
   });
 
   // Add images to product
