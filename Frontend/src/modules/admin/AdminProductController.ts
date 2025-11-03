@@ -762,13 +762,24 @@ export class AdminProductController {
         previewDiv.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Đang tải...</span></div>';
       }
 
-      // Upload to server
+      // Get product name and category from form
+      const productNameInput = document.getElementById('productName') as HTMLInputElement;
+      const categorySelect = document.getElementById('categorySelect') as HTMLSelectElement;
+      
+      const productName = productNameInput?.value || 'Unknown';
+      const categoryName = categorySelect?.selectedOptions[0]?.text || 'Unknown';
+
+      // Upload to server with metadata
       const formData = new FormData();
       formData.append('image', file);
+      formData.append('productName', productName);
+      formData.append('categoryName', categoryName);
+      formData.append('imageIndex', index.toString());
 
       const token = localStorage.getItem('blockify_auth_token');
       
       console.log(`📤 Uploading image ${index} to server...`);
+      console.log(`📋 Product: ${productName}, Category: ${categoryName}`);
 
       const response = await fetch('http://localhost:3001/api/admin/products/upload-image', {
         method: 'POST',
