@@ -357,7 +357,7 @@ export class AdminOrderController {
       <div class="modal fade" id="orderDetailModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
           <div class="modal-content">
-            <div class="modal-header text-white" style ="background-color: #0D9BFF">
+            <div class="modal-header">
               <div>
                 <h5 class="modal-title">Chi tiết đơn hàng #${order.order_number}</h5>
                 <small class="text-muted">Đặt lúc: ${new Date(order.ordered_at).toLocaleString("vi-VN")}</small>
@@ -365,7 +365,7 @@ export class AdminOrderController {
               </div>
               <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body bg-light">
+            <div class="modal-body">
               <div class="row">
                 <!-- Left: Customer Info -->
                 <div class="col-md-4">
@@ -404,29 +404,24 @@ export class AdminOrderController {
                   <div class="card mb-3">
                     <div class="card-body">
                       <h6 class="card-title text-primary">Chi tiết sản phẩm</h6>
-                      <table style =" width: 100%;
-                                      border-collapse: collapse;
-                                      background: #D4EEFF;
-                                      border: 1px solid #000000;
-                                      border-radius: 8px;
-                                      overflow: hidden;">
-                        <thead style ="background-color: #0D9BFF">
-                          <tr class="text-white">
-                            <th style = "padding: 10px 16px; border-bottom: 1px solid #D0D2D5;  text-align: left; font-size: 14px;">Sản phẩm</th>
-                            <th style = "padding: 10px 16px; border-bottom: 1px solid #D0D2D5;  text-align: left; font-size: 14px;">SKU</th>
-                            <th style = "padding: 10px 16px; border-bottom: 1px solid #D0D2D5;  text-align: left; font-size: 14px;">Số lượng</th>
-                            <th style = "padding: 10px 16px; border-bottom: 1px solid #D0D2D5;  text-align: left; font-size: 14px;">Đơn giá</th>
-                            <th style = "padding: 10px 16px; border-bottom: 1px solid #D0D2D5;  text-align: left; font-size: 14px;">Thành tiền</th>
+                      <table class="table1">
+                        <thead>
+                          <tr>
+                            <th>Sản phẩm</th>
+                            <th>SKU</th>
+                            <th>Số lượng</th>
+                            <th>Đơn giá</th>
+                            <th>Thành tiền</th>
                           </tr>
                         </thead>
                         <tbody>
                           ${order.order_items?.map((item: any) => `
                             <tr>
-                              <td style = "padding: 10px 16px; border-bottom: 1px solid #D0D2D5;  text-align: left; font-size: 14px;">${item.product_name}</td>
-                              <td style = "padding: 10px 16px; border-bottom: 1px solid #D0D2D5;  text-align: left; font-size: 14px;">${item.product_sku}</td>
-                              <td style = "padding: 10px 16px; border-bottom: 1px solid #D0D2D5;  text-align: left; font-size: 14px;">${item.quantity}</td>
-                              <td style = "padding: 10px 16px; border-bottom: 1px solid #D0D2D5;  text-align: left; font-size: 14px;">${this.formatPrice(item.unit_price)}</td>
-                              <td style = "padding: 10px 16px; border-bottom: 1px solid #D0D2D5;  text-align: left; font-size: 14px;">${this.formatPrice(item.total_price)}</td>
+                              <td>${item.product_name}</td>
+                              <td>${item.product_sku}</td>
+                              <td>${item.quantity}</td>
+                              <td>${this.formatPrice(item.unit_price)}</td>
+                              <td>${this.formatPrice(item.total_price)}</td>
                             </tr>
                           `).join("") || ""}
                         </tbody>
@@ -763,9 +758,9 @@ export class AdminOrderController {
 
     return `
       <div class="modal fade" id="paymentProofModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-          <div class="modal-content bg-light">
-            <div class="modal-header text-white" style ="background-color: #FFA800">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-success text-white">
               <div>
                 <h5 class="modal-title">
                   <i class="bi bi-check-circle"></i> Minh Chứng Thanh Toán Tự Động
@@ -776,8 +771,8 @@ export class AdminOrderController {
             </div>
             <div class="modal-body">
               <!-- Verification Status -->
-              <div class="card mb-3 border-primary">
-                <div class="card-header text-white" style ="background-color: #0D9BFF">
+              <div class="card mb-3 border-success">
+                <div class="card-header bg-success text-white">
                   <h6 class="mb-0"><i class="bi bi-shield-check"></i> Trạng Thái Xác Minh</h6>
                 </div>
                 <div class="card-body">
@@ -803,8 +798,8 @@ export class AdminOrderController {
               </div>
 
               <!-- Transaction Details -->
-              <div class="card border-primary mb-3">
-                <div class="card-header text-white" style ="background-color: #0D9BFF">
+              <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
                   <h6 class="mb-0"><i class="bi bi-receipt"></i> Chi Tiết Giao Dịch</h6>
                 </div>
                 <div class="card-body">
@@ -825,8 +820,8 @@ export class AdminOrderController {
               </div>
 
               <!-- Order Information -->
-              <div class="card border-primary" >
-                <div class="card-header text-white" style ="background-color: #0D9BFF">
+              <div class="card">
+                <div class="card-header bg-info text-white">
                   <h6 class="mb-0"><i class="bi bi-box-seam"></i> Thông Tin Đơn Hàng</h6>
                 </div>
                 <div class="card-body">
