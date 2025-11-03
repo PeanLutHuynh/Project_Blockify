@@ -20,6 +20,8 @@ export class AdminProductController {
     this.setupEventListeners();
     this.setupBulkActions();
     this.setupImageUpload();
+    // Load categories for dropdowns
+    this.loadCategories();
   }
 
   /**
@@ -462,48 +464,113 @@ export class AdminProductController {
    */
   private async handleAddProduct(): Promise<void> {
     try {
+      console.log('🚀 Starting product creation...');
+      
       const productName = (document.getElementById('productName') as HTMLInputElement)?.value;
+      const categorySelect = document.getElementById('productCategory') as HTMLSelectElement;
+      const categoryName = categorySelect?.selectedOptions[0]?.text || 'uncategorized';
+      const categoryId = parseInt(categorySelect?.value || '0');
       
-      // Get form data
-      const difficultyValue = (document.getElementById('productAge') as HTMLInputElement)?.value.trim();
+      console.log('📋 Product info:', { productName, categoryName, categoryId });
       
-      const formData: any = {
-        product_name: productName,
-        product_slug: this.generateSlug(productName),
-        category_id: parseInt((document.getElementById('productCategory') as HTMLSelectElement)?.value || '1'),
-        description: (document.getElementById('productDesc') as HTMLTextAreaElement)?.value || '',
-        short_description: '',
-        price: parseFloat((document.getElementById('productPrice') as HTMLInputElement)?.value),
-        stock_quantity: parseInt((document.getElementById('productStock') as HTMLInputElement)?.value || '0'),
-        piece_count: parseInt((document.getElementById('productPieces') as HTMLInputElement)?.value) || null,
-        difficulty_level: difficultyValue || null,
-        status: (document.getElementById('productStatus') as HTMLSelectElement)?.value || 'active',
-        images: [],
-      };
+      // Validate required fields
+      if (!productName || !categoryId) {
+        this.showError('Vui lòng nhập tên sản phẩm và chọn danh mục!');
+        return;
+      }
+      
+      // Step 1: Upload all images FIRST
+      console.log('📤 Step 1: Uploading images...');
+      const imageInputs = document.querySelectorAll('.product-image-input') as NodeListOf<HTMLInputElement>;
+      const uploadedImageUrls: string[] = [];
+      
+      const token = localStorage.getItem('blockify_auth_token');
+      
+      for (let index = 0; index < imageInputs.length; index++) {
+        const input = imageInputs[index];
+        const file = input.files?.[0];
+        
+        if (file) {
+          console.log(`📤 Uploading image ${index}...`);
+          
+          // Upload to server with metadata
+          const formData = new FormData();
+          formData.append('image', file);
+          formData.append('productName', productName);
+          formData.append('categoryId', categoryId.toString()); // Send category ID, backend will lookup name
+          formData.append('imageIndex', index.toString());
 
-      // Collect image URLs from uploaded images
-      const imageInputs = document.querySelectorAll('.product-image-input');
-      imageInputs.forEach((_input: any, index) => {
-        const previewDiv = document.getElementById(`preview-${index}`);
-        if (previewDiv) {
-          const imgElement = previewDiv.querySelector('img[data-uploaded-url]');
-          if (imgElement) {
-            const uploadedUrl = imgElement.getAttribute('data-uploaded-url');
-            if (uploadedUrl) {
-              formData.images.push({
-                image_url: uploadedUrl,
-                is_primary: index === 0,
-                sort_order: index,
-              });
-            }
+          const response = await fetch('http://localhost:3001/api/admin/products/upload-image', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: formData
+          });
+
+          const result = await response.json();
+          
+          if (result.success && result.data?.imageUrl) {
+            uploadedImageUrls.push(result.data.imageUrl);
+            console.log(`✅ Image ${index} uploaded: ${result.data.imageUrl}`);
+          } else {
+            throw new Error(`Failed to upload image ${index}: ${result.error}`);
           }
         }
-      });
+      }
+      
+      console.log(`✅ All images uploaded! Total: ${uploadedImageUrls.length}`);
+      
+      // Step 2: Prepare product data
+      const difficultyValue = (document.getElementById('productAge') as HTMLSelectElement)?.value.trim();
+      
+      // Get and parse all form values
+      const priceValue = parseFloat((document.getElementById('productPrice') as HTMLInputElement)?.value);
+      const salePriceValue = parseFloat((document.getElementById('productSalePrice') as HTMLInputElement)?.value);
+      const stockValue = parseInt((document.getElementById('productStock') as HTMLInputElement)?.value);
+      const minStockValue = parseInt((document.getElementById('productMinStock') as HTMLInputElement)?.value);
+      const weightValue = parseFloat((document.getElementById('productWeight') as HTMLInputElement)?.value);
+      const piecesValue = parseInt((document.getElementById('productPieces') as HTMLInputElement)?.value);
+      
+      // Validate required fields
+      if (isNaN(priceValue) || priceValue <= 0) {
+        this.showError('Vui lòng nhập giá sản phẩm hợp lệ!');
+        return;
+      }
+      
+      const productData: any = {
+        product_name: productName,
+        product_slug: this.generateSlug(productName),
+        category_id: categoryId,
+        description: (document.getElementById('productDesc') as HTMLTextAreaElement)?.value || '',
+        short_description: (document.getElementById('productShortDesc') as HTMLTextAreaElement)?.value || '',
+        price: priceValue,
+        sale_price: !isNaN(salePriceValue) ? salePriceValue : undefined,
+        stock_quantity: !isNaN(stockValue) ? stockValue : 0,
+        min_stock_level: !isNaN(minStockValue) ? minStockValue : undefined,
+        weight: !isNaN(weightValue) ? weightValue : undefined,
+        dimensions: (document.getElementById('productDimensions') as HTMLInputElement)?.value || undefined,
+        piece_count: !isNaN(piecesValue) ? piecesValue : undefined,
+        difficulty_level: difficultyValue || undefined,
+        is_featured: (document.getElementById('productIsFeatured') as HTMLInputElement)?.checked || false,
+        is_bestseller: (document.getElementById('productIsBestseller') as HTMLInputElement)?.checked || false,
+        is_new: (document.getElementById('productIsNew') as HTMLInputElement)?.checked || false,
+        status: (document.getElementById('productStatus') as HTMLSelectElement)?.value || 'active',
+        images: uploadedImageUrls.map((url, index) => ({
+          image_url: url,
+          is_primary: index === 0,
+          sort_order: index,
+        })),
+      };
 
-      // Send request
-      const response = await httpClient.post('/api/admin/products', formData);
+      console.log('📦 Product data:', productData);
+      
+      // Step 3: Create product
+      console.log('🔄 Step 2: Creating product...');
+      const response = await httpClient.post('/api/admin/products', productData);
 
       if (response.success) {
+        console.log('✅ Product created successfully!');
         this.showSuccess('Thêm sản phẩm thành công!');
         
         // Reset form
@@ -522,11 +589,12 @@ export class AdminProductController {
         // Reload products
         await this.loadProducts(this.currentPage);
       } else {
-        this.showError(response.error || 'Không thể thêm sản phẩm');
+        console.error('❌ Backend error:', response);
+        this.showError(response.error || response.message || 'Không thể thêm sản phẩm');
       }
     } catch (error: any) {
-      console.error('Error adding product:', error);
-      this.showError(error.message || 'Không thể thêm sản phẩm');
+      console.error('❌ Error adding product:', error);
+      this.showError(error.message || error.error || 'Không thể thêm sản phẩm');
     }
   }
 
@@ -553,10 +621,35 @@ export class AdminProductController {
         (document.getElementById('editProductName') as HTMLInputElement).value = product.product_name;
         (document.getElementById('editProductCategory') as HTMLSelectElement).value = product.category_id;
         (document.getElementById('editProductDesc') as HTMLTextAreaElement).value = product.description || '';
+        (document.getElementById('editProductShortDesc') as HTMLTextAreaElement).value = product.short_description || '';
         (document.getElementById('editProductPrice') as HTMLInputElement).value = product.price;
+        (document.getElementById('editProductSalePrice') as HTMLInputElement).value = product.sale_price || '';
         (document.getElementById('editProductStock') as HTMLInputElement).value = product.stock_quantity || 0;
+        (document.getElementById('editProductMinStock') as HTMLInputElement).value = product.min_stock_level || '';
+        (document.getElementById('editProductWeight') as HTMLInputElement).value = product.weight || '';
+        (document.getElementById('editProductDimensions') as HTMLInputElement).value = product.dimensions || '';
         (document.getElementById('editProductPieces') as HTMLInputElement).value = product.piece_count || 0;
-        (document.getElementById('editProductAge') as HTMLInputElement).value = product.difficulty_level || '';
+        
+        // Set difficulty level - only if it's a valid option (capitalize first letter)
+        const validDifficulties = ['Easy', 'Medium', 'Hard', 'Expert'];
+        const difficultySelect = document.getElementById('editProductAge') as HTMLSelectElement;
+        if (product.difficulty_level) {
+          // Capitalize first letter
+          const capitalizedDifficulty = product.difficulty_level.charAt(0).toUpperCase() + product.difficulty_level.slice(1).toLowerCase();
+          if (validDifficulties.includes(capitalizedDifficulty)) {
+            difficultySelect.value = capitalizedDifficulty;
+          } else {
+            difficultySelect.value = ''; // Reset to empty if invalid value
+          }
+        } else {
+          difficultySelect.value = '';
+        }
+        
+        // Set checkboxes
+        (document.getElementById('editProductIsFeatured') as HTMLInputElement).checked = product.is_featured || false;
+        (document.getElementById('editProductIsBestseller') as HTMLInputElement).checked = product.is_bestseller || false;
+        (document.getElementById('editProductIsNew') as HTMLInputElement).checked = product.is_new || false;
+        
         (document.getElementById('editProductStatus') as HTMLSelectElement).value = product.status || 'active';
 
         // Clear all image previews first
@@ -607,17 +700,25 @@ export class AdminProductController {
       const productId = parseInt((document.getElementById('editProductId') as HTMLInputElement)?.value);
       const productName = (document.getElementById('editProductName') as HTMLInputElement)?.value;
 
-      const difficultyValue = (document.getElementById('editProductAge') as HTMLInputElement)?.value.trim();
+      const difficultyValue = (document.getElementById('editProductAge') as HTMLSelectElement)?.value.trim();
       
       const formData: any = {
         product_name: productName,
         product_slug: this.generateSlug(productName),
         category_id: parseInt((document.getElementById('editProductCategory') as HTMLSelectElement)?.value),
         description: (document.getElementById('editProductDesc') as HTMLTextAreaElement)?.value || '',
+        short_description: (document.getElementById('editProductShortDesc') as HTMLTextAreaElement)?.value || '',
         price: parseFloat((document.getElementById('editProductPrice') as HTMLInputElement)?.value),
+        sale_price: parseFloat((document.getElementById('editProductSalePrice') as HTMLInputElement)?.value) || null,
         stock_quantity: parseInt((document.getElementById('editProductStock') as HTMLInputElement)?.value),
+        min_stock_level: parseInt((document.getElementById('editProductMinStock') as HTMLInputElement)?.value) || null,
+        weight: parseFloat((document.getElementById('editProductWeight') as HTMLInputElement)?.value) || null,
+        dimensions: (document.getElementById('editProductDimensions') as HTMLInputElement)?.value || null,
         piece_count: parseInt((document.getElementById('editProductPieces') as HTMLInputElement)?.value) || null,
         difficulty_level: difficultyValue || null,
+        is_featured: (document.getElementById('editProductIsFeatured') as HTMLInputElement)?.checked || false,
+        is_bestseller: (document.getElementById('editProductIsBestseller') as HTMLInputElement)?.checked || false,
+        is_new: (document.getElementById('editProductIsNew') as HTMLInputElement)?.checked || false,
         status: (document.getElementById('editProductStatus') as HTMLSelectElement)?.value,
       };
 
@@ -752,7 +853,7 @@ export class AdminProductController {
   }
 
   /**
-   * Handle image upload - Upload to Supabase Storage and show preview
+   * Handle image selection - Show LOCAL preview only (don't upload yet)
    */
   private async handleImageUpload(file: File, index: number, previewPrefix: string): Promise<void> {
     try {
@@ -762,59 +863,38 @@ export class AdminProductController {
         previewDiv.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Đang tải...</span></div>';
       }
 
-      // Get product name and category from form
-      const productNameInput = document.getElementById('productName') as HTMLInputElement;
-      const categorySelect = document.getElementById('categorySelect') as HTMLSelectElement;
+      // Read file as Data URL for LOCAL preview
+      const reader = new FileReader();
       
-      const productName = productNameInput?.value || 'Unknown';
-      const categoryName = categorySelect?.selectedOptions[0]?.text || 'Unknown';
-
-      // Upload to server with metadata
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('productName', productName);
-      formData.append('categoryName', categoryName);
-      formData.append('imageIndex', index.toString());
-
-      const token = localStorage.getItem('blockify_auth_token');
-      
-      console.log(`📤 Uploading image ${index} to server...`);
-      console.log(`📋 Product: ${productName}, Category: ${categoryName}`);
-
-      const response = await fetch('http://localhost:3001/api/admin/products/upload-image', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      });
-
-      const result = await response.json();
-      console.log(`📡 Upload response:`, result);
-
-      if (result.success && result.data?.imageUrl) {
-        const imageUrl = result.data.imageUrl;
+      reader.onload = (e) => {
+        const localImageUrl = e.target?.result as string;
         
-        // Show preview with uploaded URL
-        if (previewDiv) {
+        // Show preview with local Data URL
+        if (previewDiv && localImageUrl) {
           previewDiv.innerHTML = `
-            <img src="${imageUrl}" alt="Image ${index + 1}" style="max-width: 100%; max-height: 150px; object-fit: cover; border-radius: 4px;" data-uploaded-url="${imageUrl}">
-            <div class="mt-1 small text-success">✅ Đã tải lên</div>
+            <img src="${localImageUrl}" alt="Image ${index + 1}" style="max-width: 100%; max-height: 150px; object-fit: cover; border-radius: 4px;" data-local-preview="true">
+            <div class="mt-1 small text-info">📸 Preview</div>
           `;
         }
         
-        console.log(`✅ Image ${index} uploaded: ${imageUrl}`);
-      } else {
-        throw new Error(result.error || 'Upload failed');
-      }
+        console.log(`✅ Preview image ${index} loaded`);
+      };
+
+      reader.onerror = () => {
+        if (previewDiv) {
+          previewDiv.innerHTML = '<div class="text-danger small">❌ Không thể đọc file</div>';
+        }
+      };
+
+      reader.readAsDataURL(file);
     } catch (error: any) {
-      console.error('❌ Image upload error:', error);
-      this.showError(error.message || 'Không thể tải ảnh lên');
+      console.error('❌ Image preview error:', error);
+      this.showError(error.message || 'Không thể xem trước ảnh');
       
       // Show error state
       const previewDiv = document.getElementById(`${previewPrefix}-${index}`);
       if (previewDiv) {
-        previewDiv.innerHTML = '<div class="text-danger small">❌ Upload thất bại</div>';
+        previewDiv.innerHTML = '<div class="text-danger small">❌ Lỗi</div>';
       }
     }
   }

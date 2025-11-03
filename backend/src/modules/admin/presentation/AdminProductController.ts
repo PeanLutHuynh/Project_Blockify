@@ -198,22 +198,43 @@ export class AdminProductController {
       }
 
       const body = req.body as CreateProductDTO;
+      
+      logger.info('📦 [CreateProduct] Request body:', JSON.stringify(body, null, 2));
 
       // Validate required fields
       if (!body.product_name || !body.category_id || !body.price) {
-        this.sendError(res, 400, 'Missing required fields');
+        logger.error('❌ [CreateProduct] Missing required fields:', {
+          product_name: body.product_name,
+          category_id: body.category_id,
+          price: body.price
+        });
+        this.sendError(res, 400, 'Missing required fields: product_name, category_id, and price are required');
         return;
       }
 
+      logger.info('✅ [CreateProduct] Validation passed, creating product...');
+      
       const product = await this.productService.createProduct(
         body,
         adminId
       );
 
+      logger.info('✅ [CreateProduct] Product created successfully:', product.product_id);
       this.sendSuccess(res, 'Product created successfully', product);
     } catch (error: any) {
-      logger.error('Create product error:', error);
-      this.sendError(res, 400, error.message || 'Bad request');
+      console.error('❌❌❌ [CreateProduct] FATAL ERROR ❌❌❌');
+      console.error('Error object:', error);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      console.error('Error code:', error.code);
+      console.error('Error details:', error.details);
+      logger.error('❌ [CreateProduct] Error:', error);
+      logger.error('❌ [CreateProduct] Error stack:', error.stack);
+      
+      // Return detailed error to frontend
+      const errorMessage = error.message || error.code || 'Bad request';
+      const errorDetails = error.details || error.hint || '';
+      this.sendError(res, 400, `${errorMessage}${errorDetails ? ': ' + errorDetails : ''}`);
     }
   }
 
@@ -585,11 +606,39 @@ export class AdminProductController {
       }
 
       // Get optional metadata from request body (sent via FormData)
-      const categoryName = req.body?.categoryName || req.body?.category_name;
+      const categoryIdStr = req.body?.categoryId || req.body?.category_id;
       const productName = req.body?.productName || req.body?.product_name;
       const imageIndex = req.body?.imageIndex || req.body?.image_index;
 
-      console.log('📋 Upload metadata:', { categoryName, productName, imageIndex });
+      console.log('📋 Upload metadata (raw):', { 
+        categoryIdStr, 
+        productName, 
+        imageIndex,
+        bodyKeys: Object.keys(req.body || {}),
+        fullBody: req.body
+      });
+      
+      // Lookup category name from category_id
+      let categoryName = 'uncategorized';
+      if (categoryIdStr) {
+        try {
+          const categoryId = parseInt(categoryIdStr);
+          console.log(`🔍 Looking up category ID: ${categoryId}`);
+          const category = await this.productService.getCategoryById(categoryId);
+          if (category) {
+            categoryName = category.category_name;
+            console.log(`✅ Category lookup: ID ${categoryId} → "${categoryName}"`);
+          } else {
+            console.warn(`⚠️ Category ID ${categoryId} not found, using "uncategorized"`);
+          }
+        } catch (err) {
+          console.error('❌ Error looking up category:', err);
+        }
+      } else {
+        console.warn(`⚠️ No categoryId provided in request body, using "uncategorized"`);
+      }
+
+      console.log('📋 Upload metadata (resolved):', { categoryName, productName, imageIndex });
 
       // Upload to Supabase Storage
       const imageUrl = await this.productService.uploadProductImage(
