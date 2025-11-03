@@ -327,7 +327,7 @@ async function loadRecommendedProductsForSection() {
           <img src="${product.imageUrl}" 
                alt="${product.name}" 
                class="product-img"
-               onerror="this.src='/public/images/2.jpg'">
+               onerror="this.src='/public/images/img2.jpg'">
           <div class="product-footer pt-4">${product.name}</div>
         </div>
       `;

@@ -681,7 +681,7 @@ function initializeProductDetailPage() {
     if (img) {
       img.src = src;
       img.onerror = () => {
-        img.src = '/public/images/2.jpg';
+        img.src = '/public/images/img2.jpg';
       };
     }
   };
