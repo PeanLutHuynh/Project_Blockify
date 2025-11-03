@@ -354,21 +354,23 @@ export class AdminProductService {
         throw new Error(errors.join(', '));
       }
 
-      // Add images if provided
+      // Add images if provided - group all images into one row
       if (dto.images && dto.images.length > 0) {
-        product.images = dto.images.map(
-          (img, index) =>
-            new ProductImage({
-              productId: 0, // Will be set after product creation
-              imageUrl: img.image_url,
-              altText: img.alt_text,
-              isPrimary: img.is_primary || index === 0,
-              sortOrder: img.sort_order || index,
-              altImg1: img.alt_img1,
-              altImg2: img.alt_img2,
-              altImg3: img.alt_img3,
-            })
-        );
+        const imageUrls = dto.images.map(img => img.image_url);
+        
+        // Create single image row with main image + alt images
+        product.images = [
+          new ProductImage({
+            productId: 0, // Will be set after product creation
+            imageUrl: imageUrls[0], // Primary image
+            altText: dto.images[0]?.alt_text,
+            isPrimary: true,
+            sortOrder: 0,
+            altImg1: imageUrls[1] || undefined, // Second image
+            altImg2: imageUrls[2] || undefined, // Third image
+            altImg3: imageUrls[3] || undefined, // Fourth image
+          })
+        ];
       }
 
       // Create product
