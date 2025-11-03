@@ -584,10 +584,20 @@ export class AdminProductController {
         return;
       }
 
+      // Get optional metadata from request body (sent via FormData)
+      const categoryName = req.body?.categoryName || req.body?.category_name;
+      const productName = req.body?.productName || req.body?.product_name;
+      const imageIndex = req.body?.imageIndex || req.body?.image_index;
+
+      console.log('📋 Upload metadata:', { categoryName, productName, imageIndex });
+
       // Upload to Supabase Storage
       const imageUrl = await this.productService.uploadProductImage(
         fileData.buffer,
-        fileData.mimetype
+        fileData.mimetype,
+        categoryName,
+        productName,
+        imageIndex ? parseInt(imageIndex) : undefined
       );
 
       console.log('✅ Image uploaded:', imageUrl);

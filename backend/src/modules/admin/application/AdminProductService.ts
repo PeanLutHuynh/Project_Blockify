@@ -756,11 +756,19 @@ export class AdminProductService {
   /**
    * Upload product image to Supabase Storage
    */
-  async uploadProductImage(fileBuffer: Buffer, fileType: string): Promise<string> {
+  async uploadProductImage(
+    fileBuffer: Buffer, 
+    fileType: string,
+    categoryName?: string,
+    productName?: string,
+    imageIndex?: number
+  ): Promise<string> {
     try {
       console.log(`🔥 ===== PRODUCT IMAGE UPLOAD STARTED =====`);
       console.log(`🔥 File type: ${fileType}`);
       console.log(`🔥 File size: ${fileBuffer.length} bytes`);
+      console.log(`🔥 Category: ${categoryName || 'Unknown'}`);
+      console.log(`🔥 Product: ${productName || 'Unknown'}`);
 
       // Validate file type
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
@@ -773,18 +781,30 @@ export class AdminProductService {
         throw new Error('File size exceeds 5MB limit');
       }
 
-      // Generate unique file name
+      // Generate file name with folder structure: category/product/image{index}.ext
       const fileExtension = fileType.split('/')[1];
-      const fileName = `product-img/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
+      const timestamp = Date.now();
+      const randomStr = Math.random().toString(36).substring(7);
+      
+      // Create folder path: category/product/filename
+      const folderPath = categoryName && productName 
+        ? `${categoryName}/${productName}`
+        : 'uncategorized';
+      
+      const imageName = imageIndex !== undefined 
+        ? `image${imageIndex}.${fileExtension}`
+        : `${timestamp}_${randomStr}.${fileExtension}`;
+        
+      const fileName = `${folderPath}/${imageName}`;
 
-      console.log(`📤 Uploading product image: ${fileName}`);
+      console.log(`📤 Uploading to: ${fileName}`);
 
       // Upload to Supabase Storage bucket 'product-img'
       const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
         .from('product-img')
         .upload(fileName, fileBuffer, {
           contentType: fileType,
-          upsert: false
+          upsert: true // Allow overwrite if same name exists
         });
 
       if (uploadError) {
