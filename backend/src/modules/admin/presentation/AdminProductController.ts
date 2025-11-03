@@ -626,8 +626,10 @@ export class AdminProductController {
           console.log(`🔍 Looking up category ID: ${categoryId}`);
           const category = await this.productService.getCategoryById(categoryId);
           if (category) {
+            // Use category_name (original name) to match existing folders in Storage
+            // Storage folders use original names like "Train", "Construction", "Fire Fighter"
             categoryName = category.category_name;
-            console.log(`✅ Category lookup: ID ${categoryId} → "${categoryName}"`);
+            console.log(`✅ Category lookup: ID ${categoryId} → name "${categoryName}"`);
           } else {
             console.warn(`⚠️ Category ID ${categoryId} not found, using "uncategorized"`);
           }
@@ -660,14 +662,21 @@ export class AdminProductController {
 
   /**
    * POST /api/admin/products/:id/images
-   * Add images to product
+   * Add images to product (multipart file upload)
    */
   async addProductImages(
     req: AdminRequest,
     res: HttpResponse,
-    productId: string
+    productId: string,
+    fileData: { buffer: Buffer; mimetype: string; filename: string; size: number }
   ): Promise<void> {
     try {
+      console.log('📤 [Controller] addProductImages CALLED');
+      console.log('  - Product ID:', productId);
+      console.log('  - File:', fileData.filename);
+      console.log('  - Type:', fileData.mimetype);
+      console.log('  - Size:', fileData.size);
+
       const adminId = await this.getAdminId(req);
       if (!adminId) {
         this.sendError(res, 401, 'Unauthorized');
@@ -680,23 +689,74 @@ export class AdminProductController {
         return;
       }
 
-      const body = req.body as { images: Array<any> };
-
-      if (!body.images || !Array.isArray(body.images) || body.images.length === 0) {
-        this.sendError(res, 400, 'Images array is required');
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(fileData.mimetype)) {
+        this.sendError(res, 400, 'Invalid file type. Only JPEG, PNG, GIF, WEBP are allowed');
         return;
       }
 
+      // Validate file size (max 5MB)
+      if (fileData.size > 5 * 1024 * 1024) {
+        this.sendError(res, 400, 'File size exceeds 5MB limit');
+        return;
+      }
+
+      // Get product to extract category and name
+      console.log(`🔍 Looking up product ID: ${id}`);
+      const product = await this.productService.getProductById(id);
+      if (!product) {
+        this.sendError(res, 404, 'Product not found');
+        return;
+      }
+
+      console.log('✅ Product found:', {
+        id: product.product_id,
+        name: product.product_name,
+        category_id: product.category_id
+      });
+
+      // Get category name
+      const category = await this.productService.getCategoryById(product.category_id);
+      const categoryName = category?.category_name || 'uncategorized';
+
+      console.log(`✅ Category lookup: ID ${product.category_id} → name "${categoryName}"`);
+
+      // Get optional metadata from request body
+      const imageIndex = req.body?.imageIndex || req.body?.image_index;
+
+      console.log('📋 Upload metadata:', { 
+        categoryName, 
+        productName: product.product_name, 
+        imageIndex 
+      });
+
+      // Upload to Supabase Storage
+      const imageUrl = await this.productService.uploadProductImage(
+        fileData.buffer,
+        fileData.mimetype,
+        categoryName,
+        product.product_name,
+        imageIndex ? parseInt(imageIndex) : undefined
+      );
+
+      console.log('✅ Image uploaded:', imageUrl);
+
+      // Add image record to database
       await this.productService.addProductImages(
         id,
-        body.images,
+        [{
+          image_url: imageUrl,
+          is_primary: false,
+          sort_order: imageIndex ? parseInt(imageIndex) : 999
+        }],
         adminId
       );
 
-      this.sendSuccess(res, 'Images added successfully');
+      this.sendSuccess(res, 'Image added successfully', { imageUrl });
     } catch (error: any) {
       logger.error('Add product images error:', error);
-      this.sendError(res, 400, error.message || 'Bad request');
+      this.sendError(res, 500, error.message || 'Failed to add image');
     }
   }
 

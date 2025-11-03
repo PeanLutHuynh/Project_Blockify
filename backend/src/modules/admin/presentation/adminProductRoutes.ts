@@ -90,11 +90,26 @@ export function registerAdminProductRoutes(router: any): void {
     }
   });
 
-  // Add images to product
+  // Add images to product - With multipart parser
   router.post("/api/admin/products/:id/images", authenticateToken, async (req: HttpRequest, res: HttpResponse) => {
-    const urlParts = req.url?.split("/") || [];
-    const productId = urlParts[urlParts.length - 2] || "";
-    await adminProductController.addProductImages(req, res, productId);
+    try {
+      console.log('📤 [Route] Add product images');
+      
+      // Parse multipart data
+      const fileData = await parseMultipartData(req);
+      
+      if (!fileData) {
+        return res.status(400).json({ success: false, error: 'No file uploaded' });
+      }
+      
+      const urlParts = req.url?.split("/") || [];
+      const productId = urlParts[urlParts.length - 2] || "";
+      
+      await adminProductController.addProductImages(req, res, productId, fileData);
+    } catch (error: any) {
+      console.error('❌ [Route] Error adding product images:', error);
+      return res.status(500).json({ success: false, error: error.message });
+    }
   });
 
   // Delete product image
