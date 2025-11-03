@@ -238,28 +238,7 @@ body {
 .btn1 {
   background-color: #0094ff;
   border: 1px solid #0094ff;
-
-/* .btn {
->>>>>>> Back-end
-  padding: 10px 16px;
-  border-radius: 8px;
-  color: #fff;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
 }
-/* .btn {
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: 1px solid #0d9bff;
-  background: #96d3ff;
-  color: #fff;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-=======
->>>>>>> Back-end
-} */
 .btn-outline {
   background: #fff;
   color: #0d9bff;
@@ -508,10 +487,8 @@ tr:last-child td { border-bottom: none; }
   color: #856404;
 }
 
-/* Voucher Management Styles */
 .voucher-navbar {
   background-color: #0094ff;
-  
   border: 1px solid #e6e6e6;
   border-radius: 8px;
   padding: 15px 20px;
@@ -519,16 +496,17 @@ tr:last-child td { border-bottom: none; }
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: #333;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-
 .voucher-navbar .navbar-title {
   font-weight: 700;
   font-size: 18px;
   color: #333;
   margin: 0;
 }
-
 .voucher-navbar .navbar-actions {
   display: flex;
   gap: 10px;
@@ -895,5 +873,4 @@ tr:last-child td { border-bottom: none; }
   .product-navbar .navbar-actions {
     justify-content: center;
   }
-}
 }
