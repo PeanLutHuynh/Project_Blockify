@@ -171,18 +171,28 @@ export class AdminProductService {
       const limit = query.limit || 20;
       const offset = (page - 1) * limit;
 
-      logger.info('📦 AdminProductService.getAllProducts - Query:', { page, limit, offset });
+      logger.info('📦 AdminProductService.getAllProducts - Query:', { 
+        page, limit, offset, 
+        search: query.query,
+        stock_filter: query.stock_filter,
+        category_id: query.category_id,
+        difficulty_level: query.difficulty_level
+      });
 
-      // Simple direct query like Orders
+      // Query products - categories is LEFT JOIN by default in Supabase
+      // If category_id is null or invalid, categories will be null
       let supabaseQuery = supabaseAdmin
         .from('products')
         .select(`
           *,
-          categories(category_id, category_name, category_slug),
-          product_images(image_id, image_url, alt_img1, alt_img2, alt_img3, is_primary, sort_order)
-        `, { count: 'exact' })
-        .order('created_at', { ascending: false })
-        .range(offset, offset + limit - 1);
+          categories!left(category_id, category_name, category_slug),
+          product_images!left(image_id, image_url, alt_img1, alt_img2, alt_img3, is_primary, sort_order)
+        `, { count: 'exact' });
+
+      // Apply search filter
+      if (query.query && query.query.trim().length > 0) {
+        supabaseQuery = supabaseQuery.ilike('product_name', `%${query.query.trim()}%`);
+      }
 
       // Apply filters if provided
       if (query.category_id) {
@@ -191,9 +201,46 @@ export class AdminProductService {
       if (query.status) {
         supabaseQuery = supabaseQuery.eq('status', query.status);
       }
-      if (query.in_stock) {
+      if (query.difficulty_level) {
+        supabaseQuery = supabaseQuery.eq('difficulty_level', query.difficulty_level);
+      }
+      if (query.is_featured !== undefined) {
+        supabaseQuery = supabaseQuery.eq('is_featured', query.is_featured);
+      }
+      if (query.is_new !== undefined) {
+        supabaseQuery = supabaseQuery.eq('is_new', query.is_new);
+      }
+      if (query.is_bestseller !== undefined) {
+        supabaseQuery = supabaseQuery.eq('is_bestseller', query.is_bestseller);
+      }
+
+      // Handle stock filtering with proper logic
+      if (query.stock_filter) {
+        if (query.stock_filter === 'out_of_stock') {
+          // Hết hàng: stock_quantity = 0
+          supabaseQuery = supabaseQuery.eq('stock_quantity', 0);
+        } else if (query.stock_filter === 'low_stock') {
+          // Sắp hết: stock_quantity > 0 AND stock_quantity <= min_stock_level
+          // Note: Supabase doesn't directly support column-to-column comparison
+          // We'll handle this in post-processing for now
+          supabaseQuery = supabaseQuery.gt('stock_quantity', 0);
+        } else if (query.stock_filter === 'in_stock') {
+          // Còn hàng: stock_quantity > min_stock_level
+          // We'll handle this in post-processing too
+          supabaseQuery = supabaseQuery.gt('stock_quantity', 0);
+        }
+      } else if (query.in_stock) {
+        // Legacy in_stock filter
         supabaseQuery = supabaseQuery.gt('stock_quantity', 0);
       }
+
+      // Apply sorting
+      const sortBy = query.sortBy || 'created_at';
+      const sortOrder = query.sortOrder ? (query.sortOrder === 'asc' ? true : false) : false; // Default: descending (newest first)
+      supabaseQuery = supabaseQuery.order(sortBy, { ascending: sortOrder });
+
+      // Apply pagination
+      supabaseQuery = supabaseQuery.range(offset, offset + limit - 1);
 
       const { data, error, count } = await supabaseQuery;
 
@@ -202,13 +249,14 @@ export class AdminProductService {
         throw error;
       }
 
-      logger.info(`✅ Found ${data?.length || 0} products (total: ${count})`);
+      logger.info(`✅ Supabase returned ${data?.length || 0} products from DB (total count: ${count})`);
+      logger.info(`📊 Will apply post-processing: stock_filter=${query.stock_filter}`);
 
       // Calculate sold_count for each product
       const productIds = (data || []).map((item: any) => item.product_id);
       const soldCounts = await this.calculateSoldCounts(productIds);
 
-      const products = (data || []).map((item: any) => ({
+      let products = (data || []).map((item: any) => ({
         product_id: item.product_id,
         product_name: item.product_name,
         product_slug: item.product_slug,
@@ -219,6 +267,7 @@ export class AdminProductService {
         price: item.price,
         sale_price: item.sale_price,
         stock_quantity: item.stock_quantity,
+        min_stock_level: item.min_stock_level,
         piece_count: item.piece_count,
         difficulty_level: item.difficulty_level,
         dimensions: item.dimensions,
@@ -236,13 +285,34 @@ export class AdminProductService {
         updated_at: item.updated_at,
       }));
 
+      // Post-process stock filtering (column-to-column comparison)
+      const beforeFilterCount = products.length;
+      if (query.stock_filter === 'low_stock') {
+        // Sắp hết: 0 < stock_quantity <= min_stock_level
+        products = products.filter((p: any) => 
+          p.stock_quantity > 0 && 
+          p.min_stock_level && 
+          p.stock_quantity <= p.min_stock_level
+        );
+        logger.info(`🔍 low_stock filter: ${beforeFilterCount} → ${products.length} products`);
+      } else if (query.stock_filter === 'in_stock') {
+        // Còn hàng: stock_quantity > min_stock_level (or no min_stock_level set)
+        products = products.filter((p: any) => 
+          p.stock_quantity > 0 && 
+          (!p.min_stock_level || p.stock_quantity > p.min_stock_level)
+        );
+        logger.info(`🔍 in_stock filter: ${beforeFilterCount} → ${products.length} products`);
+      }
+
+      logger.info(`📤 Returning ${products.length} products to frontend`);
+
       return {
         products,
         pagination: {
           page,
           limit,
-          total: count || 0,
-          total_pages: Math.ceil((count || 0) / limit),
+          total: products.length, // Use filtered count
+          total_pages: Math.ceil(products.length / limit),
         },
       };
     } catch (error) {
