@@ -16,6 +16,21 @@ body { background-color: #f5f5f5;
   background: #f8f9fa;
   
 }
+#filter-panel {
+  display: none;
+  transition: all 0.3s ease;
+}
+
+#filter-panel.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 :root {
   --primary-blue: #2196F3;
   --secondary-blue: #1976D2;
