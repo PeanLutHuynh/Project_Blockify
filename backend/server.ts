@@ -55,7 +55,15 @@ async function bootstrap() {
             'http://127.0.0.1:5173',
             'http://127.0.0.1:4173',
             ENV.FRONTEND_URL,
+            'https://blockify-vn.vercel.app', // Production frontend
           ].filter(Boolean);
+
+          // Allow all Vercel preview deployments in production
+          if (ENV.NODE_ENV === 'production' && origin) {
+            if (origin.includes('vercel.app') || origin.includes('blockify')) {
+              return true;
+            }
+          }
 
           return !origin || allowedOrigins.includes(origin);
         },

@@ -1,33 +1,48 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Load shared .env from project root
-const envPath = path.resolve(process.cwd(), '../.env');
-console.log('Loading .env from:', envPath);
-const result = dotenv.config({ path: envPath });
+// Only load .env file in development
+if (process.env.NODE_ENV !== 'production') {
+  // Load shared .env from project root
+  const envPath = path.resolve(process.cwd(), '../.env');
+  console.log('Loading .env from:', envPath);
+  const result = dotenv.config({ path: envPath });
 
-if (result.error) {
-  console.warn('Warning: Could not load .env file:', result.error.message);
-} else {
-  console.log('✅ Successfully loaded shared environment configuration');
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    console.log('✅ SUPABASE_SERVICE_ROLE_KEY loaded');
+  if (result.error) {
+    console.warn('Warning: Could not load .env file:', result.error.message);
   } else {
-    console.error('❌ SUPABASE_SERVICE_ROLE_KEY is missing!');
+    console.log('✅ Successfully loaded shared environment configuration');
   }
+} else {
+  console.log('🚀 Running in PRODUCTION mode - using environment variables from hosting platform');
+}
+
+// Validate critical environment variables
+if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.log('✅ SUPABASE_SERVICE_ROLE_KEY loaded');
+} else {
+  console.error('❌ SUPABASE_SERVICE_ROLE_KEY is missing!');
 }
 
 export const ENV = {
   NODE_ENV: process.env.NODE_ENV || 'development',
-  FRONTEND_URL: process.env.FRONTEND_URL,
-  EMAIL_REDIRECT_URL: process.env.EMAIL_REDIRECT_URL || 'http://127.0.0.1:3002/src/pages/EmailVerified.html',
+  
+  // Auto-select URLs based on environment
+  FRONTEND_URL: process.env.NODE_ENV === 'production' 
+    ? (process.env.FRONTEND_URL || process.env.PRODUCTION_FRONTEND_URL || 'https://blockify-vn.vercel.app')
+    : (process.env.FRONTEND_URL || 'http://127.0.0.1:3002'),
+    
+  EMAIL_REDIRECT_URL: process.env.NODE_ENV === 'production'
+    ? (process.env.EMAIL_REDIRECT_URL || process.env.PRODUCTION_EMAIL_REDIRECT_URL || 'https://blockify-vn.vercel.app/pages/EmailVerified.html')
+    : (process.env.EMAIL_REDIRECT_URL || 'http://127.0.0.1:3002/src/pages/EmailVerified.html'),
 
   MAX_FILE_SIZE: 5242880,
   ALLOWED_FILE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'],
   RATE_LIMIT_WINDOW_MS: Number(process.env.RATE_LIMIT_WINDOW_MS) || 900000,
   RATE_LIMIT_MAX_REQUESTS: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
-  PORT: process.env.PORT || '3001',
-  HOST: process.env.HOST || 'localhost',
+  
+  PORT: process.env.PORT || (process.env.NODE_ENV === 'production' ? '10000' : '3001'),
+  HOST: process.env.HOST || '0.0.0.0',
 
   SUPABASE_URL: process.env.SUPABASE_URL || '',
   SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || '',
@@ -52,7 +67,7 @@ export const ENV = {
   SEPAY_MERCHANT_ID: process.env.SEPAY_MERCHANT_ID || '',
   SEPAY_SECRET_KEY: process.env.SEPAY_SECRET_KEY || '',
 
-  // Ngrok URL for webhooks
+  // Ngrok URL for webhooks (development only)
   NGROK_URL: process.env.NGROK_URL || ''
 };
 
