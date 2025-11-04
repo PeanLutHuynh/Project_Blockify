@@ -593,7 +593,7 @@
         </div>
         <div class="toolbar">
           <input class="search" placeholder="Tìm voucher">
-          <button class="btn btn-danger add-btn">+ Thêm voucher</button>
+          <button class="btn btn-danger add-btn" data-bs-toggle="modal" data-bs-target="#addVoucherModal">+ Thêm voucher</button>
         </div>
         
         <!-- Voucher List -->
@@ -1448,8 +1448,8 @@
          `;
          
          // Add payment status filter
-         const paymentFilter = document.createElement('select');
-         paymentFilter.className = 'form-select d-inline-block w-auto ms-2';
+        const paymentFilter = document.createElement('select');
+        paymentFilter.className = 'form-select d-inline-block w-auto ms-2';
          paymentFilter.innerHTML = `
            <option value="">Tất cả thanh toán</option>
            <option value="pending">Chưa thanh toán</option>

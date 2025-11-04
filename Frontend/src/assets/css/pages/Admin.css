@@ -895,6 +895,26 @@ tr:last-child td { border-bottom: none; }
     justify-content: center;
   }
 }
+
+/* Order page - mobile toolbar and table handling */
+@media (max-width: 576px) {
+  #order .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  #order .toolbar .search,
+  #order .toolbar .form-select {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block;
+    margin-left: 0 !important;
+  }
+  #order .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
 .sidebar {
     position: fixed;
     top: 0;
