@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang Đặt Hàng</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/pages/HomePage.css">
+  <link rel="stylesheet" href="../assets/css/pages/OrderPage.css">
+  
+  <!-- Supabase JS SDK from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+      <a class="navbar-brand px-2 rounded-5 border bg-light border-1 border-white" href="IntroductionPage.html">
+        <img src="../../public/images/Group 71.png" alt="Blockify Logo" width="40" height="45">
+      </a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="HomePage.html">Trang chủ</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="IntroductionPage.html">Giới thiệu</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="Service.html">Dịch vụ</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="Contact.html">Hỏi đáp</a>
+          </li>
+        </ul>
+        
+        <div class="navbar-right-icons">
+          <a href="#" class="search-icon">
+            <i class="bi bi-search" id="openSearch"></i>
+          </a>
+          <a href="CartPage.html" class="cart-icon">
+            <i class="bi bi-cart"></i>
+          </a>
+          <a href="SigninPage.html" class="btn-sign">Đăng nhập</a>
+          <a href="SignupPage.html" class="btn-sign">Đăng ký</a>
+        </div>
+      </div>
+      
+      <!-- Search Overlay -->
+      <div class="overlay" id="overlay">
+        <div class="search-popup">
+          <div class="search-header">
+            <strong class="text-white">Tìm kiếm</strong>
+            <i class="bi bi-x-circle" id="closeSearch" style="cursor:pointer; color:white"></i>
+          </div>
+          
+          <input 
+            type="text" 
+            class="search-input text-white" 
+            id="searchInput" 
+            style="border: 0; background-color: rgb(30, 41, 57);" 
+            placeholder="Nhập từ khóa...">
+          
+          <div class="line mb-2"></div>
+          
+          <div class="suggestion-box">
+            <div>
+              <button class="suggestion-btn text-white">Gợi ý</button>
+              <span class="suggestion-text">Bộ xe tải LEGO màu vàng</span>
+            </div>
+            <i class="bi bi-box-arrow-up-right" style="color:white"></i>
+          </div>
+          <div class="suggestion-box">
+            <div>
+              <button class="suggestion-btn text-white">Gợi ý</button>
+              <span class="suggestion-text">Công viên nước</span>
+            </div>
+            <i class="bi bi-box-arrow-up-right" style="color:white"></i>
+          </div>
+          <div class="suggestion-box">
+            <div>
+              <button class="suggestion-btn text-white">Gợi ý</button>
+              <span class="suggestion-text">Thế giới Ninjago</span>
+            </div>
+            <i class="bi bi-box-arrow-up-right" style="color:white"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container my-4">
+    <div class="row">
+      <!-- Customer Info -->
+      <div class="col-md-7">
+        <div class="card p-4">
+          <h6 class="section-title">1. Thông Tin Khách Hàng</h6>
+          <div class="mb-3 row">
+            <label class="col-sm-3 col-form-label">Họ và Tên:</label>
+            <div class="col-sm-9">
+              <p class="form-control-plaintext" id="customer-name">Đang tải...</p>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label class="col-sm-3 col-form-label">Số Điện Thoại:</label>
+            <div class="col-sm-9">
+              <p class="form-control-plaintext" id="customer-phone">Đang tải...</p>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label class="col-sm-3 col-form-label">Email:</label>
+            <div class="col-sm-9">
+              <p class="form-control-plaintext" id="customer-email">Đang tải...</p>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label class="col-sm-3 col-form-label">Địa Chỉ Giao Hàng:</label>
+            <div class="col-sm-9">
+              <p class="form-control-plaintext" id="shipping-address">Đang tải...</p>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-blue">Thông Tin</button>
+            <button class="btn btn-outline-primary">Thay Đổi</button>
+          </div>
+
+          <hr>
+          <h6 class="section-title">2. Phương Thức Vận Chuyển</h6>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="shipping" id="standard">
+            <label class="form-check-label" for="standard">
+              Giao Hàng Tiêu Chuẩn
+            </label>
+          </div>
+          <div class="form-check mb-4">
+            <input class="form-check-input" type="radio" name="shipping" id="fast">
+            <label class="form-check-label" for="fast">
+              Giao Hàng Nhanh
+            </label>
+          </div>
+
+          <h6 class="section-title">3. Ghi Chú (Không bắt buộc)</h6>
+          <textarea class="form-control" rows="3"></textarea>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="col-md-5">
+        <div class="card p-4 order-summary">
+          <h6 class="mb-3">Đơn Hàng</h6>
+          <div id="order-items"></div>
+          <button class="btn btn-outline-primary mb-3">Áp Dụng Mã Giảm Giá</button>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Tổng giá gốc:</span>
+            <span id="original-total">0 VND</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Giảm giá sản phẩm:</span>
+            <span class="text-danger" id="discount-amount">-0 VND</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Tạm tính (Sau giảm):</span>
+            <span id="subtotal">0 VND</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>Phí vận chuyển:</span>
+            <span id="shipping">0 VND</span>
+          </div>
+          <div class="mt-3">
+            <h6 class="section-title">Phương Thức Thanh Toán</h6>
+            <div class="info-box">
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="pm" id="pm-cod" value="cod" checked>
+                <label class="form-check-label" for="pm-cod">Thanh toán khi nhận hàng (COD)</label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="pm" id="pm-bank" value="bank_transfer">
+                <label class="form-check-label" for="pm-bank">Chuyển khoản ngân hàng</label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="pm" id="pm-momo" value="momo">
+                <label class="form-check-label" for="pm-momo">Ví MoMo</label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="pm" id="pm-zalopay" value="zalopay">
+                <label class="form-check-label" for="pm-zalopay">Ví ZaloPay</label>
+              </div>
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="radio" name="pm" id="pm-vnpay" value="vnpay">
+                <label class="form-check-label" for="pm-vnpay">VNPAY</label>
+              </div>
+              <!-- ⚠️ COMMENTED OUT: Old flow - View QR before checkout + Upload proof manually
+                   New flow: Checkout → Show QR modal → Auto verify → Done
+              <div id="upload-box" class="mt-2 d-none">
+                <div class="alert alert-info mb-3">
+                  <small>
+                    <i class="bi bi-info-circle-fill"></i>
+                    <strong>Lưu ý:</strong> Nhấn nút "Xem mã QR" để thanh toán trước, sau đó tải lên minh chứng và nhấn "Thanh Toán Ngay" để hoàn tất đơn hàng.
+                  </small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <label class="form-label mb-0">Tải lên minh chứng thanh toán <span class="text-danger">*</span></label>
+                  <button type="button" class="btn btn-sm btn-primary" id="show-qr-btn" title="Xem mã QR để thanh toán">
+                    <i class="bi bi-qr-code-scan"></i> Xem mã QR
+                  </button>
+                </div>
+                <input type="file" class="form-control" id="payment-proof" accept="image/*,application/pdf" title="Chọn ảnh hoặc PDF minh chứng thanh toán">
+                <small class="text-muted">Chỉ chấp nhận ảnh (JPEG, JPG, PNG, GIF, WebP) hoặc PDF. Tối đa 5MB. Mỗi đơn hàng chỉ upload 1 file.</small>
+                <div id="upload-preview" class="mt-2"></div>
+              </div>
+              -->
+            </div>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between fw-bold">
+            <span>Tổng Cộng:</span>
+            <span id="grand-total">0 VND</span>
+          </div>
+          <button class="btn btn-blue w-100 mt-3">Thanh Toán Ngay</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+  import { initializeApp } from '/dist/src/core/config/init.js';
+  import { initializeNavbarAuth } from '/dist/src/shared/components/NavbarAuth.js';
+  import { OrderController } from '/dist/src/modules/order/OrderController.js';
+  
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Initialize app (loads config, initializes Supabase, auth state)
+    await initializeApp();
+    
+    // Initialize navbar auth (handles user avatar, logout, etc.)
+    initializeNavbarAuth('.navbar-right-icons');
+    
+    // Initialize order controller
+    const controller = new OrderController();
+    await controller.init();
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEGO SHOP - Dịch vụ</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/pages/Service.css">
+    
+    <!-- Supabase JS SDK from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand px-2 rounded-5 border bg-light border-1 border-white" href="IntroductionPage.html">
+                <img src="../../public/images/Group 71.png" alt="Blockify Logo" width="40" height="45">
+              </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                  <a class="nav-link d-flex align-items-center" href="HomePage.html">
+                    <i class="bi bi-house-door me-2"></i> Trang chủ
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link d-flex align-items-center" href="IntroductionPage.html">
+                    <i class="bi bi-info-circle me-2"></i> Giới thiệu
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link d-flex align-items-center" href="Service.html">
+                    <i class="bi bi-gear me-2"></i> Dịch vụ
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link d-flex align-items-center" href="Contact.html">
+                    <i class="bi bi-question-circle me-2"></i> Hỏi đáp
+                  </a>
+                </li>
+              </ul>    
+                <div class="navbar-right-icons">
+                    <a href="#" class="search-icon d-flex justify-content-start align-items-center">
+                        <i class="bi bi-search text-secondary" id="openSearch"> </i>
+                    </a>
+                    <a href="CartPage.html" class="cart-icon">
+                        <i class="bi bi-cart"></i>
+                    </a>
+                    <a href="SigninPage.html" class="btn-sign">Đăng nhập</a>
+                    <a href="SignupPage.html" class="btn-sign">Đăng ký</a>
+                </div>
+      
+            <!-- Tìm kiếm -->
+            <div class="overlay" id="overlay">
+              <div class="search-popup">
+                <div class="search-header">
+                  <strong class="text-white">Tìm kiếm</strong>
+                  <i class="bi bi-x-circle" id="closeSearch" style="cursor:pointer; color:white"></i>
+                </div>
+            
+                <!-- Input -->
+                <input 
+                  type="text" 
+                  class="search-input text-white" 
+                  id="searchInput" 
+                  style="border: 0; background-color: rgb(30, 41, 57);" 
+                  placeholder="Nhập từ khóa...">
+                
+                <div class="line mb-2"></div>
+            
+      
+              </div>
+            </div>
+        </div>
+      </nav>
+      
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1>Dịch vụ của chúng tôi</h1>
+            <p class="lead">Chúng tôi mang đến các dịch vụ LEGO chất lượng cao, biến ý tưởng sáng tạo của bạn thành hiện thực</p>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="section-title">Dịch vụ nổi bật</h2>
+            
+            <div class="row g-4">
+                <!-- Custom Build Service -->
+                <div class="col-lg-6 col-md-6">
+                    <div class="card service-card h-100">
+                        <div class="card-body p-4">
+                            <div class="service-icon">
+                                <i class="bi bi-tools"></i>
+                            </div>
+                            <h3 class="card-title h4 mb-3">Thiết kế theo yêu cầu</h3>
+                            <p class="card-text text-muted">Tạo ra những mô hình LEGO độc đáo dựa trên ý tưởng của bạn cùng đội ngũ thiết kế chuyên nghiệp.</p>
+                            <ul class="service-features">
+                                <li>Tư vấn thiết kế miễn phí</li>
+                                <li>Mô hình 3D trước khi sản xuất</li>
+                                <li>Chỉ sử dụng linh kiện LEGO chính hãng</li>
+                                <li>Bảo hành 6 tháng</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Repair Service -->
+                <div class="col-lg-6 col-md-6">
+                    <div class="card service-card h-100">
+                        <div class="card-body p-4">
+                            <div class="service-icon">
+                                <i class="bi bi-wrench"></i>
+                            </div>
+                            <h3 class="card-title h4 mb-3">Sửa chữa & Bảo dưỡng</h3>
+                            <p class="card-text text-muted">Khôi phục và bảo trì mô hình LEGO của bạn để luôn như mới.</p>
+                            <ul class="service-features">
+                                <li>Thay thế các mảnh hỏng</li>
+                                <li>Vệ sinh chuyên nghiệp</li>
+                                <li>Tăng cường độ bền kết cấu</li>
+                                <li>Tư vấn lưu trữ an toàn</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rental Service -->
+                <div class="col-lg-6 col-md-6">
+                    <div class="card service-card h-100">
+                        <div class="card-body p-4">
+                            <div class="service-icon">
+                                <i class="bi bi-box"></i>
+                            </div>
+                            <h3 class="card-title h4 mb-3">Cho thuê LEGO</h3>
+                            <p class="card-text text-muted">Trải nghiệm các bộ LEGO cao cấp mà không cần đầu tư chi phí lớn ban đầu.</p>
+                            <ul class="service-features">
+                                <li>Hơn 500 bộ LEGO khác nhau</li>
+                                <li>Giao hàng tận nơi</li>
+                                <li>Thời gian thuê linh hoạt</li>
+                                <li>Bảo hiểm đầy đủ</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Consulting Service -->
+                <div class="col-lg-6 col-md-6">
+                    <div class="card service-card h-100">
+                        <div class="card-body p-4">
+                            <div class="service-icon">
+                                <i class="bi bi-lightbulb"></i>
+                            </div>
+                            <h3 class="card-title h4 mb-3">Tư vấn chuyên nghiệp</h3>
+                            <p class="card-text text-muted">Nhận tư vấn từ các chuyên gia LEGO về xây dựng, sưu tầm và đầu tư.</p>
+                            <ul class="service-features">
+                                <li>Tư vấn qua video call</li>
+                                <li>Kế hoạch xây dựng chi tiết</li>
+                                <li>Báo giá chính xác</li>
+                                <li>Hỗ trợ 24/7</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process-section">
+        <div class="container">
+            <h2 class="section-title">Quy trình làm việc</h2>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="process-step">
+                        <div class="step-number">1</div>
+                        <h4>Tư vấn</h4>
+                        <p class="text-muted">Lắng nghe nhu cầu và đưa ra giải pháp phù hợp nhất cho khách hàng</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="process-step">
+                        <div class="step-number">2</div>
+                        <h4>Báo giá</h4>
+                        <p class="text-muted">Cung cấp báo giá chi tiết và minh bạch cho từng dịch vụ</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="process-step">
+                        <div class="step-number">3</div>
+                        <h4>Thực hiện</h4>
+                        <p class="text-muted">Thực hiện dịch vụ với chất lượng cao và đúng thời hạn cam kết</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="process-step">
+                        <div class="step-number">4</div>
+                        <h4>Bàn giao</h4>
+                        <p class="text-muted">Bàn giao sản phẩm/dịch vụ kèm hướng dẫn chi tiết sử dụng</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <section class="contact-cta">
+        <div class="container">
+            <h2>Bạn đã sẵn sàng bắt đầu chưa?</h2>
+            <p class="lead mb-4">Hỏi đáp ngay để tìm hiểu thêm về các dịch vụ LEGO</p>
+            <a href="Contact.html" class="btn btn-light-custom btn-lg">Hỏi đáp ngay</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-section ">
+        <div class="footer-top py-5">
+          <div class="container">
+            <div class="row gy-4">
+              <!-- Logo & Intro -->
+              <div class="col-md-4">
+                <div class="d-flex align-items-center mb-3">
+                
+                  <h4 class="fw-bold mb-0 text-white">Blockify</h4>
+                </div>
+                <p class="text-light small">
+                  Blockify là nền tảng mua sắm trực tuyến thông minh giúp bạn tận hưởng hàng ngàn ưu đãi, 
+                  tích xu và đổi quà cực hấp dẫn mỗi ngày.
+                </p>
+               
+              </div>
+      
+              <!-- Quick Links -->
+              <div class="col-md-2 col-6">
+                <h6 class="fw-bold text-uppercase mb-3 text-white">Liên kết</h6>
+                <ul class="list-unstyled footer-links">
+                  <li><a href="HomePage.html">Trang chủ</a></li>
+                  <li><a href="IntroductionPage.html">Giới thiệu</a></li>
+                  <li><a href="Service.html">Dịch vụ</a></li>
+                  <li><a href="Contact.html">Hỏi đáp</a></li>
+                </ul>
+              </div>
+      
+              <!-- Customer Service -->
+              <div class="col-md-3 col-6">
+                <h6 class="fw-bold text-uppercase mb-3 text-white">Hỗ trợ khách hàng</h6>
+                <ul class="list-unstyled footer-links">
+                  <li><a href="#">Chính sách bảo mật</a></li>
+                  <li><a href="#">Điều khoản sử dụng</a></li>
+                  <li><a href="#">Chính sách hoàn tiền</a></li>
+                  <li><a href="#">Trung tâm trợ giúp</a></li>
+                  <li><a href="#">Vận chuyển & giao hàng</a></li>
+                </ul>
+              </div>
+      
+              <!-- Contact & Social -->
+              <div class="col-md-3">
+                <h6 class="fw-bold text-uppercase mb-3 text-white">Liên hệ</h6>
+                <ul class="list-unstyled small text-light mb-3">
+                  <li><i class="bi bi-geo-alt-fill me-2"></i> 123 Nguyễn Huệ, Q.1, TP.HCM</li>
+                  <li><i class="bi bi-telephone-fill me-2"></i> (028) 1234 5678</li>
+                  <li><i class="bi bi-envelope-fill me-2"></i> support@blockify.vn</li>
+                </ul>
+                <div class="d-flex gap-3 mt-3">
+                  <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
+                  <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
+                  <a href="#" class="social-icon"><i class="bi bi-twitter"></i></a>
+                  <a href="#" class="social-icon"><i class="bi bi-youtube"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <!-- Bottom Bar -->
+        <div class="footer-bottom text-center py-3 mt-4">
+          <div class="container">
+            <hr style="border-color: rgba(255,255,255,0.2);">
+            <p class="mb-0 small text-light">
+              &copy; 2025 <strong>Blockify</strong>. All rights reserved. |
+              <a href="#" class="text-white text-decoration-underline">Chính sách bảo mật</a> |
+              <a href="#" class="text-white text-decoration-underline">Điều khoản dịch vụ</a>
+            </p>
+          </div>
+        </div>
+      </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="/dist/src/assets/js/components/Service.js"></script>
+</body>
+</html>

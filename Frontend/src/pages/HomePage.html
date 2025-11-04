@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cửa hàng LEGO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/pages/HomePage.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+  <div class="container">
+    <a class="navbar-brand px-2 rounded-5 border bg-light border-1 border-white" href="IntroductionPage.html">
+      <img src="../../public/images/Group 71.png" alt="Blockify Logo" width="40" height="45">
+    </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="HomePage.html">
+              <i class="bi bi-house-door me-2"></i> Trang chủ
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="IntroductionPage.html">
+              <i class="bi bi-info-circle me-2"></i> Giới thiệu
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="Service.html">
+              <i class="bi bi-gear me-2"></i> Dịch vụ
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="Contact.html">
+              <i class="bi bi-question-circle me-2"></i> Hỏi đáp
+            </a>
+          </li>
+        </ul>    
+          <div class="navbar-right-icons">
+              <a href="#" class="search-icon d-flex justify-content-start align-items-center">
+                  <i class="bi bi-search text-secondary" id="openSearch"> </i>
+              </a>
+              <a href="CartPage.html" class="cart-icon">
+                  <i class="bi bi-cart"></i>
+              </a>
+              <a href="SigninPage.html" class="btn-sign">Đăng nhập</a>
+              <a href="SignupPage.html" class="btn-sign">Đăng ký</a>
+          </div>
+
+      <!-- Tìm kiếm -->
+      <div class="overlay" id="overlay">
+        <div class="search-popup">
+          <div class="search-header">
+            <strong class="text-white">Tìm kiếm</strong>
+            <i class="bi bi-x-circle" id="closeSearch" style="cursor:pointer; color:white"></i>
+          </div>
+      
+          <!-- Input -->
+          <input 
+            type="text" 
+            class="search-input text-white" 
+            id="searchInput" 
+            style="border: 0; background-color: rgb(30, 41, 57);" 
+            placeholder="Nhập từ khóa...">
+          
+          <div class="line mb-2"></div>
+        </div>
+      </div>
+  </div>
+</nav>
+<!-- Banner -->
+<section class="banner container mt-4 ">
+  <div class="row bg-dark p-2 rounded-1">
+    <div class="col-md-9 p-0 m-0  bg-light">
+      <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="../../public/images/Banner1.jpeg" class="d-block w-100" alt="banner1">
+          </div>
+          <div class="carousel-item">
+            <img src="../../public/images/Banner2.jpg" class="d-block w-100" alt="banner2">
+          </div>
+          <div class="carousel-item">
+            <img src="../../public/images/Banner3.jpeg" class="d-block w-100" alt="banner3">
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Right content -->
+    <div class="col-md-3 d-flex p-3 flex-column justify-content-center text-end">
+      <h2 class="text-white fw-bold" style="text-align: right; font-family: 'Montserrat', Arial, sans-serif;"><b>LEGO CITY</b></h2>
+      <p class ="text-white ">Khám phá thành phố của riêng bạn</p>
+      <button class="btn btn-buy w-50 text-white border border-white align-self-end rounded-4"><i style="margin-right: 7px;" class="fa-solid fa-cart-shopping"></i>Mua ngay</button>
+    </div>
+  </div>
+</section>
+
+<!-- Category + Products -->
+<section class="container my-4">
+  <div class="row g-4">
+    <div class="col-md-3">
+      <div class="category pb-1 text-center">
+        <h5 class="text-white fw-bold m-0 p-3 rounded-top-3" style="background-color: #0D9BFF;">Danh mục</h5>
+        <!-- Categories will be loaded dynamically from database by HomePage.ts -->
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div class="d-flex gap-2 mb-3">
+        <button class="btn text-white" style ="background-color: #0D9BFF;">Mới nhất</button>
+        <button class="btn btn-outline-primary">Phổ biến</button>
+
+        <button class="btn btn-outline-primary">Bộ lọc</button>
+      </div>
+      <div class="row g-3" id="main-product-list"></div>
+      
+      <!-- Pagination Controls -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div id="pagination-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Promotion -->
+<section class="container my-5 p-3 rounded-3" style="background-color: rgb(212, 238, 255);">
+  <h3 class="text-primary fw-bold mb-3">KHUYẾN MÃI</h3>
+  <div class="row">
+    <div class="col-md-3">
+      <div class="promotion-box p-0">
+        <img src="../../public/images/Group 69.png" class="img h-100 w-100" alt="lego">
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="promotion-box p-0">
+        <img src="../../public/images/Frame 39.png" class="img h-100 w-100" alt="lego">
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 rounded-3" style="background-color: #F5F5F5;">
+      <!-- Voucher -->
+      <div class="voucher mt-4 mx-auto">
+        <div class="voucher-left">
+          <span class="tag">Số lượng có hạn</span>
+          <div class="voucher-img"></div>
+        </div>
+        <div class="voucher-right">
+          <div class="voucher-title">
+            <span class="badge">Giảm giá</span>
+            Giảm 15% cho đơn hàng trên 15k
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:44%"></div>
+          </div>
+          <div class="voucher-info">
+            <span>Còn 44%</span> - 
+            <span class="expire">Hết hạn sau 23 giờ</span>
+          </div>
+          <button class="view-btn">Xem ngay</button>
+        </div>
+      </div>
+      <div class="voucher mt-3 mx-auto">
+        <div class="voucher-left">
+          <span class="tag">Số lượng có hạn</span>
+          <div class="voucher-img"></div>
+        </div>
+        <div class="voucher-right">
+          <div class="voucher-title">
+            <span class="badge">Giảm giá</span>
+            Giảm 15% cho đơn hàng trên 15k
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:44%"></div>
+          </div>
+          <div class="voucher-info">
+            <span>Còn 44%</span> - 
+            <span class="expire">Hết hạn sau 23 giờ</span>
+          </div>
+          <button class="view-btn">Xem ngay</button>
+        </div>
+      </div>
+      <div class="voucher mt-3 mx-auto">
+        <div class="voucher-left">
+          <span class="tag">Số lượng có hạn</span>
+          <div class="voucher-img"></div>
+        </div>
+        <div class="voucher-right">
+          <div class="voucher-title">
+            <span class="badge">Giảm giá</span>
+            Giảm 15% cho đơn hàng trên 15k
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:44%"></div>
+          </div>
+          <div class="voucher-info">
+            <span>Còn 44%</span> - 
+            <span class="expire">Hết hạn sau 23 giờ</span>
+          </div>
+          <button class="view-btn">Xem ngay</button>
+        </div>
+      </div>
+    </div>
+</section>
+
+<!-- Recommended Product -->
+<section class="recommended">
+  <div class="container">
+    <h3 class="text-center mb-4"><b>SẢN PHẨM ĐỀ XUẤT</b></h3>
+    <div class="row g-4 justify-content-center pb-4" id="product-list"></div>
+  </div>
+</section>
+
+<footer class="footer-section ">
+  <div class="footer-top py-5">
+    <div class="container">
+      <div class="row gy-4">
+        <!-- Logo & Intro -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-center mb-3">
+          
+            <h4 class="fw-bold mb-0 text-white">Blockify</h4>
+          </div>
+          <p class="text-light small">
+            Blockify là nền tảng mua sắm trực tuyến thông minh giúp bạn tận hưởng hàng ngàn ưu đãi, 
+            tích xu và đổi quà cực hấp dẫn mỗi ngày.
+          </p>
+         
+        </div>
+
+        <!-- Quick Links -->
+        <div class="col-md-2 col-6">
+          <h6 class="fw-bold text-uppercase mb-3 text-white">Liên kết</h6>
+          <ul class="list-unstyled footer-links">
+            <li><a href="HomePage.html">Trang chủ</a></li>
+            <li><a href="IntroductionPage.html">Giới thiệu</a></li>
+            <li><a href="Service.html">Dịch vụ</a></li>
+            <li><a href="Contact.html">Hỏi đáp</a></li>
+          </ul>
+        </div>
+        <!-- Customer Service -->
+        <div class="col-md-3 col-6">
+          <h6 class="fw-bold text-uppercase mb-3 text-white">Hỗ trợ khách hàng</h6>
+          <ul class="list-unstyled footer-links">
+            <li><a href="#">Chính sách bảo mật</a></li>
+            <li><a href="#">Điều khoản sử dụng</a></li>
+            <li><a href="#">Chính sách hoàn tiền</a></li>
+            <li><a href="#">Trung tâm trợ giúp</a></li>
+            <li><a href="#">Vận chuyển & giao hàng</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact & Social -->
+        <div class="col-md-3">
+          <h6 class="fw-bold text-uppercase mb-3 text-white">Liên hệ</h6>
+          <ul class="list-unstyled small text-light mb-3">
+            <li><i class="bi bi-geo-alt-fill me-2"></i> 123 Nguyễn Huệ, Q.1, TP.HCM</li>
+            <li><i class="bi bi-telephone-fill me-2"></i> (028) 1234 5678</li>
+            <li><i class="bi bi-envelope-fill me-2"></i> support@blockify.vn</li>
+          </ul>
+          <div class="d-flex gap-3 mt-3">
+            <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="social-icon"><i class="bi bi-twitter"></i></a>
+            <a href="#" class="social-icon"><i class="bi bi-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="footer-bottom text-center py-3 mt-4">
+    <div class="container">
+      <hr style="border-color: rgba(255,255,255,0.2);">
+      <p class="mb-0 small text-light">
+        &copy; 2025 <strong>Blockify</strong>. All rights reserved. |
+        <a href="#" class="text-white text-decoration-underline">Chính sách bảo mật</a> |
+        <a href="#" class="text-white text-decoration-underline">Điều khoản dịch vụ</a>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="/dist/src/assets/js/components/HomePage.js"></script>
+</body>
+</html>

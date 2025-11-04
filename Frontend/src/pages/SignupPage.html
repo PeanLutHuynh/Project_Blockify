@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/pages/SignupPage.css">
+  
+  <!-- Supabase JS SDK from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script>
+    document.documentElement.style.visibility = 'hidden';
+    window.addEventListener('load', function(){
+      document.documentElement.style.visibility = '';
+    });
+  </script>
+  <meta name="color-scheme" content="light only">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <div class="signin-page">
+    <!-- Left Side - Image Section -->
+    <div class="left-section ">
+        <div class="brand-text">Blockify</div>
+        <div class="gradient-bg"></div>
+        <img src="../../public/images/I1.jpg" alt="City building" class="tower-image">
+    </div>
+
+    <!-- Right Side - Form Section -->
+    <div class="right-section ">
+        <!-- Decorative Blocks -->
+        <div class="deco-block deco-1">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 33 39">
+                <g>
+                    <path d="M8.38445 6.60583C8.38445 3.54346 10.355 0.703752 13.3818 0.238817C15.4758 -0.082818 17.3823 -0.0780897 19.4742 0.244232C22.5169 0.71308 24.5083 3.56122 24.5083 6.63988V9.51815C24.5083 13.3841 21.3743 16.5182 17.5083 16.5182H15.3844C11.5185 16.5182 8.38445 13.3842 8.38445 9.51816V6.60583Z" fill="#0096F4" />
+                    <path d="M1.27483e-05 9.32167L16.5846 5.42183L32.8927 9.32167V32.976L16.5846 38.8552L1.27483e-05 32.976L1.27483e-05 9.32167Z" fill="#0096F4" />
+                </g>
+            </svg>
+        </div>
+        <div class="deco-block deco-2">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 22 26">
+                <g>
+                    <path d="M5.41104 5.13299C5.41104 2.64625 7.00345 0.279571 9.47971 0.0515234C10.2378 -0.018293 10.9725 -0.0168929 11.7302 0.0546105C14.2123 0.288829 15.8168 2.65602 15.8168 5.14914V5.63741C15.8168 8.51089 13.4874 10.8403 10.6139 10.8403C7.74045 10.8403 5.41104 8.51089 5.41104 5.63741V5.13299Z" fill="#0096F4" />
+                    <path d="M1.89468e-06 6.11751L10.7031 3.55819L21.2278 6.11751V21.641L10.7031 25.4993L1.89468e-06 21.641L1.89468e-06 6.11751Z" fill="#0096F4" />
+                </g>
+            </svg>
+        </div>
+        <div class="deco-block deco-3">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 15 18">
+                <g>
+                    <path d="M3.78436 3.59109C3.78436 1.85134 4.89832 0.195432 6.63075 0.0359964C7.16036 -0.0127429 7.67363 -0.0117652 8.20298 0.0381534C9.9395 0.201908 11.0619 1.85818 11.0619 3.6024V3.9456C11.0619 5.95524 9.43278 7.58438 7.42314 7.58438C5.41349 7.58438 3.78436 5.95524 3.78436 3.9456V3.59109Z" fill="#0096F4" />
+                    <path d="M1.02684e-05 4.2801L7.4855 2.48949L14.8462 4.2801V15.141L7.4855 17.8404L1.02684e-05 15.141V4.2801Z" fill="#0096F4" />
+                </g>
+            </svg>
+        </div>
+        <div class="deco-block deco-4">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 12 14">
+                <g>
+                    <path d="M2.9924 2.73973C2.9924 1.41388 3.85038 0.163998 5.16986 0.0341699C5.63942 -0.0120323 6.09101 -0.011136 6.56035 0.0360381C7.88276 0.168955 8.74695 1.41893 8.74695 2.748V2.87557C8.74695 4.46465 7.45875 5.75285 5.86967 5.75285C4.2806 5.75285 2.9924 4.46465 2.9924 2.87557V2.73973Z" fill="#0096F4" />
+                    <path d="M2.15083e-05 3.24652L5.91899 1.88832L11.7393 3.24652V11.4846L5.91899 13.5322L2.15083e-05 11.4846V3.24652Z" fill="#0096F4" />
+                </g>
+            </svg>
+        </div>
+
+        <!-- Bottom Decorative Blocks -->
+        <div class="deco-block deco-bottom-1">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 137 83">
+                <path d="M0 10.1491L14.3735 10.149V5.08835C14.3735 5.08835 14.3735 2.10509 15.9031 0.8711C17.2599 -0.223478 20.3949 0.0276497 20.3949 0.0276497H39.514H59.2169C59.2169 0.0276497 62.3357 -0.236956 63.5154 0.870966C64.695 1.97889 64.6545 4.14167 64.6545 5.08821V10.149L78.8257 10.1491L136.548 57.8902V82.6857H0L0 10.1491Z" fill="#0096F4" />
+            </svg>
+        </div>
+        <div class="deco-block deco-bottom-2">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 155 94">
+                <path d="M0 31.5524H27.9863V8.03153C27.9863 8.03153 27.9863 5.35435 30.6516 2.67718C33.317 0 35.9824 0 35.9824 0H77.2954H118.608C118.608 0 121.274 0 123.939 2.67718C126.605 5.35435 126.605 8.03153 126.605 8.03153V31.5524H154.591V93.7012H0V31.5524Z" fill="#0096F4" />
+            </svg>
+        </div>
+        <div class="deco-block deco-bottom-3">
+            <svg fill="none" preserveAspectRatio="none" viewBox="0 0 106 47">
+                <path d="M0 7.30791H11.8282V0.885766C11.8282 0.885766 11.8282 0.442883 12.1478 0.221441C12.4675 0 13.1069 0 13.1069 0H25.8941H37.4026C37.4026 0 38.0824 0.0280702 38.3616 0.221441C38.6408 0.414813 38.6813 0.885766 38.6813 0.885766V7.30791H65.8541V0.885766C65.8541 0.885766 65.8946 0.414813 66.1738 0.221441C66.4529 0.0280702 67.1328 0 67.1328 0H79.2806H91.4285C91.4285 0 92.1084 0.0280702 92.3875 0.221441C92.6667 0.414813 92.7072 0.885766 92.7072 0.885766V7.30791H105.494V16.1656L54.985 46.9459H0V7.30791Z" fill="#0096F4" />
+            </svg>
+        </div>
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-xl-7 ">
+                    <!-- Welcome Section -->
+                    <h1 class="welcome-title text-center">Chào mừng</h1>
+                    <p class="signin-label text-center">Đăng ký</p>
+
+                     <!-- Error container -->
+                      <div id="error-container" class="d-none mb-3"></div>
+                      <!-- Success container -->
+                      <div id="success-container" class="d-none mb-3"></div>
+
+                    <!-- Sign In Form -->
+                    <form id="signinForm" class="needs-validation" novalidate>
+                        <!-- Username Field -->
+                        <div class="mb-3 position-relative underline-input">
+                            <label class="form-label small text-muted">Tên đăng nhập</label>
+                            <input id="username" type="text" class="form-control form-control-custom" placeholder="Tên đăng nhập" required>
+                            <i class="fa-regular fa-user input-icon"></i>
+                            <div class="invalid-feedback">Hãy nhập tên đăng nhập của bạn.</div>
+                          </div>
+                          <!-- Email -->
+                          <div class="mb-3 position-relative underline-input">
+                            <label class="form-label small text-muted">Email</label>
+                            <input id="email" type="email" class="form-control form-control-custom" placeholder="Email" required>
+                            <i class="fa-regular fa-envelope input-icon"></i>
+                            <div class="invalid-feedback">Hãy nhập email hợp lệ.</div>
+                          </div>
+                          <!-- Password -->
+                          <div class="mb-3 position-relative underline-input">
+                            <label class="form-label small text-muted">Mật khẩu</label>
+                            <input id="password" type="password" class="form-control form-control-custom" placeholder="Mật khẩu" required>
+                            <i class="fa-solid fa-lock input-icon"></i>
+                            <div class="invalid-feedback">Hãy nhập mật khẩu của bạn.</div>
+                          </div>
+                          <!-- Confirm Password -->
+                          <div class="mb-3 position-relative underline-input">
+                            <label class="form-label small text-muted">Xác nhận mật khẩu</label>
+                            <input id="confirmPassword" type="password" class="form-control form-control-custom" placeholder="Xác nhận mật khẩu" required>
+                            <i class="fa-solid fa-lock input-icon"></i>
+                            <div class="invalid-feedback">Mật khẩu không khớp.</div>
+                          </div>
+                          <!-- Show password -->
+                          <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="showPwd">
+                            <label class="form-check-label" for="showPwd">Hiện mật khẩu</label>
+                          </div>
+
+                        <!-- Sign In Button -->
+                        <div class="text-center ">
+                            <button type="submit" id="submit-btn" class="btn btn-signin">Đăng ký</button>
+                        </div>
+                    </form>
+
+                    <!-- OR Divider -->
+                    <div class="or-divider">
+                        <hr />
+                        <span class="or-text">Hoặc</span>
+                        <hr />
+                    </div>
+
+                    <!-- Google Sign In -->
+                    <div class="text-center">
+                        <button class="btn btn-google" id="google-signup-btn">
+                            <img src="https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png" alt="Google" class="google-icon">
+                            Tiếp tục với Google
+                        </button>
+
+                        <p class="text-center text-muted mt-3 mb-0">
+                          Bạn đã có tài khoản? Đăng nhập tại
+                          <a href="SigninPage.html" class="link-primary link-like">đây</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="/dist/src/assets/js/components/SignupPage.js"></script>
+</body>
+</html>

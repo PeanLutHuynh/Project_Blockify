@@ -1,0 +1,365 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+  }
+.row-text{
+  font-size: 3rem;
+      font-weight: 800;
+      color: white;
+      text-align: center;
+      margin-bottom: 40px;
+      text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+      animation: fadeInDown 0.8s ease-out;
+}
+  /* Footer */
+  .footer-section {
+    background: rgb(37, 37, 37);
+    color: white;
+    margin-top: 60px;
+    font-size: 0.95rem;
+  }
+
+  .footer-links li {
+    margin-bottom: 8px;
+  }
+
+  .footer-links a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .footer-links a:hover {
+    color: #fff;
+    text-decoration: underline;
+  }
+
+  .social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    color: white;
+    transition: all 0.3s;
+    font-size: 1.1rem;
+  }
+
+  .social-icon:hover {
+    background: #fff;
+    color: #0d9bff;
+    transform: translateY(-3px);
+  }
+
+  .footer-bottom {
+    background: rgba(0, 0, 0, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .footer-bottom a {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  /* Navbar */
+  .navbar-custom {
+    background: #0D9BFF;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .navbar-brand {
+    color: white !important;
+    font-weight: bold;
+    font-size: 1.5rem;
+  }
+  
+  .nav-link {
+    color: rgba(255,255,255,0.9) !important;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+  
+  .nav-link:hover {
+    color: white !important;
+    transform: translateY(-2px);
+  }
+  
+  .navbar-right-icons a {
+    color: white;
+    font-size: 1.2rem;
+    margin-left: 20px;
+    transition: transform 0.3s;
+  }
+  
+  .navbar-right-icons a:hover {
+    transform: scale(1.1);
+  }
+
+  /* Hero Section */
+  .hero-section {
+    background: #0D9BFF;
+    color: white;
+    padding: 60px 0;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .coin-balance {
+    background: #ffffff;
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+  
+  .coin-icon {
+    width: 80px;
+    height: 80px;
+    background: rgb(255, 211, 35);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2.5rem;
+    box-shadow: 0 8px 20px rgba(255,215,0,0.4);
+  }
+  
+  .balance-amount {
+    font-size: 3rem;
+    font-weight: bold;
+    margin: 20px 0;
+  }
+
+  /* Filter Tabs */
+  .filter-section {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  
+  .filter-tabs .nav-pills .nav-link {
+    padding: 12px 24px;
+    border-radius: 25px;
+    background: #f1f5ff;
+    color: #667eea;
+    font-weight: 600;
+    border: none;
+    margin-right: 12px;
+    margin-bottom: 10px;
+    transition: all 0.3s;
+  }
+  
+  .filter-tabs .nav-pills .nav-link.active {
+    background: #0D9BFF;
+    color: white;
+    box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+  }
+  
+  .filter-tabs .nav-pills .nav-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  /* Voucher Cards */
+  .voucher {
+    display: flex;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+    width: 100%;
+    font-family: Arial, sans-serif;
+    background: #ffffff;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    height: 100%;
+  }
+
+  .voucher:hover {
+    border-color: #0d9bff;
+    box-shadow: 0 4px 12px rgba(13, 155, 255, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .voucher-left {
+    position: relative;
+    width: 120px;
+    background: #0d9bff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .voucher-left .tag {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: #ffb400;
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .voucher-img {
+    width: 80px;
+    height: 80px;
+    background: #ccc;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .voucher-right {
+    flex: 1;
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: space-between;
+  }
+
+  .voucher-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .voucher-title .badge {
+    background: #0094ff;
+    color: white;
+    padding: 2px 6px;
+    font-size: 12px;
+    border-radius: 3px;
+    margin-right: 6px;
+  }
+
+  .progress-bar {
+    height: 3px;
+    background: #ddd;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress {
+    height: 100%;
+    background: #ff3b3b;
+    transition: width 0.3s ease;
+  }
+
+  .voucher-info {
+    font-size: 13px;
+    color: #666;
+  }
+
+  .voucher-info .expire {
+    color: #ff3b3b;
+    font-weight: bold;
+  }
+
+  .voucher-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .voucher-price {
+    background: rgb(214, 182, 0);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .view-btn {
+    background: #0094ff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+  }
+
+  .view-btn:hover {
+    background: #0074cc;
+    transform: scale(1.05);
+  }
+
+  /* Section Headers */
+  .section-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 25px;
+    padding-left: 15px;
+    border-left: 5px solid #667eea;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+  }
+  
+  .empty-state i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.3;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .balance-amount {
+      font-size: 2rem;
+    }
+    
+    .hero-section {
+      padding: 40px 0;
+    }
+    
+    .filter-tabs .nav-pills .nav-link {
+      margin-right: 8px;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+    }
+
+    .voucher {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .voucher-left {
+      width: 100%;
+      padding: 10px 0;
+    }
+
+    .voucher-img {
+      width: 100px;
+      height: 100px;
+    }
+
+    .voucher-right {
+      width: 100%;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .voucher-footer {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }

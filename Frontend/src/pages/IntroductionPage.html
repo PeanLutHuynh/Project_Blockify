@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thành phố LEGO</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/pages/IntroductionPage.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+  <div class="container">
+    <a class="navbar-brand px-2 rounded-5 border bg-light border-1 border-white" href="IntroductionPage.html">
+      <img src="../../public/images/Group 71.png" alt="Blockify Logo" width="40" height="45">
+    </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="HomePage.html">
+              <i class="bi bi-house-door me-2"></i> Trang chủ
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="IntroductionPage.html">
+              <i class="bi bi-info-circle me-2"></i> Giới thiệu
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="Service.html">
+              <i class="bi bi-gear me-2"></i> Dịch vụ
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="Contact.html">
+              <i class="bi bi-question-circle me-2"></i> Hỏi đáp
+            </a>
+          </li>
+        </ul>    
+          <div class="navbar-right-icons">
+              <a href="#" class="search-icon d-flex justify-content-start align-items-center">
+                  <i class="bi bi-search text-secondary" id="openSearch"> </i>
+              </a>
+              <a href="CartPage.html" class="cart-icon">
+                  <i class="bi bi-cart"></i>
+              </a>
+              <a href="SigninPage.html" class="btn-sign">Đăng nhập</a>
+              <a href="SignupPage.html" class="btn-sign">Đăng ký</a>
+          </div>
+
+      <!-- Tìm kiếm -->
+      <div class="overlay" id="overlay">
+        <div class="search-popup">
+          <div class="search-header">
+            <strong class="text-white">Tìm kiếm</strong>
+            <i class="bi bi-x-circle" id="closeSearch" style="cursor:pointer; color:white"></i>
+          </div>
+      
+          <!-- Input -->
+          <input 
+            type="text" 
+            class="search-input text-white" 
+            id="searchInput" 
+            style="border: 0; background-color: rgb(30, 41, 57);" 
+            placeholder="Nhập từ khóa...">
+          <div class="line mb-2"></div>
+        </div>
+      </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<div class="hero">
+  <img src="../../public/images/Rectangle 24 (1).png" style="max-width: 100%; object-fit: contain; max-height: 100%;" alt="Logo LEGO">
+</div>
+
+<!-- Intro Section -->
+<div class="intro">
+  <h2><b>Blockify</b></h2>
+  <p style="white-space: pre-line; font-size: 1rem;">
+    Chào mừng đến với Blockify  
+    Nơi hành trình khám phá, vui chơi và sáng tạo bắt đầu!  
+    Với bộ sưu tập đa dạng gồm các công trình, phương tiện và nhân vật mang tính biểu tượng,  
+    LEGO City mang đến cho cả gia đình vô số cơ hội cùng nhau xây dựng, tưởng tượng và chia sẻ những câu chuyện thú vị trong thành phố sôi động này.
+  </p>
+</div>
+
+<!-- Blue Section -->
+<div class="blue-section">
+</div>
+
+<!-- Highlight Section -->
+<div class="highlight container-fluid bg-dark my-5">
+  <h4 class=" mb-4 text-white text-center"><b>SẢN PHẨM CỦA BLOCKIFY</b></h4>
+  <div id="lego-list" class="lego-listlist d-flex justify-content-center gap-3"></div>
+</div>
+
+<script>
+  // Danh sách LEGO
+  const legoItems = [
+    { img: "../../public/images/Group 40.png"},
+    { img: "../../public/images/Group 41.png"},
+    { img: "../../public/images/Group 42.png"},
+    { img: "../../public/images/Group 44.png"},
+    { img: "../../public/images/Group 43.png"},
+    { img: "../../public/images/Group 45.png"},
+    { img: "../../public/images/Group 46.png"}
+  ];
+
+  // Render card
+  const legoList = document.getElementById("lego-list");
+  legoItems.forEach(item => {
+    legoList.innerHTML += `
+      <div class="card1" style="width: 12rem; border:none; height:15rem;">
+        <img src="${item.img}" class="card-img-top" style="max-height:100%; max-width:100%; object-fit:contain; margin:0;" alt="Sản phẩm LEGO">
+      </div>
+    `;
+  });
+</script>
+<div class = "container-fluid ">
+  <div class ="row">
+    <div class ="col-9 mx-auto">
+      <div class = "row">
+        <div class ="col-md-4 col-sm-12 bg-light">
+          <img src = "../../public/images/Rectangle 80.png" style = "height:90%; width:100%">
+        </div>
+        <div class ="col-md-4 col-sm-12 bg-light">
+          <img src = "../../public/images/legooo.jpg" style = "height:90%; width:100%">
+        </div>
+        <div class ="col-md-4 col-sm-12 ms-auto" style="background-color: rgb(229, 247, 255);">
+          <div class ="text-cont-1 mt-2" >
+            <b>Khám phá, bảo vệ thành phố của bạn - với LEGO City!</b><p></p>
+            <pre  class="text-wrap text-break overflow-hidden" style="font-size: 1rem; font-family: Arial, sans-serif;">Thành phố này không bao giờ biến mất khi trí tưởng tượng vẫn còn
+              Nơi mỗi viên gạch nhỏ có thể trở thành tòa nhà chọc trời, một chiếc xe cứu hỏa, hay thậm chí là cả một thế giới phiêu lưu.
+            </pre>
+            
+          </div>
+          <div class ="text-img ">
+            <img src= "../../public/images/Group 67.png">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer1 mt-5">
+  <div class="stripe-above"></div>
+  <div class="stripe-top"></div>
+  <div class="stripe-middle"></div>
+  <div class="stripe-blue">
+    <div class ="stripe-text text-start">
+      <div class ="row">
+        <div class ="col-2 me-5">
+          
+        </div>
+        <div class ="col-8 mt-3">
+          <b style="font-size: 2.3ch; font-family: Arial, sans-serif; color: white;">Thắp sáng thành phố với trí tưởng tượng của bạn</b>
+          <p></p>
+          <p style = "white-space: pre-line; color: black;">Khám phá bộ sưu tập Lego City mới nhất của Blockify và bắt đầu xây dựng ý tưởng của riêng bạn
+            Bắt đầu khám phá ngay!</p>
+        </div>
+      </div>     
+    </div>
+  </div>
+  <img src="../../public/images/Rectangle 73.png" alt="Lego Batman" class="batman">
+</div>
+
+<div class="container-fluid img-container mt-4">
+  <div class="row">
+    <div class="col-11 mx-auto">
+      <h2><b>Bạn đã sẵn sàng khám phá?</b></h2>
+      <ul class="d-flex justify-content-between list-unstyled gap-3">
+        <li class="flex-fill rounded text-center">
+          <div class="img-img ">
+            <img src = "../../public/images/img1.jpg">
+          </div>
+          <div class="img-text py-2"><b>Xây dựng thành phố trong mơ của bạn</b>
+          <p>Cầm lấy những mảnh ghép và thiết kế thành phố của riêng bạn</p></div>
+        </li>
+        <li class="flex-fill rounded text-center">
+          <div class="img-img bg-light">
+            <img src = "../../public/images/img2.jpg">
+          </div>
+          <div class="img-text py-2"><b>Trở thành một cảnh sát trong thế giới LEGO</b>
+            <p>Lắp ráp xe, máy bay tuần tra và trụ sở để giữ an toàn cho thành phố của bạn</p>
+          </div>
+        </li>
+        <li class="flex-fill rounded text-center">
+          <div class="img-img bg-light">
+            <img src ="../../public/images/img3.jpg">
+          </div>
+          <div class="img-text py-2"><b>Thử thách giải cứu</b>
+          
+          <p> Kiểm tra các tòa nhà và kĩ năng giải cứu bằng cách xây dựng trạm cứu hỏa và đoàn lính dũng cảm</p></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class ="img-1-container container-fluid mt-4">
+  <div class ="row mb-2">
+    <div class ="col-3">
+
+    </div>
+    <div class ="col-4 text-img-1-container mt-4 text-white ">
+      <p class="text-img-p">
+        Trở thành anh hùng tại thành phố mà bạn đã xây dựng
+        Khám phá, sáng tạo vô số các cuộc phiêu lưu 
+        <p class = "text-img-p">Mỗi mảnh ghép là một hành trình</p>
+      </pre>
+    </div>
+  </div>
+</div>
+<div class ="container">
+  <div class ="row">
+    <div class ="col-7 my-5 mx-auto text-center">
+      <h5>Các mảnh ghép không ngừng xuất hiện - Hãy cùng bước vào trải nghiệm!</h5>
+    </div>
+  </div>
+</div>
+
+<footer class="footer-section ">
+  <div class="footer-top py-5">
+    <div class="container">
+      <div class="row gy-4">
+        <!-- Logo & Intro -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-center mb-3">
+          
+            <h4 class="fw-bold mb-0 text-white">Blockify</h4>
+          </div>
+          <p class="text-light small">
+            Blockify là nền tảng mua sắm trực tuyến thông minh giúp bạn tận hưởng hàng ngàn ưu đãi, 
+            tích xu và đổi quà cực hấp dẫn mỗi ngày.
+          </p>
+         
+        </div>
+
+        <!-- Quick Links -->
+        <div class="col-md-2 col-6">
+          <h6 class="fw-bold text-uppercase mb-3 text-white">Liên kết</h6>
+          <ul class="list-unstyled footer-links">
+            <li><a href="HomePage.html">Trang chủ</a></li>
+            <li><a href="IntroductionPage.html">Giới thiệu</a></li>
+            <li><a href="Service.html">Dịch vụ</a></li>
+            <li><a href="Contact.html">Hỏi đáp</a></li>
+          </ul>
+        </div>
+
+        <!-- Customer Service -->
+        <div class="col-md-3 col-6">
+          <h6 class="fw-bold text-uppercase mb-3 text-white">Hỗ trợ khách hàng</h6>
+          <ul class="list-unstyled footer-links">
+            <li><a href="#">Chính sách bảo mật</a></li>
+            <li><a href="#">Điều khoản sử dụng</a></li>
+            <li><a href="#">Chính sách hoàn tiền</a></li>
+            <li><a href="#">Trung tâm trợ giúp</a></li>
+            <li><a href="#">Vận chuyển & giao hàng</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact & Social -->
+        <div class="col-md-3">
+          <h6 class="fw-bold text-uppercase mb-3 text-white">Liên hệ</h6>
+          <ul class="list-unstyled small text-light mb-3">
+            <li><i class="bi bi-geo-alt-fill me-2"></i> 123 Nguyễn Huệ, Q.1, TP.HCM</li>
+            <li><i class="bi bi-telephone-fill me-2"></i> (028) 1234 5678</li>
+            <li><i class="bi bi-envelope-fill me-2"></i> support@blockify.vn</li>
+          </ul>
+          <div class="d-flex gap-3 mt-3">
+            <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="social-icon"><i class="bi bi-twitter"></i></a>
+            <a href="#" class="social-icon"><i class="bi bi-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="footer-bottom text-center py-3 mt-4">
+    <div class="container">
+      <hr style="border-color: rgba(255,255,255,0.2);">
+      <p class="mb-0 small text-light">
+        &copy; 2025 <strong>Blockify</strong>. All rights reserved. |
+        <a href="#" class="text-white text-decoration-underline">Chính sách bảo mật</a> |
+        <a href="#" class="text-white text-decoration-underline">Điều khoản dịch vụ</a>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="/dist/src/assets/js/components/Introduction.js"></script>
+</body>
+</html>

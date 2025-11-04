@@ -1,0 +1,2063 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng điều khiển quản trị</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/pages/Admin.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  
+  <!-- Supabase JS SDK từ CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header d-flex justify-content-between align-items-center">
+    <div class="header-left d-flex align-items-center gap-3">
+      <a class="navbar-brand" href="#git add ">Blockify</a>
+    </div>
+    <div class="header-right d-flex align-items-center gap-2">
+      <span id="adminName" class="header-link">Đang tải...</span>
+      <a href="#" id="logoutBtn" class="header-link">👤 Đăng xuất</a>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar d-flex flex-column">
+      <div class="user d-flex align-items-center gap-2 mb-3">
+        <img src="../../public/images/Group 40.png" alt="avatar">
+        <div class="name">QTLHH</div>
+      </div>
+      <ul class="menu nav flex-column">
+        <li class="active nav-item" data-target="dashboard">
+          <i class="bi bi-speedometer2 me-2"></i>Bảng điều khiển
+        </li>
+        
+        <li class="nav-item" data-target="customer">
+          <i class="bi bi-people-fill me-2 text-secondary"></i>Khách hàng
+        </li>        
+        <li class="nav-item" data-target="product">
+          <i class="bi bi-box-seam me-2"></i>Sản phẩm
+        </li>
+        <li class="nav-item" data-target="order">
+          <i class="bi bi-receipt-cutoff me-2"></i>Đơn hàng
+        </li>
+        <li class="nav-item" data-target="shop-info">
+          <i class="bi bi-shop me-2"></i>Thông tin cửa hàng
+        </li>
+        <li class="nav-item" data-target="feedback-manager">
+          <i class="bi bi-chat-dots me-2"></i>Đánh giá sản phẩm
+        </li>
+        <li class="nav-item" data-target="voucher">
+          <i class="bi bi-ticket-perforated me-2"></i>Quản lý Voucher
+        </li>
+        <li class="nav-item" data-target="notification">
+          <i class="bi bi-bell-fill me-2 text-secondary"></i>Thông báo
+        </li>
+        
+      </ul>
+    </aside>
+
+    <main class="main container-fluid">
+      <!-- Dashboard -->
+      <section id="dashboard" class="section active">
+        <div class="dashboard-header">Bảng điều khiển</div>
+        <!-- Metrics Cards -->
+        <div class="metrics-grid row g-3 mb-4">
+          <div class="metric-card col-12 ">
+            <div class="title">Tổng bán</div>
+            <div class="value">—</div>
+          </div>
+          <div class="metric-card col-12 ">
+            <div class="title">Sản phẩm mới</div>
+            <div class="value">30</div>
+          </div>
+          <div class="metric-card col-12 ">
+            <div class="title">Khách hàng mới</div>
+            <div class="value">310</div>
+          </div>
+          <div class="metric-card col-12">
+            <div class="title">Tồn kho</div>
+            <div class="value">—</div>
+          </div>
+        </div>
+        <!-- Dashboard Content -->
+        <div class="dashboard-content row g-3">
+          <!-- Chart Panel -->
+          <div class="chart-panel col-12 col-lg-8">
+            <div class="chart-header d-flex gap-3 mb-3">
+              <div class="chart-tab">Doanh thu tháng</div>
+              <div class="chart-tab inactive">Doanh thu ngày</div>
+            </div>
+            <div class="chart-container">
+              <div class="chart-line"></div>
+              <div class="chart-points">
+                <div class="chart-point" style="height: 20px;"></div>
+                <div class="chart-point" style="height: 35px;"></div>
+                <div class="chart-point" style="height: 28px;"></div>
+                <div class="chart-point" style="height: 45px;"></div>
+                <div class="chart-point" style="height: 52px;"></div>
+                <div class="chart-point" style="height: 38px;"></div>
+                <div class="chart-point" style="height: 65px;"></div>
+                <div class="chart-point" style="height: 58px;"></div>
+                <div class="chart-point" style="height: 72px;"></div>
+                <div class="chart-point" style="height: 45px;"></div>
+                <div class="chart-point" style="height: 80px;"></div>
+                <div class="chart-point" style="height: 85px;"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Best Selling Products -->
+          <div class="products-panel col-12 ">
+            <div class="panel-title">Sản phẩm bán chạy</div>
+            <div class="product-list">
+              <div class="product-item d-flex align-items-center gap-2">
+                <img class="product-thumb" src="img/Rectangle 108 (1).png" alt="">
+                <div class="product-info">
+                  <div class="product-name">Nhà để xe - 34 xe</div>
+                  <div class="product-price">245.000 VND</div>
+                </div>
+              </div>
+              <div class="product-item d-flex align-items-center gap-2">
+                <img class="product-thumb" src="img/Rectangle 108 (2).png" alt="">
+                <div class="product-info">
+                  <div class="product-name">Xe cảnh sát</div>
+                  <div class="product-price">230.000 VND</div>
+                </div>
+              </div>
+              <div class="product-item d-flex align-items-center gap-2">
+                <img class="product-thumb" src="img/Rectangle 108 (3).png" alt="">
+                <div class="product-info">
+                  <div class="product-name">Xe xây dựng màu vàng</div>
+                  <div class="product-price">199.000 VND</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Customer -->
+      <section id="customer" class="section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="mb-0"><i class="bi bi-people-fill me-2"></i>Quản lý Khách hàng</h4>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="toolbar d-flex gap-2 mb-3">
+              <input class="search form-control" placeholder="Tìm kiếm khách hàng">
+            </div>
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width:40px;"><input type="checkbox"></th>
+                    <th>Tên</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="customerList"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Product Management -->
+      <section id="product" class="section">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="mb-0"><i class="bi bi-box-seam me-2"></i>Quản lý Sản Phẩm</h4>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="all-products-tab" data-bs-toggle="tab" data-bs-target="#all-products" type="button" role="tab">
+              Tất Cả Sản Phẩm
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories-content" type="button" role="tab">
+              Quản Lý Danh Mục
+            </button>
+          </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+          <!-- All Products Tab -->
+          <div class="tab-pane fade show active" id="all-products" role="tabpanel">
+        
+        <!-- Search and Filter Bar -->
+        <div class="card mb-3">
+          <div class="card-body">
+            <!-- First Row -->
+            <div class="row g-3 mb-2">
+              <div class="col-md-4">
+                <div class="input-group">
+                  <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" placeholder="Vui lòng nhập tối thiểu 2 ký tự" id="productSearch">
+                </div>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="categoryFilter">
+                  <option value="">Danh mục</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="stockFilter">
+                  <option value="">Kho hàng</option>
+                  <option value="in_stock">Còn hàng</option>
+                  <option value="out_of_stock">Hết hàng</option>
+                  <option value="low_stock">Sắp hết</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="statusFilter">
+                  <option value="">Trạng thái</option>
+                  <option value="active">Đang bán</option>
+                  <option value="inactive">Ngừng bán</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-primary w-100" onclick="window.adminProductController?.applyFilters()">
+                  <i class="bi bi-funnel me-1"></i>Tìm
+                </button>
+              </div>
+            </div>
+
+            <!-- Second Row - Additional Filters -->
+            <div class="row g-3">
+              <div class="col-md-2">
+                <select class="form-select" id="difficultyFilter">
+                  <option value="">Độ khó</option>
+                  <option value="Easy">Dễ (Easy)</option>
+                  <option value="Medium">Trung bình (Medium)</option>
+                  <option value="Hard">Khó (Hard)</option>
+                  <option value="Expert">Chuyên gia (Expert)</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="featuredFilter">
+                  <option value="">Nổi bật</option>
+                  <option value="true">Có</option>
+                  <option value="false">Không</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="newFilter">
+                  <option value="">Sản phẩm mới</option>
+                  <option value="true">Có</option>
+                  <option value="false">Không</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="bestsellerFilter">
+                  <option value="">Bán chạy</option>
+                  <option value="true">Có</option>
+                  <option value="false">Không</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <button class="btn btn-outline-secondary w-100" onclick="window.adminProductController?.resetFilters()">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i>Đặt lại bộ lọc
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product List -->
+        <div class="card">
+              <div class="card-body">
+                <!-- Action Bar -->
+                <div class="d-flex justify-content-between align-items-center mb-3">                                                                            <div>
+                    <span class="text-muted" id="productCountText">0 Sản Phẩm</span>                                                                            </div>
+                  <div>
+                    <button class="btn btn-link text-primary" onclick="window.location.reload()">                                                                   <i class="bi bi-arrow-clockwise me-1"></i>Tối ưu sản phẩm                                                                                   </button>
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addProductModal">                                                        <i class="bi bi-plus-circle me-1"></i>Thêm 1 sản phẩm mới                                                                                   </button>
+                    <div class="btn-group ms-2">
+                      <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" id="bulkActionDropdown">                                    Công cụ Xử lý hàng loạt
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" id="bulkEditBtn"><i class="bi bi-pencil me-2"></i>Chỉnh sửa hàng loạt</a></li>                          <li><a class="dropdown-item" href="#" id="bulkDeleteBtn"><i class="bi bi-trash me-2"></i>Xóa hàng loạt</a></li>                             </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Product Table -->
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th width="40"><input type="checkbox" class="form-check-input" id="selectAllCheckbox"></th>
+                        <th width="350">Tên sản phẩm</th>
+                        <th width="120">SKU phân loại</th>
+                        <th width="120">Phân loại hàng</th>
+                        <th width="120" style="cursor: pointer;" data-sort="price">
+                          Giá <i class="bi bi-arrow-down-up" id="sortPriceIcon"></i>
+                        </th>
+                        <th width="100" style="cursor: pointer;" data-sort="stock_quantity">
+                          Kho hàng <i class="bi bi-arrow-down-up" id="sortStockIcon"></i>
+                        </th>
+                        <th width="100">Doanh số</th>
+                        <th width="100">Thao tác</th>
+                      </tr>
+                    </thead>
+                    <tbody id="productList">
+                      <!-- Products will be rendered here -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Product Count -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div>
+                    <span class="text-muted">Tổng: <span id="totalProducts">0</span> sản phẩm</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- End All Products Tab -->
+
+          <!-- Categories Tab -->
+          <div class="tab-pane fade" id="categories-content" role="tabpanel">
+            
+            <!-- Search Bar -->
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                      <input type="text" class="form-control" placeholder="Tìm kiếm danh mục..." id="categorySearch">
+                    </div>
+                  </div>
+                  <div class="col-md-6 text-end">
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                      <i class="bi bi-plus-circle me-1"></i>Thêm Danh Mục Mới
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Categories Table -->
+            <div class="card">
+              <div class="card-body">
+                <!-- Action Bar -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <span class="text-muted" id="categoryCountText">0 Danh Mục</span>
+                  </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th width="80">ID</th>
+                        <th width="200">Tên Danh Mục</th>
+                        <th width="200">Slug</th>
+                        <th>Mô Tả</th>
+                        <th width="120">Số Sản Phẩm</th>
+                        <th width="150">Thao Tác</th>
+                      </tr>
+                    </thead>
+                    <tbody id="categoryList">
+                      <!-- Categories will be rendered here -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Total Count -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div>
+                    <span class="text-muted">Tổng: <span id="totalCategories">0</span> danh mục</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- End Categories Tab -->
+
+        </div>
+        <!-- End Tab Content -->
+
+      </section>
+
+      <!-- Shop Info -->
+      <section id="shop-info" class="section h-100">
+        <div class="bar-blue mb-4">Thông tin cửa hàng</div>
+        <div class="shop-info-panel panel">
+          <form id="shopInfoForm">
+            <div class="row mb-3 align-items-center">
+              
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Tên cửa hàng</label>
+                  <input type="text" id="shopName" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Địa chỉ</label>
+                  <input type="text" id="shopAddress" class="form-control">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Số điện thoại</label>
+                  <input type="text" id="shopPhone" class="form-control">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input type="email" id="shopEmail" class="form-control">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Mô tả</label>
+                  <textarea id="shopDesc" class="form-control" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+              </div>
+              <div class="col-md-6 text-center mb-3 mb-md-0">
+                <div class ="row">
+                  <div class ="col-md-6 mx-auto">
+                    <img id="shopLogoPreview" src="../../public/images/Group 40.png" alt="Logo shop" class="shop-logo img-thumbnail">
+                <input type="file" id="shopLogo" class="form-control mt-5">
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Order -->
+      <section id="order" class="section">
+        <div class="bar-blue">Quản lý đơn hàng</div>
+        <div class="toolbar">
+          <input class="search" placeholder="Tìm đơn hàng">
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle text-center table-hover" id="orderTable">
+            <thead class="table-light">
+              <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Email</th>
+                <th>SĐT</th>
+                <th>Ngày đặt</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái đơn</th>
+                <th>Thanh toán</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="orderList"></tbody>
+          </table>
+        </div>
+      </section>
+      
+      <!-- Modal Chi tiết Đơn hàng -->
+      <div class="modal fade" id="orderDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg"><div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Chi tiết đơn hàng</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="row mb-2"><div class="col-5 fw-semibold">Khách hàng:</div><div class="col" id="detailCustomerName"></div></div>
+              <div class="row mb-2"><div class="col-5 fw-semibold">Email:</div><div class="col" id="detailCustomerEmail"></div></div>
+              <div class="row mb-2"><div class="col-5 fw-semibold">SĐT:</div><div class="col" id="detailCustomerPhone"></div></div>
+              <div class="row mb-2"><div class="col-5 fw-semibold">Địa chỉ:</div><div class="col" id="detailCustomerAddress"></div></div>
+              <div class="row mb-2"><div class="col-5 fw-semibold">Phương thức:</div><div class="col" id="detailPaymentMethod"></div></div>
+              <div class="row mb-2"><div class="col-5 fw-semibold">Mã hóa đơn:</div><div class="col" id="detailOrderId"></div></div>
+              <div class="row mb-2"><div class="col-5 fw-semibold">Tên đơn:</div><div class="col" id="detailOrderName"></div></div>
+              <div class="row mb-2"><div class="col-5 fw-semibold">Số lượng:</div><div class="col" id="detailOrderQuantity"></div></div>
+              <div class="row mb-2"><div class="col-5 fw-semibold">Mẫu hàng:</div><div class="col" id="detailOrderVariant"></div></div>
+              <div class="row mb-2"><div class="col-5 fw-semibold">Tổng tiền:</div><div class="col" id="detailOrderTotal"></div></div>
+              <div class="row mb-2"><div class="col-5 fw-semibold">Trạng thái:</div><div class="col" id="detailOrderStatus"></div></div>
+              <div class="row mb-2"><div class="col-5 fw-semibold">Hình sản phẩm:</div><div class="col"><img id="detailProductImg" src="" class="img-fluid mb-2" style="max-width: 100px;"></div></div>
+              <div class="row mb-2">
+                <div class="col-5 fw-semibold">Minh chứng thanh toán:</div>
+                <div class="col">
+                  <img id="detailPayProof" src="" class="img-fluid" style="max-width: 120px; cursor: pointer;" onclick="window.open(this.src, '_blank')">
+                  <div class="mt-2">
+                    <span class="badge bg-secondary" id="paymentStatusBadge">Chưa kiểm tra</span>
+                  </div>
+                  <div class="mt-2" id="paymentVerifyActions" style="display:none;">
+                    <button type="button" class="btn btn-success btn-sm me-2" id="approvePaymentBtn">✓ Xác nhận thanh toán</button>
+                    <button type="button" class="btn btn-danger btn-sm" id="rejectPaymentBtn">✗ Từ chối thanh toán</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer order-action-footer">
+            <button type="button" class="btn btn-success next-status-btn">Cập nhật trạng thái</button>
+            <button type="button" class="btn btn-warning refund-btn">Xử lý hoàn trả</button>
+            <button type="button" class="btn btn-danger cancel-btn">Hủy đơn</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div></div>
+      </div>
+      
+      <!-- Modal Xử lý hoàn trả -->
+      <div class="modal fade" id="refundModal" tabindex="-1">
+        <div class="modal-dialog"><div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Xử lý hoàn/trả hàng</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="refundForm">
+              <div class="mb-3">
+                <label class="form-label">Sản phẩm hoàn trả</label>
+                <input type="text" id="refundProduct" class="form-control" readonly>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Lý do hoàn trả</label>
+                <textarea id="refundReason" class="form-control" rows="3" placeholder="Nhập lý do hoàn/trả hàng..."></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="confirmRefund">Xác nhận hoàn trả</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- Feedback Manager -->
+      <section id="feedback-manager" class="section">
+        <div class="bar-blue">Quản lý đánh giá sản phẩm</div>
+        <div class="panel">
+            <div class="feedback-list">
+              <div class="feedback-item d-flex align-items-start gap-3">
+                <img src="img/Rectangle 108 (2).png" class="feedback-thumb" alt="">
+                <div class="flex-fill">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <strong class="feedback-product">Xe cảnh sát</strong>
+                    <span class="badge bg-primary ms-2">Mới</span>
+                  </div>
+                  <div><b>Tên khách:</b> Nguyễn Văn A · <b>Email:</b> vana@gmail.com · <b>Đánh giá:</b>
+                    <span class="text-warning">★★★★★</span>
+                  </div>
+                  <div><i>"Sản phẩm rất tốt, giao hàng nhanh!"</i></div>
+                  <div class="feedback-actions mt-1">
+                    <button type="button" class="btn btn-outline btn-sm view-feedback-btn" data-feedback-id="FB001" data-bs-toggle="modal" data-bs-target="#feedbackDetailModal">Xem</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm ms-2 acknowledge-feedback-btn" data-feedback-id="FB001">Ghi nhận</button>
+                  </div>
+                </div>
+              </div>
+              <div class="feedback-item d-flex align-items-start gap-3 mt-3">
+                <img src="img/Rectangle 108 (3).png" class="feedback-thumb" alt="">
+                <div class="flex-fill">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <strong class="feedback-product">Xe xây dựng vàng</strong>
+                    <span class="badge bg-primary ms-2">Mới</span>
+                  </div>
+                  <div><b>Tên khách:</b> Trần Bảo B · <b>Email:</b> baobb@gmail.com · <b>Đánh giá:</b>
+                    <span class="text-warning">★★★★☆</span>
+                  </div>
+                  <div><i>"Đúng mô tả, bé nhà mình thích lắm."</i></div>
+                  <div class="feedback-actions mt-1">
+                    <button type="button" class="btn btn-outline btn-sm view-feedback-btn" data-feedback-id="FB002">Xem</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm ms-2 acknowledge-feedback-btn" data-feedback-id="FB002">Ghi nhận</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </section>
+
+      <!-- Voucher Management -->
+      <section id="voucher" class="section">
+        <!-- Voucher Navbar -->
+        <div class="voucher-navbar">
+          <h3 class="navbar-title text-white">Quản lý Voucher</h3>
+          <div class="navbar-actions">
+            <input class="search form-control" placeholder="Tìm kiếm voucher" id="voucherSearch">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVoucherModal">
+              <i class="bi bi-plus-circle me-1"></i>Thêm Voucher
+            </button>
+          </div>
+        </div>
+        
+        <!-- Voucher List -->
+        <div class="row g-3" id="voucherList">
+          <!-- Vouchers will be rendered here -->
+        </div>
+      </section>
+
+      <!-- Notification -->
+      <section id="notification" class="section">
+        <div class="bar-blue">Thông báo</div>
+        <div class="toolbar">
+          <input class="search" placeholder="Tìm thông báo">
+          <button class="btn btn-outline" title="Xóa"><span>🗑</span></button>
+        </div>
+        <div class="panel">
+          <div class="note">
+            <strong>Giao hàng</strong>
+            <div>Đơn hàng 1234 đã được giao thành công</div>
+          </div>
+        </div>
+      </section>
+      <!-- Modal phản hồi đánh giá -->
+      <div class="modal fade" id="feedbackDetailModal" tabindex="-1" aria-labelledby="feedbackDetailLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="feedbackDetailLabel">Chi tiết đánh giá/Phản hồi</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-2"><strong>Sản phẩm:</strong> <span id="feedbackProductName"></span></div>
+              <div class="mb-2"><strong>Khách hàng:</strong> <span id="feedbackCustomer"></span> <span class="muted">(<span id="feedbackCustomerEmail"></span>)</span></div>
+              <div class="mb-2"><strong>Đánh giá:</strong> <span id="feedbackStars"></span></div>
+              <div class="mb-2"><strong>Nội dung phản hồi:</strong>
+                <div class="border rounded p-2 bg-light" id="feedbackContent"></div>
+              </div>
+              <div class="mt-3">
+                <label for="adminReply" class="form-label"><strong>Phản hồi/Ghi nhận của quản trị viên:</strong></label>
+                <textarea id="adminReply" rows="2" class="form-control" placeholder="Nhập phản hồi hoặc nhấn Ghi nhận..."></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary send-feedback-reply">Gửi phản hồi</button>
+              <button type="button" class="btn btn-outline-secondary acknowledge-feedback">Ghi nhận</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Product Modal -->
+  <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content shadow-lg rounded-4">
+        <div class="modal-header text-white rounded-top-4" style="background-color: #0D9BFF;">
+          <h5 class="modal-title fw-bold" id="addProductModalLabel">
+            <i class="bi bi-box-seam me-2"></i> Thêm sản phẩm mới
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body bg-light">
+          <form id="productForm" class="p-2">
+            
+            <!-- Hình ảnh sản phẩm -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Hình ảnh sản phẩm (tối đa 4 hình)</label>
+              <div class="row g-3" id="productImagesContainer">
+                <!-- Mỗi ảnh -->
+                <div class="col-6 col-md-3 text-center">
+                  <div class="border border-2 rounded-3 p-2 bg-white">
+                    <input type="file" class="form-control product-image-input" accept="image/*" data-index="0">
+                    <div class="image-preview mt-2" id="preview-0"></div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                  <div class="border border-2 rounded-3 p-2 bg-white">
+                    <input type="file" class="form-control product-image-input" accept="image/*" data-index="1">
+                    <div class="image-preview mt-2" id="preview-1"></div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                  <div class="border border-2 rounded-3 p-2 bg-white">
+                    <input type="file" class="form-control product-image-input" accept="image/*" data-index="2">
+                    <div class="image-preview mt-2" id="preview-2"></div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                  <div class="border border-2 rounded-3 p-2 bg-white">
+                    <input type="file" class="form-control product-image-input" accept="image/*" data-index="3">
+                    <div class="image-preview mt-2" id="preview-3"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Thông tin cơ bản -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Tên sản phẩm</label>
+                <input type="text" class="form-control" id="productName" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Danh mục</label>
+                <select class="form-select" id="productCategory" required>
+                  <option value="">-- Chọn danh mục --</option>
+                </select>
+              </div>
+            </div>
+  
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Độ khó</label>
+                <select class="form-select" id="productAge">
+                  <option value="">-- Chọn độ khó --</option>
+                  <option value="Easy">Dễ (Easy)</option>
+                  <option value="Medium">Trung bình (Medium)</option>
+                  <option value="Hard">Khó (Hard)</option>
+                  <option value="Expert">Chuyên gia (Expert)</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Số mảnh ghép</label>
+                <input type="number" class="form-control" id="productPieces">
+              </div>
+            </div>
+  
+            <!-- Thông tin kỹ thuật -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Tồn kho</label>
+                <input type="number" class="form-control" id="productStock" min="0" value="0">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Trạng thái</label>
+                <select class="form-select" id="productStatus" required>
+                  <option value="active">Đang bán</option>
+                  <option value="inactive">Ngừng bán</option>
+              
+                </select>
+              </div>
+            </div>
+  
+            <!-- Giá -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Giá gốc (VND)</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-cash"></i></span>
+                  <input type="number" class="form-control" id="productPrice" min="0" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Giá khuyến mãi (VND)</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                  <input type="number" class="form-control" id="productSalePrice" min="0" placeholder="Để trống nếu không giảm giá">
+                </div>
+              </div>
+            </div>
+
+            <!-- Kích thước & Trọng lượng -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Kích thước (cm)</label>
+                <input type="text" class="form-control" id="productDimensions" placeholder="VD: 30x40x5">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Trọng lượng (kg)</label>
+                <input type="number" class="form-control" id="productWeight" min="0" step="0.01" placeholder="VD: 1.5">
+              </div>
+            </div>
+
+            <!-- Tồn kho tối thiểu -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Mức tồn kho tối thiểu</label>
+              <input type="number" class="form-control" id="productMinStock" min="0" placeholder="Cảnh báo khi tồn kho dưới mức này">
+            </div>
+
+            <!-- Mô tả -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Mô tả ngắn</label>
+              <textarea class="form-control" id="productShortDesc" rows="2" placeholder="Mô tả ngắn gọn (1-2 dòng)"></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Mô tả chi tiết</label>
+              <textarea class="form-control" id="productDesc" rows="4" placeholder="Nhập mô tả chi tiết..."></textarea>
+            </div>
+
+            <!-- Thuộc tính đặc biệt -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Thuộc tính đặc biệt</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="productIsFeatured">
+                <label class="form-check-label" for="productIsFeatured">
+                  Sản phẩm nổi bật (Featured)
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="productIsBestseller">
+                <label class="form-check-label" for="productIsBestseller">
+                  Bán chạy nhất (Bestseller)
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="productIsNew">
+                <label class="form-check-label" for="productIsNew">
+                  Sản phẩm mới (New)
+                </label>
+              </div>
+            </div>
+  
+            <div class="modal-footer border-0">
+              <button type="button" class="btn btn-danger rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-primary rounded-pill px-4">
+                <i class="bi bi-save me-1"></i> Lưu sản phẩm
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  
+
+  <!-- Edit Product Modal -->
+  <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content shadow-lg rounded-4">
+        
+        <!-- Header -->
+        <div class="modal-header text-white rounded-top-4" style="background-color: #0D9BFF;">
+          <h5 class="modal-title fw-bold" id="editProductModalLabel">
+            <i class="bi bi-pencil-square me-2"></i> Chỉnh sửa sản phẩm
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+  
+        <!-- Body -->
+        <div class="modal-body bg-light">
+          <form id="editProductForm" class="p-2">
+            <input type="hidden" id="editProductId">
+  
+            <!-- Ảnh sản phẩm -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Hình ảnh sản phẩm (tối đa 4 hình)</label>
+              <div class="row g-3" id="editProductImagesContainer">
+                <div class="col-6 col-md-3 text-center">
+                  <div class="border border-2 rounded-3 p-2 bg-white">
+                    <input type="file" class="form-control edit-product-image-input" accept="image/*" data-index="0">
+                    <div class="image-preview mt-2" id="edit-preview-0"></div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                  <div class="border border-2 rounded-3 p-2 bg-white">
+                    <input type="file" class="form-control edit-product-image-input" accept="image/*" data-index="1">
+                    <div class="image-preview mt-2" id="edit-preview-1"></div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                  <div class="border border-2 rounded-3 p-2 bg-white">
+                    <input type="file" class="form-control edit-product-image-input" accept="image/*" data-index="2">
+                    <div class="image-preview mt-2" id="edit-preview-2"></div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                  <div class="border border-2 rounded-3 p-2 bg-white">
+                    <input type="file" class="form-control edit-product-image-input" accept="image/*" data-index="3">
+                    <div class="image-preview mt-2" id="edit-preview-3"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Thông tin cơ bản -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Tên sản phẩm</label>
+                <input type="text" class="form-control" id="editProductName" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Danh mục</label>
+                <select class="form-select" id="editProductCategory" required>
+                  <option value="">-- Chọn danh mục --</option>
+                </select>
+              </div>
+            </div>
+  
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Độ khó</label>
+                <select class="form-select" id="editProductAge">
+                  <option value="">-- Chọn độ khó --</option>
+                  <option value="Easy">Dễ (Easy)</option>
+                  <option value="Medium">Trung bình (Medium)</option>
+                  <option value="Hard">Khó (Hard)</option>
+                  <option value="Expert">Chuyên gia (Expert)</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Số mảnh ghép</label>
+                <input type="number" class="form-control" id="editProductPieces">
+              </div>
+            </div>
+  
+            <!-- Thông tin kỹ thuật -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Tồn kho</label>
+                <input type="number" class="form-control" id="editProductStock" min="0">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Trạng thái</label>
+                <select class="form-select" id="editProductStatus" required>
+                  <option value="active">Đang bán</option>
+                  <option value="inactive">Ngừng bán</option>
+                </select>
+              </div>
+            </div>
+  
+            <!-- Giá -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Giá gốc (VND)</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-cash"></i></span>
+                  <input type="number" class="form-control" id="editProductPrice" min="0" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Giá khuyến mãi (VND)</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                  <input type="number" class="form-control" id="editProductSalePrice" min="0" placeholder="Để trống nếu không giảm giá">
+                </div>
+              </div>
+            </div>
+
+            <!-- Kích thước & Trọng lượng -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Kích thước (cm)</label>
+                <input type="text" class="form-control" id="editProductDimensions" placeholder="VD: 30x40x5">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Trọng lượng (kg)</label>
+                <input type="number" class="form-control" id="editProductWeight" min="0" step="0.01" placeholder="VD: 1.5">
+              </div>
+            </div>
+
+            <!-- Tồn kho tối thiểu -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Mức tồn kho tối thiểu</label>
+              <input type="number" class="form-control" id="editProductMinStock" min="0" placeholder="Cảnh báo khi tồn kho dưới mức này">
+            </div>
+
+            <!-- Mô tả -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Mô tả ngắn</label>
+              <textarea class="form-control" id="editProductShortDesc" rows="2" placeholder="Mô tả ngắn gọn (1-2 dòng)"></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Mô tả chi tiết</label>
+              <textarea class="form-control" id="editProductDesc" rows="4" placeholder="Nhập mô tả chi tiết..."></textarea>
+            </div>
+
+            <!-- Thuộc tính đặc biệt -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Thuộc tính đặc biệt</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="editProductIsFeatured">
+                <label class="form-check-label" for="editProductIsFeatured">
+                  Sản phẩm nổi bật (Featured)
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="editProductIsBestseller">
+                <label class="form-check-label" for="editProductIsBestseller">
+                  Bán chạy nhất (Bestseller)
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="editProductIsNew">
+                <label class="form-check-label" for="editProductIsNew">
+                  Sản phẩm mới (New)
+                </label>
+              </div>
+            </div>
+  
+            <!-- Footer -->
+            <div class="modal-footer border-0">
+              <button type="button" class="btn btn-danger rounded-pill px-4" data-bs-dismiss="modal">
+                <i class="bi bi-x-circle me-1"></i> Hủy
+              </button>
+              <button type="submit" class="btn rounded-pill px-4 text-dark fw-semibold" style ="background-color: #0D9BFF; color: white;">
+                <i class="bi bi-save2 me-1"></i> Cập nhật sản phẩm
+              </button>
+            </div>
+  
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  <!-- Bulk Edit Advanced Modal -->
+  <div class="modal fade" id="bulkEditAdvancedModal" tabindex="-1" aria-labelledby="bulkEditAdvancedModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+          <h5 class="modal-title fw-bold" id="bulkEditAdvancedModalLabel">
+            <i class="bi bi-pencil-square me-2"></i>Chỉnh sửa hàng loạt
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <!-- Step 1: Select Field to Edit -->
+          <div class="mb-4">
+            <label class="form-label fw-bold text-primary">
+              <i class="bi bi-sliders me-2"></i>Chọn tiêu chí cần sửa:
+            </label>
+            <select class="form-select form-select-lg" id="bulkEditField">
+              <option value="">-- Chọn trường muốn chỉnh sửa --</option>
+              <option value="status">Trạng thái (active / inactive / draft)</option>
+              <option value="category">Danh mục</option>
+              <option value="price">Giá bán</option>
+              <option value="sale_price">Giá khuyến mãi</option>
+              <option value="stock">Số lượng tồn kho</option>
+              <option value="difficulty">Độ khó</option>
+              <option value="piece_count">Số mảnh ghép</option>
+              <option value="is_featured">Sản phẩm nổi bật</option>
+              <option value="is_bestseller">Bán chạy nhất</option>
+              <option value="is_new">Sản phẩm mới</option>
+            </select>
+          </div>
+
+          <!-- Step 2: Products Table -->
+          <div class="card border-0 shadow-sm" id="bulkEditTableContainer" style="display: none;">
+            <div class="card-header bg-light">
+              <h6 class="mb-0 text-secondary">
+                <i class="bi bi-list-check me-2"></i>Sản phẩm đã chọn (<span id="bulkEditCount">0</span>)
+              </h6>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light sticky-top">
+                    <tr>
+                      <th style="width: 80px;">Hình ảnh</th>
+                      <th style="width: 250px;">Tên sản phẩm</th>
+                      <th style="width: 150px;">Danh mục</th>
+                      <th style="width: 120px;">SKU</th>
+                      <th>Giá trị hiện tại</th>
+                      <th>Giá trị mới</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bulkEditTableBody">
+                    <!-- Dynamic rows will be inserted here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Helper Text -->
+          <div class="alert alert-info mt-3" id="bulkEditHelper" style="display: none;">
+            <i class="bi bi-info-circle me-2"></i>
+            <span id="bulkEditHelperText">Chọn một tiêu chí để bắt đầu chỉnh sửa.</span>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0 bg-light">
+          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> Hủy
+          </button>
+          <button type="button" class="btn btn-primary rounded-pill px-4" id="bulkEditSaveBtn" disabled>
+            <i class="bi bi-save2 me-1"></i> Lưu thay đổi (<span id="bulkEditSaveCount">0</span>)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Category Modal -->
+  <div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-plus-circle me-2"></i>Thêm Danh Mục Mới
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="categoryForm">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Tên Danh Mục <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="category_name" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Slug <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="category_slug" required>
+              <small class="text-muted">VD: lego-city, lego-technic (chữ thường, không dấu, dùng dấu gạch ngang)</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mô Tả</label>
+              <textarea class="form-control" name="description" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save me-1"></i>Lưu
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Category Modal -->
+  <div class="modal fade" id="editCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-pencil me-2"></i>Chỉnh Sửa Danh Mục
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="editCategoryForm">
+          <input type="hidden" id="editCategoryId">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Tên Danh Mục <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="category_name" id="editCategoryName" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Slug <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="category_slug" id="editCategorySlug" required>
+              <small class="text-muted">VD: lego-city, lego-technic (chữ thường, không dấu, dùng dấu gạch ngang)</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mô Tả</label>
+              <textarea class="form-control" name="description" id="editCategoryDescription" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save me-1"></i>Cập Nhật
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Voucher Modal -->
+  <div class="modal fade" id="addVoucherModal" tabindex="-1" aria-labelledby="addVoucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addVoucherModalLabel">Thêm Voucher</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <form id="voucherForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Tên phiếu giảm giá</label>
+                  <input type="text" class="form-control" id="voucherName" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Loại giảm giá</label>
+                  <select class="form-control" id="voucherType" required>
+                    <option value="">Chọn loại giảm giá</option>
+                    <option value="percentage">Giảm theo phần trăm (%)</option>
+                    <option value="fixed">Giảm cố định (VND)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Giá trị giảm</label>
+                  <input type="number" class="form-control" id="voucherValue" min="0" required>
+                  <small class="form-text text-muted" id="voucherValueHelp">Nhập số phần trăm hoặc số tiền</small>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Mức giảm tối đa (VND)</label>
+                  <input type="number" class="form-control" id="voucherMaxDiscount" min="0">
+                  <small class="form-text text-muted">Chỉ áp dụng cho giảm theo phần trăm</small>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Ngày bắt đầu áp dụng</label>
+                  <input type="datetime-local" class="form-control" id="voucherStartDate" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Ngày kết thúc áp dụng</label>
+                  <input type="datetime-local" class="form-control" id="voucherEndDate" required>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Giá trị đơn hàng tối thiểu (VND)</label>
+                  <input type="number" class="form-control" id="voucherMinOrder" min="0" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Số lần được phép sử dụng</label>
+                  <input type="number" class="form-control" id="voucherUsageLimit" min="1" required>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Mô tả chi tiết</label>
+              <textarea class="form-control" id="voucherDescription" rows="3" placeholder="Mô tả về voucher, điều kiện sử dụng..."></textarea>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Trạng thái hoạt động</label>
+              <select class="form-control" id="voucherStatus" required>
+                <option value="active">Đang bật</option>
+                <option value="inactive">Tắt</option>
+              </select>
+            </div>
+            
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-primary">Lưu Voucher</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Voucher Modal -->
+  <div class="modal fade" id="editVoucherModal" tabindex="-1" aria-labelledby="editVoucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editVoucherModalLabel">Chỉnh sửa Voucher</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editVoucherForm">
+            <input type="hidden" id="editVoucherId">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Tên phiếu giảm giá</label>
+                  <input type="text" class="form-control" id="editVoucherName" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Loại giảm giá</label>
+                  <select class="form-control" id="editVoucherType" required>
+                    <option value="">Chọn loại giảm giá</option>
+                    <option value="percentage">Giảm theo phần trăm (%)</option>
+                    <option value="fixed">Giảm cố định (VND)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Giá trị giảm</label>
+                  <input type="number" class="form-control" id="editVoucherValue" min="0" required>
+                  <small class="form-text text-muted" id="editVoucherValueHelp">Nhập số phần trăm hoặc số tiền</small>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Mức giảm tối đa (VND)</label>
+                  <input type="number" class="form-control" id="editVoucherMaxDiscount" min="0">
+                  <small class="form-text text-muted">Chỉ áp dụng cho giảm theo phần trăm</small>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Ngày bắt đầu áp dụng</label>
+                  <input type="datetime-local" class="form-control" id="editVoucherStartDate" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Ngày kết thúc áp dụng</label>
+                  <input type="datetime-local" class="form-control" id="editVoucherEndDate" required>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Giá trị đơn hàng tối thiểu (VND)</label>
+                  <input type="number" class="form-control" id="editVoucherMinOrder" min="0" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Số lần được phép sử dụng</label>
+                  <input type="number" class="form-control" id="editVoucherUsageLimit" min="1" required>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Mô tả chi tiết</label>
+              <textarea class="form-control" id="editVoucherDescription" rows="3" placeholder="Mô tả về voucher, điều kiện sử dụng..."></textarea>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Trạng thái hoạt động</label>
+              <select class="form-control" id="editVoucherStatus" required>
+                <option value="active">Đang bật</option>
+                <option value="inactive">Tắt</option>
+              </select>
+            </div>
+            
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-primary">Cập nhật Voucher</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Bootstrap JS first -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Tải cấu hình môi trường trước -->
+  <script type="module" src="/dist/src/core/config/env.js"></script>
+  <script type="module" src="/dist/src/assets/js/components/Admin.js"></script>
+  
+  <!-- Admin Product Management -->
+  <script type="module">
+    import { AdminProductController } from '/dist/src/modules/admin/AdminProductController.js';
+    
+    // Initialize Admin Product Controller
+    const adminProductController = new AdminProductController();
+    window.adminProductController = adminProductController;
+  </script>
+
+  <!-- Admin Category Management -->
+  <script type="module">
+    import { AdminCategoryController } from '/dist/src/modules/admin/AdminCategoryController.js';
+    
+    // Initialize Admin Category Controller
+    const adminCategoryController = new AdminCategoryController();
+    window.adminCategoryController = adminCategoryController;
+  </script>
+
+  <!-- Admin Order Management -->
+  <script type="module">
+    import { AdminOrderController } from '/dist/src/modules/admin/AdminOrderController.js';
+    
+    // Initialize Admin Order Controller
+    const adminOrderController = new AdminOrderController();
+    window.adminOrderController = adminOrderController;
+  </script>
+  
+  <!-- ORDER MANAGEMENT INITIALIZATION -->
+  <script>
+     // Initialize Admin Order Controller when ready
+     document.addEventListener('DOMContentLoaded', () => {
+       // Wait for controller to be ready
+       const waitForOrderController = setInterval(() => {
+         if (window.adminOrderController) {
+           clearInterval(waitForOrderController);
+           initializeOrderSection();
+         }
+       }, 100);
+     });
+     
+     function initializeOrderSection() {
+       const orderSection = document.getElementById('order');
+       
+       // Setup order filters first
+       setupOrderFilters();
+       
+       // LUÔN load orders khi page load (không phụ thuộc vào class active)
+       // Điều này đảm bảo data luôn sẵn sàng, giống như trước khi thêm Product Management
+       window.adminOrderController.loadOrders();
+       console.log('📦 Loading orders (always on page load)');
+       
+       // Load lại orders khi switching to order section (để refresh data nếu cần)
+       document.querySelectorAll('.menu li').forEach(item => {
+         item.addEventListener('click', () => {
+           const target = item.getAttribute('data-target');
+           if (target === 'order') {
+             window.adminOrderController.loadOrders();
+             console.log('📦 Loading orders (clicked order tab - refreshing)');
+           }
+         });
+       });
+     }
+     
+     function setupOrderFilters() {
+       const orderSection = document.getElementById('order');
+       if (!orderSection) return;
+       
+       const toolbar = orderSection.querySelector('.toolbar');
+       if (toolbar) {
+         const searchInput = toolbar.querySelector('.search');
+         
+         // Add status filter
+         const statusFilter = document.createElement('select');
+         statusFilter.className = 'form-select d-inline-block w-auto ms-2';
+         statusFilter.innerHTML = `
+           <option value="">Tất cả trạng thái</option>
+           <option value="Đang xử lý">Đang xử lý</option>
+           <option value="Đang giao">Đang giao</option>
+           <option value="Đã giao">Đã giao</option>
+           <option value="Đã hủy">Đã hủy</option>
+           <option value="Đã trả">Đã trả</option>
+         `;
+         
+         // Add payment status filter
+         const paymentFilter = document.createElement('select');
+         paymentFilter.className = 'form-select d-inline-block w-auto ms-2';
+         paymentFilter.innerHTML = `
+           <option value="">Tất cả thanh toán</option>
+           <option value="pending">Chưa thanh toán</option>
+           <option value="paid">Đã thanh toán</option>
+           <option value="failed">Thất bại</option>
+           <option value="refunded">Đã hoàn tiền</option>
+         `;
+         
+         toolbar.appendChild(statusFilter);
+         toolbar.appendChild(paymentFilter);
+         
+         // Helper function to load with all filters
+         const loadWithFilters = () => {
+           window.adminOrderController.loadOrders({
+             status: statusFilter.value || undefined,
+             paymentStatus: paymentFilter.value || undefined,
+             search: searchInput?.value.trim() || undefined
+           });
+         };
+         
+         // Add event listeners
+         statusFilter.addEventListener('change', loadWithFilters);
+         paymentFilter.addEventListener('change', loadWithFilters);
+         
+         // Search input event listener
+         if (searchInput) {
+           let searchTimeout;
+           searchInput.addEventListener('input', (e) => {
+             clearTimeout(searchTimeout);
+             searchTimeout = setTimeout(() => {
+               loadWithFilters();
+             }, 500);
+           });
+           
+           searchInput.addEventListener('keypress', (e) => {
+             if (e.key === 'Enter') {
+               clearTimeout(searchTimeout);
+               loadWithFilters();
+             }
+           });
+         }
+       }
+     }
+  </script>
+  
+  <!-- PRODUCT MANAGEMENT INITIALIZATION -->
+  <script>
+     // Initialize Admin Product Controller when ready
+     document.addEventListener('DOMContentLoaded', () => {
+       // Wait for controller to be ready
+       const waitForProductController = setInterval(() => {
+         if (window.adminProductController) {
+           clearInterval(waitForProductController);
+           initializeProductSection();
+         }
+       }, 100);
+     });
+     
+     function initializeProductSection() {
+       const productSection = document.getElementById('product');
+       
+       // Load categories first
+       window.adminProductController.loadCategories();
+       
+       // Load products when product section is active
+       if (productSection && productSection.classList.contains('active')) {
+         window.adminProductController.loadProducts();
+       }
+       
+       // Load products when switching to product section
+       document.querySelectorAll('.menu li').forEach(item => {
+         item.addEventListener('click', () => {
+           const target = item.getAttribute('data-target');
+           if (target === 'product') {
+             window.adminProductController.loadProducts();
+             window.adminProductController.loadCategories();
+           }
+         });
+       });
+
+       // Load categories when switching to categories tab
+       const categoriesTab = document.getElementById('categories-tab');
+       if (categoriesTab) {
+         categoriesTab.addEventListener('shown.bs.tab', () => {
+           console.log('🔄 Switching to categories tab, loading categories...');
+           if (window.adminCategoryController) {
+             window.adminCategoryController.loadCategories();
+           }
+         });
+       }
+     }
+        // DEMO DATA PHẢN HỒI/ĐÁNH GIÁ
+        const feedbackListDemo = [
+            {
+                id: 'FB001',
+                product: 'Xe cảnh sát',
+                productImg: 'img/Rectangle 108 (2).png',
+                customer: 'Nguyễn Văn A',
+                customerEmail: 'vana@gmail.com',
+                stars: 5,
+                content: 'Sản phẩm rất tốt, giao hàng nhanh!',
+                replied: false,
+                adminReply: ''
+            },
+            {
+                id: 'FB002',
+                product: 'Xe xây dựng vàng',
+                productImg: 'img/Rectangle 108 (3).png',
+                customer: 'Trần Bảo B',
+                customerEmail: 'baobb@gmail.com',
+                stars: 4,
+                content: 'Đúng mô tả, bé nhà mình thích lắm.',
+                replied: false,
+                adminReply: ''
+            },
+        ];
+          // VOUCHER MANAGEMENT
+          let vouchersData = [
+            {
+                id: 'VCH001',
+                name: 'Giảm giá 20% cho đơn hàng đầu tiên',
+                code: 'WELCOME20',
+                type: 'percentage',
+                value: 20,
+                maxDiscount: 100000,
+                startDate: '2024-01-01T00:00',
+                endDate: '2024-12-31T23:59',
+                minOrder: 200000,
+                usageLimit: 1000,
+                usedCount: 156,
+                description: 'Voucher giảm giá 20% cho khách hàng mới, áp dụng cho đơn hàng đầu tiên',
+                status: 'active'
+            },
+            {
+                id: 'VCH002',
+                name: 'Giảm 50.000 VND cho đơn hàng từ 500.000 VND',
+                code: 'SAVE50K',
+                type: 'fixed',
+                value: 50000,
+                maxDiscount: 0,
+                startDate: '2024-01-15T00:00',
+                endDate: '2024-06-30T23:59',
+                minOrder: 500000,
+                usageLimit: 500,
+                usedCount: 89,
+                description: 'Giảm giá cố định 50.000 VND cho đơn hàng từ 500.000 VND trở lên',
+                status: 'active'
+            },
+            {
+                id: 'VCH003',
+                name: 'Giảm giá 15% cho ngày lễ',
+                code: 'HOLIDAY15',
+                type: 'percentage',
+                value: 15,
+                maxDiscount: 200000,
+                startDate: '2024-02-10T00:00',
+                endDate: '2024-02-15T23:59',
+                minOrder: 300000,
+                usageLimit: 200,
+                usedCount: 200,
+                description: 'Voucher đặc biệt cho dịp lễ Tết, giảm 15% tối đa 200.000 VND',
+                status: 'expired'
+            },
+            {
+                id: 'VCH004',
+                name: 'Giảm 30.000 VND cho sinh nhật',
+                code: 'BIRTHDAY30',
+                type: 'fixed',
+                value: 30000,
+                maxDiscount: 0,
+                startDate: '2024-03-01T00:00',
+                endDate: '2024-12-31T23:59',
+                minOrder: 150000,
+                usageLimit: 1,
+                usedCount: 0,
+                description: 'Voucher sinh nhật đặc biệt, mỗi khách hàng chỉ được sử dụng 1 lần',
+                status: 'inactive'
+            }
+        ];
+        
+        // Initialize voucher management
+        initializeVoucherManagement();
+        
+        function initializeVoucherManagement() {
+            renderVoucherList();
+            setupVoucherFormHandlers();
+            setupVoucherSearch();
+        }
+        
+        function renderVoucherList() {
+            const voucherList = document.getElementById('voucherList');
+            if (!voucherList) return;
+            
+            voucherList.innerHTML = vouchersData.map(voucher => {
+                const currentDate = new Date();
+                const startDate = new Date(voucher.startDate);
+                const endDate = new Date(voucher.endDate);
+                const isExpired = currentDate > endDate;
+                const isNotStarted = currentDate < startDate;
+                
+                let statusClass = voucher.status;
+                if (isExpired) statusClass = 'expired';
+                
+                // Calculate usage percentage
+                const usagePercentage = Math.round((voucher.usedCount / voucher.usageLimit) * 100);
+                
+                // Calculate time remaining
+                const timeRemaining = calculateTimeRemaining(endDate);
+                
+                // Get voucher icon based on type
+                const voucherIcon = voucher.type === 'percentage' ? '%' : '₫';
+                
+                return `
+                    <div class="col-6">
+                        <div class="voucher" onclick="editVoucher('${voucher.id}')">
+                            <div class="voucher-left">
+                                <span class="tag">Số lượng có hạn</span>
+                                <div class="voucher-img">${voucherIcon}</div>
+                            </div>
+                            <div class="voucher-right">
+                                <div class="voucher-title">
+                                    <span class="badge">${voucher.type === 'percentage' ? 'Giảm %' : 'Giảm tiền'}</span>
+                                    ${voucher.name}
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width:${usagePercentage}%"></div>
+                                </div>
+                                <div class="voucher-info">
+                                    <span>Còn ${100 - usagePercentage}%</span> - 
+                                    <span class="expire">${timeRemaining}</span>
+                                </div>
+                                <div class="voucher-code-display">Mã: ${voucher.code}</div>
+                                <div class="voucher-details-grid">
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Giá trị:</span>
+                                        <span class="voucher-detail-value">
+                                            ${voucher.type === 'percentage' ? `${voucher.value}%` : `${voucher.value.toLocaleString()} VND`}
+                                        </span>
+                                    </div>
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Tối thiểu:</span>
+                                        <span class="voucher-detail-value">${voucher.minOrder.toLocaleString()} VND</span>
+                                    </div>
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Đã dùng:</span>
+                                        <span class="voucher-detail-value">${voucher.usedCount}/${voucher.usageLimit}</span>
+                                    </div>
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Trạng thái:</span>
+                                        <span class="voucher-detail-value">
+                                            ${statusClass === 'active' ? 'Đang bật' : 
+                                              statusClass === 'inactive' ? 'Tắt' : 'Hết hạn'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="voucher-actions">
+                                    <button class="view-btn" onclick="event.stopPropagation(); editVoucher('${voucher.id}')">
+                                        Chỉnh sửa
+                                    </button>
+                                    <button class="delete-btn" onclick="event.stopPropagation(); deleteVoucher('${voucher.id}')">
+                                        Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            attachVoucherActionEvents();
+        }
+        
+        function attachVoucherActionEvents() {
+            // Edit voucher buttons
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const voucherId = btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+                    if (voucherId) {
+                        editVoucher(voucherId);
+                    }
+                });
+            });
+            
+            // Delete voucher buttons
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const voucherId = btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+                    if (voucherId) {
+                        deleteVoucher(voucherId);
+                    }
+                });
+            });
+        }
+        
+        function setupVoucherFormHandlers() {
+            // Add voucher form
+            const addVoucherForm = document.getElementById('voucherForm');
+            if (addVoucherForm) {
+                addVoucherForm.addEventListener('submit', handleAddVoucher);
+            }
+            
+            // Edit voucher form
+            const editVoucherForm = document.getElementById('editVoucherForm');
+            if (editVoucherForm) {
+                editVoucherForm.addEventListener('submit', handleEditVoucher);
+            }
+            
+            // Voucher type change handlers
+            setupVoucherTypeHandlers();
+        }
+        
+        function setupVoucherTypeHandlers() {
+            // Add voucher type handlers
+            const addVoucherType = document.getElementById('voucherType');
+            const addVoucherValueHelp = document.getElementById('voucherValueHelp');
+            const addVoucherMaxDiscount = document.getElementById('voucherMaxDiscount');
+            
+            if (addVoucherType) {
+                addVoucherType.addEventListener('change', function() {
+                    const type = this.value;
+                    if (type === 'percentage') {
+                        addVoucherValueHelp.textContent = 'Nhập số phần trăm (ví dụ: 20)';
+                        addVoucherMaxDiscount.parentElement.style.display = 'block';
+                    } else if (type === 'fixed') {
+                        addVoucherValueHelp.textContent = 'Nhập số tiền giảm (ví dụ: 50000)';
+                        addVoucherMaxDiscount.parentElement.style.display = 'none';
+                    } else {
+                        addVoucherValueHelp.textContent = 'Nhập số phần trăm hoặc số tiền';
+                        addVoucherMaxDiscount.parentElement.style.display = 'block';
+                    }
+                });
+            }
+            
+            // Edit voucher type handlers
+            const editVoucherType = document.getElementById('editVoucherType');
+            const editVoucherValueHelp = document.getElementById('editVoucherValueHelp');
+            const editVoucherMaxDiscount = document.getElementById('editVoucherMaxDiscount');
+            
+            if (editVoucherType) {
+                editVoucherType.addEventListener('change', function() {
+                    const type = this.value;
+                    if (type === 'percentage') {
+                        editVoucherValueHelp.textContent = 'Nhập số phần trăm (ví dụ: 20)';
+                        editVoucherMaxDiscount.parentElement.style.display = 'block';
+                    } else if (type === 'fixed') {
+                        editVoucherValueHelp.textContent = 'Nhập số tiền giảm (ví dụ: 50000)';
+                        editVoucherMaxDiscount.parentElement.style.display = 'none';
+                    } else {
+                        editVoucherValueHelp.textContent = 'Nhập số phần trăm hoặc số tiền';
+                        editVoucherMaxDiscount.parentElement.style.display = 'block';
+                    }
+                });
+            }
+        }
+        
+        function handleAddVoucher(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: 'VCH' + String(vouchersData.length + 1).padStart(3, '0'),
+                name: document.getElementById('voucherName').value,
+                code: generateVoucherCode(),
+                type: document.getElementById('voucherType').value,
+                value: parseInt(document.getElementById('voucherValue').value),
+                maxDiscount: parseInt(document.getElementById('voucherMaxDiscount').value) || 0,
+                startDate: document.getElementById('voucherStartDate').value,
+                endDate: document.getElementById('voucherEndDate').value,
+                minOrder: parseInt(document.getElementById('voucherMinOrder').value),
+                usageLimit: parseInt(document.getElementById('voucherUsageLimit').value),
+                usedCount: 0,
+                description: document.getElementById('voucherDescription').value,
+                status: document.getElementById('voucherStatus').value
+            };
+            
+            vouchersData.push(formData);
+            renderVoucherList();
+            
+            // Reset form
+            document.getElementById('voucherForm').reset();
+            
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('addVoucherModal'))?.hide();
+            
+            alert('Thêm voucher thành công!');
+        }
+        
+        function editVoucher(voucherId) {
+            const voucher = vouchersData.find(v => v.id === voucherId);
+            if (!voucher) return;
+            
+            // Fill edit form
+            document.getElementById('editVoucherId').value = voucher.id;
+            document.getElementById('editVoucherName').value = voucher.name;
+            document.getElementById('editVoucherType').value = voucher.type;
+            document.getElementById('editVoucherValue').value = voucher.value;
+            document.getElementById('editVoucherMaxDiscount').value = voucher.maxDiscount;
+            document.getElementById('editVoucherStartDate').value = voucher.startDate;
+            document.getElementById('editVoucherEndDate').value = voucher.endDate;
+            document.getElementById('editVoucherMinOrder').value = voucher.minOrder;
+            document.getElementById('editVoucherUsageLimit').value = voucher.usageLimit;
+            document.getElementById('editVoucherDescription').value = voucher.description;
+            document.getElementById('editVoucherStatus').value = voucher.status;
+            
+            // Trigger type change to update help text
+            document.getElementById('editVoucherType').dispatchEvent(new Event('change'));
+            
+            // Show edit modal
+            const editModal = new bootstrap.Modal(document.getElementById('editVoucherModal'));
+            editModal.show();
+        }
+        
+        function handleEditVoucher(e) {
+            e.preventDefault();
+            
+            const voucherId = document.getElementById('editVoucherId').value;
+            const voucherIndex = vouchersData.findIndex(v => v.id === voucherId);
+            
+            if (voucherIndex === -1) return;
+            
+            // Update voucher data
+            vouchersData[voucherIndex] = {
+                ...vouchersData[voucherIndex],
+                name: document.getElementById('editVoucherName').value,
+                type: document.getElementById('editVoucherType').value,
+                value: parseInt(document.getElementById('editVoucherValue').value),
+                maxDiscount: parseInt(document.getElementById('editVoucherMaxDiscount').value) || 0,
+                startDate: document.getElementById('editVoucherStartDate').value,
+                endDate: document.getElementById('editVoucherEndDate').value,
+                minOrder: parseInt(document.getElementById('editVoucherMinOrder').value),
+                usageLimit: parseInt(document.getElementById('editVoucherUsageLimit').value),
+                description: document.getElementById('editVoucherDescription').value,
+                status: document.getElementById('editVoucherStatus').value
+            };
+            
+            renderVoucherList();
+            
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('editVoucherModal'))?.hide();
+            
+            alert('Cập nhật voucher thành công!');
+        }
+        
+        function deleteVoucher(voucherId) {
+            if (confirm('Bạn có chắc chắn muốn xóa voucher này?')) {
+                const voucherIndex = vouchersData.findIndex(v => v.id === voucherId);
+                if (voucherIndex !== -1) {
+                    vouchersData.splice(voucherIndex, 1);
+                    renderVoucherList();
+                    alert('Xóa voucher thành công!');
+                }
+            }
+        }
+        
+        function setupVoucherSearch() {
+            const searchInput = document.getElementById('voucherSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const filteredVouchers = vouchersData.filter(voucher => 
+                        voucher.name.toLowerCase().includes(searchTerm) ||
+                        voucher.code.toLowerCase().includes(searchTerm) ||
+                        voucher.description.toLowerCase().includes(searchTerm)
+                    );
+                    
+                    renderFilteredVoucherList(filteredVouchers);
+                });
+            }
+        }
+        
+        function renderFilteredVoucherList(vouchers) {
+            const voucherList = document.getElementById('voucherList');
+            if (!voucherList) return;
+            
+            if (vouchers.length === 0) {
+                voucherList.innerHTML = '<div class="col-12"><div class="text-center text-muted">Không tìm thấy voucher nào</div></div>';
+                return;
+            }
+            
+            voucherList.innerHTML = vouchers.map(voucher => {
+                const currentDate = new Date();
+                const startDate = new Date(voucher.startDate);
+                const endDate = new Date(voucher.endDate);
+                const isExpired = currentDate > endDate;
+                
+                let statusClass = voucher.status;
+                if (isExpired) statusClass = 'expired';
+                
+                // Calculate usage percentage
+                const usagePercentage = Math.round((voucher.usedCount / voucher.usageLimit) * 100);
+                
+                // Calculate time remaining
+                const timeRemaining = calculateTimeRemaining(endDate);
+                
+                // Get voucher icon based on type
+                const voucherIcon = voucher.type === 'percentage' ? '%' : '₫';
+                
+                return `
+                    <div class="col-6">
+                        <div class="voucher" onclick="editVoucher('${voucher.id}')">
+                            <div class="voucher-left">
+                                <span class="tag">Số lượng có hạn</span>
+                                <div class="voucher-img">${voucherIcon}</div>
+                            </div>
+                            <div class="voucher-right">
+                                <div class="voucher-title">
+                                    <span class="badge">${voucher.type === 'percentage' ? 'Giảm %' : 'Giảm tiền'}</span>
+                                    ${voucher.name}
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width:${usagePercentage}%"></div>
+                                </div>
+                                <div class="voucher-info">
+                                    <span>Còn ${100 - usagePercentage}%</span> - 
+                                    <span class="expire">${timeRemaining}</span>
+                                </div>
+                                <div class="voucher-code-display">Mã: ${voucher.code}</div>
+                                <div class="voucher-details-grid">
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Giá trị:</span>
+                                        <span class="voucher-detail-value">
+                                            ${voucher.type === 'percentage' ? `${voucher.value}%` : `${voucher.value.toLocaleString()} VND`}
+                                        </span>
+                                    </div>
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Tối thiểu:</span>
+                                        <span class="voucher-detail-value">${voucher.minOrder.toLocaleString()} VND</span>
+                                    </div>
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Đã dùng:</span>
+                                        <span class="voucher-detail-value">${voucher.usedCount}/${voucher.usageLimit}</span>
+                                    </div>
+                                    <div class="voucher-detail-item">
+                                        <span class="voucher-detail-label">Trạng thái:</span>
+                                        <span class="voucher-detail-value">
+                                            ${statusClass === 'active' ? 'Đang bật' : 
+                                              statusClass === 'inactive' ? 'Tắt' : 'Hết hạn'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="voucher-actions">
+                                    <button class="view-btn" onclick="event.stopPropagation(); editVoucher('${voucher.id}')">
+                                        Chỉnh sửa
+                                    </button>
+                                    <button class="delete-btn" onclick="event.stopPropagation(); deleteVoucher('${voucher.id}')">
+                                        Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            attachVoucherActionEvents();
+        }
+        
+        function generateVoucherCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        function formatDateRange(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const startStr = start.toLocaleDateString('vi-VN');
+            const endStr = end.toLocaleDateString('vi-VN');
+            return `${startStr} - ${endStr}`;
+        }
+        
+        function calculateTimeRemaining(endDate) {
+            const now = new Date();
+            const end = new Date(endDate);
+            const diff = end - now;
+            
+            if (diff <= 0) {
+                return 'Đã hết hạn';
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (days > 0) {
+                return `Hết hạn sau ${days} ngày`;
+            } else if (hours > 0) {
+                return `Hết hạn sau ${hours} giờ`;
+            } else {
+                return `Hết hạn sau ${minutes} phút`;
+            }
+        }
+        
+  </script>
+  <script>
+    document.querySelectorAll('.menu li').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.menu li').forEach(li => li.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+        item.classList.add('active');
+        const target = item.getAttribute('data-target');
+        document.getElementById(target).classList.add('active');
+      });
+    });
+  </script>
+</body>
+
+</html>

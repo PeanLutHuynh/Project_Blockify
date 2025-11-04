@@ -1,0 +1,24 @@
+{
+  "name": "blockify-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "dev": "concurrently \"tsc --watch\" \"npx http-server . -p 3002 -c-1 --cors -o /src/pages/HomePage.html\"",
+    "serve": "npx http-server . -p 3002 -c-1 --cors -o /src/pages/HomePage.html",
+    "type-check": "tsc --noEmit",
+    "clean": "powershell -Command \"Get-ChildItem -Path src -Include *.js,*.js.map,*.d.ts -Recurse | Remove-Item -Force\""
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "@supabase/supabase-js": "^2.39.0",
+    "bootstrap": "^5.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "http-server": "^14.1.1",
+    "typescript": "^5.9.2"
+  }
+}

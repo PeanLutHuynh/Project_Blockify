@@ -1,0 +1,354 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.signin-page {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background: white;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Left Section */
+.left-section {
+  width: 700px;
+  height: 100%;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.gradient-bg {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #0096f4 0%, #c0e7ff 56.25%);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.tower-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  position: relative;
+  z-index: 1;
+}
+
+.brand-text {
+  position: absolute;
+  top: 40px;
+  left: 35px;
+  font-family: 'Montserrat';
+  font-size: 48px;
+  color: white;
+  z-index: 2;
+}
+
+/* Right Section */
+.right-section {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: white;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+}
+
+.right-section .container {
+  position: relative;
+  z-index: 10;
+}
+
+/* Decorative Blocks */
+.deco-block {
+  position: absolute;
+  pointer-events: none;
+}
+
+.deco-block svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.deco-1 {
+  width: 30px;
+  height: 40px;
+  right: 14%;
+  top: 27px;
+  transform: rotate(24.482deg);
+}
+
+.deco-2 {
+  width: 26px;
+  height: 31px;
+  right: 8%;
+  top: 30px;
+  transform: rotate(330.656deg);
+}
+
+.deco-3 {
+  width: 18px;
+  height: 22px;
+  right: 3%;
+  top: 45px;
+  transform: rotate(4.797deg);
+}
+
+.deco-4 {
+  width: 14px;
+  height: 16px;
+  right: 2%;
+  top: 70px;
+  transform: rotate(21.473deg);
+}
+
+.deco-bottom-1 {
+  width: 50px;
+  height: 30px;
+  left: 5%;
+  bottom: 80px;
+  transform: rotate(342.64deg);
+}
+
+.deco-bottom-2 {
+  width: 90px;
+  height: 50px;
+  right: 7%;
+  bottom: 60px;
+  transform: rotate(341.454deg);
+}
+
+.deco-bottom-3 {
+  width: 80px;
+  height: 40px;
+  left: 15%;
+  bottom: 20px;
+}
+
+/* Welcome Section */
+.welcome-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 48px;
+  color: #0096f4;
+  margin-bottom: 20px;
+  line-height: 1.1;
+}
+
+.signin-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: #969696;
+  margin-bottom: 30px;
+}
+
+/* Input Groups */
+.input-group-custom {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-control-custom {
+  height: 48px;
+  border: 2px solid #0096f4;
+  border-radius: 7px;
+  padding-left: 50px;
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  color: #828282;
+  background: white;
+}
+
+.form-control-custom:focus {
+  border-color: #0096f4;
+  box-shadow: 0 0 0 0.2rem rgba(0, 150, 244, 0.15);
+}
+
+.form-control-custom::placeholder {
+  color: #828282;
+}
+
+/* Show Password Checkbox */
+.show-password-check {
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+.show-password-check .form-check-input {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background-color: #d9d9d9;
+  border: none;
+  cursor: pointer;
+}
+
+.show-password-check .form-check-input:checked {
+  background-color: #0096f4;
+  border-color: #0096f4;
+}
+
+.show-password-check .form-check-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  color: black;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+/* Sign In Button */
+.btn-signin {
+  background: #0096f4;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  padding: 10px 35px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  min-width: 150px;
+  height: 50px;
+  transition: all 0.3s ease;
+
+  /* 👇 tạo khoảng cách với phần "Hiện mật khẩu" */
+  margin-top: 25px;
+}
+
+.btn-signin:hover {
+  background: #0078c4;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 150, 244, 0.3);
+}
+
+/* OR Divider */
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 10px 0;
+}
+
+.or-divider hr {
+  flex: 1;
+  border: none;
+  border-top: 2px solid #515151;
+  margin: 0;
+}
+
+.or-text {
+  background: white;
+  padding: 6px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  color: #090909;
+}
+
+/* Google Button */
+.btn-google {
+  background: white;
+  border: 1px solid black;
+  border-radius: 7px;
+  padding: 8px 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  color: black;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 50px;
+  transition: all 0.3s ease;
+}
+
+.btn-google:hover {
+  background: #f8f9fa;
+  color: black;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.google-icon {
+  width: 30px;
+  height: 32px;
+  object-fit: contain;
+}
+
+/* Responsive Design */
+@media (max-width: 1500px) {
+  .welcome-title {
+    font-size: 42px;
+  }
+  .left-section {
+    width: 480px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .welcome-title {
+    font-size: 38px;
+  }
+  .signin-label,
+  .form-control-custom,
+  .show-password-check .form-check-label,
+  .btn-signin,
+  .btn-google {
+    font-size: 16px;
+  }
+  .form-control-custom {
+    height: 44px;
+  }
+}
+
+@media (max-width: 778px) {
+  .signin-page {
+    flex-direction: column;
+  }
+  .left-section {
+    width: 100%;
+    height: 130px;
+  }
+  .brand-text {
+    top: 15px;
+    left: 15px;
+    font-size: 32px;
+  }
+  .right-section {
+    flex: 1;
+  }
+  .welcome-title {
+    font-size: 34px;
+    margin-top: 15px;
+  }
+  .deco-bottom-1,
+  .deco-bottom-2,
+  .deco-bottom-3 {
+    display: none;
+  }
+}
