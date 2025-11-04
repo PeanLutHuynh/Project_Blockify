@@ -483,6 +483,42 @@ export class AdminProductController {
   }
 
   /**
+   * GET /api/admin/categories/:id
+   * Get category by ID
+   */
+  async getCategoryById(
+    req: AdminRequest,
+    res: HttpResponse,
+    categoryId: string
+  ): Promise<void> {
+    try {
+      const adminId = await this.getAdminId(req);
+      if (!adminId) {
+        this.sendError(res, 401, 'Unauthorized');
+        return;
+      }
+
+      const id = parseInt(categoryId);
+      if (isNaN(id)) {
+        this.sendError(res, 400, 'Invalid category ID');
+        return;
+      }
+
+      const category = await this.productService.getCategoryById(id);
+
+      if (!category) {
+        this.sendError(res, 404, 'Category not found');
+        return;
+      }
+
+      this.sendSuccess(res, 'Category retrieved successfully', category);
+    } catch (error: any) {
+      logger.error('Get category by ID error:', error);
+      this.sendError(res, 500, error.message || 'Internal server error');
+    }
+  }
+
+  /**
    * POST /api/admin/categories
    * Create new category
    */

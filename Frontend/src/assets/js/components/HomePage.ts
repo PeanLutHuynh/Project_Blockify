@@ -22,6 +22,15 @@ initializeOnReady(async () => {
   // Original homepage logic (UI interactions only - synchronous)
   setupUIInteractions();
   
+  // ✅ Wait for backend to be ready before loading data
+  const backendReady = await waitForBackend();
+  
+  if (!backendReady) {
+    console.warn('⚠️ Backend not ready, showing error message');
+    showBackendErrorMessage();
+    return;
+  }
+  
   // Load categories dynamically from Supabase
   await loadCategorySidebar();
   
@@ -34,6 +43,59 @@ initializeOnReady(async () => {
   // Setup category filter handlers
   setupCategoryFilters();
 });
+
+/**
+ * Wait for backend to be ready (with retry)
+ */
+async function waitForBackend(maxRetries: number = 5, delayMs: number = 1000): Promise<boolean> {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      console.log(`🔄 Checking backend health (attempt ${i + 1}/${maxRetries})...`);
+      
+      const response = await fetch('http://127.0.0.1:3001/health', {
+        method: 'GET',
+        signal: AbortSignal.timeout(2000), // 2s timeout
+      });
+      
+      if (response.ok) {
+        console.log('✅ Backend is ready!');
+        return true;
+      }
+    } catch (error) {
+      console.log(`⚠️ Backend not ready yet (attempt ${i + 1}/${maxRetries})`);
+      
+      if (i < maxRetries - 1) {
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  
+  console.error('❌ Backend failed to respond after multiple retries');
+  return false;
+}
+
+/**
+ * Show backend error message
+ */
+function showBackendErrorMessage(): void {
+  const mainList = document.getElementById('main-product-list');
+  const productList = document.getElementById('product-list');
+  
+  const errorHtml = `
+    <div class="col-12 text-center py-5">
+      <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+      <h4>Không thể kết nối tới server</h4>
+      <p class="text-muted">Vui lòng kiểm tra xem backend đã chạy chưa (npm run dev trong folder backend)</p>
+      <button class="btn btn-primary" onclick="location.reload()">
+        <i class="fas fa-sync-alt me-2"></i>Thử lại
+      </button>
+    </div>
+  `;
+  
+  if (mainList) mainList.innerHTML = errorHtml;
+  if (productList) productList.innerHTML = errorHtml;
+}
 
 /**
  * Setup UI interactions (synchronous only - no API calls)

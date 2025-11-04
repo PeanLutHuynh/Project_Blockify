@@ -977,6 +977,25 @@ export class CategoryRepository
     }
   }
 
+  /**
+   * Get product count for category
+   */
+  async getProductCount(categoryId: number): Promise<number> {
+    try {
+      const { count, error } = await supabaseAdmin
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+        .eq('category_id', categoryId);
+
+      if (error) throw error;
+
+      return count || 0;
+    } catch (error) {
+      logger.error('Error getting product count for category:', error);
+      return 0;
+    }
+  }
+
   async findById(id: string): Promise<Category | null> {
     try {
       const { data, error } = await supabaseAdmin

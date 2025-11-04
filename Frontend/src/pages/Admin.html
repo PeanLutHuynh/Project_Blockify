@@ -169,11 +169,32 @@
         </div>
       </section>
 
-      <!-- Product Management - Shopee Style -->
+      <!-- Product Management -->
       <section id="product" class="section">
         <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">                                                                            <h4 class="mb-0"><i class="bi bi-box-seam me-2"></i>Quản lý Sản Phẩm</h4>                                                                   </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="mb-0"><i class="bi bi-box-seam me-2"></i>Quản lý Sản Phẩm</h4>
+        </div>
 
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="all-products-tab" data-bs-toggle="tab" data-bs-target="#all-products" type="button" role="tab">
+              Tất Cả Sản Phẩm
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories-content" type="button" role="tab">
+              Quản Lý Danh Mục
+            </button>
+          </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+          <!-- All Products Tab -->
+          <div class="tab-pane fade show active" id="all-products" role="tabpanel">
+        
         <!-- Search and Filter Bar -->
         <div class="card mb-3">
           <div class="card-body">
@@ -217,10 +238,10 @@
               <div class="col-md-2">
                 <select class="form-select" id="difficultyFilter">
                   <option value="">Độ khó</option>
-                  <option value="Dễ">Dễ</option>
-                  <option value="Trung bình">Trung bình</option>
-                  <option value="Khó">Khó</option>
-                  <option value="Rất khó">Rất khó</option>
+                  <option value="Easy">Dễ (Easy)</option>
+                  <option value="Medium">Trung bình (Medium)</option>
+                  <option value="Hard">Khó (Hard)</option>
+                  <option value="Expert">Chuyên gia (Expert)</option>
                 </select>
               </div>
               <div class="col-md-2">
@@ -304,6 +325,77 @@
                 </div>
               </div>
             </div>
+
+          </div>
+          <!-- End All Products Tab -->
+
+          <!-- Categories Tab -->
+          <div class="tab-pane fade" id="categories-content" role="tabpanel">
+            
+            <!-- Search Bar -->
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                      <input type="text" class="form-control" placeholder="Tìm kiếm danh mục..." id="categorySearch">
+                    </div>
+                  </div>
+                  <div class="col-md-6 text-end">
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                      <i class="bi bi-plus-circle me-1"></i>Thêm Danh Mục Mới
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Categories Table -->
+            <div class="card">
+              <div class="card-body">
+                <!-- Action Bar -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <span class="text-muted" id="categoryCountText">0 Danh Mục</span>
+                  </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th width="80">ID</th>
+                        <th width="200">Tên Danh Mục</th>
+                        <th width="200">Slug</th>
+                        <th>Mô Tả</th>
+                        <th width="120">Số Sản Phẩm</th>
+                        <th width="120">Trạng Thái</th>
+                        <th width="150">Thao Tác</th>
+                      </tr>
+                    </thead>
+                    <tbody id="categoryList">
+                      <!-- Categories will be rendered here -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Total Count -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div>
+                    <span class="text-muted">Tổng: <span id="totalCategories">0</span> danh mục</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- End Categories Tab -->
+
+        </div>
+        <!-- End Tab Content -->
+
       </section>
 
       <!-- Shop Info -->
@@ -990,6 +1082,87 @@
     </div>
   </div>
 
+  <!-- Add Category Modal -->
+  <div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-plus-circle me-2"></i>Thêm Danh Mục Mới
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="categoryForm" onsubmit="event.preventDefault(); window.adminCategoryController?.handleAddCategory(); return false;">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Tên Danh Mục <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="category_name" id="categoryName" required>
+              <input type="hidden" name="category_slug" id="categorySlug">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mô Tả</label>
+              <textarea class="form-control" name="description" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Trạng Thái</label>
+              <select class="form-select" name="is_active" id="categoryActive">
+                <option value="true">Kích hoạt</option>
+                <option value="false">Không kích hoạt</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save me-1"></i>Lưu
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Category Modal -->
+  <div class="modal fade" id="editCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-pencil me-2"></i>Chỉnh Sửa Danh Mục
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="editCategoryForm" onsubmit="event.preventDefault(); window.adminCategoryController?.handleEditCategory(); return false;">
+          <input type="hidden" id="editCategoryId">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Tên Danh Mục <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="category_name" id="editCategoryName" required>
+              <input type="hidden" name="category_slug" id="editCategorySlug">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mô Tả</label>
+              <textarea class="form-control" name="description" id="editCategoryDescription" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Trạng Thái</label>
+              <select class="form-select" name="is_active" id="editCategoryActive">
+                <option value="true">Kích hoạt</option>
+                <option value="false">Không kích hoạt</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save me-1"></i>Cập Nhật
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Voucher Modal -->
   <div class="modal fade" id="addVoucherModal" tabindex="-1" aria-labelledby="addVoucherModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -1205,6 +1378,19 @@
     window.adminProductController = adminProductController;
   </script>
 
+  <!-- Admin Category Management -->
+  <script type="module">
+    import { AdminCategoryController } from '/dist/src/modules/admin/AdminCategoryController.js';
+    
+    // Initialize Admin Category Controller
+    const adminCategoryController = new AdminCategoryController();
+    window.adminCategoryController = adminCategoryController;
+    
+    // Load categories immediately after initialization
+    console.log('🏗️ AdminCategoryController initialized, loading categories...');
+    adminCategoryController.loadCategories();
+  </script>
+
   <!-- Admin Order Management -->
   <script type="module">
     import { AdminOrderController } from '/dist/src/modules/admin/AdminOrderController.js';
@@ -1352,6 +1538,17 @@
            }
          });
        });
+
+       // Load categories when switching to categories tab
+       const categoriesTab = document.getElementById('categories-tab');
+       if (categoriesTab) {
+         categoriesTab.addEventListener('shown.bs.tab', () => {
+           console.log('🔄 Switching to categories tab, loading categories...');
+           if (window.adminCategoryController) {
+             window.adminCategoryController.loadCategories();
+           }
+         });
+       }
      }
         // DEMO DATA PHẢN HỒI/ĐÁNH GIÁ
         const feedbackListDemo = [

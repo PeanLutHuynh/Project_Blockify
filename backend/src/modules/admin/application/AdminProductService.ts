@@ -684,17 +684,7 @@ export class AdminProductService {
         return null;
       }
 
-      return {
-        category_id: category.categoryId!,
-        category_name: category.categoryName,
-        category_slug: category.categorySlug,
-        description: category.description,
-        image_url: category.imageUrl,
-        parent_category_id: category.parentCategoryId,
-        sort_order: category.sortOrder,
-        is_active: category.isActive,
-        created_at: category.createdAt?.toISOString(),
-      };
+      return await this.toCategoryResponse(category);
     } catch (error) {
       logger.error('Error getting category by ID:', error);
       return null;
@@ -1129,11 +1119,9 @@ export class AdminProductService {
   private async toCategoryResponse(
     category: Category
   ): Promise<CategoryResponseDTO> {
-    const productCount = (await this.categoryRepo.hasProducts(
+    const productCount = await this.categoryRepo.getProductCount(
       category.categoryId!
-    ))
-      ? 1
-      : 0;
+    );
 
     return {
       category_id: category.categoryId!,
