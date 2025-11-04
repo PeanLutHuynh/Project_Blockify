@@ -138,7 +138,7 @@ export class AuthService {
                 success: true,
                 user: this.currentUser!,
                 message: response.message || "Sign in successful",
-                redirectTo: '/src/pages/Admin.html'
+                redirectTo: '/pages/Admin.html'
               };
             }
           }
@@ -151,7 +151,7 @@ export class AuthService {
           success: true,
           user: this.currentUser!,
           message: response.message || "Sign in successful",
-          redirectTo: '/src/pages/HomePage.html'
+          redirectTo: '/pages/HomePage.html'
         };
       } else {
         console.error('❌ Backend authentication failed:', response);
@@ -362,7 +362,7 @@ export class AuthService {
           user: this.currentUser!,
           token: response.data.token,
           message: response.message || "Google authentication successful",
-          redirectTo: "/src/pages/HomePage.html",
+          redirectTo: "/pages/HomePage.html",
         };
       } else {
         return {
@@ -530,14 +530,14 @@ export class AuthService {
                   console.log('👑 Google OAuth: Admin detected, redirecting to Admin panel...');
                   // Check if we're not already on admin page
                   if (!window.location.pathname.includes('Admin.html')) {
-                    window.location.href = '/src/pages/Admin.html';
+                    window.location.href = '/pages/Admin.html';
                   }
                 } else {
                   console.log('👤 Google OAuth: Regular user, redirecting to Home page...');
                   // Check if we're on auth callback or signin page
                   if (window.location.pathname.includes('AuthCallback.html') || 
                       window.location.pathname.includes('Signin')) {
-                    window.location.href = '/src/pages/HomePage.html';
+                    window.location.href = '/pages/HomePage.html';
                   }
                 }
               } else {

@@ -81,7 +81,7 @@ export class EmailVerifiedController {
         if (this.countdownInterval) {
           clearInterval(this.countdownInterval);
         }
-        window.location.href = '/src/pages/SigninPage.html';
+        window.location.href = '/pages/SigninPage.html';
       }
     }, 1000);
     

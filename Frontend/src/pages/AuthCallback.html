@@ -39,14 +39,14 @@
         setTimeout(() => {
           // Chuyển hướng đến trang chủ
           console.log('✅ AuthCallback: Đang chuyển hướng đến trang chủ...');
-          window.location.href = '/src/pages/HomePage.html';
+          window.location.href = '/pages/HomePage.html';
         }, 2000);
         
       } catch (error) {
         console.error('❌ Lỗi AuthCallback:', error);
         document.getElementById('status').textContent = 'Xác thực thất bại. Đang chuyển hướng...';
         setTimeout(() => {
-          window.location.href = '/src/pages/SigninPage.html';
+          window.location.href = '/pages/SigninPage.html';
         }, 2000);
       }
     })();

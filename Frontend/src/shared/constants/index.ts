@@ -151,14 +151,14 @@ export const EVENT_TYPES = {
  * Route paths
  */
 export const ROUTES = {
-  HOME: '/src/pages/HomePage.html',
-  SIGN_IN: '/src/pages/SigninPage.html',
-  ACCOUNT: '/src/pages/Account.html',
-  ADMIN: '/src/pages/Admin.html',
-  CART: '/src/pages/CartPage.html',
-  INTRO: '/src/pages/IntroductionPage.html',
-  ORDER: '/src/pages/OrderPage.html',
-  PRODUCT_DETAIL: '/src/pages/ProductDetail.html'
+  HOME: '/pages/HomePage.html',
+  SIGN_IN: '/pages/SigninPage.html',
+  ACCOUNT: '/pages/Account.html',
+  ADMIN: '/pages/Admin.html',
+  CART: '/pages/CartPage.html',
+  INTRO: '/pages/IntroductionPage.html',
+  ORDER: '/pages/OrderPage.html',
+  PRODUCT_DETAIL: '/pages/ProductDetail.html'
 } as const;
 
 /**

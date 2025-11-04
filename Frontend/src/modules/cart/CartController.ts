@@ -349,7 +349,7 @@ export class CartController {
     sessionStorage.setItem('checkoutItems', JSON.stringify(selectedItemsData));
 
     // Redirect to order page
-    window.location.href = '/src/pages/OrderPage.html';
+    window.location.href = '/pages/OrderPage.html';
   }
 
   /**

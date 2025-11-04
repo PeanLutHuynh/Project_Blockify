@@ -21,7 +21,7 @@ async function toggleHeart(heart: HTMLElement): Promise<void> {
   // Check if user is logged in
   if (!authService.isAuthenticated()) {
     alert('Vui lòng đăng nhập để thêm vào wishlist');
-    window.location.href = '/src/pages/SigninPage.html';
+    window.location.href = '/pages/SigninPage.html';
     return;
   }
 
@@ -271,7 +271,7 @@ async function handleBuyNow(): Promise<void> {
     sessionStorage.setItem('checkoutSource', 'buyNow'); // Mark as direct buy
     
     // Redirect to order page
-    window.location.href = '/src/pages/OrderPage.html';
+    window.location.href = '/pages/OrderPage.html';
     
   } catch (error) {
     console.error('❌ [ProductDetail] Error in Buy Now:', error);
@@ -415,7 +415,7 @@ async function loadRecommendedProducts(currentProductId?: number): Promise<void>
           // Check if user is logged in
           if (!authService.isAuthenticated()) {
             alert('Vui lòng đăng nhập để thêm vào wishlist');
-            window.location.href = '/src/pages/SigninPage.html';
+            window.location.href = '/pages/SigninPage.html';
             return;
           }
           
@@ -460,7 +460,7 @@ async function loadRecommendedProducts(currentProductId?: number): Promise<void>
         const slug = card.getAttribute('data-slug');
         if (slug) {
           console.log(`🔗 Navigating to product: ${slug}`);
-          window.location.href = `/src/pages/ProductDetail.html?slug=${slug}`;
+          window.location.href = `/pages/ProductDetail.html?slug=${slug}`;
         }
       });
     });

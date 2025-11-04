@@ -201,10 +201,10 @@ export class AuthCallbackController {
 
       console.log('👑 [AuthCallback] Final user role:', userRole);
 
-      let redirectUrl = '/src/pages/HomePage.html';
+      let redirectUrl = '/pages/HomePage.html';
       if (userRole === 'admin') {
         console.log('👑 [AuthCallback] Admin detected, redirecting to Admin panel');
-        redirectUrl = '/src/pages/Admin.html';
+        redirectUrl = '/pages/Admin.html';
       } else {
         console.log('👤 [AuthCallback] Regular user, redirecting to Home page');
       }

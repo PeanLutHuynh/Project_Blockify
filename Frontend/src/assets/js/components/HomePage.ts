@@ -435,7 +435,7 @@ async function loadRecommendedProductsForSection() {
         const slug = card.getAttribute('data-product-slug');
         if (slug) {
           console.log(`🔗 Navigating to ProductDetail: ${slug}`);
-          window.location.href = `/src/pages/ProductDetail.html?slug=${slug}`;
+          window.location.href = `/pages/ProductDetail.html?slug=${slug}`;
         }
       }
     });
@@ -671,7 +671,7 @@ async function renderProductsToGrid(products: any[]) {
         // Check if user is logged in
         if (!authService.isAuthenticated()) {
           alert('Vui lòng đăng nhập để thêm vào wishlist');
-          window.location.href = '/src/pages/SigninPage.html';
+          window.location.href = '/pages/SigninPage.html';
           return;
         }
         
@@ -720,8 +720,8 @@ async function renderProductsToGrid(products: any[]) {
       console.log(`🖱️ Card ${index + 1} clicked, slug:`, slug);
       
       if (slug) {
-        console.log(`✅ Navigating to: /src/pages/ProductDetail.html?slug=${slug}`);
-        window.location.href = `/src/pages/ProductDetail.html?slug=${slug}`;
+        console.log(`✅ Navigating to: /pages/ProductDetail.html?slug=${slug}`);
+        window.location.href = `/pages/ProductDetail.html?slug=${slug}`;
       } else {
         console.error('❌ No slug found for card');
       }

@@ -165,7 +165,7 @@ class SupabaseService {
    * Redirects to AuthCallback page which will handle session detection
    */
   async signInWithGoogle(redirectTo?: string) {
-    const defaultRedirect = `${window.location.origin}/src/pages/AuthCallback.html`;
+    const defaultRedirect = `${window.location.origin}/pages/AuthCallback.html`;
     
     return await this.getClient().auth.signInWithOAuth({
       provider: 'google',

@@ -262,7 +262,7 @@ export class SearchController {
       // Close popup first
       this.hideSearchPopup();
       // Navigate to product page with slug parameter
-      window.location.href = `/src/pages/ProductDetail.html?slug=${slug}`;
+      window.location.href = `/pages/ProductDetail.html?slug=${slug}`;
       console.log(`🔗 Navigating to ProductDetail with slug: ${slug}`);
     } else {
       console.warn('Product slug not available:', product);

@@ -255,21 +255,21 @@ export class ModernAuthController {
       window.location.href = redirectUrl;
       return;
     }
-    window.location.href = '/src/pages/HomePage.html';
+    window.location.href = '/pages/HomePage.html';
   }
 
   /**
    * Redirect to sign in page
    */
   private redirectToSignIn(): void {
-    window.location.href = '/src/pages/SigninPage.html';
+    window.location.href = '/pages/SigninPage.html';
   }
 
   /**
    * Redirect to email verification page
    */
   private redirectToVerifyEmail(email: string): void {
-    window.location.href = `/src/pages/VerifyEmail.html?email=${encodeURIComponent(email)}&from=signup`;
+    window.location.href = `/pages/VerifyEmail.html?email=${encodeURIComponent(email)}&from=signup`;
   }
 
   /**

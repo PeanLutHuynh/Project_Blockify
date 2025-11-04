@@ -12,7 +12,7 @@ const API_BASE_URL = isProductionEnv
 
 const GOOGLE_OAUTH_REDIRECT_URL = isProductionEnv
   ? 'https://blockify-vn.vercel.app/pages/AuthCallback.html'
-  : 'http://127.0.0.1:3002/src/pages/AuthCallback.html';
+  : 'http://127.0.0.1:3002/pages/AuthCallback.html';
 
 // Default local values (will be overridden by API)
 export let ENV = {
