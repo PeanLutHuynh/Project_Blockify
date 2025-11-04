@@ -1,6 +1,19 @@
 import { httpClient } from '../../core/api/FetchHttpClient.js';
 
 /**
+ * Get API base URL based on environment
+ */
+const getApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:3001';
+    }
+  }
+  return 'https://blockify-backend.onrender.com';
+};
+
+/**
  * AdminProductController - Frontend
  * Handles product management UI interactions for Admin
  */
@@ -1115,7 +1128,7 @@ export class AdminProductController {
           formData.append('categoryId', categoryId.toString());
           formData.append('imageIndex', index.toString());
 
-          const uploadResponse = await fetch(`http://localhost:3001/api/admin/products/${productId}/images`, {
+          const uploadResponse = await fetch(`${getApiBaseUrl()}/api/admin/products/${productId}/images`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`
@@ -1328,7 +1341,7 @@ export class AdminProductController {
           if (oldImage && oldImage.image_id) {
             console.log(`🗑️ Deleting old image ID: ${oldImage.image_id}`);
             try {
-              const deleteResponse = await fetch(`http://localhost:3001/api/admin/products/images/${oldImage.image_id}`, {
+              const deleteResponse = await fetch(`${getApiBaseUrl()}/api/admin/products/images/${oldImage.image_id}`, {
                 method: 'DELETE',
                 headers: {
                   'Authorization': `Bearer ${token}`,
@@ -1356,7 +1369,7 @@ export class AdminProductController {
           formData.append('imageIndex', index.toString());
 
           try {
-            const uploadResponse = await fetch(`http://localhost:3001/api/admin/products/${productId}/images`, {
+            const uploadResponse = await fetch(`${getApiBaseUrl()}/api/admin/products/${productId}/images`, {
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${token}`

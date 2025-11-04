@@ -9,7 +9,9 @@ export const APP_CONFIG = {
   
   // API Configuration
   API: {
-    BASE_URL: 'http://localhost:3001/api',
+    BASE_URL: typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:3001/api'
+      : 'https://blockify-backend.onrender.com/api',
     TIMEOUT: 30000,
     RETRY_ATTEMPTS: 3,
     RETRY_DELAY: 1000

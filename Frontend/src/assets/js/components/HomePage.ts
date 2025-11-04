@@ -65,7 +65,11 @@ async function waitForBackend(maxRetries: number = 5, delayMs: number = 1000): P
     try {
       console.log(`🔄 Checking backend health (attempt ${i + 1}/${maxRetries})...`);
       
-      const response = await fetch('http://127.0.0.1:3001/health', {
+      const apiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://127.0.0.1:3001'
+        : 'https://blockify-backend.onrender.com';
+      
+      const response = await fetch(`${apiBaseUrl}/health`, {
         method: 'GET',
         signal: AbortSignal.timeout(2000), // 2s timeout
       });
@@ -194,7 +198,11 @@ async function loadProductsFromAPI(categoryId: number | undefined, page: number)
       params.append('categoryId', categoryId.toString());
     }
 
-    const url = `http://127.0.0.1:3001/api/v1/products/?${params.toString()}`;
+    const apiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://127.0.0.1:3001'
+      : 'https://blockify-backend.onrender.com';
+    
+    const url = `${apiBaseUrl}/api/v1/products/?${params.toString()}`;
     console.log('🔗 Fetching from:', url);
 
     // Fetch products

@@ -410,7 +410,17 @@ const getApiBaseUrl = (): string => {
   if (typeof window !== 'undefined' && (window as any).APP_CONFIG?.API_BASE_URL) {
     return (window as any).APP_CONFIG.API_BASE_URL;
   }
-  return 'http://localhost:3001';
+  
+  // Auto-detect based on current hostname
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:3001';
+    }
+  }
+  
+  // Production default
+  return 'https://blockify-backend.onrender.com';
 };
 
 // Create singleton instance

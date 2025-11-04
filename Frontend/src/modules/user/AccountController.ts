@@ -7,6 +7,19 @@ import { WishlistService, WishlistItem } from '../../core/services/WishlistServi
 import { cartService } from '../../core/services/CartService.js';
 
 /**
+ * Get API base URL based on environment
+ */
+const getApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:3001';
+    }
+  }
+  return 'https://blockify-backend.onrender.com';
+};
+
+/**
  * AccountController
  * Handles user account page operations
  * Following MVC pattern - this is the Controller
@@ -440,7 +453,7 @@ export class AccountController {
           return;
         }
 
-        const response = await fetch(`http://localhost:3001/api/v1/users/${this.currentUser.id}/avatar`, {
+        const response = await fetch(`${getApiBaseUrl()}/api/v1/users/${this.currentUser.id}/avatar`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`

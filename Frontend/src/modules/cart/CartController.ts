@@ -111,7 +111,10 @@ export class CartController {
     
     // If URL starts with /, it's a relative path - prepend frontend server
     if (url.startsWith('/')) {
-      return `http://127.0.0.1:3002${url}`;
+      const frontendUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://127.0.0.1:3002'
+        : 'https://blockify-vn.vercel.app';
+      return `${frontendUrl}${url}`;
     }
     
     // Otherwise return as-is

@@ -3,10 +3,21 @@
  * Fetches config from backend API to avoid hardcoding sensitive values
  */
 
+// Detect environment and set API base URL
+const isProductionEnv = window.location.hostname.includes('vercel.app') || 
+                        window.location.hostname.includes('blockify');
+const API_BASE_URL = isProductionEnv 
+  ? 'https://blockify-backend.onrender.com'
+  : 'http://127.0.0.1:3001';
+
+const GOOGLE_OAUTH_REDIRECT_URL = isProductionEnv
+  ? 'https://blockify-vn.vercel.app/pages/AuthCallback.html'
+  : 'http://127.0.0.1:3002/src/pages/AuthCallback.html';
+
 // Default local values (will be overridden by API)
 export let ENV = {
   // API Configuration
-  API_BASE_URL: 'http://127.0.0.1:3001',
+  API_BASE_URL,
   
   // Supabase Configuration (loaded from backend)
   SUPABASE_URL: '',
@@ -16,14 +27,14 @@ export let ENV = {
   GOOGLE_CLIENT_ID: '',
   
   // Environment
-  NODE_ENV: 'development',
+  NODE_ENV: isProductionEnv ? 'production' : 'development',
   
   // Frontend-specific configurations
   JWT_STORAGE_KEY: 'blockify_auth_token',
   USER_STORAGE_KEY: 'blockify_user',
   
   // Google OAuth - Full URL for Supabase redirect
-  GOOGLE_OAUTH_REDIRECT_URL: 'http://127.0.0.1:3002/src/pages/AuthCallback.html',
+  GOOGLE_OAUTH_REDIRECT_URL,
   
   // API endpoints
   API_ENDPOINTS: {
