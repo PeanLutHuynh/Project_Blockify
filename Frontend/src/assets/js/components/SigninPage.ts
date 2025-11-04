@@ -18,30 +18,6 @@ if (await authService.isSupabaseAuthenticated()) {
 
 console.log('✅ App initialized, SUPABASE_URL:', ENV.SUPABASE_URL);
 
-// Typing effect for welcome message (2 lines)
-const welcomeLines = ['WELCOME TO', 'OUR SHOP'];
-const welcomeDiv = document.getElementById('welcome-typing');
-const spans = welcomeDiv ? welcomeDiv.querySelectorAll('span') : [];
-
-let line = 0, idx = 0;
-function typeWelcomeLines() {
-  if (welcomeDiv && line < welcomeLines.length && spans.length > line) {
-    if (idx <= welcomeLines[line].length) {
-      spans[line].textContent = welcomeLines[line].slice(0, idx);
-      idx++;
-      setTimeout(typeWelcomeLines, 90);
-    } else {
-      line++;
-      idx = 0;
-      setTimeout(typeWelcomeLines, 400);
-    }
-  }
-}
-
-// Start typing animation after page loads
-if (welcomeDiv && spans.length >= 2) {
-  typeWelcomeLines();
-}
 
 // Password visibility toggle
 document.getElementById('showPwd')!.addEventListener('change', function(this: HTMLInputElement){

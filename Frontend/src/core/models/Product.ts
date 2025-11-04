@@ -19,14 +19,16 @@ export abstract class BaseProduct {
   protected _price: number;
   protected _imageUrl: string;
   protected _category: string;
-
+  protected _difficultyLevel: string;
+ 
   constructor(
     id: string,
     name: string,
     description: string,
     price: number,
     imageUrl: string,
-    category: string
+    category: string,
+    difficultyLevel: string
   ) {
     this._id = id;
     this._name = name;
@@ -34,6 +36,7 @@ export abstract class BaseProduct {
     this._price = price;
     this._imageUrl = imageUrl;
     this._category = category;
+    this._difficultyLevel = difficultyLevel;
   }
 
   // Encapsulation: Public getters
@@ -59,6 +62,9 @@ export abstract class BaseProduct {
 
   get category(): string {
     return this._category;
+  }
+  get difficultyLevel(): string {
+    return this._difficultyLevel;
   }
 
   // Encapsulation: Public setters with validation
@@ -96,7 +102,6 @@ export class Product extends BaseProduct {
   private _rating: number;
   private _pieceCount: number;
   private _salePrice?: number;
-
   constructor(
     id: string,
     name: string,
@@ -110,10 +115,11 @@ export class Product extends BaseProduct {
     isActive: boolean = true,
     rating: number = 0,
     pieceCount: number = 0,
-    salePrice?: number
+    salePrice?: number,
+    difficultyLevel: string = 'Medium'
   ) {
     // Inheritance: Call parent constructor
-    super(id, name, description, price, imageUrl, category);
+    super(id, name, description, price, imageUrl, category, difficultyLevel);
     this._productUrl = productUrl;
     this._slug = slug;
     this._stockQuantity = stockQuantity;
@@ -121,6 +127,7 @@ export class Product extends BaseProduct {
     this._rating = rating;
     this._pieceCount = pieceCount;
     this._salePrice = salePrice;
+    this._difficultyLevel = difficultyLevel;
   }
 
   // Encapsulation: Additional getters
@@ -150,6 +157,10 @@ export class Product extends BaseProduct {
 
   get salePrice(): number | undefined {
     return this._salePrice;
+  }
+
+  get difficultyLevel(): string {
+    return this._difficultyLevel;
   }
 
   // Polymorphism: Override abstract method
@@ -211,6 +222,13 @@ export class Product extends BaseProduct {
     // Extract piece count
     const pieceCount = parseInt(String(data.pieceCount || data.piece_count || 0));
     
+    // Extract difficulty level
+    const difficultyLevel =
+      data.difficulty_level ||
+      (data as any).difficult_level ||
+      data.difficultyLevel ||
+      'Medium';
+    
     console.log('🔄 [Product.fromApiResponse] Parsing:', {
       input: { product_id: data.product_id, id: data.id, product_name: data.product_name, name: data.name },
       output: { id: productId, name: productName, price, stockQuantity }
@@ -229,7 +247,8 @@ export class Product extends BaseProduct {
       data.is_active !== undefined ? data.is_active : data.isActive !== undefined ? data.isActive : true,
       data.rating || data.rating_average || 0,
       pieceCount,
-      salePrice
+      salePrice,
+      difficultyLevel
     );
   }
 
@@ -244,7 +263,8 @@ export class Product extends BaseProduct {
       category: this._category,
       product_url: this._productUrl,
       stock_quantity: this._stockQuantity,
-      is_active: this._isActive
+      is_active: this._isActive,
+      difficulty_level: this._difficultyLevel
     };
   }
 
@@ -258,6 +278,7 @@ export class Product extends BaseProduct {
     category: string;
     productUrl?: string;
     isAvailable: boolean;
+    difficultyLevel: string;
   } {
     return {
       id: this._id,
@@ -267,7 +288,8 @@ export class Product extends BaseProduct {
       imageUrl: this._imageUrl,
       category: this._category,
       productUrl: this._productUrl,
-      isAvailable: this.isAvailable()
+      isAvailable: this.isAvailable(),
+      difficultyLevel: this._difficultyLevel
     };
   }
 }
@@ -292,15 +314,17 @@ export class LegoProduct extends Product {
     pieceCount: number,
     ageRange: string,
     rating: number = 0,
-    salePrice?: number
+    salePrice?: number,
+    difficultyLevel: string = ''
   ) {
-    super(id, name, description, price, imageUrl, category, productUrl, slug, stockQuantity, isActive, rating, pieceCount, salePrice);
+    super(id, name, description, price, imageUrl, category, productUrl, slug, stockQuantity, isActive, rating, pieceCount, salePrice, difficultyLevel);
     this._ageRange = ageRange;
   }
 
   get ageRange(): string {
     return this._ageRange;
   }
+
 
   // Polymorphism: Override method with specialized behavior
   getProductType(): string {

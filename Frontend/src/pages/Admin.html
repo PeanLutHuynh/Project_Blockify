@@ -17,6 +17,9 @@
   <!-- Header -->
   <div class="header d-flex justify-content-between align-items-center">
     <div class="header-left d-flex align-items-center gap-3">
+      <button class="toggle-sidebar-btn d-lg-none" style="background-color: #68c0ff; color: white;" id="toggleSidebarBtn" aria-label="Mở menu">
+        <i class="bi bi-list"></i>
+      </button>
       <a class="navbar-brand" href="#git add ">Blockify</a>
     </div>
     <div class="header-right d-flex align-items-center gap-2">
@@ -65,7 +68,7 @@
     <main class="main container-fluid">
       <!-- Dashboard -->
       <section id="dashboard" class="section active">
-        <div class="dashboard-header">Bảng điều khiển</div>
+        <div class="bar-blue"><h4 class="mb-0"> <i class="bi bi-speedometer2 me-2"></i>Bảng điều khiển</h4></div>
         <!-- Metrics Cards -->
         <div class="metrics-grid row g-3 mb-4">
           <div class="metric-card col-12 ">
@@ -143,29 +146,66 @@
 
       <!-- Customer -->
       <section id="customer" class="section">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="bar-blue">
           <h4 class="mb-0"><i class="bi bi-people-fill me-2"></i>Quản lý Khách hàng</h4>
         </div>
-        <div class="card">
+        
+        <!-- Statistics Cards -->
+        <div id="user-statistics"></div>
+
+        <div class="card border-0 shadow-sm">
           <div class="card-body">
-            <div class="toolbar d-flex gap-2 mb-3">
-              <input class="search form-control" placeholder="Tìm kiếm khách hàng">
+            <!-- Toolbar -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-8">
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search text-muted"></i>
+                  </span>
+                  <input 
+                    type="text" 
+                    class="form-control border-start-0" 
+                    id="user-search-input"
+                    placeholder="Tìm kiếm theo họ tên..."
+                  >
+                </div>
+              </div>
+              <div class="col-md-4">
+                <select class="form-select" id="user-status-filter">
+                  <option value="all">Tất cả trạng thái</option>
+                  <option value="active">Đang hoạt động</option>
+                  <option value="inactive">Bị khóa</option>
+                </select>
+              </div>
             </div>
+
+            <!-- Table -->
             <div class="table-responsive">
-              <table class="table table-bordered table-hover align-middle">
+              <table class="table table-hover align-middle">
                 <thead class="table-light">
                   <tr>
-                    <th style="width:40px;"><input type="checkbox"></th>
-                    <th>Tên</th>
+                    <th>Họ tên</th>
                     <th>Email</th>
                     <th>Số điện thoại</th>
+                    <th>Giới tính</th>
+                    <th>Sinh nhật</th>
                     <th>Trạng thái</th>
-                    <th>Hành động</th>
                   </tr>
                 </thead>
-                <tbody id="customerList"></tbody>
+                <tbody id="users-table-body">
+                  <tr>
+                    <td colspan="7" class="text-center py-5">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </div>
+
+            <!-- Pagination -->
+            <div id="user-pagination" class="mt-3"></div>
           </div>
         </div>
       </section>
@@ -173,7 +213,7 @@
       <!-- Product Management -->
       <section id="product" class="section">
         <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="bar-blue">
           <h4 class="mb-0"><i class="bi bi-box-seam me-2"></i>Quản lý Sản Phẩm</h4>
         </div>
 
@@ -296,16 +336,16 @@
                 <!-- Product Table -->
                 <div class="table-responsive">
                   <table class="table table-hover align-middle">
-                    <thead class="table-light">
+                    <thead>
                       <tr>
                         <th width="40"><input type="checkbox" class="form-check-input" id="selectAllCheckbox"></th>
-                        <th width="350">Tên sản phẩm</th>
+                        <th width="330">Tên sản phẩm</th>
                         <th width="120">SKU phân loại</th>
                         <th width="120">Phân loại hàng</th>
                         <th width="120" style="cursor: pointer;" data-sort="price">
                           Giá <i class="bi bi-arrow-down-up" id="sortPriceIcon"></i>
                         </th>
-                        <th width="100" style="cursor: pointer;" data-sort="stock_quantity">
+                        <th width="120" style="cursor: pointer;" data-sort="stock_quantity">
                           Kho hàng <i class="bi bi-arrow-down-up" id="sortStockIcon"></i>
                         </th>
                         <th width="100">Doanh số</th>
@@ -365,13 +405,14 @@
                 <!-- Table -->
                 <div class="table-responsive">
                   <table class="table table-hover align-middle">
-                    <thead class="table-light">
+                    <thead>
                       <tr>
                         <th width="80">ID</th>
                         <th width="200">Tên Danh Mục</th>
                         <th width="200">Slug</th>
                         <th>Mô Tả</th>
                         <th width="120">Số Sản Phẩm</th>
+                        <th width="120">Trạng Thái</th>
                         <th width="150">Thao Tác</th>
                       </tr>
                     </thead>
@@ -400,7 +441,7 @@
 
       <!-- Shop Info -->
       <section id="shop-info" class="section h-100">
-        <div class="bar-blue mb-4">Thông tin cửa hàng</div>
+        <div class="bar-blue mb-4"><h4 class="mb-0"> <i class="bi bi-shop me-2"></i>Thông tin cửa hàng</h4></div>
         <div class="shop-info-panel panel">
           <form id="shopInfoForm">
             <div class="row mb-3 align-items-center">
@@ -444,13 +485,13 @@
 
       <!-- Order -->
       <section id="order" class="section">
-        <div class="bar-blue">Quản lý đơn hàng</div>
+        <div class="bar-blue"><h4 class="mb-0"> <i class="bi bi-receipt-cutoff me-2"></i>Quản lý đơn hàng</h4></div>
         <div class="toolbar">
           <input class="search" placeholder="Tìm đơn hàng">
         </div>
         <div class="table-responsive">
           <table class="table align-middle text-center table-hover" id="orderTable">
-            <thead class="table-light">
+            <thead>
               <tr>
                 <th>Mã đơn</th>
                 <th>Khách hàng</th>
@@ -541,7 +582,7 @@
 
       <!-- Feedback Manager -->
       <section id="feedback-manager" class="section">
-        <div class="bar-blue">Quản lý đánh giá sản phẩm</div>
+        <div class="bar-blue"><h4 class="mb-0"> <i class="bi bi-chat-dots me-2"></i>Quản lý đánh giá sản phẩm</h4></div>
         <div class="panel">
             <div class="feedback-list">
               <div class="feedback-item d-flex align-items-start gap-3">
@@ -585,14 +626,12 @@
       <!-- Voucher Management -->
       <section id="voucher" class="section">
         <!-- Voucher Navbar -->
-        <div class="voucher-navbar">
-          <h3 class="navbar-title text-white">Quản lý Voucher</h3>
-          <div class="navbar-actions">
-            <input class="search form-control" placeholder="Tìm kiếm voucher" id="voucherSearch">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVoucherModal">
-              <i class="bi bi-plus-circle me-1"></i>Thêm Voucher
-            </button>
-          </div>
+        <div class="bar-blue">
+         <h4 class="mb-0">  <i class="bi bi-ticket-perforated me-2"></i>Quản lý Voucher</h4>
+        </div>
+        <div class="toolbar">
+          <input class="search" placeholder="Tìm voucher">
+          <button class="btn btn-danger add-btn" data-bs-toggle="modal" data-bs-target="#addVoucherModal">+ Thêm voucher</button>
         </div>
         
         <!-- Voucher List -->
@@ -603,7 +642,7 @@
 
       <!-- Notification -->
       <section id="notification" class="section">
-        <div class="bar-blue">Thông báo</div>
+        <div class="bar-blue"><h4 class="mb-0"> <i class="bi bi-bell-fill me-2"></i>Thông báo</h4></div>
         <div class="toolbar">
           <input class="search" placeholder="Tìm thông báo">
           <button class="btn btn-outline" title="Xóa"><span>🗑</span></button>
@@ -1008,7 +1047,7 @@
   <div class="modal fade" id="bulkEditAdvancedModal" tabindex="-1" aria-labelledby="bulkEditAdvancedModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
-        <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <div class="modal-header" style="background: #0D9BFF; color: white;">
           <h5 class="modal-title fw-bold" id="bulkEditAdvancedModalLabel">
             <i class="bi bi-pencil-square me-2"></i>Chỉnh sửa hàng loạt
           </h5>
@@ -1045,7 +1084,7 @@
             <div class="card-body p-0">
               <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                 <table class="table table-hover mb-0">
-                  <thead class="table-light sticky-top">
+                  <thead class="sticky-top">
                     <tr>
                       <th style="width: 80px;">Hình ảnh</th>
                       <th style="width: 250px;">Tên sản phẩm</th>
@@ -1071,10 +1110,10 @@
         </div>
 
         <div class="modal-footer border-0 bg-light">
-          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+          <button type="button" class="btn btn-danger rounded-1 px-4" data-bs-dismiss="modal">
             <i class="bi bi-x-circle me-1"></i> Hủy
           </button>
-          <button type="button" class="btn btn-primary rounded-pill px-4" id="bulkEditSaveBtn" disabled>
+          <button type="button" class="btn btn-primary rounded-1 px-4" id="bulkEditSaveBtn" disabled>
             <i class="bi bi-save2 me-1"></i> Lưu thay đổi (<span id="bulkEditSaveCount">0</span>)
           </button>
         </div>
@@ -1096,16 +1135,19 @@
           <div class="modal-body">
             <div class="mb-3">
               <label class="form-label">Tên Danh Mục <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" name="category_name" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Slug <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" name="category_slug" required>
-              <small class="text-muted">VD: lego-city, lego-technic (chữ thường, không dấu, dùng dấu gạch ngang)</small>
+              <input type="text" class="form-control" name="category_name" id="categoryName" required>
+              <input type="hidden" name="category_slug" id="categorySlug">
             </div>
             <div class="mb-3">
               <label class="form-label">Mô Tả</label>
               <textarea class="form-control" name="description" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Trạng Thái</label>
+              <select class="form-select" name="is_active" id="categoryActive">
+                <option value="true">Kích hoạt</option>
+                <option value="false">Không kích hoạt</option>
+              </select>
             </div>
           </div>
           <div class="modal-footer">
@@ -1135,15 +1177,18 @@
             <div class="mb-3">
               <label class="form-label">Tên Danh Mục <span class="text-danger">*</span></label>
               <input type="text" class="form-control" name="category_name" id="editCategoryName" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Slug <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" name="category_slug" id="editCategorySlug" required>
-              <small class="text-muted">VD: lego-city, lego-technic (chữ thường, không dấu, dùng dấu gạch ngang)</small>
+              <input type="hidden" name="category_slug" id="editCategorySlug">
             </div>
             <div class="mb-3">
               <label class="form-label">Mô Tả</label>
               <textarea class="form-control" name="description" id="editCategoryDescription" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Trạng Thái</label>
+              <select class="form-select" name="is_active" id="editCategoryActive">
+                <option value="true">Kích hoạt</option>
+                <option value="false">Không kích hoạt</option>
+              </select>
             </div>
           </div>
           <div class="modal-footer">
@@ -1379,6 +1424,10 @@
     // Initialize Admin Category Controller
     const adminCategoryController = new AdminCategoryController();
     window.adminCategoryController = adminCategoryController;
+    
+    // Load categories immediately after initialization
+    console.log('🏗️ AdminCategoryController initialized, loading categories...');
+    adminCategoryController.loadCategories();
   </script>
 
   <!-- Admin Order Management -->
@@ -1389,8 +1438,54 @@
     const adminOrderController = new AdminOrderController();
     window.adminOrderController = adminOrderController;
   </script>
+
+  <!-- Admin User Management -->
+  <script type="module">
+    import { AdminUserController } from '/dist/src/modules/admin/AdminUserController.js';
+    
+    // Initialize Admin User Controller
+    const adminUserController = new AdminUserController();
+    window.adminUserController = adminUserController;
+    console.log('👥 AdminUserController initialized');
+  </script>
   
-  <!-- ORDER MANAGEMENT INITIALIZATION -->
+  <!-- USER MANAGEMENT INITIALIZATION -->
+  <script>
+    // Initialize Admin User Controller when ready
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait for controller to be ready
+      const waitForUserController = setInterval(() => {
+        if (window.adminUserController) {
+          clearInterval(waitForUserController);
+          initializeUserSection();
+        }
+      }, 100);
+    });
+    
+    function initializeUserSection() {      
+      // Check if customer section is active on page load
+      const customerSection = document.getElementById('customer');
+      if (customerSection && customerSection.classList.contains('active')) {
+        window.adminUserController.checkAndLoadData();
+      }
+      
+      // Load users when switching to customer section
+      document.querySelectorAll('.menu li').forEach(item => {
+        item.addEventListener('click', () => {
+          const target = item.getAttribute('data-target');
+          if (target === 'customer') {
+            console.log('👥 Switched to customer tab, loading data...');
+            // Wait a bit for section to be active
+            setTimeout(() => {
+              window.adminUserController.checkAndLoadData();
+            }, 100);
+          }
+        });
+      });
+      
+    }
+  </script>
+  
   <script>
      // Initialize Admin Order Controller when ready
      document.addEventListener('DOMContentLoaded', () => {
@@ -1409,11 +1504,7 @@
        // Setup order filters first
        setupOrderFilters();
        
-       // LUÔN load orders khi page load (không phụ thuộc vào class active)
-       // Điều này đảm bảo data luôn sẵn sàng, giống như trước khi thêm Product Management
-       window.adminOrderController.loadOrders();
-       console.log('📦 Loading orders (always on page load)');
-       
+       window.adminOrderController.loadOrders();       
        // Load lại orders khi switching to order section (để refresh data nếu cần)
        document.querySelectorAll('.menu li').forEach(item => {
          item.addEventListener('click', () => {
@@ -1447,8 +1538,8 @@
          `;
          
          // Add payment status filter
-         const paymentFilter = document.createElement('select');
-         paymentFilter.className = 'form-select d-inline-block w-auto ms-2';
+        const paymentFilter = document.createElement('select');
+        paymentFilter.className = 'form-select d-inline-block w-auto ms-2';
          paymentFilter.innerHTML = `
            <option value="">Tất cả thanh toán</option>
            <option value="pending">Chưa thanh toán</option>
@@ -1662,7 +1753,7 @@
                 const voucherIcon = voucher.type === 'percentage' ? '%' : '₫';
                 
                 return `
-                    <div class="col-6">
+                    <div class="col-12 col-md-6">
                         <div class="voucher" onclick="editVoucher('${voucher.id}')">
                             <div class="voucher-left">
                                 <span class="tag">Số lượng có hạn</span>
@@ -1948,7 +2039,7 @@
                 const voucherIcon = voucher.type === 'percentage' ? '%' : '₫';
                 
                 return `
-                    <div class="col-6">
+                    <div class="col-12 col-md-6">
                         <div class="voucher" onclick="editVoucher('${voucher.id}')">
                             <div class="voucher-left">
                                 <span class="tag">Số lượng có hạn</span>
@@ -2055,6 +2146,25 @@
         item.classList.add('active');
         const target = item.getAttribute('data-target');
         document.getElementById(target).classList.add('active');
+      });
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggleBtn = document.getElementById('toggleSidebarBtn');
+      const sidebar = document.querySelector('.sidebar');
+      if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', function() {
+          sidebar.classList.toggle('active');
+        });
+      }
+      // Auto-close sidebar on menu click in mobile view
+      document.querySelectorAll('.menu li').forEach(item => {
+        item.addEventListener('click', () => {
+          if (window.innerWidth <= 991 && sidebar && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+          }
+        });
       });
     });
   </script>

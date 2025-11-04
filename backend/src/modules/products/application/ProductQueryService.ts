@@ -161,6 +161,7 @@ export class ProductQueryService {
           description,
           short_description,
           price,
+          difficulty_level,
           product_slug,
           category_id,
           stock_quantity,
@@ -192,7 +193,9 @@ export class ProductQueryService {
           price: parseFloat(item.price) || 0,
           image_url: imageUrl,
           product_url: `/src/pages/ProductDetail.html?slug=${slug}`,
-          category: item.category_id?.toString() || ''
+          category: item.category_id?.toString() || '',
+          difficulty_level: item.difficulty_level || null,
+          difficultyLevel: item.difficulty_level || null
         };
       });
       
@@ -217,6 +220,7 @@ export class ProductQueryService {
           short_description,
           price,
           sale_price,
+          difficulty_level,
           product_slug,
           category_id,
           stock_quantity,
@@ -266,7 +270,9 @@ export class ProductQueryService {
           rating: item.rating_average || 0,
           pieceCount: item.piece_count || 0,
           product_url: `/src/pages/ProductDetail.html?slug=${slug}`,
-          category: item.category_id?.toString() || ''
+          category: item.category_id?.toString() || '',
+          difficulty_level: item.difficulty_level || null,
+          difficultyLevel: item.difficulty_level || null
         };
       });
 
@@ -304,6 +310,7 @@ export class ProductQueryService {
           short_description,
           price,
           sale_price,
+          difficulty_level,
           product_slug,
           category_id,
           stock_quantity,
@@ -349,7 +356,9 @@ export class ProductQueryService {
           rating: item.rating_average || 0,
           pieceCount: item.piece_count || 0,
           product_url: `/src/pages/ProductDetail.html?slug=${slug}`,
-          category: item.category_id?.toString() || ''
+          category: item.category_id?.toString() || '',
+          difficulty_level: item.difficulty_level || null,
+          difficultyLevel: item.difficulty_level || null
         };
       });
 

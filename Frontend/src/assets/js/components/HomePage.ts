@@ -22,6 +22,17 @@ initializeOnReady(async () => {
   // Original homepage logic (UI interactions only - synchronous)
   setupUIInteractions();
   
+  // ✅ Wait for backend to be ready before loading data
+  const backendReady = await waitForBackend();
+  
+  if (!backendReady) {
+    console.warn('⚠️ Backend not ready, showing error message');
+    showBackendErrorMessage();
+    return;
+  }
+  
+  console.log('✅ Backend is ready, loading data...');
+  
   // Load categories dynamically from Supabase
   await loadCategorySidebar();
   
@@ -34,6 +45,70 @@ initializeOnReady(async () => {
   // Setup category filter handlers
   setupCategoryFilters();
 });
+
+function normalizeDifficulty(value: any): string | undefined {
+  if (!value) return undefined;
+  const str = String(value).trim().toLowerCase();
+  if (!str) return undefined;
+  if (str.startsWith('easy')) return 'Easy';
+  if (str.startsWith('medium')) return 'Medium';
+  if (str.startsWith('hard')) return 'Hard';
+  if (str.startsWith('expert')) return 'Expert';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/**
+ * Wait for backend to be ready (with retry)
+ */
+async function waitForBackend(maxRetries: number = 5, delayMs: number = 1000): Promise<boolean> {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      console.log(`🔄 Checking backend health (attempt ${i + 1}/${maxRetries})...`);
+      
+      const response = await fetch('http://127.0.0.1:3001/health', {
+        method: 'GET',
+        signal: AbortSignal.timeout(2000), // 2s timeout
+      });
+      
+      if (response.ok) {
+        console.log('✅ Backend is ready!');
+        return true;
+      }
+    } catch (error) {
+      console.log(`⚠️ Backend not ready yet (attempt ${i + 1}/${maxRetries})`);
+      
+      if (i < maxRetries - 1) {
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  
+  console.error('❌ Backend failed to respond after multiple retries');
+  return false;
+}
+
+/**
+ * Show backend error message
+ */
+function showBackendErrorMessage(): void {
+  const mainList = document.getElementById('main-product-list');
+  const productList = document.getElementById('product-list');
+  
+  const errorHtml = `
+    <div class="col-12 text-center py-5">
+      <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+      <h4>Không thể kết nối tới server</h4>
+      <p class="text-muted">Vui lòng kiểm tra xem backend đã chạy chưa (npm run dev trong folder backend)</p>
+      <button class="btn btn-primary" onclick="location.reload()">
+        <i class="fas fa-sync-alt me-2"></i>Thử lại
+      </button>
+    </div>
+  `;
+  
+  if (mainList) mainList.innerHTML = errorHtml;
+  if (productList) productList.innerHTML = errorHtml;
+}
 
 /**
  * Setup UI interactions (synchronous only - no API calls)
@@ -243,49 +318,59 @@ async function loadRecommendedProductsForSection() {
     let products: any[] = [];
 
     // ✅ Bước 1: Check if user is authenticated AND has delivered orders
-    const isAuth = await supabaseService.isAuthenticated();
+    let isAuth = false;
+    try {
+      isAuth = await supabaseService.isAuthenticated();
+    } catch (error) {
+      console.warn('⚠️ Could not check authentication, assuming not logged in:', error);
+      isAuth = false;
+    }
     
     if (isAuth) {
-      // Get current user
-      const { data: userData } = await supabaseService.getUser();
-      
-      if (userData && userData.user) {
-        // Get user_id from users table
-        const client = supabaseService.getClient();
-        const { data: userRecord } = await client
-          .from('users')
-          .select('user_id')
-          .eq('auth_uid', userData.user.id)
-          .single();
+      try {
+        // Get current user
+        const { data: userData } = await supabaseService.getUser();
+        
+        if (userData && userData.user) {
+          // Get user_id from users table
+          const client = supabaseService.getClient();
+          const { data: userRecord } = await client
+            .from('users')
+            .select('user_id')
+            .eq('auth_uid', userData.user.id)
+            .single();
 
-        if (userRecord) {
-          const userId = userRecord.user_id;
-          console.log(`✅ User logged in: ${userId}, checking for delivered orders...`);
+          if (userRecord) {
+            const userId = userRecord.user_id;
+            console.log(`✅ User logged in: ${userId}, checking for delivered orders...`);
 
-          // Check if user has delivered orders
-          const { data: orders } = await client
-            .from('orders')
-            .select('order_id')
-            .eq('user_id', userId)
-            .eq('status', 'Đã giao')
-            .limit(1);
+            // Check if user has delivered orders
+            const { data: orders } = await client
+              .from('orders')
+              .select('order_id')
+              .eq('user_id', userId)
+              .eq('status', 'Đã giao')
+              .limit(1);
 
-          if (orders && orders.length > 0) {
-            console.log('✅ User has delivered orders, loading personalized recommendations...');
-            
-            // Try personalized recommendations
-            const result = await productService.getRecommendedProductsForUser(userId, 8);
-            
-            if (result.success && result.products && result.products.length > 0) {
-              products = result.products;
-              console.log(`✅ Loaded ${products.length} personalized recommendations`);
+            if (orders && orders.length > 0) {
+              console.log('✅ User has delivered orders, loading personalized recommendations...');
+              
+              // Try personalized recommendations
+              const result = await productService.getRecommendedProductsForUser(userId, 8);
+              
+              if (result.success && result.products && result.products.length > 0) {
+                products = result.products;
+                console.log(`✅ Loaded ${products.length} personalized recommendations`);
+              } else {
+                console.log('⚠️ No personalized recommendations found, will fallback to best-selling');
+              }
             } else {
-              console.log('⚠️ No personalized recommendations found, will fallback to best-selling');
+              console.log('⚠️ User has NO delivered orders, will show best-selling products');
             }
-          } else {
-            console.log('⚠️ User has NO delivered orders, will show best-selling products');
           }
         }
+      } catch (error) {
+        console.warn('⚠️ Error checking user recommendations, will fallback to best-selling:', error);
       }
     } else {
       console.log('⚠️ User not logged in, will show best-selling products');
@@ -458,9 +543,13 @@ async function renderProductsToGrid(products: any[]) {
     const displayPrice = salePrice > 0 ? salePrice : price;
     const formattedPrice = displayPrice.toLocaleString('vi-VN');
     const rating = product.rating || 4.8;
-    const age = product.recommendedAge || '8+';
-    const pieces = product.pieceCount || 120;
-    
+    const pieces = product.pieceCount || product.piece_count || 120;
+    const difficultyLevel =
+      normalizeDifficulty(product.difficultyLevel) ||
+      normalizeDifficulty(product.difficulty_level) ||
+      normalizeDifficulty((product as any).difficult_level) ||
+      normalizeDifficulty(product.difficulty) ||
+      'Medium';
     // Check if product is in wishlist
     const isInWishlist = wishlistProductIds.includes(parseInt(product.id));
     const heartClass = isInWishlist ? 'fas fa-heart icon-heart liked' : 'far fa-heart icon-heart';
@@ -473,7 +562,7 @@ async function renderProductsToGrid(products: any[]) {
             <img src="${product.imageUrl}" alt="${product.name}">
           </div>
           <div class="product-info d-flex align-items-center justify-content-between">
-            <span><i class="fas fa-child"></i> ${age}</span>
+            <span><i class="fa-solid fa-fire "></i> ${difficultyLevel}</span>
             <span><i class="fas fa-cube"></i> ${pieces}</span>
             <span><i class="fas fa-star text-warning"></i> ${rating}</span>
           </div>

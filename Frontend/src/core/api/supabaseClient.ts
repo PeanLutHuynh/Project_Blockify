@@ -18,7 +18,69 @@ class SupabaseService {
   private authStateListeners: Array<(user: any | null) => void> = [];
 
   /**
-   * Initialize Supabase client
+   * Wait for Supabase SDK to load from CDN
+   */
+  private async waitForSDK(maxRetries: number = 20, delayMs: number = 100): Promise<boolean> {
+    for (let i = 0; i < maxRetries; i++) {
+      if (window.supabase && window.supabase.createClient) {
+        console.log('✅ Supabase SDK loaded from CDN');
+        return true;
+      }
+      console.log(`⏳ Waiting for Supabase SDK from CDN... (${i + 1}/${maxRetries})`);
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+    console.error('❌ Supabase SDK failed to load from CDN');
+    return false;
+  }
+
+  /**
+   * Initialize Supabase client (async version)
+   * Must be called after ENV is loaded
+   */
+  async initializeAsync(): Promise<boolean> {
+    if (!ENV.SUPABASE_URL || !ENV.SUPABASE_ANON_KEY) {
+      console.error('❌ Supabase configuration is missing. Please load ENV first.');
+      return false;
+    }
+
+    // ✅ Prevent double initialization
+    if (this.client) {
+      console.warn('⚠️ Supabase client already initialized');
+      return true;
+    }
+
+    // ✅ Wait for Supabase SDK to load from CDN
+    const sdkReady = await this.waitForSDK();
+    if (!sdkReady) {
+      return false;
+    }
+
+    this.client = window.supabase.createClient(ENV.SUPABASE_URL, ENV.SUPABASE_ANON_KEY, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    });
+
+    // Set up auth state change listener
+    this.client.auth.onAuthStateChange((event: any, session: any) => {
+      // Only log important events, not every state change
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+        console.log('🔐 Supabase auth event:', event, session?.user?.email);
+      }
+      
+      // Notify all listeners
+      const user = session?.user || null;
+      this.authStateListeners.forEach(listener => listener(user));
+    });
+
+    console.log('✅ Supabase client initialized');
+    return true;
+  }
+
+  /**
+   * Initialize Supabase client (synchronous - deprecated, use initializeAsync instead)
    * Must be called after ENV is loaded
    */
   initialize(): void {
@@ -30,6 +92,12 @@ class SupabaseService {
     // Check if Supabase SDK is loaded from CDN
     if (!window.supabase || !window.supabase.createClient) {
       console.error('❌ Supabase SDK not loaded. Make sure to include the CDN script in HTML.');
+      return;
+    }
+
+    // ✅ Prevent double initialization
+    if (this.client) {
+      console.warn('⚠️ Supabase client already initialized');
       return;
     }
 
@@ -54,6 +122,22 @@ class SupabaseService {
     });
 
     console.log('✅ Supabase client initialized');
+  }
+
+  /**
+   * Wait for Supabase client to be ready
+   */
+  async waitForReady(maxRetries: number = 10, delayMs: number = 100): Promise<boolean> {
+    for (let i = 0; i < maxRetries; i++) {
+      if (this.client) {
+        console.log('✅ Supabase client is ready');
+        return true;
+      }
+      console.log(`⏳ Waiting for Supabase client... (${i + 1}/${maxRetries})`);
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+    console.error('❌ Supabase client failed to initialize');
+    return false;
   }
 
   /**

@@ -287,6 +287,13 @@ body, * {
   color: #555;
   }
   
+ 
+  .line{
+    height:1px;
+    width:100%;
+    background-color: white;
+  }
+  
   /* Footer */
   .footer1 {
   position: relative;
