@@ -149,26 +149,63 @@
         <div class="bar-blue">
           <h4 class="mb-0"><i class="bi bi-people-fill me-2"></i>Quản lý Khách hàng</h4>
         </div>
-        <div class="card">
+        
+        <!-- Statistics Cards -->
+        <div id="user-statistics"></div>
+
+        <div class="card border-0 shadow-sm">
           <div class="card-body">
-            <div class="toolbar d-flex gap-2 mb-3">
-              <input class="search form-control" placeholder="Tìm kiếm khách hàng">
+            <!-- Toolbar -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-8">
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search text-muted"></i>
+                  </span>
+                  <input 
+                    type="text" 
+                    class="form-control border-start-0" 
+                    id="user-search-input"
+                    placeholder="Tìm kiếm theo họ tên..."
+                  >
+                </div>
+              </div>
+              <div class="col-md-4">
+                <select class="form-select" id="user-status-filter">
+                  <option value="all">Tất cả trạng thái</option>
+                  <option value="active">Đang hoạt động</option>
+                  <option value="inactive">Bị khóa</option>
+                </select>
+              </div>
             </div>
+
+            <!-- Table -->
             <div class="table-responsive">
-              <table class="table table-bordered table-hover align-middle">
-                <thead>
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
                   <tr>
-                    <th style="width:40px;"><input type="checkbox"></th>
-                    <th>Tên</th>
+                    <th>Họ tên</th>
                     <th>Email</th>
                     <th>Số điện thoại</th>
+                    <th>Giới tính</th>
+                    <th>Sinh nhật</th>
                     <th>Trạng thái</th>
-                    <th>Hành động</th>
                   </tr>
                 </thead>
-                <tbody id="customerList"></tbody>
+                <tbody id="users-table-body">
+                  <tr>
+                    <td colspan="7" class="text-center py-5">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </div>
+
+            <!-- Pagination -->
+            <div id="user-pagination" class="mt-3"></div>
           </div>
         </div>
       </section>
@@ -1401,8 +1438,54 @@
     const adminOrderController = new AdminOrderController();
     window.adminOrderController = adminOrderController;
   </script>
+
+  <!-- Admin User Management -->
+  <script type="module">
+    import { AdminUserController } from '/dist/src/modules/admin/AdminUserController.js';
+    
+    // Initialize Admin User Controller
+    const adminUserController = new AdminUserController();
+    window.adminUserController = adminUserController;
+    console.log('👥 AdminUserController initialized');
+  </script>
   
-  <!-- ORDER MANAGEMENT INITIALIZATION -->
+  <!-- USER MANAGEMENT INITIALIZATION -->
+  <script>
+    // Initialize Admin User Controller when ready
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait for controller to be ready
+      const waitForUserController = setInterval(() => {
+        if (window.adminUserController) {
+          clearInterval(waitForUserController);
+          initializeUserSection();
+        }
+      }, 100);
+    });
+    
+    function initializeUserSection() {      
+      // Check if customer section is active on page load
+      const customerSection = document.getElementById('customer');
+      if (customerSection && customerSection.classList.contains('active')) {
+        window.adminUserController.checkAndLoadData();
+      }
+      
+      // Load users when switching to customer section
+      document.querySelectorAll('.menu li').forEach(item => {
+        item.addEventListener('click', () => {
+          const target = item.getAttribute('data-target');
+          if (target === 'customer') {
+            console.log('👥 Switched to customer tab, loading data...');
+            // Wait a bit for section to be active
+            setTimeout(() => {
+              window.adminUserController.checkAndLoadData();
+            }, 100);
+          }
+        });
+      });
+      
+    }
+  </script>
+  
   <script>
      // Initialize Admin Order Controller when ready
      document.addEventListener('DOMContentLoaded', () => {
@@ -1421,11 +1504,7 @@
        // Setup order filters first
        setupOrderFilters();
        
-       // LUÔN load orders khi page load (không phụ thuộc vào class active)
-       // Điều này đảm bảo data luôn sẵn sàng, giống như trước khi thêm Product Management
-       window.adminOrderController.loadOrders();
-       console.log('📦 Loading orders (always on page load)');
-       
+       window.adminOrderController.loadOrders();       
        // Load lại orders khi switching to order section (để refresh data nếu cần)
        document.querySelectorAll('.menu li').forEach(item => {
          item.addEventListener('click', () => {

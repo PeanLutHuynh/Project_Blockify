@@ -2,7 +2,7 @@ import { Router } from "../../../infrastructure/http/Router";
 import { AdminController } from "./AdminController";
 // import { AdminProductController } from "./AdminProductController";
 import { requireAdmin } from "../infrastructure/middleware/AdminAuthMiddleware";
-import { createAdminUserRouter } from "../../user/presentation/adminUserRoutes";
+import { registerAdminUserRoutes } from "./adminUserRoutes";
 
 /**
  * Admin Routes
@@ -197,26 +197,6 @@ export function setupAdminRoutes(router: Router): void {
   //   }
   // );
 
-  // Admin User Management Routes (with admin auth middleware)
-  const adminUserRouter = createAdminUserRouter();
-  const adminUserRoutes = adminUserRouter.getRoutes();
-  
-  adminUserRoutes.forEach(route => {
-    // Wrap handler with admin middleware
-    const wrappedHandler = async (req: any, res: any) => {
-      // Check admin first
-      const adminMiddlewareResult = await requireAdmin(req, res, () => {});
-      if (adminMiddlewareResult !== undefined) {
-        return; // Middleware blocked the request
-      }
-      // Call original handler
-      return route.handler(req, res);
-    };
-    
-    router.addRoute(
-      route.method,
-      `/api/v1/admin/users${route.path}`,
-      wrappedHandler
-    );
-  });
+  // Admin User Management Routes
+  registerAdminUserRoutes(router);
 }
