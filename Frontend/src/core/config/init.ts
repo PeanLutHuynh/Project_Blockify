@@ -28,10 +28,14 @@ export async function initializeApp(): Promise<void> {
     await waitForConfig();
     console.log('✅ Configuration loaded');
     
-    // Step 2: Initialize Supabase client
+    // Step 2: Initialize Supabase client (async - wait for CDN SDK to load)
     if (ENV.SUPABASE_URL && ENV.SUPABASE_ANON_KEY) {
-      supabaseService.initialize();
-      console.log('✅ Supabase client initialized');
+      const supabaseInitialized = await supabaseService.initializeAsync();
+      if (supabaseInitialized) {
+        console.log('✅ Supabase client initialized');
+      } else {
+        console.error('❌ Failed to initialize Supabase client');
+      }
     } else {
       console.warn('⚠️ Supabase configuration missing, auth features may not work');
     }
@@ -71,14 +75,14 @@ export function updateCartBadge(): void {
  * Initialize app with DOM ready check
  * Use this in page scripts
  */
-export function initializeOnReady(callback?: () => void): void {
+export function initializeOnReady(callback?: () => void | Promise<void>): void {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
       await initializeApp();
-      callback?.();
+      await callback?.(); // ✅ MUST AWAIT ASYNC CALLBACK
     });
   } else {
-    initializeApp().then(() => callback?.());
+    initializeApp().then(async () => await callback?.()); // ✅ MUST AWAIT ASYNC CALLBACK
   }
 }
 

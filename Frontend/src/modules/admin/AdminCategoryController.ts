@@ -6,6 +6,7 @@ import { httpClient } from '../../core/api/FetchHttpClient.js';
  */
 export class AdminCategoryController {
   private categories: any[] = [];
+  private listenersSetup: boolean = false; // ✅ Flag to prevent duplicate listeners
 
   constructor() {
     this.init();
@@ -29,6 +30,12 @@ export class AdminCategoryController {
    * Setup event listeners
    */
   private setupEventListeners(): void {
+    // ✅ Prevent duplicate event listeners
+    if (this.listenersSetup) {
+      console.log('⚠️ Event listeners already set up, skipping...');
+      return;
+    }
+    
     console.log('🔧 Setting up AdminCategoryController event listeners...');
     
     // Search functionality
@@ -93,6 +100,8 @@ export class AdminCategoryController {
       console.error('❌ editCategoryForm NOT FOUND! Check HTML element ID');
     }
     
+    // ✅ Mark listeners as set up
+    this.listenersSetup = true;
     console.log('✅ Event listeners setup complete');
   }
 
