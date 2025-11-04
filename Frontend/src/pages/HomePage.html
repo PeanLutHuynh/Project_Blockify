@@ -118,19 +118,57 @@
     <div class="col-md-3">
       <div class="category pb-1 text-center">
         <h5 class="text-white fw-bold m-0 p-3 rounded-top-3" style="background-color: #0D9BFF;">Danh mục</h5>
-        <!-- Categories will be loaded dynamically from database by HomePage.ts -->
+        <!-- Categories will be loaded dynamically -->
       </div>
     </div>
+
     <div class="col-md-9">
       <div class="d-flex gap-2 mb-3">
-        <button class="btn text-white" style ="background-color: #0D9BFF;">Mới nhất</button>
+        <button class="btn text-white" style="background-color: #0D9BFF;">Mới nhất</button>
         <button class="btn btn-outline-primary">Phổ biến</button>
-
-        <button class="btn btn-outline-primary">Bộ lọc</button>
+        <button id="filter-toggle" class="btn btn-outline-primary">Bộ lọc</button>
       </div>
+
+      <!-- Bộ lọc -->
+      <div id="filter-panel" class="card p-3 mb-3">
+        <h6 class="fw-bold mb-3">Bộ lọc sản phẩm</h6>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Khoảng giá</label>
+            <select class="form-select">
+              <option value="">Tất cả</option>
+              <option value="0-200000">0 - 200.000₫</option>
+              <option value="200000-500000">200.000₫ - 500.000₫</option>
+              <option value="500000-1000000">500.000₫ - 1.000.000₫</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Thương hiệu</label>
+            <select class="form-select">
+              <option value="">Tất cả</option>
+              <option>Lego</option>
+              <option>Sluban</option>
+              <option>Qman</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Sắp xếp theo</label>
+            <select class="form-select">
+              <option>Mặc định</option>
+              <option>Giá tăng dần</option>
+              <option>Giá giảm dần</option>
+            </select>
+          </div>
+        </div>
+        <div class="text-end mt-3">
+          <button class="btn btn-primary">Áp dụng</button>
+        </div>
+      </div>
+
+      <!-- Danh sách sản phẩm -->
       <div class="row g-3" id="main-product-list"></div>
-      
-      <!-- Pagination Controls -->
+
+      <!-- Phân trang -->
       <div class="row mt-4">
         <div class="col-12">
           <div id="pagination-container"></div>
@@ -139,6 +177,7 @@
     </div>
   </div>
 </section>
+
 
 <!-- Promotion -->
 <section class="container my-5 p-3 rounded-3" style="background-color: rgb(212, 238, 255);">
@@ -151,7 +190,7 @@
     </div>
     <div class="col-md-3">
       <div class="promotion-box p-0">
-        <img src="../../public/images/Frame 39.png" class="img h-100 w-100" alt="lego">
+        <img src="../../public/images/Frame 39.svg" class="img h-100 w-100" alt="lego">
       </div>
     </div>
 
@@ -301,5 +340,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module" src="/dist/src/assets/js/components/HomePage.js"></script>
+<script>
+  document.getElementById('filter-toggle').addEventListener('click', function() {
+    document.getElementById('filter-panel').classList.toggle('active');
+  });
+</script>
 </body>
 </html>

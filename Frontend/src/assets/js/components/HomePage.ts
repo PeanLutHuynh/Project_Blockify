@@ -35,6 +35,17 @@ initializeOnReady(async () => {
   setupCategoryFilters();
 });
 
+function normalizeDifficulty(value: any): string | undefined {
+  if (!value) return undefined;
+  const str = String(value).trim().toLowerCase();
+  if (!str) return undefined;
+  if (str.startsWith('easy')) return 'Easy';
+  if (str.startsWith('medium')) return 'Medium';
+  if (str.startsWith('hard')) return 'Hard';
+  if (str.startsWith('expert')) return 'Expert';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 /**
  * Setup UI interactions (synchronous only - no API calls)
  */
@@ -458,9 +469,13 @@ async function renderProductsToGrid(products: any[]) {
     const displayPrice = salePrice > 0 ? salePrice : price;
     const formattedPrice = displayPrice.toLocaleString('vi-VN');
     const rating = product.rating || 4.8;
-    const age = product.recommendedAge || '8+';
-    const pieces = product.pieceCount || 120;
-    
+    const pieces = product.pieceCount || product.piece_count || 120;
+    const difficultyLevel =
+      normalizeDifficulty(product.difficultyLevel) ||
+      normalizeDifficulty(product.difficulty_level) ||
+      normalizeDifficulty((product as any).difficult_level) ||
+      normalizeDifficulty(product.difficulty) ||
+      'Medium';
     // Check if product is in wishlist
     const isInWishlist = wishlistProductIds.includes(parseInt(product.id));
     const heartClass = isInWishlist ? 'fas fa-heart icon-heart liked' : 'far fa-heart icon-heart';
@@ -473,7 +488,7 @@ async function renderProductsToGrid(products: any[]) {
             <img src="${product.imageUrl}" alt="${product.name}">
           </div>
           <div class="product-info d-flex align-items-center justify-content-between">
-            <span><i class="fas fa-child"></i> ${age}</span>
+            <span><i class="fa-solid fa-fire "></i> ${difficultyLevel}</span>
             <span><i class="fas fa-cube"></i> ${pieces}</span>
             <span><i class="fas fa-star text-warning"></i> ${rating}</span>
           </div>
