@@ -1,0 +1,97 @@
+{
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/pages/HomePage.html"
+    },
+    {
+      "source": "/HomePage.html",
+      "destination": "/pages/HomePage.html"
+    },
+    {
+      "source": "/IntroductionPage.html",
+      "destination": "/pages/IntroductionPage.html"
+    },
+    {
+      "source": "/Service.html",
+      "destination": "/pages/Service.html"
+    },
+    {
+      "source": "/Contact.html",
+      "destination": "/pages/Contact.html"
+    },
+    {
+      "source": "/ProductDetail.html",
+      "destination": "/pages/ProductDetail.html"
+    },
+    {
+      "source": "/CartPage.html",
+      "destination": "/pages/CartPage.html"
+    },
+    {
+      "source": "/OrderPage.html",
+      "destination": "/pages/OrderPage.html"
+    },
+    {
+      "source": "/OrderConfirmation.html",
+      "destination": "/pages/OrderConfirmation.html"
+    },
+    {
+      "source": "/SigninPage.html",
+      "destination": "/pages/SigninPage.html"
+    },
+    {
+      "source": "/SignupPage.html",
+      "destination": "/pages/SignupPage.html"
+    },
+    {
+      "source": "/Account.html",
+      "destination": "/pages/Account.html"
+    },
+    {
+      "source": "/Admin.html",
+      "destination": "/pages/Admin.html"
+    },
+    {
+      "source": "/AuthCallback.html",
+      "destination": "/pages/AuthCallback.html"
+    },
+    {
+      "source": "/VerifyEmail.html",
+      "destination": "/pages/VerifyEmail.html"
+    },
+    {
+      "source": "/EmailVerified.html",
+      "destination": "/pages/EmailVerified.html"
+    },
+    {
+      "source": "/Coin.html",
+      "destination": "/pages/Coin.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/dist/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ]
+}

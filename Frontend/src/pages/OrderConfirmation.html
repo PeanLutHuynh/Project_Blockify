@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
@@ -16,8 +16,8 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
     <div class="container">
-      <a class="navbar-brand px-2 rounded-5 border bg-light border-1 border-white" href="IntroductionPage.html">
-        <img src="../../public/images/Group 71.png" alt="Blockify Logo" width="40" height="45">
+      <a class="navbar-brand px-2 rounded-5 border bg-light border-1 border-white" href="/IntroductionPage.html">
+        <img src="../public/images/Group 71.png" alt="Blockify Logo" width="40" height="45">
       </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,22 +27,22 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link d-flex align-items-center" href="HomePage.html">
+              <a class="nav-link d-flex align-items-center" href="/HomePage.html">
                 <i class="bi bi-house-door me-2"></i> Trang chủ
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link d-flex align-items-center" href="IntroductionPage.html">
+              <a class="nav-link d-flex align-items-center" href="/IntroductionPage.html">
                 <i class="bi bi-info-circle me-2"></i> Giới thiệu
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link d-flex align-items-center" href="Service.html">
+              <a class="nav-link d-flex align-items-center" href="/Service.html">
                 <i class="bi bi-gear me-2"></i> Dịch vụ
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link d-flex align-items-center" href="Contact.html">
+              <a class="nav-link d-flex align-items-center" href="/Contact.html">
                 <i class="bi bi-question-circle me-2"></i> Hỏi đáp
               </a>
             </li>
@@ -51,11 +51,11 @@
                 <a href="#" class="search-icon d-flex justify-content-start align-items-center">
                     <i class="bi bi-search text-secondary" id="openSearch"> </i>
                 </a>
-                <a href="CartPage.html" class="cart-icon">
+                <a href="/CartPage.html" class="cart-icon">
                     <i class="bi bi-cart"></i>
                 </a>
-                <a href="SigninPage.html" class="btn-sign">Đăng nhập</a>
-                <a href="SignupPage.html" class="btn-sign">Đăng ký</a>
+                <a href="/SigninPage.html" class="btn-sign">Đăng nhập</a>
+                <a href="/SignupPage.html" class="btn-sign">Đăng ký</a>
             </div>
   
         <!-- Tìm kiếm -->
@@ -218,8 +218,8 @@
           </div>
           <!-- Actions -->
         <div class="text-center">
-          <a href="HomePage.html" class="btn btn-light btn-outline-primary me-2">Tiếp tục mua sắm</a>
-          <a href="Account.html" class="btn btn-primary">Xem đơn hàng của tôi</a>
+          <a href="/HomePage.html" class="btn btn-light btn-outline-primary me-2">Tiếp tục mua sắm</a>
+          <a href="/Account.html" class="btn btn-primary">Xem đơn hàng của tôi</a>
         </div>
          </div>
         
@@ -232,10 +232,10 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module">
-    import { initializeApp } from '/dist/src/core/config/init.js';
-    import { initializeNavbarAuth } from '/dist/src/shared/components/NavbarAuth.js';
-    import { OrderService } from '/dist/src/core/services/OrderService.js';
-    import { AuthService } from '/dist/src/core/services/AuthService.js';
+    import { initializeApp } from '../src/core/config/init.js';
+    import { initializeNavbarAuth } from '../src/shared/components/NavbarAuth.js';
+    import { OrderService } from '../src/core/services/OrderService.js';
+    import { AuthService } from '../src/core/services/AuthService.js';
 
     class OrderConfirmationController {
       constructor() {
