@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -169,18 +170,42 @@
         </div>
       </section>
 
-      <!-- Product Management - Shopee Style -->
+      <!-- Product Management -->
       <section id="product" class="section">
         <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">                                                                            <h4 class="mb-0"><i class="bi bi-box-seam me-2"></i>Quản lý Sản Phẩm</h4>                                                                   </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="mb-0"><i class="bi bi-box-seam me-2"></i>Quản lý Sản Phẩm</h4>
+        </div>
 
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="all-products-tab" data-bs-toggle="tab" data-bs-target="#all-products" type="button" role="tab">
+              Tất Cả Sản Phẩm
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories-content" type="button" role="tab">
+              Quản Lý Danh Mục
+            </button>
+          </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+          <!-- All Products Tab -->
+          <div class="tab-pane fade show active" id="all-products" role="tabpanel">
+        
         <!-- Search and Filter Bar -->
         <div class="card mb-3">
           <div class="card-body">
-            <div class="row g-3">
+            <!-- First Row -->
+            <div class="row g-3 mb-2">
               <div class="col-md-4">
                 <div class="input-group">
-                  <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>                                                                   <input type="text" class="form-control" placeholder="Vui lòng nhập tối thiểu 2 ký tự" id="productSearch">                                   </div>
+                  <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" placeholder="Vui lòng nhập tối thiểu 2 ký tự" id="productSearch">
+                </div>
               </div>
               <div class="col-md-2">
                 <select class="form-select" id="categoryFilter">
@@ -200,12 +225,50 @@
                   <option value="">Trạng thái</option>
                   <option value="active">Đang bán</option>
                   <option value="inactive">Ngừng bán</option>
-
                 </select>
               </div>
               <div class="col-md-2">
                 <button class="btn btn-primary w-100" onclick="window.adminProductController?.applyFilters()">
                   <i class="bi bi-funnel me-1"></i>Tìm
+                </button>
+              </div>
+            </div>
+
+            <!-- Second Row - Additional Filters -->
+            <div class="row g-3">
+              <div class="col-md-2">
+                <select class="form-select" id="difficultyFilter">
+                  <option value="">Độ khó</option>
+                  <option value="Easy">Dễ (Easy)</option>
+                  <option value="Medium">Trung bình (Medium)</option>
+                  <option value="Hard">Khó (Hard)</option>
+                  <option value="Expert">Chuyên gia (Expert)</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="featuredFilter">
+                  <option value="">Nổi bật</option>
+                  <option value="true">Có</option>
+                  <option value="false">Không</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="newFilter">
+                  <option value="">Sản phẩm mới</option>
+                  <option value="true">Có</option>
+                  <option value="false">Không</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="bestsellerFilter">
+                  <option value="">Bán chạy</option>
+                  <option value="true">Có</option>
+                  <option value="false">Không</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <button class="btn btn-outline-secondary w-100" onclick="window.adminProductController?.resetFilters()">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i>Đặt lại bộ lọc
                 </button>
               </div>
             </div>
@@ -235,10 +298,17 @@
                   <table class="table table-hover align-middle">
                     <thead class="table-light">
                       <tr>
-                        <th width="40"><input type="checkbox" class="form-check-input" id="selectAllCheckbox"></th>                                                   <th width="350">Tên sản phẩm</th>
+                        <th width="40"><input type="checkbox" class="form-check-input" id="selectAllCheckbox"></th>
+                        <th width="350">Tên sản phẩm</th>
                         <th width="120">SKU phân loại</th>
                         <th width="120">Phân loại hàng</th>
-                        <th width="120">Giá <i class="bi bi-sort-down"></i></th>                                                                                      <th width="100">Kho hàng <i class="bi bi-info-circle"></i> <i class="bi bi-sort-down"></i></th>                                               <th width="100">Doanh số</th>
+                        <th width="120" style="cursor: pointer;" data-sort="price">
+                          Giá <i class="bi bi-arrow-down-up" id="sortPriceIcon"></i>
+                        </th>
+                        <th width="100" style="cursor: pointer;" data-sort="stock_quantity">
+                          Kho hàng <i class="bi bi-arrow-down-up" id="sortStockIcon"></i>
+                        </th>
+                        <th width="100">Doanh số</th>
                         <th width="100">Thao tác</th>
                       </tr>
                     </thead>
@@ -248,17 +318,84 @@
                   </table>
                 </div>
 
-                <!-- Pagination -->
-                <div class="d-flex justify-content-between align-items-center mt-3">                                                                            <div>
-                    <span class="text-muted">Hiển thị 1-20 của <span id="totalProducts">0</span> sản phẩm</span>                                                </div>
-                  <nav>
-                    <ul class="pagination mb-0" id="productPagination">
-                      <!-- Pagination will be rendered here -->
-                    </ul>
-                  </nav>
+                <!-- Product Count -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div>
+                    <span class="text-muted">Tổng: <span id="totalProducts">0</span> sản phẩm</span>
+                  </div>
                 </div>
               </div>
             </div>
+
+          </div>
+          <!-- End All Products Tab -->
+
+          <!-- Categories Tab -->
+          <div class="tab-pane fade" id="categories-content" role="tabpanel">
+            
+            <!-- Search Bar -->
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                      <input type="text" class="form-control" placeholder="Tìm kiếm danh mục..." id="categorySearch">
+                    </div>
+                  </div>
+                  <div class="col-md-6 text-end">
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                      <i class="bi bi-plus-circle me-1"></i>Thêm Danh Mục Mới
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Categories Table -->
+            <div class="card">
+              <div class="card-body">
+                <!-- Action Bar -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <span class="text-muted" id="categoryCountText">0 Danh Mục</span>
+                  </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th width="80">ID</th>
+                        <th width="200">Tên Danh Mục</th>
+                        <th width="200">Slug</th>
+                        <th>Mô Tả</th>
+                        <th width="120">Số Sản Phẩm</th>
+                        <th width="150">Thao Tác</th>
+                      </tr>
+                    </thead>
+                    <tbody id="categoryList">
+                      <!-- Categories will be rendered here -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Total Count -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div>
+                    <span class="text-muted">Tổng: <span id="totalCategories">0</span> danh mục</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- End Categories Tab -->
+
+        </div>
+        <!-- End Tab Content -->
+
       </section>
 
       <!-- Shop Info -->
@@ -446,7 +583,7 @@
       </section>
 
       <!-- Voucher Management -->
-      <section id="voucher" class="section active">
+      <section id="voucher" class="section">
         <!-- Voucher Navbar -->
         <div class="voucher-navbar">
           <h3 class="navbar-title text-white">Quản lý Voucher</h3>
@@ -867,6 +1004,159 @@
   </div>
   
 
+  <!-- Bulk Edit Advanced Modal -->
+  <div class="modal fade" id="bulkEditAdvancedModal" tabindex="-1" aria-labelledby="bulkEditAdvancedModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+          <h5 class="modal-title fw-bold" id="bulkEditAdvancedModalLabel">
+            <i class="bi bi-pencil-square me-2"></i>Chỉnh sửa hàng loạt
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <!-- Step 1: Select Field to Edit -->
+          <div class="mb-4">
+            <label class="form-label fw-bold text-primary">
+              <i class="bi bi-sliders me-2"></i>Chọn tiêu chí cần sửa:
+            </label>
+            <select class="form-select form-select-lg" id="bulkEditField">
+              <option value="">-- Chọn trường muốn chỉnh sửa --</option>
+              <option value="status">Trạng thái (active / inactive / draft)</option>
+              <option value="category">Danh mục</option>
+              <option value="price">Giá bán</option>
+              <option value="sale_price">Giá khuyến mãi</option>
+              <option value="stock">Số lượng tồn kho</option>
+              <option value="difficulty">Độ khó</option>
+              <option value="piece_count">Số mảnh ghép</option>
+              <option value="is_featured">Sản phẩm nổi bật</option>
+              <option value="is_bestseller">Bán chạy nhất</option>
+              <option value="is_new">Sản phẩm mới</option>
+            </select>
+          </div>
+
+          <!-- Step 2: Products Table -->
+          <div class="card border-0 shadow-sm" id="bulkEditTableContainer" style="display: none;">
+            <div class="card-header bg-light">
+              <h6 class="mb-0 text-secondary">
+                <i class="bi bi-list-check me-2"></i>Sản phẩm đã chọn (<span id="bulkEditCount">0</span>)
+              </h6>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light sticky-top">
+                    <tr>
+                      <th style="width: 80px;">Hình ảnh</th>
+                      <th style="width: 250px;">Tên sản phẩm</th>
+                      <th style="width: 150px;">Danh mục</th>
+                      <th style="width: 120px;">SKU</th>
+                      <th>Giá trị hiện tại</th>
+                      <th>Giá trị mới</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bulkEditTableBody">
+                    <!-- Dynamic rows will be inserted here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Helper Text -->
+          <div class="alert alert-info mt-3" id="bulkEditHelper" style="display: none;">
+            <i class="bi bi-info-circle me-2"></i>
+            <span id="bulkEditHelperText">Chọn một tiêu chí để bắt đầu chỉnh sửa.</span>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0 bg-light">
+          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> Hủy
+          </button>
+          <button type="button" class="btn btn-primary rounded-pill px-4" id="bulkEditSaveBtn" disabled>
+            <i class="bi bi-save2 me-1"></i> Lưu thay đổi (<span id="bulkEditSaveCount">0</span>)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Category Modal -->
+  <div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-plus-circle me-2"></i>Thêm Danh Mục Mới
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="categoryForm">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Tên Danh Mục <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="category_name" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Slug <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="category_slug" required>
+              <small class="text-muted">VD: lego-city, lego-technic (chữ thường, không dấu, dùng dấu gạch ngang)</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mô Tả</label>
+              <textarea class="form-control" name="description" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save me-1"></i>Lưu
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Category Modal -->
+  <div class="modal fade" id="editCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-pencil me-2"></i>Chỉnh Sửa Danh Mục
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="editCategoryForm">
+          <input type="hidden" id="editCategoryId">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Tên Danh Mục <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="category_name" id="editCategoryName" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Slug <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="category_slug" id="editCategorySlug" required>
+              <small class="text-muted">VD: lego-city, lego-technic (chữ thường, không dấu, dùng dấu gạch ngang)</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mô Tả</label>
+              <textarea class="form-control" name="description" id="editCategoryDescription" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save me-1"></i>Cập Nhật
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Voucher Modal -->
   <div class="modal fade" id="addVoucherModal" tabindex="-1" aria-labelledby="addVoucherModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -1082,6 +1372,15 @@
     window.adminProductController = adminProductController;
   </script>
 
+  <!-- Admin Category Management -->
+  <script type="module">
+    import { AdminCategoryController } from '/dist/src/modules/admin/AdminCategoryController.js';
+    
+    // Initialize Admin Category Controller
+    const adminCategoryController = new AdminCategoryController();
+    window.adminCategoryController = adminCategoryController;
+  </script>
+
   <!-- Admin Order Management -->
   <script type="module">
     import { AdminOrderController } from '/dist/src/modules/admin/AdminOrderController.js';
@@ -1229,6 +1528,17 @@
            }
          });
        });
+
+       // Load categories when switching to categories tab
+       const categoriesTab = document.getElementById('categories-tab');
+       if (categoriesTab) {
+         categoriesTab.addEventListener('shown.bs.tab', () => {
+           console.log('🔄 Switching to categories tab, loading categories...');
+           if (window.adminCategoryController) {
+             window.adminCategoryController.loadCategories();
+           }
+         });
+       }
      }
         // DEMO DATA PHẢN HỒI/ĐÁNH GIÁ
         const feedbackListDemo = [

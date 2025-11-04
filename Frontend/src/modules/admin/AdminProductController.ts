@@ -8,6 +8,10 @@ export class AdminProductController {
   private products: any[] = [];
   private categories: any[] = [];
   private currentPage: number = 1;
+  // @ts-ignore - Used for bulk edit tracking
+  private selectedProducts: any[] = [];
+  private currentSortField: string | null = null;
+  private currentSortOrder: 'asc' | 'desc' | null = null;
 
   constructor() {
     this.init();
@@ -20,6 +24,7 @@ export class AdminProductController {
     this.setupEventListeners();
     this.setupBulkActions();
     this.setupImageUpload();
+    this.setupSortHandlers();
     // Load categories for dropdowns
     this.loadCategories();
   }
@@ -104,6 +109,94 @@ export class AdminProductController {
   }
 
   /**
+   * Setup sort handlers for table columns
+   */
+  private setupSortHandlers(): void {
+    // Add click handlers to sortable table headers
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', (e) => {
+        const field = (e.currentTarget as HTMLElement).dataset.sort;
+        if (field) {
+          this.handleSortClick(field);
+        }
+      });
+    });
+  }
+
+  /**
+   * Handle sort click - toggle sort order
+   */
+  private handleSortClick(field: string): void {
+    // Toggle sort order
+    if (this.currentSortField === field) {
+      if (this.currentSortOrder === null) {
+        this.currentSortOrder = 'asc';
+      } else if (this.currentSortOrder === 'asc') {
+        this.currentSortOrder = 'desc';
+      } else {
+        // Reset to no sort
+        this.currentSortField = null;
+        this.currentSortOrder = null;
+      }
+    } else {
+      // New field, start with ascending
+      this.currentSortField = field;
+      this.currentSortOrder = 'asc';
+    }
+
+    // Update sort icons
+    this.updateSortIcons();
+
+    // Apply filters with new sort
+    this.applyFilters();
+  }
+
+  /**
+   * Update sort icons based on current sort state
+   */
+  private updateSortIcons(): void {
+    // Reset all icons
+    document.querySelectorAll('th[data-sort] i').forEach(icon => {
+      icon.className = 'bi bi-arrow-down-up';
+    });
+
+    // Update active icon
+    if (this.currentSortField && this.currentSortOrder) {
+      const icon = document.querySelector(`th[data-sort="${this.currentSortField}"] i`);
+      if (icon) {
+        if (this.currentSortOrder === 'asc') {
+          icon.className = 'bi bi-sort-up text-primary';
+        } else {
+          icon.className = 'bi bi-sort-down text-primary';
+        }
+      }
+    }
+  }
+
+  /**
+   * Reset all filters
+   */
+  public resetFilters(): void {
+    // Reset all filter dropdowns
+    (document.getElementById('categoryFilter') as HTMLSelectElement).value = '';
+    (document.getElementById('stockFilter') as HTMLSelectElement).value = '';
+    (document.getElementById('statusFilter') as HTMLSelectElement).value = '';
+    (document.getElementById('difficultyFilter') as HTMLSelectElement).value = '';
+    (document.getElementById('featuredFilter') as HTMLSelectElement).value = '';
+    (document.getElementById('newFilter') as HTMLSelectElement).value = '';
+    (document.getElementById('bestsellerFilter') as HTMLSelectElement).value = '';
+    (document.getElementById('productSearch') as HTMLInputElement).value = '';
+
+    // Reset sort
+    this.currentSortField = null;
+    this.currentSortOrder = null;
+    this.updateSortIcons();
+
+    // Reload products
+    this.applyFilters();
+  }
+
+  /**
    * Get selected product IDs
    */
   private getSelectedProductIds(): number[] {
@@ -118,7 +211,7 @@ export class AdminProductController {
   }
 
   /**
-   * Handle bulk edit
+   * Handle bulk edit - Open advanced modal
    */
   private async handleBulkEdit(): Promise<void> {
     const selectedIds = this.getSelectedProductIds();
@@ -128,29 +221,492 @@ export class AdminProductController {
       return;
     }
 
-    // Show bulk edit modal or prompt
-    const newStatus = prompt(`Chỉnh sửa hàng loạt ${selectedIds.length} sản phẩm\n\nChọn trạng thái mới:\n- active (Đang bán)\n- inactive (Ngừng bán)\n- draft (Nháp)`);
+    // Get full product data for selected products
+    try {
+      const productPromises = selectedIds.map(id => httpClient.get(`/api/admin/products/${id}`));
+      const responses = await Promise.all(productPromises);
+      const products = responses.map(res => res.data).filter(p => p);
+
+      // Store selected products for modal
+      this.selectedProducts = products;
+
+      // Open modal
+      this.openBulkEditAdvancedModal(products);
+    } catch (error: any) {
+      console.error('Error loading products:', error);
+      this.showError('Không thể tải thông tin sản phẩm');
+    }
+  }
+
+  /**
+   * Open Bulk Edit Advanced Modal
+   */
+  private openBulkEditAdvancedModal(products: any[]): void {
+    console.log('🔧 Opening bulk edit modal for', products.length, 'products');
     
-    if (!newStatus || !['active', 'inactive', 'draft'].includes(newStatus)) {
+    // Clear previous table data
+    const tbody = document.getElementById('bulkEditTableBody');
+    if (tbody) tbody.innerHTML = '';
+    
+    // Update count
+    const countElem = document.getElementById('bulkEditCount');
+    if (countElem) countElem.textContent = products.length.toString();
+
+    const saveCountElem = document.getElementById('bulkEditSaveCount');
+    if (saveCountElem) saveCountElem.textContent = products.length.toString();
+
+    // Reset field selector
+    const fieldSelect = document.getElementById('bulkEditField') as HTMLSelectElement;
+    if (fieldSelect) {
+      fieldSelect.value = '';
+      // Remove old event listeners and add new one
+      const newFieldSelect = fieldSelect.cloneNode(true) as HTMLSelectElement;
+      fieldSelect.parentNode?.replaceChild(newFieldSelect, fieldSelect);
+      newFieldSelect.addEventListener('change', () => this.onBulkEditFieldChange(products));
+    }
+
+    // Hide table and helper initially
+    const tableContainer = document.getElementById('bulkEditTableContainer');
+    if (tableContainer) tableContainer.style.display = 'none';
+
+    const helper = document.getElementById('bulkEditHelper');
+    if (helper) helper.style.display = 'none';
+
+    // Setup save button
+    const saveBtn = document.getElementById('bulkEditSaveBtn') as HTMLButtonElement;
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      // Remove old event listeners
+      const newSaveBtn = saveBtn.cloneNode(true) as HTMLButtonElement;
+      saveBtn.parentNode?.replaceChild(newSaveBtn, saveBtn);
+      newSaveBtn.onclick = () => this.saveBulkEdit(products);
+    }
+
+    // Show modal
+    const modalEl = document.getElementById('bulkEditAdvancedModal');
+    if (modalEl && (window as any).bootstrap) {
+      const modal = new (window as any).bootstrap.Modal(modalEl);
+      modal.show();
+    }
+  }
+
+  /**
+   * Handle field selection change
+   */
+  private onBulkEditFieldChange(products: any[]): void {
+    const fieldSelect = document.getElementById('bulkEditField') as HTMLSelectElement;
+    const selectedField = fieldSelect?.value;
+
+    const tableContainer = document.getElementById('bulkEditTableContainer');
+    const helper = document.getElementById('bulkEditHelper');
+    const saveBtn = document.getElementById('bulkEditSaveBtn') as HTMLButtonElement;
+
+    if (!selectedField) {
+      if (tableContainer) tableContainer.style.display = 'none';
+      if (helper) helper.style.display = 'none';
+      if (saveBtn) saveBtn.disabled = true;
+      return;
+    }
+
+    // Show table
+    if (tableContainer) tableContainer.style.display = 'block';
+    if (helper) {
+      helper.style.display = 'block';
+      const helperText = document.getElementById('bulkEditHelperText');
+      if (helperText) helperText.textContent = this.getBulkEditHelperText(selectedField);
+    }
+    if (saveBtn) saveBtn.disabled = false;
+
+    // Render table rows
+    this.renderBulkEditTable(products, selectedField);
+
+    // Load categories if needed
+    if (selectedField === 'category') {
+      this.loadCategoriesForBulkEdit(products);
+    }
+  }
+
+  /**
+   * Get helper text for field
+   */
+  private getBulkEditHelperText(field: string): string {
+    const texts: Record<string, string> = {
+      status: 'Chọn trạng thái mới cho từng sản phẩm (active/inactive/draft)',
+      category: 'Chọn danh mục mới cho từng sản phẩm',
+      price: 'Nhập giá bán mới (VD: 500000)',
+      sale_price: 'Nhập giá khuyến mãi (để trống nếu không có)',
+      stock: 'Nhập số lượng tồn kho mới',
+      difficulty: 'Chọn độ khó (Easy/Medium/Hard/Expert)',
+      piece_count: 'Nhập số mảnh ghép',
+      is_featured: 'Bật/tắt sản phẩm nổi bật',
+      is_bestseller: 'Bật/tắt bán chạy nhất',
+      is_new: 'Bật/tắt sản phẩm mới'
+    };
+    return texts[field] || 'Nhập giá trị mới cho từng sản phẩm';
+  }
+
+  /**
+   * Render bulk edit table
+   */
+  private renderBulkEditTable(products: any[], field: string): void {
+    const tbody = document.getElementById('bulkEditTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = products.map((product, index) => {
+      const thumbnail = product.images?.[0]?.image_url || product.product_images?.[0]?.image_url || '/images/placeholder.png';
+      const currentValue = this.getCurrentFieldValue(product, field);
+      const inputHtml = this.getBulkEditInputHtml(field, currentValue, index);
+
+      return `
+        <tr>
+          <td>
+            <img src="${thumbnail}" alt="${product.product_name}" 
+                 class="rounded" style="width: 60px; height: 60px; object-fit: cover;">
+          </td>
+          <td>
+            <div class="fw-semibold">${product.product_name}</div>
+            <small class="text-muted">ID: ${product.product_id}</small>
+          </td>
+          <td>${product.category_name || '-'}</td>
+          <td><code>${product.product_slug || '-'}</code></td>
+          <td>
+            <span class="badge bg-secondary">${this.formatCurrentValue(field, currentValue)}</span>
+          </td>
+          <td>
+            ${inputHtml}
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  /**
+   * Get current field value
+   */
+  private getCurrentFieldValue(product: any, field: string): any {
+    const fieldMap: Record<string, string> = {
+      status: 'status',
+      category: 'category_id',
+      price: 'price',
+      sale_price: 'sale_price',
+      stock: 'stock_quantity',
+      difficulty: 'difficulty_level',
+      piece_count: 'piece_count',
+      is_featured: 'is_featured',
+      is_bestseller: 'is_bestseller',
+      is_new: 'is_new'
+    };
+    return product[fieldMap[field]];
+  }
+
+  /**
+   * Format current value for display
+   */
+  private formatCurrentValue(field: string, value: any): string {
+    if (value === null || value === undefined || value === '') return 'Chưa đặt';
+    
+    if (field === 'price' || field === 'sale_price') {
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+    }
+    
+    if (field.startsWith('is_')) {
+      return value ? 'Có' : 'Không';
+    }
+    
+    if (field === 'status') {
+      const statusMap: Record<string, string> = {
+        active: 'Đang bán',
+        inactive: 'Ngừng bán',
+        draft: 'Nháp'
+      };
+      return statusMap[value] || value;
+    }
+    
+    if (field === 'difficulty') {
+      const difficultyMap: Record<string, string> = {
+        Easy: 'Dễ',
+        Medium: 'Trung bình',
+        Hard: 'Khó',
+        Expert: 'Chuyên gia'
+      };
+      return difficultyMap[value] || value;
+    }
+    
+    return value.toString();
+  }
+
+  /**
+   * Get input HTML for bulk edit
+   */
+  private getBulkEditInputHtml(field: string, currentValue: any, index: number): string {
+    const inputName = `bulk_${field}_${index}`;
+    
+    switch (field) {
+      case 'status':
+        return `
+          <select class="form-select bulk-edit-input" name="${inputName}" data-index="${index}">
+            <option value="active" ${currentValue === 'active' ? 'selected' : ''}>Đang bán</option>
+            <option value="inactive" ${currentValue === 'inactive' ? 'selected' : ''}>Ngừng bán</option>
+            <option value="draft" ${currentValue === 'draft' ? 'selected' : ''}>Nháp</option>
+          </select>
+        `;
+      
+      case 'category':
+        // Need to load categories
+        return `<select class="form-select bulk-edit-input" name="${inputName}" data-index="${index}" id="bulk-category-${index}"></select>`;
+      
+      case 'difficulty':
+        return `
+          <select class="form-select bulk-edit-input" name="${inputName}" data-index="${index}">
+            <option value="">-- Chọn độ khó --</option>
+            <option value="Easy" ${currentValue === 'Easy' ? 'selected' : ''}>Dễ (Easy)</option>
+            <option value="Medium" ${currentValue === 'Medium' ? 'selected' : ''}>Trung bình (Medium)</option>
+            <option value="Hard" ${currentValue === 'Hard' ? 'selected' : ''}>Khó (Hard)</option>
+            <option value="Expert" ${currentValue === 'Expert' ? 'selected' : ''}>Chuyên gia (Expert)</option>
+          </select>
+        `;
+      
+      case 'is_featured':
+      case 'is_bestseller':
+      case 'is_new':
+        return `
+          <div class="form-check form-switch">
+            <input class="form-check-input bulk-edit-input" type="checkbox" name="${inputName}" 
+                   data-index="${index}" ${currentValue ? 'checked' : ''}>
+          </div>
+        `;
+      
+      case 'price':
+      case 'sale_price':
+        return `
+          <input type="number" class="form-control bulk-edit-input" name="${inputName}" 
+                 data-index="${index}" value="${currentValue || ''}" min="0" step="1000" 
+                 placeholder="Nhập giá...">
+        `;
+      
+      case 'stock':
+      case 'piece_count':
+        return `
+          <input type="number" class="form-control bulk-edit-input" name="${inputName}" 
+                 data-index="${index}" value="${currentValue || ''}" min="0" 
+                 placeholder="Nhập số...">
+        `;
+      
+      default:
+        return `
+          <input type="text" class="form-control bulk-edit-input" name="${inputName}" 
+                 data-index="${index}" value="${currentValue || ''}" 
+                 placeholder="Nhập giá trị...">
+        `;
+    }
+  }
+
+  /**
+   * Save bulk edit changes
+   */
+  private async saveBulkEdit(products: any[]): Promise<void> {
+    const fieldSelect = document.getElementById('bulkEditField') as HTMLSelectElement;
+    const selectedField = fieldSelect?.value;
+
+    if (!selectedField) {
+      this.showError('Vui lòng chọn tiêu chí cần sửa');
       return;
     }
 
     try {
-      // Update each product
-      const updatePromises = selectedIds.map(id => 
-        httpClient.patch(`/api/admin/products/${id}/status`, { status: newStatus })
-      );
+      // Collect all input values
+      const inputs = document.querySelectorAll('.bulk-edit-input') as NodeListOf<HTMLInputElement | HTMLSelectElement>;
+      const updates: any[] = [];
 
-      await Promise.all(updatePromises);
+      inputs.forEach((input) => {
+        const index = parseInt(input.dataset.index || '0');
+        const product = products[index];
+        
+        let newValue: any;
+        if (input.type === 'checkbox') {
+          newValue = (input as HTMLInputElement).checked;
+        } else if (input.type === 'number') {
+          newValue = input.value ? parseFloat(input.value) : null;
+        } else {
+          newValue = input.value || null;
+        }
+
+        updates.push({
+          product_id: product.product_id,
+          field: selectedField,
+          value: newValue
+        });
+      });
+
+      console.log('📤 Bulk updates:', updates);
+
+      // Send updates to backend
+      const updatePromises = updates.map(async (update) => {
+        try {
+          console.log(`📝 Processing update for product ${update.product_id}:`, { field: update.field, value: update.value });
+          
+          // Get full product data first
+          const productResponse = await httpClient.get(`/api/admin/products/${update.product_id}`);
+          
+          if (!productResponse.success || !productResponse.data) {
+            console.error(`❌ Failed to get product ${update.product_id}:`, productResponse);
+            throw new Error(`Failed to get product ${update.product_id}`);
+          }
+          
+          const product = productResponse.data;
+          console.log(`✅ Got product ${update.product_id}:`, product);
+          
+          // Use appropriate endpoint
+          if (update.field === 'status') {
+            const payload = { 
+              status: update.value,
+              reason: 'Bulk edit from admin'
+            };
+            console.log(`📤 PATCH /api/admin/products/${update.product_id}/status:`, payload);
+            return httpClient.patch(`/api/admin/products/${update.product_id}/status`, payload);
+          } else if (update.field === 'stock') {
+            const payload = { 
+              stock_quantity: update.value,
+              reason: 'Bulk edit from admin'
+            };
+            console.log(`📤 PATCH /api/admin/products/${update.product_id}/stock:`, payload);
+            return httpClient.patch(`/api/admin/products/${update.product_id}/stock`, payload);
+          } else {
+            // For other fields, use PUT with full product data
+            const payload = this.buildBulkEditPayload(product, update.field, update.value);
+            console.log(`📤 PUT /api/admin/products/${update.product_id}:`, payload);
+            return httpClient.put(`/api/admin/products/${update.product_id}`, payload);
+          }
+        } catch (err) {
+          console.error(`❌ Error updating product ${update.product_id}:`, err);
+          return { success: false, error: err };
+        }
+      });
+
+      const results = await Promise.all(updatePromises);
       
-      this.showSuccess(`Đã cập nhật ${selectedIds.length} sản phẩm thành công!`);
+      const successCount = results.filter(r => r.success).length;
+      const failCount = results.length - successCount;
+      
+      if (successCount > 0) {
+        this.showSuccess(`Đã cập nhật ${successCount} sản phẩm thành công!` + (failCount > 0 ? ` (${failCount} thất bại)` : ''));
+      } else {
+        this.showError('Không thể cập nhật sản phẩm');
+      }
+      
+      // Close modal
+      const modalEl = document.getElementById('bulkEditAdvancedModal');
+      if (modalEl && (window as any).bootstrap) {
+        const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
+        modal?.hide();
+      }
+
+      // Reload products
       await this.loadProducts(this.currentPage);
       
       // Uncheck all
       (document.getElementById('selectAllCheckbox') as HTMLInputElement).checked = false;
     } catch (error: any) {
-      console.error('Error bulk editing:', error);
+      console.error('❌ Error bulk editing:', error);
       this.showError('Không thể cập nhật sản phẩm hàng loạt');
+    }
+  }
+
+  /**
+   * Build payload for bulk edit based on field and current product data
+   */
+  private buildBulkEditPayload(product: any, field: string, value: any): any {
+    const payload: any = {
+      product_name: product.product_name,
+      product_slug: product.product_slug,
+      category_id: parseInt(product.category_id),
+      description: product.description || '',
+      short_description: product.short_description || '',
+      price: parseFloat(product.price),
+      sale_price: product.sale_price ? parseFloat(product.sale_price) : null,
+      stock_quantity: parseInt(product.stock_quantity) || 0,
+      min_stock_level: product.min_stock_level ? parseInt(product.min_stock_level) : null,
+      weight: product.weight ? parseFloat(product.weight) : null,
+      dimensions: product.dimensions || null,
+      piece_count: product.piece_count ? parseInt(product.piece_count) : null,
+      difficulty_level: product.difficulty_level || null,
+      is_featured: Boolean(product.is_featured),
+      is_bestseller: Boolean(product.is_bestseller),
+      is_new: Boolean(product.is_new),
+      status: product.status
+    };
+
+    // Update the specific field with proper type conversion
+    const fieldMap: Record<string, string> = {
+      category: 'category_id',
+      price: 'price',
+      sale_price: 'sale_price',
+      stock: 'stock_quantity',
+      difficulty: 'difficulty_level',
+      piece_count: 'piece_count',
+      is_featured: 'is_featured',
+      is_bestseller: 'is_bestseller',
+      is_new: 'is_new'
+    };
+
+    const targetField = fieldMap[field] || field;
+    
+    // Convert value to proper type based on field
+    if (field === 'category') {
+      payload[targetField] = parseInt(value);
+    } else if (field === 'price' || field === 'sale_price') {
+      payload[targetField] = value ? parseFloat(value) : null;
+    } else if (field === 'stock' || field === 'piece_count') {
+      payload[targetField] = value ? parseInt(value) : null;
+    } else if (field.startsWith('is_')) {
+      payload[targetField] = Boolean(value);
+    } else {
+      payload[targetField] = value;
+    }
+
+    console.log(`📦 Built payload for ${field} (${targetField}):`, payload);
+    
+    return payload;
+  }
+
+  /**
+   * Load categories for bulk edit dropdowns
+   */
+  private async loadCategoriesForBulkEdit(products: any[]): Promise<void> {
+    try {
+      console.log('📦 Loading categories for bulk edit...');
+      const response = await httpClient.get('/api/admin/categories');
+      
+      console.log('📦 Categories response:', response);
+      
+      if (response.success && response.data) {
+        // Backend returns: { success: true, data: { categories: [...], count: N } }
+        let categories = response.data.categories || [];
+        
+        console.log('📦 Categories array:', categories);
+        
+        if (!Array.isArray(categories) || categories.length === 0) {
+          console.warn('⚠️ No categories found');
+          return;
+        }
+        
+        // Populate each category select
+        products.forEach((product, index) => {
+          const select = document.getElementById(`bulk-category-${index}`) as HTMLSelectElement;
+          if (select) {
+            console.log(`📝 Populating category select for product ${index}:`, product.category_id);
+            select.innerHTML = categories.map((cat: any) => 
+              `<option value="${cat.category_id}" ${cat.category_id === product.category_id ? 'selected' : ''}>
+                ${cat.category_name}
+              </option>`
+            ).join('');
+          }
+        });
+        
+        console.log('✅ Categories loaded for bulk edit');
+      }
+    } catch (error) {
+      console.error('❌ Error loading categories:', error);
     }
   }
 
@@ -195,11 +751,14 @@ export class AdminProductController {
     try {
       console.log('📦 Loading products, page:', page);
       
+      // Load all products (high limit to show everything on one page)
       const response = await httpClient.get(
-        `/api/admin/products?page=${page}&limit=20`
+        `/api/admin/products?page=1&limit=1000`
       );
 
       console.log('📦 Products response:', response);
+      console.log('📦 Backend returned:', response.data?.products?.length, 'products');
+      console.log('📦 Pagination:', response.data?.pagination);
 
       if (response.success && response.data) {
         this.products = response.data.products || [];
@@ -257,19 +816,38 @@ export class AdminProductController {
       const categoryId = (document.getElementById('categoryFilter') as HTMLSelectElement)?.value;
       const stockFilter = (document.getElementById('stockFilter') as HTMLSelectElement)?.value;
       const statusFilter = (document.getElementById('statusFilter') as HTMLSelectElement)?.value;
+      const difficultyFilter = (document.getElementById('difficultyFilter') as HTMLSelectElement)?.value;
+      const featuredFilter = (document.getElementById('featuredFilter') as HTMLSelectElement)?.value;
+      const newFilter = (document.getElementById('newFilter') as HTMLSelectElement)?.value;
+      const bestsellerFilter = (document.getElementById('bestsellerFilter') as HTMLSelectElement)?.value;
       const searchQuery = (document.getElementById('productSearch') as HTMLInputElement)?.value;
 
-      console.log('🔧 Applying filters:', { categoryId, stockFilter, statusFilter, searchQuery });
+      console.log('🔧 Applying filters:', { 
+        categoryId, stockFilter, statusFilter, difficultyFilter, 
+        featuredFilter, newFilter, bestsellerFilter, searchQuery,
+        sort: { field: this.currentSortField, order: this.currentSortOrder }
+      });
 
       // Build query parameters for backend
       const params = new URLSearchParams();
       params.append('page', '1');
-      params.append('limit', '100'); // Get more for client-side filtering
+      params.append('limit', '1000'); // Load all products for client-side filtering
 
       if (categoryId) params.append('category_id', categoryId);
       if (statusFilter) params.append('status', statusFilter);
+      if (stockFilter) params.append('stock_filter', stockFilter);
+      if (difficultyFilter) params.append('difficulty_level', difficultyFilter);
+      if (featuredFilter) params.append('is_featured', featuredFilter);
+      if (newFilter) params.append('is_new', newFilter);
+      if (bestsellerFilter) params.append('is_bestseller', bestsellerFilter);
       if (searchQuery && searchQuery.trim().length >= 2) {
         params.append('query', searchQuery.trim());
+      }
+
+      // Add sort parameters
+      if (this.currentSortField && this.currentSortOrder) {
+        params.append('sortBy', this.currentSortField);
+        params.append('sortOrder', this.currentSortOrder);
       }
 
       const response = await httpClient.get(`/api/admin/products?${params.toString()}`);
@@ -277,21 +855,7 @@ export class AdminProductController {
       console.log('🔧 Filter response:', response);
 
       if (response.success && response.data) {
-        let products = response.data.products || [];
-        
-        // Client-side stock filtering
-        // Hết hàng: stock_quantity = 0
-        // Sắp hết: stock_quantity <= 5 && stock_quantity > 0
-        // Còn hàng: stock_quantity > 5
-        if (stockFilter === 'out_of_stock') {
-          products = products.filter((p: any) => p.stock_quantity === 0);
-        } else if (stockFilter === 'low_stock') {
-          products = products.filter((p: any) => p.stock_quantity > 0 && p.stock_quantity <= 5);
-        } else if (stockFilter === 'in_stock') {
-          products = products.filter((p: any) => p.stock_quantity > 5);
-        }
-
-        this.products = products;
+        this.products = response.data.products || [];
         this.currentPage = 1;
         this.renderProducts();
       }
