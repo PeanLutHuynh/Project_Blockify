@@ -479,49 +479,7 @@ export class AdminProductController {
         return;
       }
       
-      // Step 1: Upload all images FIRST
-      console.log('📤 Step 1: Uploading images...');
-      const imageInputs = document.querySelectorAll('.product-image-input') as NodeListOf<HTMLInputElement>;
-      const uploadedImageUrls: string[] = [];
-      
-      const token = localStorage.getItem('blockify_auth_token');
-      
-      for (let index = 0; index < imageInputs.length; index++) {
-        const input = imageInputs[index];
-        const file = input.files?.[0];
-        
-        if (file) {
-          console.log(`📤 Uploading image ${index}...`);
-          
-          // Upload to server with metadata
-          const formData = new FormData();
-          formData.append('image', file);
-          formData.append('productName', productName);
-          formData.append('categoryId', categoryId.toString()); // Send category ID, backend will lookup name
-          formData.append('imageIndex', index.toString());
-
-          const response = await fetch('http://localhost:3001/api/admin/products/upload-image', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            },
-            body: formData
-          });
-
-          const result = await response.json();
-          
-          if (result.success && result.data?.imageUrl) {
-            uploadedImageUrls.push(result.data.imageUrl);
-            console.log(`✅ Image ${index} uploaded: ${result.data.imageUrl}`);
-          } else {
-            throw new Error(`Failed to upload image ${index}: ${result.error}`);
-          }
-        }
-      }
-      
-      console.log(`✅ All images uploaded! Total: ${uploadedImageUrls.length}`);
-      
-      // Step 2: Prepare product data
+      // Step 1: Prepare product data FIRST (without images)
       const difficultyValue = (document.getElementById('productAge') as HTMLSelectElement)?.value.trim();
       
       // Get and parse all form values
@@ -556,42 +514,80 @@ export class AdminProductController {
         is_bestseller: (document.getElementById('productIsBestseller') as HTMLInputElement)?.checked || false,
         is_new: (document.getElementById('productIsNew') as HTMLInputElement)?.checked || false,
         status: (document.getElementById('productStatus') as HTMLSelectElement)?.value || 'active',
-        images: uploadedImageUrls.map((url, index) => ({
-          image_url: url,
-          is_primary: index === 0,
-          sort_order: index,
-        })),
       };
 
       console.log('📦 Product data:', productData);
       
-      // Step 3: Create product
-      console.log('🔄 Step 2: Creating product...');
-      const response = await httpClient.post('/api/admin/products', productData);
+      // Step 2: Create product WITHOUT images first
+      console.log('🔄 Step 1: Creating product...');
+      const createResponse = await httpClient.post('/api/admin/products', productData);
 
-      if (response.success) {
-        console.log('✅ Product created successfully!');
-        this.showSuccess('Thêm sản phẩm thành công!');
-        
-        // Reset form
-        (document.getElementById('productForm') as HTMLFormElement)?.reset();
-        document.querySelectorAll('.image-preview').forEach((preview) => {
-          preview.innerHTML = '';
-        });
-        
-        // Close modal
-        const modalEl = document.getElementById('addProductModal');
-        if (modalEl && (window as any).bootstrap) {
-          const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
-          modal?.hide();
-        }
-        
-        // Reload products
-        await this.loadProducts(this.currentPage);
-      } else {
-        console.error('❌ Backend error:', response);
-        this.showError(response.error || response.message || 'Không thể thêm sản phẩm');
+      if (!createResponse.success || !createResponse.data?.product_id) {
+        console.error('❌ Backend error:', createResponse);
+        this.showError(createResponse.error || createResponse.message || 'Không thể thêm sản phẩm');
+        return;
       }
+      
+      const productId = createResponse.data.product_id;
+      console.log('✅ Product created with ID:', productId);
+      
+      // Step 3: Upload images with product_id
+      const imageInputs = document.querySelectorAll('.product-image-input') as NodeListOf<HTMLInputElement>;
+      const token = localStorage.getItem('blockify_auth_token');
+      let uploadedCount = 0;
+      
+      console.log('� Step 2: Uploading images...');
+      
+      for (let index = 0; index < imageInputs.length; index++) {
+        const input = imageInputs[index];
+        const file = input.files?.[0];
+        
+        if (file) {
+          console.log(`📤 Uploading image ${index}...`);
+          
+          const formData = new FormData();
+          formData.append('image', file);
+          formData.append('productName', productName);
+          formData.append('categoryId', categoryId.toString());
+          formData.append('imageIndex', index.toString());
+
+          const uploadResponse = await fetch(`http://localhost:3001/api/admin/products/${productId}/images`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: formData
+          });
+
+          const result = await uploadResponse.json();
+          
+          if (result.success) {
+            uploadedCount++;
+            console.log(`✅ Image ${index} uploaded successfully`);
+          } else {
+            console.error(`❌ Failed to upload image ${index}:`, result.error);
+          }
+        }
+      }
+      
+      console.log(`✅ Product created! Images uploaded: ${uploadedCount}`);
+      this.showSuccess('Thêm sản phẩm thành công!');
+      
+      // Reset form
+      (document.getElementById('productForm') as HTMLFormElement)?.reset();
+      document.querySelectorAll('.image-preview').forEach((preview) => {
+        preview.innerHTML = '';
+      });
+      
+      // Close modal
+      const modalEl = document.getElementById('addProductModal');
+      if (modalEl && (window as any).bootstrap) {
+        const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
+        modal?.hide();
+      }
+      
+      // Reload products
+      await this.loadProducts(this.currentPage);
     } catch (error: any) {
       console.error('❌ Error adding product:', error);
       this.showError(error.message || error.error || 'Không thể thêm sản phẩm');
@@ -697,15 +693,25 @@ export class AdminProductController {
    */
   private async handleEditProduct(): Promise<void> {
     try {
+      console.log('🔄 Starting product update...');
+      
       const productId = parseInt((document.getElementById('editProductId') as HTMLInputElement)?.value);
       const productName = (document.getElementById('editProductName') as HTMLInputElement)?.value;
+      const categorySelect = document.getElementById('editProductCategory') as HTMLSelectElement;
+      const categoryId = parseInt(categorySelect?.value || '0');
 
+      console.log('📋 Product info:', { productId, productName, categoryId });
+
+      // Step 1: Update product info FIRST
+      console.log('� Step 1: Updating product info...');
+
+      // Step 2: Prepare product data
       const difficultyValue = (document.getElementById('editProductAge') as HTMLSelectElement)?.value.trim();
       
-      const formData: any = {
+      const productData: any = {
         product_name: productName,
         product_slug: this.generateSlug(productName),
-        category_id: parseInt((document.getElementById('editProductCategory') as HTMLSelectElement)?.value),
+        category_id: categoryId,
         description: (document.getElementById('editProductDesc') as HTMLTextAreaElement)?.value || '',
         short_description: (document.getElementById('editProductShortDesc') as HTMLTextAreaElement)?.value || '',
         price: parseFloat((document.getElementById('editProductPrice') as HTMLInputElement)?.value),
@@ -722,25 +728,113 @@ export class AdminProductController {
         status: (document.getElementById('editProductStatus') as HTMLSelectElement)?.value,
       };
 
-      const response = await httpClient.put(`/api/admin/products/${productId}`, formData);
+      console.log('📦 Product update data:', productData);
 
-      if (response.success) {
-        this.showSuccess('Cập nhật sản phẩm thành công!');
-        
-        // Close modal
-        const modalEl = document.getElementById('editProductModal');
-        if (modalEl && (window as any).bootstrap) {
-          const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
-          modal?.hide();
-        }
-        
-        // Reload products
-        await this.loadProducts(this.currentPage);
-      } else {
-        this.showError(response.error || 'Không thể cập nhật sản phẩm');
+      // Step 2: Update product info
+      const updateResponse = await httpClient.put(`/api/admin/products/${productId}`, productData);
+
+      if (!updateResponse.success) {
+        console.error('❌ Failed to update product:', updateResponse);
+        this.showError(updateResponse.error || 'Không thể cập nhật sản phẩm');
+        return;
       }
+
+      console.log('✅ Product info updated');
+
+      // Step 3: Handle image replacements (DELETE old + INSERT new)
+      console.log('📤 Step 2: Checking for new images...');
+      const imageInputs = document.querySelectorAll('.edit-product-image-input') as NodeListOf<HTMLInputElement>;
+      const token = localStorage.getItem('blockify_auth_token');
+      let imagesChanged = false;
+      
+      // Get current product to find existing image IDs
+      const currentProduct = await httpClient.get(`/api/admin/products/${productId}`);
+      const existingImages = currentProduct.data?.product_images || currentProduct.data?.images || [];
+      
+      for (let index = 0; index < imageInputs.length; index++) {
+        const input = imageInputs[index];
+        const file = input.files?.[0];
+        
+        if (file) {
+          imagesChanged = true;
+          console.log(`📤 Processing image ${index}...`);
+          
+          // Step 3a: DELETE old image at this position (if exists)
+          const oldImage = existingImages[index];
+          if (oldImage && oldImage.image_id) {
+            console.log(`🗑️ Deleting old image ID: ${oldImage.image_id}`);
+            try {
+              const deleteResponse = await fetch(`http://localhost:3001/api/admin/products/images/${oldImage.image_id}`, {
+                method: 'DELETE',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+              });
+              
+              const deleteResult = await deleteResponse.json();
+              if (deleteResult.success) {
+                console.log(`✅ Old image deleted from Storage & DB`);
+              } else {
+                console.warn(`⚠️ Failed to delete old image:`, deleteResult.error);
+              }
+            } catch (err) {
+              console.error(`❌ Error deleting old image:`, err);
+            }
+          }
+          
+          // Step 3b: INSERT new image (upload to Storage + save to DB)
+          console.log(`📤 Uploading new image ${index}...`);
+          const formData = new FormData();
+          formData.append('image', file);
+          formData.append('productName', productName);
+          formData.append('categoryId', categoryId.toString());
+          formData.append('imageIndex', index.toString());
+
+          try {
+            const uploadResponse = await fetch(`http://localhost:3001/api/admin/products/${productId}/images`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`
+              },
+              body: formData
+            });
+
+            const uploadResult = await uploadResponse.json();
+            
+            if (uploadResult.success) {
+              console.log(`✅ New image ${index} uploaded & saved`);
+            } else {
+              console.error(`❌ Failed to upload image ${index}:`, uploadResult.error);
+              this.showError(`Không thể upload ảnh ${index + 1}`);
+            }
+          } catch (err) {
+            console.error(`❌ Error uploading image ${index}:`, err);
+            this.showError(`Lỗi khi upload ảnh ${index + 1}`);
+          }
+        }
+      }
+      
+      if (imagesChanged) {
+        console.log('✅ Images updated successfully');
+      } else {
+        console.log('ℹ️ No new images to upload');
+      }
+
+      console.log('✅ Product updated successfully!');
+      this.showSuccess('Cập nhật sản phẩm thành công!');
+      
+      // Close modal
+      const modalEl = document.getElementById('editProductModal');
+      if (modalEl && (window as any).bootstrap) {
+        const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
+        modal?.hide();
+      }
+      
+      // Reload products
+      await this.loadProducts(this.currentPage);
     } catch (error: any) {
-      console.error('Error updating product:', error);
+      console.error('❌ Error updating product:', error);
       this.showError(error.message || 'Không thể cập nhật sản phẩm');
     }
   }
