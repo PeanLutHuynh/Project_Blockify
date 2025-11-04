@@ -154,13 +154,31 @@ export class ProductController {
    * GET /api/v1/products
    * 
    * @description Lấy sản phẩm với pagination và category filter
+   * Query params:
+   * - categoryId: Filter by category
+   * - page: Page number
+   * - limit: Number of products per page
+   * - featured: If 'true', only return products with is_featured = TRUE
    */
   getAllProducts = async (req: HttpRequest, res: HttpResponse): Promise<void> => {
     try {
       const categoryId = req.query.categoryId ? parseInt(req.query.categoryId as string) : undefined;
       const page = req.query.page ? parseInt(req.query.page as string) : 1;
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 12;
+      const onlyFeatured = req.query.featured === 'true';
 
+      // If only featured products requested, use getFeaturedProducts
+      if (onlyFeatured) {
+        const featuredProducts = await this.productService.getFeaturedProducts(limit, true);
+        res.json({
+          success: true,
+          data: featuredProducts,
+          message: `Tìm thấy ${featuredProducts.length} sản phẩm nổi bật`
+        });
+        return;
+      }
+
+      // Otherwise use normal pagination
       const result = await this.productService.getProducts(categoryId, page, limit);
 
       res.json({
@@ -404,6 +422,64 @@ export class ProductController {
       res.status(500).json({
         success: false,
         message: 'Có lỗi xảy ra khi kiểm tra tồn kho'
+      });
+    }
+  };
+
+  /**
+   * GET /api/v1/products/new?limit=12
+   * 
+   * @description Get new products (is_new = true)
+   * For "Mới nhất" filter on homepage
+   */
+  getNewProducts = async (req: HttpRequest, res: HttpResponse): Promise<void> => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 12;
+
+      const results = await this.productService.getNewProducts(limit);
+
+      res.json({
+        success: true,
+        results,
+        count: results.length,
+        message: `Tìm thấy ${results.length} sản phẩm mới nhất`
+      });
+
+    } catch (error) {
+      logger.error('Get new products error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Có lỗi xảy ra',
+        results: []
+      });
+    }
+  };
+
+  /**
+   * GET /api/v1/products/bestseller?limit=12
+   * 
+   * @description Get bestseller products (is_bestseller = true)
+   * For "Phổ biến" filter on homepage
+   */
+  getBestsellerProducts = async (req: HttpRequest, res: HttpResponse): Promise<void> => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 12;
+
+      const results = await this.productService.getBestsellerProducts(limit);
+
+      res.json({
+        success: true,
+        results,
+        count: results.length,
+        message: `Tìm thấy ${results.length} sản phẩm phổ biến`
+      });
+
+    } catch (error) {
+      logger.error('Get bestseller products error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Có lỗi xảy ra',
+        results: []
       });
     }
   };

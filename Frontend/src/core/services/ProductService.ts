@@ -204,24 +204,41 @@ export class ProductService {
 
   /**
    * Get featured products for home page
-   * Uses search with "lego" keyword to get all products
+   * @param limit - Number of products to return
+   * @param onlyFeatured - If true, only return products with is_featured = TRUE
    */
-  async getFeaturedProducts(limit: number = 10): Promise<{
+  async getFeaturedProducts(limit: number = 10, onlyFeatured: boolean = false): Promise<{
     success: boolean;
     products: Product[];
     message?: string;
   }> {
     try {
-      // Use search with common keyword to get products
-      const response = await httpClient.get<SearchResponse>(
-        `/api/v1/products/search?q=lego&limit=${limit}`
-      );
+      // Build URL based on onlyFeatured flag
+      let url = `/api/v1/products?limit=${limit}`;
+      if (onlyFeatured) {
+        url += '&featured=true';
+      }
+
+      const response = await httpClient.get<SearchResponse>(url);
 
       console.log('Featured products API Response:', response); // Debug log
 
       if (response.success) {
-        const apiData = (response.data as any) || response;
-        const results = (apiData.results || (response as any).results || []);
+        // Parse nested structure: response.data.data or response.data
+        let results = [];
+        
+        if (response.data && Array.isArray((response.data as any).data)) {
+          // Case 1: { success: true, data: { data: [...] } }
+          results = (response.data as any).data;
+        } else if (response.data && Array.isArray(response.data)) {
+          // Case 2: { success: true, data: [...] }
+          results = response.data;
+        } else if (Array.isArray((response as any).data)) {
+          // Case 3: { data: [...] }
+          results = (response as any).data;
+        }
+        
+        console.log('📦 Parsed results:', results); // Debug
         
         const products = results.map((item: any) => 
           Product.fromApiResponse(item)
@@ -230,7 +247,7 @@ export class ProductService {
         return {
           success: true,
           products,
-          message: apiData.message || (response as any).message
+          message: (response.data as any)?.message || response.message || 'Loaded featured products'
         };
       }
 
@@ -389,6 +406,104 @@ export class ProductService {
       console.error('Get recommended products by product error:', error);
       // Fallback to featured products on error
       return this.getFeaturedProducts(limit);
+    }
+  }
+
+  /**
+   * Get new products (is_new = true)
+   * For "Mới nhất" filter on homepage
+   */
+  async getNewProducts(limit: number = 12): Promise<{
+    success: boolean;
+    products: Product[];
+    message?: string;
+  }> {
+    try {
+      console.log(`🔍 Getting new products (limit: ${limit})`);
+
+      const response = await httpClient.get<SearchResponse>(
+        `/api/v1/products/new?limit=${limit}`
+      );
+
+      console.log('New products API Response:', response);
+
+      if (response.success) {
+        const apiData = (response.data as any) || response;
+        const results = (apiData.results || (response as any).results || []);
+        
+        const products = results.map((item: any) => 
+          Product.fromApiResponse(item)
+        );
+
+        return {
+          success: true,
+          products,
+          message: apiData.message || (response as any).message || 'Sản phẩm mới nhất'
+        };
+      }
+
+      return {
+        success: false,
+        products: [],
+        message: response.message || 'Không tìm thấy sản phẩm mới'
+      };
+
+    } catch (error) {
+      console.error('Get new products error:', error);
+      return {
+        success: false,
+        products: [],
+        message: 'Có lỗi xảy ra khi lấy sản phẩm mới'
+      };
+    }
+  }
+
+  /**
+   * Get bestseller products (is_bestseller = true)
+   * For "Phổ biến" filter on homepage
+   */
+  async getBestsellerProducts(limit: number = 12): Promise<{
+    success: boolean;
+    products: Product[];
+    message?: string;
+  }> {
+    try {
+      console.log(`🔍 Getting bestseller products (limit: ${limit})`);
+
+      const response = await httpClient.get<SearchResponse>(
+        `/api/v1/products/bestseller?limit=${limit}`
+      );
+
+      console.log('Bestseller products API Response:', response);
+
+      if (response.success) {
+        const apiData = (response.data as any) || response;
+        const results = (apiData.results || (response as any).results || []);
+        
+        const products = results.map((item: any) => 
+          Product.fromApiResponse(item)
+        );
+
+        return {
+          success: true,
+          products,
+          message: apiData.message || (response as any).message || 'Sản phẩm phổ biến'
+        };
+      }
+
+      return {
+        success: false,
+        products: [],
+        message: response.message || 'Không tìm thấy sản phẩm phổ biến'
+      };
+
+    } catch (error) {
+      console.error('Get bestseller products error:', error);
+      return {
+        success: false,
+        products: [],
+        message: 'Có lỗi xảy ra khi lấy sản phẩm phổ biến'
+      };
     }
   }
 }
