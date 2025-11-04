@@ -12,8 +12,7 @@
     "frontend:dev": "cd Frontend && npm run dev",
     "frontend:serve": "cd Frontend && npm run serve",
     "setup": "npm install && cd backend && npm install && cd ../Frontend && npm install",
-    "build": "npm run backend:build && cd Frontend && npm run build",
-    "start": "npm run backend:start",
+    "build": "cd Frontend && npm run build",
     "start:all": "concurrently \"npm run backend:start\" \"npm run frontend:serve\"",
     "type-check": "cd backend && npx tsc --noEmit && cd ../Frontend && npm run type-check"
   },
