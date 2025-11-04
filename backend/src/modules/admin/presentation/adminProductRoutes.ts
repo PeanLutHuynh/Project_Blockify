@@ -133,6 +133,13 @@ export function registerAdminProductRoutes(router: any): void {
     await adminProductController.getActiveCategories(req, res);
   });
 
+  // Get category by ID
+  router.get("/api/admin/categories/:id", authenticateToken, async (req: HttpRequest, res: HttpResponse) => {
+    const urlParts = req.url?.split("/") || [];
+    const categoryId = urlParts[urlParts.length - 1].split("?")[0] || "";
+    await adminProductController.getCategoryById(req, res, categoryId);
+  });
+
   // Create category
   router.post("/api/admin/categories", authenticateToken, async (req: HttpRequest, res: HttpResponse) => {
     await adminProductController.createCategory(req, res);

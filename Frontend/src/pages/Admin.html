@@ -372,6 +372,7 @@
                         <th width="200">Slug</th>
                         <th>Mô Tả</th>
                         <th width="120">Số Sản Phẩm</th>
+                        <th width="120">Trạng Thái</th>
                         <th width="150">Thao Tác</th>
                       </tr>
                     </thead>
@@ -1096,16 +1097,19 @@
           <div class="modal-body">
             <div class="mb-3">
               <label class="form-label">Tên Danh Mục <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" name="category_name" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Slug <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" name="category_slug" required>
-              <small class="text-muted">VD: lego-city, lego-technic (chữ thường, không dấu, dùng dấu gạch ngang)</small>
+              <input type="text" class="form-control" name="category_name" id="categoryName" required>
+              <input type="hidden" name="category_slug" id="categorySlug">
             </div>
             <div class="mb-3">
               <label class="form-label">Mô Tả</label>
               <textarea class="form-control" name="description" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Trạng Thái</label>
+              <select class="form-select" name="is_active" id="categoryActive">
+                <option value="true">Kích hoạt</option>
+                <option value="false">Không kích hoạt</option>
+              </select>
             </div>
           </div>
           <div class="modal-footer">
@@ -1135,15 +1139,18 @@
             <div class="mb-3">
               <label class="form-label">Tên Danh Mục <span class="text-danger">*</span></label>
               <input type="text" class="form-control" name="category_name" id="editCategoryName" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Slug <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" name="category_slug" id="editCategorySlug" required>
-              <small class="text-muted">VD: lego-city, lego-technic (chữ thường, không dấu, dùng dấu gạch ngang)</small>
+              <input type="hidden" name="category_slug" id="editCategorySlug">
             </div>
             <div class="mb-3">
               <label class="form-label">Mô Tả</label>
               <textarea class="form-control" name="description" id="editCategoryDescription" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Trạng Thái</label>
+              <select class="form-select" name="is_active" id="editCategoryActive">
+                <option value="true">Kích hoạt</option>
+                <option value="false">Không kích hoạt</option>
+              </select>
             </div>
           </div>
           <div class="modal-footer">
@@ -1379,6 +1386,10 @@
     // Initialize Admin Category Controller
     const adminCategoryController = new AdminCategoryController();
     window.adminCategoryController = adminCategoryController;
+    
+    // Load categories immediately after initialization
+    console.log('🏗️ AdminCategoryController initialized, loading categories...');
+    adminCategoryController.loadCategories();
   </script>
 
   <!-- Admin Order Management -->

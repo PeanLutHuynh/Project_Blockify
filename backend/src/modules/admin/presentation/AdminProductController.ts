@@ -127,18 +127,28 @@ export class AdminProductController {
         return;
       }
 
+      // Log raw query params for debugging
+      logger.info('📋 AdminProductController.getAllProducts - Raw query params:', req.query);
+
       const query: ProductSearchQueryDTO = {
+        query: req.query.query as string, // Search text
         page: req.query.page ? parseInt(req.query.page as string) : 1,
         limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
         category_id: req.query.category_id
           ? parseInt(req.query.category_id as string)
           : undefined,
         status: req.query.status as string,
-        in_stock: req.query.in_stock === 'true',
-        is_featured: req.query.is_featured === 'true',
-        is_new: req.query.is_new === 'true',
-        is_bestseller: req.query.is_bestseller === 'true',
+        stock_filter: req.query.stock_filter as 'in_stock' | 'out_of_stock' | 'low_stock' | undefined,
+        difficulty_level: req.query.difficulty_level as string,
+        in_stock: req.query.in_stock ? req.query.in_stock === 'true' : undefined,
+        is_featured: req.query.is_featured ? req.query.is_featured === 'true' : undefined,
+        is_new: req.query.is_new ? req.query.is_new === 'true' : undefined,
+        is_bestseller: req.query.is_bestseller ? req.query.is_bestseller === 'true' : undefined,
+        sortBy: req.query.sortBy as 'price' | 'stock_quantity' | 'created_at' | undefined,
+        sortOrder: req.query.sortOrder as 'asc' | 'desc' | undefined,
       };
+
+      logger.info('📋 Parsed query object:', query);
 
       const result = await this.productService.getAllProducts(query);
 
@@ -468,6 +478,42 @@ export class AdminProductController {
       });
     } catch (error: any) {
       logger.error('Get active categories error:', error);
+      this.sendError(res, 500, error.message || 'Internal server error');
+    }
+  }
+
+  /**
+   * GET /api/admin/categories/:id
+   * Get category by ID
+   */
+  async getCategoryById(
+    req: AdminRequest,
+    res: HttpResponse,
+    categoryId: string
+  ): Promise<void> {
+    try {
+      const adminId = await this.getAdminId(req);
+      if (!adminId) {
+        this.sendError(res, 401, 'Unauthorized');
+        return;
+      }
+
+      const id = parseInt(categoryId);
+      if (isNaN(id)) {
+        this.sendError(res, 400, 'Invalid category ID');
+        return;
+      }
+
+      const category = await this.productService.getCategoryById(id);
+
+      if (!category) {
+        this.sendError(res, 404, 'Category not found');
+        return;
+      }
+
+      this.sendSuccess(res, 'Category retrieved successfully', category);
+    } catch (error: any) {
+      logger.error('Get category by ID error:', error);
       this.sendError(res, 500, error.message || 'Internal server error');
     }
   }

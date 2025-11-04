@@ -58,9 +58,13 @@ export interface ProductSearchQueryDTO {
   min_price?: number;
   max_price?: number;
   in_stock?: boolean;
+  stock_filter?: 'in_stock' | 'out_of_stock' | 'low_stock'; // New: stock filtering
+  difficulty_level?: string; // New: difficulty filter
   is_featured?: boolean;
   is_new?: boolean;
   is_bestseller?: boolean;
+  sortBy?: 'price' | 'stock_quantity' | 'created_at'; // New: sort field
+  sortOrder?: 'asc' | 'desc'; // New: sort direction
   page?: number;
   limit?: number;
 }
