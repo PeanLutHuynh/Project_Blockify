@@ -40,6 +40,7 @@ body, * {
   transition: opacity 0.3s;
   padding: 0 90px 0 5px;
   }
+
   .cart-icon {
     font-size: 1.2rem;
     text-decoration: none;
@@ -123,6 +124,16 @@ body, * {
   height: 225vh;
   background-position: center;
   position: relative;
+  }
+  .text-row-1{
+    position: absolute;
+    top: 10%;
+    left:5%;
+  }
+  .text-row-3{
+    position: absolute;
+    bottom: 25%;
+    right:5%;
   }
   
   .sub-section {
@@ -509,10 +520,6 @@ body, * {
   margin: 0;
 }
 
-.img-container li {
-  flex: 1; /* mỗi phần tử chiếm đều */
-  max-width: 32%; /* đảm bảo vừa đủ 3 cột */
-}
 .img-1-container{
   background-image: url("../../../../public/images/Frame 38.png");
   background-size: cover;
