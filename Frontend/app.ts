@@ -1,4 +1,4 @@
-import { authService } from './src/core/services/AuthService.js';
+import { authManager } from './src/core/services/AuthManager.js';
 import { loadConfig } from './src/core/config/env.js';
 
 class App {
@@ -7,22 +7,27 @@ class App {
     }
 
     private async initialize(): Promise<void> {
-        // Load configuration from backend first
+        
         await loadConfig();
+        
+        await authManager.initialize();
         
         this.setupRouting();
         this.initializeGlobalFeatures();
+        
     }
 
     private setupRouting(): void {
         // Simple routing cho MPA (Multi-page Application)
-        const currentPath = window.location.pathname;
-        
-        console.log('App initialized for page:', currentPath);
-        
+        const currentPath = window.location.pathname;        
         // Auto-verify authentication on protected pages
         if (this.isProtectedPage(currentPath)) {
             this.verifyAuthentication();
+        }
+        
+        // Auto-verify admin access on admin page
+        if (this.isAdminPage(currentPath)) {
+            this.verifyAdminAccess();
         }
     }
 
@@ -35,25 +40,29 @@ class App {
     private isProtectedPage(path: string): boolean {
         const protectedPages = [
             'Account.html',
-            'Admin.html',
-            'CartPage.html'
+            'CartPage.html',
+            'OrderPage.html',
+            'OrderConfirmation.html'
         ];
         
         return protectedPages.some(page => path.includes(page));
     }
 
+    private isAdminPage(path: string): boolean {
+        return path.includes('Admin.html');
+    }
+
     private async verifyAuthentication(): Promise<void> {
-        if (!authService.isAuthenticated()) {
-            // Redirect to signin if not authenticated
+        if (!authManager.isAuthenticated()) {
+            console.warn('[App] Not authenticated, redirecting to signin');
             window.location.href = '/src/pages/SigninPage.html';
             return;
         }
+    }
 
-        // Verify token is still valid
-        const result = await authService.verifyToken();
-        if (!result.success) {
-            window.location.href = '/src/pages/SigninPage.html';
-        }
+    private async verifyAdminAccess(): Promise<void> {
+        // Use AuthManager's guard
+        authManager.requireAdmin();
     }
 
     private setupErrorHandling(): void {
@@ -68,20 +77,17 @@ class App {
     }
 
     private setupNavigationHelpers(): void {
-        // Helper function để navigate giữa các trang
         (window as any).navigateTo = (path: string) => {
             window.location.href = path;
         };
 
-        // Helper function để logout
-        (window as any).logout = () => {
-            authService.signOut();
+        (window as any).logout = async () => {
+            await authManager.signOut();
             window.location.href = '/src/pages/SigninPage.html';
         };
     }
 
     public static initialize(): void {
-        // Khởi tạo app khi DOM ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 new App();
@@ -92,10 +98,8 @@ class App {
     }
 }
 
-// Export để sử dụng trong các page
 export { App };
 
-// Auto-initialize nếu được import trực tiếp
 if (typeof window !== 'undefined') {
     App.initialize();
 }

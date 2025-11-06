@@ -5,14 +5,13 @@
  * Shows sign in/sign up buttons when logged out
  */
 
-import { authService } from "../../core/services/AuthService.js";
+import { authManager } from "../../core/services/AuthManager.js";
 import { User } from "../../core/models/User.js";
 
 export class NavbarAuth {
   private containerSelector: string;
-  private unsubscribeAuthListener: (() => void) | null = null;
-  private currentAuthState: 'authenticated' | 'unauthenticated' | null = null;
-  private currentUserId: string | null = null;
+  private unsubscribeAuth: (() => void) | null = null;
+  private isFirstRender = true;
 
   constructor(containerSelector: string = '.navbar-right-icons') {
     this.containerSelector = containerSelector;
@@ -22,60 +21,83 @@ export class NavbarAuth {
    * Initialize the navbar auth component
    */
   initialize(): void {
-    this.render();
+    // ⚡ INSTANT RENDER: Get cached user synchronously (no await!)
+    const cachedUser = authManager.getUser();
     
-    // Setup auth state listener
-    this.setupAuthStateListener();
+    if (cachedUser) {
+      this.render(cachedUser, true);
+    } else {
+      // No cache, try reading directly from storage (sync)
+      const storageUser = this.loadUserFromStorageSync();
+      if (storageUser) {
+        this.render(storageUser, true);
+      } else {
+        this.render(null, false);
+      }
+    }
+    
+    // Subscribe to auth state changes (for updates only)
+    this.unsubscribeAuth = authManager.subscribe((user) => {
+      // Only re-render if user actually changed
+      const currentUserId = cachedUser?.id;
+      if (user?.id !== currentUserId) {
+        this.render(user, false);
+      }
+    });
+  }
+
+  /**
+   * Load user directly from storage (synchronous, instant)
+   * Fallback method when AuthManager not ready yet
+   */
+  private loadUserFromStorageSync(): any {
+    try {
+      // Try sessionStorage first (fastest)
+      let userData = sessionStorage.getItem('session_user_cache');
+      
+      // Fallback to localStorage
+      if (!userData) {
+        userData = localStorage.getItem('user');
+      }
+      
+      if (userData) {
+        return JSON.parse(userData);
+      }
+    } catch (error) {
+      console.error('Failed to load user from storage:', error);
+    }
+    return null;
   }
 
   /**
    * Clean up listeners
    */
   destroy(): void {
-    if (this.unsubscribeAuthListener) {
-      this.unsubscribeAuthListener();
+    if (this.unsubscribeAuth) {
+      this.unsubscribeAuth();
     }
   }
 
   /**
-   * Setup listener for auth state changes
-   */
-  private setupAuthStateListener(): void {
-    // Listen to Supabase auth state changes
-    this.unsubscribeAuthListener = authService.initializeAuthListener();
-    
-    // Check periodically if auth state changed (as fallback, but less frequently)
-    setInterval(() => {
-      const user = authService.getUser();
-      const isAuth = authService.isAuthenticated();
-      const newState = (user && isAuth) ? 'authenticated' : 'unauthenticated';
-      const newUserId = user?.id || null;
-      
-      // Only re-render if state actually changed
-      if (this.currentAuthState !== newState || this.currentUserId !== newUserId) {
-        console.log('🔄 Auth state changed in NavbarAuth, re-rendering');
-        this.render();
-      }
-    }, 3000); // Check every 3 seconds instead of 1 second
-  }
-
-  /**
    * Render the navbar auth UI
+   * OPTIMIZED: Handle both User objects and plain objects from storage
    */
-  private render(): void {
+  private render(user: User | any | null, fromCache: boolean = false): void {
     const container = document.querySelector(this.containerSelector);
     if (!container) return;
 
-    const user = authService.getUser();
-    const isAuth = authService.isAuthenticated();
-    
-    // Update current state
-    this.currentAuthState = (user && isAuth) ? 'authenticated' : 'unauthenticated';
-    this.currentUserId = user?.id || null;
-    
-    if (user && isAuth) {
+    // Add smooth fade-in on first render
+    if (this.isFirstRender && fromCache) {
+      container.classList.add('loaded');
+      this.isFirstRender = false;
+    }
+
+    if (user) {
+      // Convert plain object to User if needed
+      const userObj = user instanceof User ? user : User.fromApiResponse(user);
+      
       // User is logged in - show user info and logout
-      container.innerHTML = this.renderAuthenticatedState(user);
+      container.innerHTML = this.renderAuthenticatedState(userObj);
       this.attachLogoutHandler();
       this.attachAvatarClickHandler();
       this.attachSearchHandler();
@@ -143,13 +165,11 @@ export class NavbarAuth {
         e.preventDefault();
         
         try {
-          await authService.signOut();
-          console.log('✅ Logged out successfully');
+          await authManager.signOut();
           
           // Redirect to sign in page
           window.location.href = 'SigninPage.html';
         } catch (error) {
-          console.error('❌ Logout failed:', error);
           alert('Logout failed. Please try again.');
         }
       });

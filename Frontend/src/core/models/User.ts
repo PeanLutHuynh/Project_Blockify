@@ -8,6 +8,7 @@ export class User {
   private _birthDate?: Date;
   private _avatarUrl?: string;
   private _authUid: string; // Supabase Auth UID - REQUIRED
+  private _role: 'admin' | 'user'; // User role from Supabase metadata
   private _isActive: boolean;
   private _createdAt?: Date;
   private _updatedAt?: Date;
@@ -18,6 +19,7 @@ export class User {
     fullName: string;
     username: string;
     authUid: string;
+    role?: 'admin' | 'user';
     gender?: string;
     phone?: string;
     birthDate?: Date | string;
@@ -31,6 +33,7 @@ export class User {
     this._fullName = data.fullName;
     this._username = data.username;
     this._authUid = data.authUid;
+    this._role = data.role || 'user'; // Default to 'user' if not specified
     this._gender = data.gender;
     this._phone = data.phone;
     this._birthDate = typeof data.birthDate === 'string' ? new Date(data.birthDate) : data.birthDate;
@@ -77,6 +80,10 @@ export class User {
     return this._authUid;
   }
 
+  public get role(): 'admin' | 'user' {
+    return this._role;
+  }
+
   public get isActive(): boolean {
     return this._isActive;
   }
@@ -92,6 +99,13 @@ export class User {
   // Business logic methods
   public getDisplayName(): string {
     return this._fullName || this._username;
+  }
+
+  /**
+   * Check if user is admin
+   */
+  public isAdmin(): boolean {
+    return this._role === 'admin';
   }
 
   public getInitials(): string {
@@ -184,6 +198,7 @@ export class User {
       fullName: data.fullName || data.full_name,
       username: data.username,
       authUid: data.authUid || data.auth_uid,
+      role: data.role || 'user', // Get role from API response
       gender: data.gender,
       phone: data.phone,
       birthDate: data.birthDate || data.birth_date,
@@ -202,6 +217,7 @@ export class User {
       fullName: this._fullName,
       username: this._username,
       authUid: this._authUid,
+      role: this._role,
       gender: this._gender,
       phone: this._phone,
       birthDate: this._birthDate?.toISOString(),
@@ -218,6 +234,7 @@ export class User {
       fullName: this._fullName,
       username: this._username,
       authUid: this._authUid,
+      role: this._role,
       gender: this._gender,
       phone: this._phone,
       birthDate: this._birthDate,

@@ -1,0 +1,67 @@
+/* Skeleton placeholder for navbar auth area */
+.navbar-right-icons.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Skeleton animation */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* Skeleton user avatar placeholder */
+.navbar-right-icons .skeleton-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  display: inline-block;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Skeleton text placeholder */
+.navbar-right-icons .skeleton-text {
+  height: 14px;
+  background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: 4px;
+  display: inline-block;
+  width: 100px;
+  margin-left: 8px;
+}
+
+/* Hide skeleton after load */
+.navbar-right-icons:not(.loading) .skeleton-avatar,
+.navbar-right-icons:not(.loading) .skeleton-text {
+  display: none;
+}
+
+/* Smooth fade-in when content loads */
+.navbar-right-icons.loaded {
+  animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

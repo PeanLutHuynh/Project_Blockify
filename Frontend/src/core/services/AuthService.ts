@@ -48,6 +48,7 @@ interface AuthResult {
 export class AuthService {
   private readonly AUTH_TOKEN_KEY = ENV.JWT_STORAGE_KEY;
   private readonly USER_KEY = "user";
+  private readonly SESSION_CACHE_KEY = "session_user_cache"; // Fast cache for current session
   private currentUser: User | null = null;
 
   constructor() {
@@ -249,11 +250,20 @@ export class AuthService {
       const supabaseToken = sessionData.session.access_token;
       httpClient.setAuthToken(supabaseToken);
 
+      // Get Supabase user with metadata to extract role
+      const { data: supabaseUserData } = await supabaseService.getUser();
+      const supabaseUser = supabaseUserData?.user;
+      const userRole = supabaseUser?.user_metadata?.role || 'user';
+      
+      console.log('[AuthService] User role from metadata:', userRole);
+
       const response = await httpClient.get<any>("/api/auth/me");
 
       // Backend structure: { success: true, data: { id, email, ... }, message }
       if (response.success && response.data) {
-        const user = User.fromApiResponse(response.data);
+        // Add role from Supabase metadata to user data
+        const userData = { ...response.data, role: userRole };
+        const user = User.fromApiResponse(userData);
         this.setCurrentUser(user);
         
         // Store the Supabase token as well
@@ -290,7 +300,10 @@ export class AuthService {
     this.currentUser = null;
     localStorage.removeItem(this.AUTH_TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
+    sessionStorage.removeItem(this.SESSION_CACHE_KEY); // Clear session cache
     httpClient.clearAuthToken();
+    
+    console.log('[AuthService] All caches cleared on sign out');
   }
 
   /**
@@ -404,34 +417,60 @@ export class AuthService {
   }
 
   /**
-   * Set current user and persist to localStorage
+   * Set current user and persist to both localStorage and sessionStorage
+   * OPTIMIZED: sessionStorage for faster access within same session
    */
   setCurrentUser(user: User): void {
     this.currentUser = user;
-    localStorage.setItem(this.USER_KEY, JSON.stringify(user.toApiRequest()));
+    const userData = JSON.stringify(user.toApiRequest());
+    
+    // Persist to localStorage (survives browser close)
+    localStorage.setItem(this.USER_KEY, userData);
+    
+    // Cache in sessionStorage (faster access, same session only)
+    sessionStorage.setItem(this.SESSION_CACHE_KEY, userData);
+    
+    console.log('[AuthService] User cached in both localStorage and sessionStorage');
   }
 
   /**
-   * Load user from localStorage on initialization
+   * Load user from storage on initialization
+   * OPTIMIZED: Try sessionStorage first (faster), fallback to localStorage
    */
   private loadUserFromStorage(): void {
     try {
       console.log('🔍 [AuthService] Loading user from storage...');
-      const userData = localStorage.getItem(this.USER_KEY);
+      
+      // Try sessionStorage first (instant)
+      let userData = sessionStorage.getItem(this.SESSION_CACHE_KEY);
+      const source = userData ? 'sessionStorage (⚡ instant)' : 'localStorage';
+      
+      // Fallback to localStorage
+      if (!userData) {
+        userData = localStorage.getItem(this.USER_KEY);
+      }
+      
       const token = localStorage.getItem(this.AUTH_TOKEN_KEY);
       
-      console.log('🔍 [AuthService] USER_KEY:', this.USER_KEY);
-      console.log('🔍 [AuthService] AUTH_TOKEN_KEY:', this.AUTH_TOKEN_KEY);
-      console.log('🔍 [AuthService] userData exists:', !!userData);
-      console.log('🔍 [AuthService] token exists:', !!token);
+      console.log('[AuthService] USER_KEY:', this.USER_KEY);
+      console.log('[AuthService] AUTH_TOKEN_KEY:', this.AUTH_TOKEN_KEY);
+      console.log('[AuthService] userData from:', source);
+      console.log('[AuthService] token exists:', !!token);
 
       if (userData && token) {
         const parsedData = JSON.parse(userData);
         this.currentUser = User.fromApiResponse(parsedData);
         httpClient.setAuthToken(token);
-        console.log('✅ [AuthService] User loaded:', this.currentUser?.id);
+        
+        // If loaded from localStorage, cache to sessionStorage for next time
+        if (source === 'localStorage') {
+          sessionStorage.setItem(this.SESSION_CACHE_KEY, userData);
+          console.log('[AuthService] Cached to sessionStorage');
+        }
+
+        console.log(`[AuthService] User loaded from ${source}:`, this.currentUser?.id);
       } else {
-        console.warn('⚠️ [AuthService] Missing userData or token');
+        console.warn('[AuthService] Missing userData or token');
       }
     } catch (error) {
       console.error("Error loading user from storage:", error);
@@ -490,13 +529,13 @@ export class AuthService {
               const supabaseToken = sessionData?.session?.access_token;
               
               if (sessionError) {
-                console.error('❌ Session error, signing out:', sessionError.message);
+                console.error('Session error, signing out:', sessionError.message);
                 await supabaseService.signOut();
                 return;
               }
               
               if (!supabaseToken) {
-                console.warn('⚠️ No Supabase token found, but user object exists. Session may be loading...');
+                console.warn('No Supabase token found, but user object exists. Session may be loading...');
                 // Don't immediately sign out - the session might be loading
                 // Just skip syncing for now and wait for next auth state change
                 return;
@@ -507,7 +546,7 @@ export class AuthService {
               
               // For Google OAuth, ALWAYS call /api/auth/google endpoint
               // This endpoint will check admin_users first, then public.users
-              console.log('🔄 Google OAuth: Calling /api/auth/google endpoint...');
+              console.log('Google OAuth: Calling /api/auth/google endpoint...');
               const authData = {
                 email: supabaseUser.email!,
                 fullName: supabaseUser.user_metadata?.full_name || supabaseUser.email!.split('@')[0],
@@ -521,19 +560,19 @@ export class AuthService {
               // Backend structure: { success: true, data: { user, token }, message }
               if (oauthResponse.success && oauthResponse.data?.user && oauthResponse.data?.token) {
                 this.handleAuthSuccess(oauthResponse.data.user, oauthResponse.data.token);
-                console.log('✅ Google OAuth: User authenticated:', oauthResponse.data.user.email);
-                console.log('👤 Google OAuth: User role:', oauthResponse.data.user.role);
+                console.log('Google OAuth: User authenticated:', oauthResponse.data.user.email);
+                console.log('Google OAuth: User role:', oauthResponse.data.user.role);
                 
                 // Redirect based on role
                 const userRole = oauthResponse.data.user.role;
                 if (userRole === 'admin') {
-                  console.log('👑 Google OAuth: Admin detected, redirecting to Admin panel...');
+                  console.log('Google OAuth: Admin detected, redirecting to Admin panel...');
                   // Check if we're not already on admin page
                   if (!window.location.pathname.includes('Admin.html')) {
                     window.location.href = '/src/pages/Admin.html';
                   }
                 } else {
-                  console.log('👤 Google OAuth: Regular user, redirecting to Home page...');
+                  console.log('Google OAuth: Regular user, redirecting to Home page...');
                   // Check if we're on auth callback or signin page
                   if (window.location.pathname.includes('AuthCallback.html') || 
                       window.location.pathname.includes('Signin')) {
@@ -541,10 +580,10 @@ export class AuthService {
                   }
                 }
               } else {
-                console.error('❌ OAuth authentication failed:', oauthResponse);
+                console.error('OAuth authentication failed:', oauthResponse);
               }
             } catch (error) {
-              console.error('❌ Failed to sync user:', error);
+              console.error('Failed to sync user:', error);
             }
           }
         } finally {
