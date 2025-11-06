@@ -3,6 +3,7 @@ import { AdminController } from "./AdminController";
 // import { AdminProductController } from "./AdminProductController";
 import { requireAdmin } from "../infrastructure/middleware/AdminAuthMiddleware";
 import { registerAdminUserRoutes } from "./adminUserRoutes";
+import { registerAdminDashboardRoutes } from "./adminDashboardRoutes";
 
 /**
  * Admin Routes
@@ -199,4 +200,7 @@ export function setupAdminRoutes(router: Router): void {
 
   // Admin User Management Routes
   registerAdminUserRoutes(router);
+
+  // Admin Dashboard Routes
+  registerAdminDashboardRoutes(router);
 }
