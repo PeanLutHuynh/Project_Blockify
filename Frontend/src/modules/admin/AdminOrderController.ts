@@ -498,6 +498,7 @@ export class AdminOrderController {
         buttons += `<button class="btn btn-warning" id="processRefundBtn">↺ Xử lý hoàn trả</button>`;
         break;
 
+      case "Thất bại":
       case "Đã trả":
       case "Đã hủy":
         // Read-only
@@ -854,6 +855,8 @@ export class AdminOrderController {
       "Đang xử lý": { text: "Đang xử lý", class: "bg-warning text-dark" },
       "Đang giao": { text: "Đang giao", class: "bg-info" },
       "Đã giao": { text: "Đã giao", class: "bg-success" },
+      "Thất bại": { text: "Thất bại", class: "bg-danger" },
+      // Legacy support (in case old data exists)
       "Đã hủy": { text: "Đã hủy", class: "bg-danger" },
       "Đã trả": { text: "Đã trả", class: "bg-secondary" },
     };
