@@ -126,4 +126,20 @@ export class ProductService {
   async getRecommendedProductsByCategory(productId: number, limit: number = 6): Promise<ProductSearchResult[]> {
     return this.recommendationService.getRecommendedProductsByCategory(productId, limit);
   }
+
+  /**
+   * Get new products (is_new = true)
+   * @deprecated Use ProductQueryService.getNewProducts() instead
+   */
+  async getNewProducts(limit: number = 12): Promise<ProductSearchResult[]> {
+    return this.queryService.getNewProducts(limit);
+  }
+
+  /**
+   * Get bestseller products (is_bestseller = true)
+   * @deprecated Use ProductQueryService.getBestsellerProducts() instead
+   */
+  async getBestsellerProducts(limit: number = 12): Promise<ProductSearchResult[]> {
+    return this.queryService.getBestsellerProducts(limit);
+  }
 }

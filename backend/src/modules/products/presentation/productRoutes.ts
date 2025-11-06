@@ -25,6 +25,15 @@ export function createProductRoutes(): Router {
   // GET /api/v1/products/suggestions?q=keyword
   router.get('/suggestions', controller.getSuggestions);
 
+  // ✅ FILTER ROUTES (must be before /:id)
+  // Get new products (is_new = true) for "Mới nhất" filter
+  // GET /api/v1/products/new?limit=12
+  router.get('/new', controller.getNewProducts);
+
+  // Get bestseller products (is_bestseller = true) for "Phổ biến" filter
+  // GET /api/v1/products/bestseller?limit=12
+  router.get('/bestseller', controller.getBestsellerProducts);
+
   // ✅ RECOMMENDATION ROUTES (must be before /:id)
   // Get best-selling products (most purchased from delivered orders)
   // GET /api/v1/products/best-selling?limit=8
