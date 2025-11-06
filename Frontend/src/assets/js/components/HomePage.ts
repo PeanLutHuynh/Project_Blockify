@@ -3,12 +3,13 @@ import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
 import { initializeSearch } from '../../../shared/components/SearchInit.js';
 import { categoryService } from '../../../core/services/CategoryService.js';
 import { productService } from '../../../core/services/ProductService.js';
-import { supabaseService } from '../../../core/api/supabaseClient.js';
 import { WishlistService } from '../../../core/services/WishlistService.js';
 import { authService } from '../../../core/services/AuthService.js';
 
 // State management for pagination and filtering
 let currentCategoryId: number | undefined = undefined;
+// @ts-ignore - Used in filter functions
+let currentFilterMode: 'all' | 'new' | 'bestseller' = 'all';
 const wishlistService = new WishlistService();
 
 // Initialize app and run page logic
@@ -44,6 +45,9 @@ initializeOnReady(async () => {
   
   // Setup category filter handlers
   setupCategoryFilters();
+  
+  // Setup product filter buttons (Mới nhất, Phổ biến)
+  setupProductFilterButtons();
 });
 
 function normalizeDifficulty(value: any): string | undefined {
@@ -298,17 +302,8 @@ async function loadCategorySidebar() {
 }
 
 /**
- * ✅ Load "SẢN PHẨM ĐỀ XUẤT" section (phía dưới) với logic gợi ý thông minh
- * 
- * Logic:
- * 1. Nếu CHƯA ĐĂNG NHẬP hoặc CHƯA CÓ đơn hàng "Đã giao"
- *    → Hiển thị 8 sản phẩm best-selling (được mọi người mua nhiều nhất từ đơn hàng "Đã giao")
- * 
- * 2. Nếu ĐÃ ĐĂNG NHẬP và CÓ đơn hàng "Đã giao"
- *    → Hiển thị personalized recommendations (dựa trên lịch sử mua hàng)
- *    → Nếu không có personalized → Fallback to best-selling
- * 
- * - Click vào sản phẩm → Navigate to ProductDetail page
+ * ✅ Load "SẢN PHẨM ĐỀ XUẤT" section (phía dưới)
+ * Hiển thị các sản phẩm có is_featured = TRUE trong database
  */
 async function loadRecommendedProductsForSection() {
   try {
@@ -321,94 +316,31 @@ async function loadRecommendedProductsForSection() {
     // Show loading spinner
     categoryList.innerHTML = '<div class="col-12 text-center py-3"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
 
-    console.log('🎯 Loading "SẢN PHẨM ĐỀ XUẤT" section with smart recommendations...');
+    console.log('🎯 Loading "SẢN PHẨM ĐỀ XUẤT" section (is_featured = TRUE)...');
     
-    let products: any[] = [];
-
-    // ✅ Bước 1: Check if user is authenticated AND has delivered orders
-    let isAuth = false;
-    try {
-      isAuth = await supabaseService.isAuthenticated();
-    } catch (error) {
-      console.warn('⚠️ Could not check authentication, assuming not logged in:', error);
-      isAuth = false;
-    }
+    // Load featured products (is_featured = true)
+    const result = await productService.getFeaturedProducts(8, true);
     
-    if (isAuth) {
-      try {
-        // Get current user
-        const { data: userData } = await supabaseService.getUser();
-        
-        if (userData && userData.user) {
-          // Get user_id from users table
-          const client = supabaseService.getClient();
-          const { data: userRecord } = await client
-            .from('users')
-            .select('user_id')
-            .eq('auth_uid', userData.user.id)
-            .single();
-
-          if (userRecord) {
-            const userId = userRecord.user_id;
-            console.log(`✅ User logged in: ${userId}, checking for delivered orders...`);
-
-            // Check if user has delivered orders
-            const { data: orders } = await client
-              .from('orders')
-              .select('order_id')
-              .eq('user_id', userId)
-              .eq('status', 'Đã giao')
-              .limit(1);
-
-            if (orders && orders.length > 0) {
-              console.log('✅ User has delivered orders, loading personalized recommendations...');
-              
-              // Try personalized recommendations
-              const result = await productService.getRecommendedProductsForUser(userId, 8);
-              
-              if (result.success && result.products && result.products.length > 0) {
-                products = result.products;
-                console.log(`✅ Loaded ${products.length} personalized recommendations`);
-              } else {
-                console.log('⚠️ No personalized recommendations found, will fallback to best-selling');
-              }
-            } else {
-              console.log('⚠️ User has NO delivered orders, will show best-selling products');
-            }
-          }
-        }
-      } catch (error) {
-        console.warn('⚠️ Error checking user recommendations, will fallback to best-selling:', error);
-      }
-    } else {
-      console.log('⚠️ User not logged in, will show best-selling products');
-    }
-
-    // ✅ Bước 2: Nếu chưa có products (chưa login / chưa có delivered orders / personalized failed)
-    // → Load best-selling products (8 sản phẩm được mọi người mua nhiều nhất)
-    if (products.length === 0) {
-      console.log('⭐ Loading best-selling products (8 sản phẩm được mọi người mua nhiều nhất từ đơn hàng "Đã giao")...');
-      const result = await productService.getBestSellingProducts(8);
-      
-      if (result.success && result.products && result.products.length > 0) {
-        products = result.products;
-        console.log(`✅ Loaded ${products.length} best-selling products`);
-      } else {
-        console.error('❌ Failed to load best-selling products');
-      }
-    }
-
-    if (products.length === 0) {
+    if (!result.success || !result.products || result.products.length === 0) {
       categoryList.innerHTML = '<div class="col-12 text-center"><p>Không có sản phẩm đề xuất</p></div>';
-      console.warn('⚠️ No products found for recommendation section');
+      console.warn('⚠️ No featured products found');
       return;
     }
+
+    const products = result.products;
+    console.log(`✅ Loaded ${products.length} featured products (is_featured = TRUE)`);
+    console.log('📦 Featured products data:', products);
 
     // Clear loading spinner
     categoryList.innerHTML = '';
 
     // ✅ Render PRODUCT cards (chỉ có tên sản phẩm + ảnh, không có badge)
     products.slice(0, 8).forEach((product) => {
+      console.log('🔍 Rendering product:', { 
+        name: product.name, 
+        slug: product.slug, 
+        imageUrl: product.imageUrl 
+      });
       const productCard = document.createElement('div');
       productCard.className = 'd-flex justify-content-center col-md-3 col-sm-6';
       
@@ -466,6 +398,7 @@ function setupCategoryFilters() {
       
       // Clear category filter
       currentCategoryId = undefined;
+      currentFilterMode = 'all';
       
       // Clear all active states
       document.querySelectorAll('.category-item').forEach(item => {
@@ -473,6 +406,9 @@ function setupCategoryFilters() {
         el.style.color = '';
         el.style.fontWeight = '';
       });
+      
+      // Reset filter buttons
+      resetFilterButtons();
       
       // Load all products from page 1
       await loadProductsFromAPI(undefined, 1);
@@ -497,6 +433,10 @@ function setupCategoryFilters() {
       
       // Update current filter
       currentCategoryId = categoryId;
+      currentFilterMode = 'all';
+      
+      // Reset filter buttons
+      resetFilterButtons();
       
       // Load products by category with pagination (reset to page 1)
       console.log(`📂 Filtering products by category: ${categoryId}`);
@@ -505,6 +445,322 @@ function setupCategoryFilters() {
   });
 
   console.log('✅ Category filters setup complete');
+}
+
+/**
+ * Setup product filter buttons (Mới nhất, Phổ biến)
+ */
+function setupProductFilterButtons() {
+  const btnNew = document.getElementById('btn-new');
+  const btnBestseller = document.getElementById('btn-bestseller');
+  
+  if (!btnNew || !btnBestseller) {
+    console.warn('⚠️ Filter buttons not found');
+    return;
+  }
+
+  // Handle "Mới nhất" button
+  btnNew.addEventListener('click', async () => {
+    console.log('🆕 Loading new products...');
+    
+    // Update filter mode
+    currentFilterMode = 'new';
+    currentCategoryId = undefined;
+    
+    // Update button styles
+    setActiveFilterButton(btnNew);
+    
+    // Clear category selection
+    clearCategorySelection();
+    
+    // Load new products
+    await loadFilteredProducts('new');
+  });
+
+  // Handle "Phổ biến" button
+  btnBestseller.addEventListener('click', async () => {
+    console.log('🔥 Loading bestseller products...');
+    
+    // Update filter mode
+    currentFilterMode = 'bestseller';
+    currentCategoryId = undefined;
+    
+    // Update button styles
+    setActiveFilterButton(btnBestseller);
+    
+    // Clear category selection
+    clearCategorySelection();
+    
+    // Load bestseller products
+    await loadFilteredProducts('bestseller');
+  });
+
+  console.log('✅ Product filter buttons setup complete');
+  
+  // ✅ Setup filter dropdowns (Khoảng giá, Độ khó, Sắp xếp theo)
+  setupFilterDropdowns();
+  
+  // ✅ Setup filter toggle button
+  setupFilterToggle();
+}
+
+/**
+ * ✅ Setup filter panel toggle
+ */
+function setupFilterToggle() {
+  const filterToggleBtn = document.getElementById('filter-toggle');
+  const filterPanel = document.getElementById('filter-panel');
+  
+  if (!filterToggleBtn || !filterPanel) {
+    console.warn('⚠️ Filter toggle button or panel not found');
+    return;
+  }
+  
+  // Hide filter panel by default
+  filterPanel.style.display = 'none';
+  
+  filterToggleBtn.addEventListener('click', () => {
+    if (filterPanel.style.display === 'none') {
+      filterPanel.style.display = 'block';
+      filterToggleBtn.textContent = 'Ẩn bộ lọc';
+      filterToggleBtn.classList.add('active');
+    } else {
+      filterPanel.style.display = 'none';
+      filterToggleBtn.textContent = 'Bộ lọc';
+      filterToggleBtn.classList.remove('active');
+    }
+  });
+  
+  console.log('✅ Filter toggle setup complete');
+}
+
+/**
+ * ✅ Setup filter dropdowns for price range, difficulty, and sorting
+ */
+function setupFilterDropdowns() {
+  const priceFilter = document.querySelector('select[name="price-range"]') as HTMLSelectElement;
+  const difficultyFilter = document.querySelector('select[name="difficulty"]') as HTMLSelectElement;
+  const sortFilter = document.querySelector('select[name="sort"]') as HTMLSelectElement;
+  
+  // Find the apply button inside filter panel
+  const filterPanel = document.getElementById('filter-panel');
+  const applyFiltersBtn = filterPanel?.querySelector('.btn-primary') as HTMLButtonElement;
+  
+  if (!applyFiltersBtn) {
+    console.error('❌ Apply filters button not found!');
+    return;
+  }
+  
+  console.log('✅ Apply button found:', applyFiltersBtn);
+  
+  applyFiltersBtn.addEventListener('click', async () => {
+    console.log('🔧 Applying filters...');
+    
+    const priceRange = priceFilter?.value || '';
+    const difficulty = difficultyFilter?.value || '';
+    const sort = sortFilter?.value || '';
+    
+    console.log('📋 Filter values:', { priceRange, difficulty, sort });
+    
+    // Reset filter mode and category
+    currentFilterMode = 'all';
+    currentCategoryId = undefined;
+    resetFilterButtons();
+    clearCategorySelection();
+    
+    // Apply filters with current settings
+    await applyAdvancedFilters(priceRange, difficulty, sort);
+  });
+  
+  console.log('✅ Filter dropdowns setup complete');
+}
+
+/**
+ * ✅ Apply advanced filters (price, difficulty, sorting)
+ */
+async function applyAdvancedFilters(priceRange: string, difficulty: string, sort: string) {
+  try {
+    const mainList = document.getElementById('main-product-list');
+    if (!mainList) {
+      console.error('❌ Main product list container not found');
+      return;
+    }
+
+    // Show loading
+    mainList.innerHTML = '<div class="col-12 text-center py-5"><i class="fas fa-spinner fa-spin fa-3x text-primary"></i></div>';
+
+    // Build query parameters
+    const params = new URLSearchParams({
+      page: '1',
+      limit: '12'
+    });
+    
+    // Add difficulty filter (khớp với Supabase: Easy, Medium, Hard, Expert)
+    if (difficulty && difficulty !== '') {
+      params.append('difficulty_level', difficulty);
+    }
+    
+    // Add price range filter
+    if (priceRange && priceRange !== '') {
+      params.append('price_range', priceRange);
+    }
+    
+    // Add sorting
+    if (sort && sort !== '') {
+      const [sortBy, sortOrder] = sort.split('-');
+      params.append('sortBy', sortBy);
+      params.append('sortOrder', sortOrder);
+    }
+
+    const url = `http://127.0.0.1:3001/api/v1/products/?${params.toString()}`;
+    console.log('🔗 Fetching filtered products from:', url);
+
+    // Fetch products
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Filter API Response:', result);
+
+    if (result.success && result.data) {
+      // Render products
+      renderProductsToGrid(result.data);
+
+      // Hide pagination for filtered results
+      const paginationContainer = document.getElementById('pagination-container');
+      if (paginationContainer) {
+        paginationContainer.innerHTML = '';
+      }
+    } else {
+      mainList.innerHTML = `
+        <div class="col-12 text-center py-5">
+          <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+          <h5>Không tìm thấy sản phẩm phù hợp với bộ lọc</h5>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('❌ Apply filters error:', error);
+    const mainList = document.getElementById('main-product-list');
+    if (mainList) {
+      mainList.innerHTML = '<div class="col-12"><p class="text-center py-5 text-danger">Có lỗi xảy ra khi lọc sản phẩm</p></div>';
+    }
+  }
+}
+
+/**
+ * Load products based on filter mode
+ */
+async function loadFilteredProducts(mode: 'new' | 'bestseller') {
+  try {
+    const mainList = document.getElementById('main-product-list');
+    if (!mainList) {
+      console.error('❌ Main product list container not found');
+      return;
+    }
+
+    // Show loading
+    mainList.innerHTML = '<div class="col-12 text-center py-5"><i class="fas fa-spinner fa-spin fa-3x text-primary"></i></div>';
+
+    let result;
+    if (mode === 'new') {
+      result = await productService.getNewProducts(12);
+    } else {
+      result = await productService.getBestsellerProducts(12);
+    }
+    if (result.success && result.products && result.products.length > 0) {
+      // Convert Product objects to the format expected by renderProductsToGrid
+      const productsData = result.products.map(product => ({
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          description: product.description,
+          price: product.price,
+          salePrice: product.salePrice,
+          difficultyLevel: product.difficultyLevel,
+          rating: product.rating,
+          pieceCount: product.pieceCount,
+          imageUrl: product.imageUrl,
+          productUrl: product.productUrl
+        })
+      );
+
+      console.log('📦 Products after mapping:', productsData);
+      renderProductsToGrid(productsData);
+      
+      // Hide pagination for filtered results
+      const paginationContainer = document.getElementById('pagination-container');
+      if (paginationContainer) {
+        paginationContainer.innerHTML = '';
+      }
+    } else {
+      mainList.innerHTML = `
+        <div class="col-12 text-center py-5">
+          <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+          <h5>Không có sản phẩm ${mode === 'new' ? 'mới' : 'phổ biến'}</h5>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error(`❌ Load ${mode} products error:`, error);
+    const mainList = document.getElementById('main-product-list');
+    if (mainList) {
+      mainList.innerHTML = '<div class="col-12"><p class="text-center py-5 text-danger">Có lỗi xảy ra</p></div>';
+    }
+  }
+}
+
+/**
+ * Set active filter button style
+ */
+function setActiveFilterButton(activeBtn: HTMLElement) {
+  const btnNew = document.getElementById('btn-new');
+  const btnBestseller = document.getElementById('btn-bestseller');
+  
+  // Reset all buttons to outline style (nền trắng, chữ xanh)
+  [btnNew, btnBestseller].forEach(btn => {
+    if (btn) {
+      btn.className = 'btn btn-outline-primary';
+      btn.style.backgroundColor = '';
+      btn.style.color = '';
+    }
+  });
+  
+  // Set active button to filled style (nền xanh, chữ trắng)
+  activeBtn.className = 'btn text-white';
+  activeBtn.style.backgroundColor = '#0D9BFF';
+  activeBtn.style.borderColor = '#0D9BFF';
+}
+
+/**
+ * Reset filter buttons to default state (both outline)
+ */
+function resetFilterButtons() {
+  const btnNew = document.getElementById('btn-new');
+  const btnBestseller = document.getElementById('btn-bestseller');
+  
+  // Reset cả 2 nút về outline (không highlight nút nào)
+  [btnNew, btnBestseller].forEach(btn => {
+    if (btn) {
+      btn.className = 'btn btn-outline-primary';
+      btn.style.backgroundColor = '';
+      btn.style.borderColor = '';
+    }
+  });
+}
+
+/**
+ * Clear category selection
+ */
+function clearCategorySelection() {
+  document.querySelectorAll('.category-item').forEach(item => {
+    const el = item as HTMLElement;
+    el.style.color = '';
+    el.style.fontWeight = '';
+  });
 }
 
 /**
@@ -563,7 +819,7 @@ async function renderProductsToGrid(products: any[]) {
     const heartClass = isInWishlist ? 'fas fa-heart icon-heart liked' : 'far fa-heart icon-heart';
     
     return `
-      <div class="col-6 col-md-3">
+      <div class="col-12  col-md-6 col-xl-4 col-xxl-3 mb-4">
         <div class="product-card position-relative" data-product-slug="${slug}" style="cursor: pointer;">
           <i class="${heartClass}" data-product-id="${product.id}"></i>
           <div class="product-image">
@@ -575,13 +831,14 @@ async function renderProductsToGrid(products: any[]) {
             <span><i class="fas fa-star text-warning"></i> ${rating}</span>
           </div>
           <div class="divider"></div>
-          <div class="product-title" style="height:40px;">${product.name}</div>
+          <div class="product-title" style="height:60px;">${product.name}</div>
           <div class="product-price">${formattedPrice} VNĐ</div>
           <button class="btn-cart" data-product-id="${product.id}">Thêm vào giỏ</button>
         </div>
       </div>
     `;
   }).join('');
+
 
   // Add click handlers with better logging
   const cards = mainList.querySelectorAll('.product-card');

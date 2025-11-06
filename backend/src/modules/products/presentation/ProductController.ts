@@ -153,15 +153,53 @@ export class ProductController {
   /**
    * GET /api/v1/products
    * 
-   * @description Lấy sản phẩm với pagination và category filter
+   * @description Lấy sản phẩm với pagination, filters và sorting
+   * Query params:
+   * - categoryId: Filter by category
+   * - page: Page number
+   * - limit: Number of products per page
+   * - featured: If 'true', only return products with is_featured = TRUE
+   * - difficulty_level: Filter by difficulty (Easy, Medium, Hard, Expert)
+   * - price_range: Filter by price range (0-500000, 500000-1000000, 1000000+)
+   * - sortBy: Sort field (price, name, created_at)
+   * - sortOrder: Sort order (asc, desc)
    */
   getAllProducts = async (req: HttpRequest, res: HttpResponse): Promise<void> => {
     try {
       const categoryId = req.query.categoryId ? parseInt(req.query.categoryId as string) : undefined;
       const page = req.query.page ? parseInt(req.query.page as string) : 1;
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 12;
+      const onlyFeatured = req.query.featured === 'true';
+      
+      // ✅ New filter parameters
+      const difficultyLevel = req.query.difficulty_level as string | undefined;
+      const priceRange = req.query.price_range as string | undefined;
+      const sortBy = req.query.sortBy as string | undefined;
+      const sortOrder = req.query.sortOrder as 'asc' | 'desc' | undefined;
 
-      const result = await this.productService.getProducts(categoryId, page, limit);
+      // If only featured products requested, use getFeaturedProducts
+      if (onlyFeatured) {
+        const featuredProducts = await this.productService.getFeaturedProducts(limit, true);
+        res.json({
+          success: true,
+          data: featuredProducts,
+          message: `Tìm thấy ${featuredProducts.length} sản phẩm nổi bật`
+        });
+        return;
+      }
+
+      // ✅ Use enhanced getProducts with filters
+      const result = await this.productService.getProducts(
+        categoryId, 
+        page, 
+        limit,
+        {
+          difficultyLevel,
+          priceRange,
+          sortBy,
+          sortOrder
+        }
+      );
 
       res.json({
         success: true,
@@ -404,6 +442,64 @@ export class ProductController {
       res.status(500).json({
         success: false,
         message: 'Có lỗi xảy ra khi kiểm tra tồn kho'
+      });
+    }
+  };
+
+  /**
+   * GET /api/v1/products/new?limit=12
+   * 
+   * @description Get new products (is_new = true)
+   * For "Mới nhất" filter on homepage
+   */
+  getNewProducts = async (req: HttpRequest, res: HttpResponse): Promise<void> => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 12;
+
+      const results = await this.productService.getNewProducts(limit);
+
+      res.json({
+        success: true,
+        results,
+        count: results.length,
+        message: `Tìm thấy ${results.length} sản phẩm mới nhất`
+      });
+
+    } catch (error) {
+      logger.error('Get new products error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Có lỗi xảy ra',
+        results: []
+      });
+    }
+  };
+
+  /**
+   * GET /api/v1/products/bestseller?limit=12
+   * 
+   * @description Get bestseller products (is_bestseller = true)
+   * For "Phổ biến" filter on homepage
+   */
+  getBestsellerProducts = async (req: HttpRequest, res: HttpResponse): Promise<void> => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 12;
+
+      const results = await this.productService.getBestsellerProducts(limit);
+
+      res.json({
+        success: true,
+        results,
+        count: results.length,
+        message: `Tìm thấy ${results.length} sản phẩm phổ biến`
+      });
+
+    } catch (error) {
+      logger.error('Get bestseller products error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Có lỗi xảy ra',
+        results: []
       });
     }
   };

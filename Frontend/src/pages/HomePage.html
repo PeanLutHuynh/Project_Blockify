@@ -14,7 +14,7 @@
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+<nav class="navbar navbar-expand-xxl navbar-custom sticky-top">
   <div class="container">
     <a class="navbar-brand px-2 rounded-5 border bg-light border-1 border-white" href="/IntroductionPage.html">
       <img src="../public/images/Group 71.png" alt="Blockify Logo" width="40" height="45">
@@ -124,39 +124,41 @@
 
     <div class="col-md-9">
       <div class="d-flex gap-2 mb-3">
-        <button class="btn text-white" style="background-color: #0D9BFF;">Mới nhất</button>
-        <button class="btn btn-outline-primary">Phổ biến</button>
+        <button id="btn-new" class="btn btn-outline-primary">Mới nhất</button>
+        <button id="btn-bestseller" class="btn btn-outline-primary">Phổ biến</button>
         <button id="filter-toggle" class="btn btn-outline-primary">Bộ lọc</button>
       </div>
 
       <!-- Bộ lọc -->
       <div id="filter-panel" style ="background-color: #ddf1ff;" class="card p-3 mb-3">
         <h6 class="fw-bold mb-3">Bộ lọc sản phẩm</h6>
-        <div class="row g-3">
+        <div class="row g-3 filter-section">
           <div class="col-md-4">
-            <label class="form-label" >Khoảng giá</label>
-            <select class="form-select">
+            <label class="form-label">Khoảng giá</label>
+            <select class="form-select" name="price-range">
               <option value="">Tất cả</option>
-              <option value="0-200000">0 - 200.000VNĐ</option>
-              <option value="200000-500000">200.000VNĐ - 500.000VNĐ</option>
+              <option value="0-500000">0 - 500.000VNĐ</option>
               <option value="500000-1000000">500.000VNĐ - 1.000.000VNĐ</option>
+              <option value="1000000-2000000">1.000.000VNĐ - 2.000.000VNĐ</option>
+              <option value="2000000-99999999">Trên 2.000.000VNĐ</option>
             </select>
           </div>
           <div class="col-md-4">
             <label class="form-label">Độ khó</label>
-            <select class="form-select">
-             
-              <option>Easy</option>
-              <option>Medium</option>
-              <option>Hard</option>
+            <select class="form-select" name="difficulty">
+              <option value="">Tất cả</option>
+              <option value="Easy">Dễ (Easy)</option>
+              <option value="Medium">Trung bình (Medium)</option>
+              <option value="Hard">Khó (Hard)</option>
+              <option value="Expert">Chuyên gia (Expert)</option>
             </select>
           </div>
           <div class="col-md-4">
             <label class="form-label">Sắp xếp theo</label>
-            <select class="form-select">
-              <option>Mặc định</option>
-              <option>Giá tăng dần</option>
-              <option>Giá giảm dần</option>
+            <select class="form-select" name="sort">
+              <option value="">Mặc định</option>
+              <option value="price-asc">Giá tăng dần</option>
+              <option value="price-desc">Giá giảm dần</option>
             </select>
           </div>
         </div>
@@ -340,6 +342,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module" src="../src/assets/js/components/HomePage.js"></script>
+
+<!-- Global App Initialization (AuthManager + NavbarAuth) -->
+<script type="module" src="/dist/src/core/init.js"></script>
+
+<!-- Page-specific scripts -->
+<script type="module" src="/dist/src/assets/js/components/HomePage.js"></script>
+
 <script>
   document.getElementById('filter-toggle').addEventListener('click', function() {
     document.getElementById('filter-panel').classList.toggle('active');

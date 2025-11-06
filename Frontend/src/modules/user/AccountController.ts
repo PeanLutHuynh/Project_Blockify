@@ -1471,13 +1471,49 @@ export class AccountController {
   }
 
   /**
+   * Get payable amount based on payment method and order status
+   * COD: Always show full amount (except cancelled/returned orders)
+   * Other payment methods: Show 0đ if not "Đang xử lý"
+   * Cancelled/Returned orders: Show refunded amount
+   */
+  private getPayableAmount(order: Order): string {
+    // For cancelled or returned orders (Đã hủy, Đã trả), show refunded amount
+    if (order.status === 'Đã hủy' || order.status === 'Đã trả') {
+      return orderTrackingService.formatPrice(order.total_amount);
+    }
+    
+    // COD orders always show the full amount
+    if (order.payment_method === 'COD') {
+      return orderTrackingService.formatPrice(order.total_amount);
+    }
+    
+    // For other payment methods, only show amount if status is "Đang xử lý"
+    if (order.status === 'Đang xử lý') {
+      return orderTrackingService.formatPrice(order.total_amount);
+    }
+    
+    // Otherwise show 0đ
+    return '0đ';
+  }
+  
+  /**
+   * Get payment label based on order status
+   * Returns either "Số tiền phải trả" or "Số tiền đã hoàn"
+   */
+  private getPaymentLabel(order: Order): string {
+    if (order.status === 'Đã hủy' || order.status === 'Đã trả') {
+      return 'Số tiền đã hoàn';
+    }
+    return 'Số tiền phải trả';
+  }
+
+  /**
    * Render a single order card
    */
   private renderOrderCard(order: Order): string {
     const statusClass = orderTrackingService.getStatusClass(order.status);
     const statusText = orderTrackingService.getStatusText(order.status);
     const formattedDate = orderTrackingService.formatDate(order.ordered_at);
-    const formattedTotal = orderTrackingService.formatPrice(order.total_amount);
 
     // Render order items with images
     const itemsHtml = (order.items || []).map(item => `
@@ -1535,8 +1571,8 @@ export class AccountController {
               <div class="mt-1"><i class="bi bi-credit-card me-2"></i>${orderTrackingService.getPaymentMethodText(order.payment_method)}</div>
             </div>
             <div class="text-end">
-              <div class="text-muted small">Số tiền phải trả:</div>
-              <div class="fs-5 fw-bold text-danger">${formattedTotal}</div>
+              <div class="text-muted small">${this.getPaymentLabel(order)}:</div>
+              <div class="fs-5 fw-bold ${(order.status === 'Đã hủy' || order.status === 'Đã trả') ? 'text-success' : 'text-danger'}">${this.getPayableAmount(order)}</div>
             </div>
           </div>
         </div>

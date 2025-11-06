@@ -350,9 +350,9 @@ export class ModernAuthController {
       // Reset button text based on context
       const form = button.closest('form');
       if (form?.id === 'signup-form') {
-        button.innerHTML = 'Sign Up';
+        button.innerHTML = 'Đăng ký';
       } else if (form?.id === 'signin-form') {
-        button.innerHTML = 'Sign In';
+        button.innerHTML = 'Đăng nhập';
       }
     }
   }

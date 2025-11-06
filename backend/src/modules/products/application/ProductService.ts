@@ -96,10 +96,20 @@ export class ProductService {
   }
 
   /**
-   * Get products with pagination and optional category filter
+   * Get products with pagination and optional filters
    * @deprecated Use ProductQueryService.getProducts() instead
    */
-  async getProducts(categoryId?: number, page: number = 1, limit: number = 12): Promise<{
+  async getProducts(
+    categoryId?: number, 
+    page: number = 1, 
+    limit: number = 12,
+    filters?: {
+      difficultyLevel?: string;
+      priceRange?: string;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+    }
+  ): Promise<{
     data: ProductSearchResult[];
     pagination: {
       page: number;
@@ -108,7 +118,7 @@ export class ProductService {
       totalPages: number;
     };
   }> {
-    return this.queryService.getProducts(categoryId, page, limit);
+    return this.queryService.getProducts(categoryId, page, limit, filters);
   }
 
   /**
@@ -125,5 +135,21 @@ export class ProductService {
    */
   async getRecommendedProductsByCategory(productId: number, limit: number = 6): Promise<ProductSearchResult[]> {
     return this.recommendationService.getRecommendedProductsByCategory(productId, limit);
+  }
+
+  /**
+   * Get new products (is_new = true)
+   * @deprecated Use ProductQueryService.getNewProducts() instead
+   */
+  async getNewProducts(limit: number = 12): Promise<ProductSearchResult[]> {
+    return this.queryService.getNewProducts(limit);
+  }
+
+  /**
+   * Get bestseller products (is_bestseller = true)
+   * @deprecated Use ProductQueryService.getBestsellerProducts() instead
+   */
+  async getBestsellerProducts(limit: number = 12): Promise<ProductSearchResult[]> {
+    return this.queryService.getBestsellerProducts(limit);
   }
 }

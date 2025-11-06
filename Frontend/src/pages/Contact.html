@@ -14,7 +14,7 @@
 </head>
 <body>
     <!-- Thanh điều hướng -->
-    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <nav class="navbar navbar-expand-xl navbar-custom sticky-top">
         <div class="container">
             <a class="navbar-brand px-2 rounded-5 border bg-light border-1 border-white" href="/IntroductionPage.html">
                 <img src="../public/images/Group 71.png" alt="Blockify Logo" width="40" height="45">
@@ -97,7 +97,7 @@
         </div>
     </section>
     
-        <div class="map-container fade-in">
+        <div class="container fade-in mt-5">
             <div class="map-placeholder">
                 <div class="text-center">
                     <i class="fas fa-map-marked-alt fs-1 mb-3"></i>
@@ -114,7 +114,7 @@
     <section class="py-5 bg-light">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-lg-8">
+                <div class="col-lg-12">
                     <div class="faq-section fade-in">
                         <h3 class="fw-bold text-center mb-5">Câu hỏi thường gặp</h3>
                         <div class="accordion" id="faqAccordion">
@@ -122,12 +122,12 @@
                                 <h2 class="accordion-header">
                                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
                                         <i class="fas fa-shipping-fast me-3 text-primary"></i>
-                                        Thời gian giao hàng mất bao lâu?
+                                        Tôi có thể thanh toán bằng cách nào?
                                     </button>
                                 </h2>
                                 <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                                     <div class="accordion-body">
-                                        Giao hàng tiêu chuẩn thường mất từ 3–5 ngày làm việc trong nội địa. Các tùy chọn giao hàng nhanh 1–2 ngày cũng có sẵn.
+                                      Hỗ trợ thanh toán qua Momo, chuyển khoản ngân hàng hoặc trả tiền khi nhận hàng (COD).
                                     </div>
                                 </div>
                             </div>
@@ -135,12 +135,12 @@
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
                                         <i class="fas fa-undo me-3 text-success"></i>
-                                        Chính sách đổi trả của cửa hàng là gì?
+                                        LEGO có được đóng gói cẩn thận không?
                                     </button>
                                 </h2>
                                 <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                     <div class="accordion-body">
-                                        Chúng tôi hỗ trợ đổi trả trong vòng 30 ngày cho sản phẩm chưa mở và còn nguyên bao bì. Với sản phẩm đã mở, bạn có thể đổi trong 14 ngày nếu đầy đủ chi tiết.
+                                      Tất cả đơn hàng đều được đóng gói chống sốc và bảo vệ nguyên seal LEGO để đảm bảo sản phẩm đến tay bạn hoàn hảo nhất.
                                     </div>
                                 </div>
                             </div>
@@ -148,12 +148,12 @@
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
                                         <i class="fas fa-tools me-3 text-warning"></i>
-                                        Có cung cấp hướng dẫn lắp ráp không?
+                                        Cửa hàng có bán LEGO chính hãng không?
                                     </button>
                                 </h2>
                                 <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                     <div class="accordion-body">
-                                        Có chứ! Tất cả bộ LEGO đều đi kèm hướng dẫn chi tiết từng bước. Bạn cũng có thể tải bản kỹ thuật số trên website hoặc ứng dụng của chúng tôi.
+                                      Chắc chắn rồi! Chúng tôi chỉ cung cấp LEGO chính hãng 100% từ nhà phân phối được ủy quyền.
                                     </div>
                                 </div>
                             </div>
@@ -251,5 +251,10 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="../src/assets/js/components/Contact.js"></script>
+    
+    <!-- Global App Initialization (AuthManager + NavbarAuth) -->
+    <script type="module" src="/dist/src/core/init.js"></script>
+    
+    <script type="module" src="/dist/src/assets/js/components/Contact.js"></script>
 </body>
 </html>

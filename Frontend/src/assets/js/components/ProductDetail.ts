@@ -11,6 +11,17 @@ import { authService } from '../../../core/services/AuthService.js';
 
 const wishlistService = new WishlistService();
 
+function normalizeDifficulty(value: any): string | undefined {
+  if (!value) return undefined;
+  const str = String(value).trim().toLowerCase();
+  if (!str) return undefined;
+  if (str.startsWith('easy')) return 'Easy';
+  if (str.startsWith('medium')) return 'Medium';
+  if (str.startsWith('hard')) return 'Hard';
+  if (str.startsWith('expert')) return 'Expert';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 function scrollProducts(direction: 'left' | 'right'): void {
   const container = document.getElementById('productScroll');
   const scrollAmount = 260;
@@ -543,18 +554,16 @@ function renderProductDetail(product: any): void {
     pdTheme.textContent = `Theme: LEGO ${product.categories?.category_name || 'City'}`;
   }
 
-  // Update age (use difficulty_level to determine age recommendation)
+  // Update difficulty display instead of age
   const pdAge = document.getElementById('pd-age');
   if (pdAge) {
-    // Map difficulty to age ranges
-    const ageMap: Record<string, string> = {
-      'Easy': '4+',
-      'Medium': '7+',
-      'Hard': '10+',
-      'Expert': '14+'
-    };
-    const age = ageMap[product.difficulty_level || 'Medium'] || '7+';
-    pdAge.textContent = `Age: ${age}`;
+    const difficulty =
+      normalizeDifficulty(product.difficulty_level) ||
+      normalizeDifficulty(product.difficult_level) ||
+      normalizeDifficulty(product.difficultyLevel) ||
+      normalizeDifficulty(product.difficulty) ||
+      'Medium';
+    pdAge.textContent = ` ${difficulty}`;
   }
 
   // Update short description
@@ -566,18 +575,16 @@ function renderProductDetail(product: any): void {
   // Update stats
   const pdStats = document.getElementById('pd-stats');
   if (pdStats) {
-    // Map difficulty to age ranges
-    const ageMap: Record<string, string> = {
-      'Easy': '4+',
-      'Medium': '7+',
-      'Hard': '10+',
-      'Expert': '14+'
-    };
-    const age = ageMap[product.difficulty_level || 'Medium'] || '7+';
+    const difficulty =
+      normalizeDifficulty(product.difficulty_level) ||
+      normalizeDifficulty(product.difficult_level) ||
+      normalizeDifficulty(product.difficultyLevel) ||
+      normalizeDifficulty(product.difficulty) ||
+      'Medium';
     
     pdStats.innerHTML = `
-      <span class="stats-item"><i class="fas fa-user"></i> Age: ${age}</span>
-      <span class="stats-item"><i class="fas fa-users"></i> ${product.piece_count || 'N/A'}</span>
+      <span class="stats-item"><i class="fa-solid fa-fire"></i> ${difficulty}</span>
+      <span class="stats-item"><i class="fas fa-cube"></i> ${product.piece_count || 'N/A'}</span>
       <span class="stats-item"><i class="fas fa-star"></i> ${rating.toFixed(1)}</span>
     `;
   }
