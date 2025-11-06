@@ -128,8 +128,8 @@ export class NavbarAuth {
       <a href="CartPage.html" class="cart-icon">
         <i class="bi bi-cart"></i>
       </a>
-      <a href="SigninPage.html" class="btn-sign">Sign in</a>
-      <a href="SignupPage.html" class="btn-sign">Sign up</a>
+      <a href="SigninPage.html" class="btn-sign">Đăng nhập</a>
+      <a href="SignupPage.html" class="btn-sign">Đăng ký</a>
     `;
   }
 

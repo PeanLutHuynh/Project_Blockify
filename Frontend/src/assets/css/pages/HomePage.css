@@ -369,6 +369,7 @@ gap: 20px; /* khoảng cách giữa các card */
   #product-list::-webkit-scrollbar {
     display: none; /* Ẩn thanh cuộn */
   }
+ 
 
   /* Ghi đè Bootstrap col-md / col-sm */
   #product-list > div {
@@ -548,6 +549,9 @@ html { scroll-behavior: smooth; }
     width: 100%;
     text-align: center;
     padding: 10px;
+  }
+  .banner img {
+    height: 250px; /* Chiều cao lớn hơn khi ở tablet/desktop */
   }
 
   .view-btn {
