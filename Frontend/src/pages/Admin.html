@@ -1583,10 +1583,10 @@
   
   <!-- 🔐 ADMIN GUARD: Verify admin access before loading anything -->
   <script type="module">
-    import { authManager } from '/dist/src/core/init.js';
-    import { loadConfig } from '/dist/src/core/config/env.js';
-    import { supabaseService } from '/dist/src/core/api/supabaseClient.js';
-    
+    import { authManager } from '../src/core/init.js';
+    import { loadConfig } from '../src/core/config/env.js';
+    import { supabaseService } from '../src/core/api/supabaseClient.js';
+
     (async () => {
       console.log('🔐 [Admin.html] Verifying admin access...');
       
@@ -1603,7 +1603,7 @@
         // 4. Check if user is admin
         if (!authManager.isAuthenticated()) {
           console.warn('⚠️ [Admin.html] Not authenticated, redirecting to signin');
-          window.location.href = '/src/pages/SigninPage.html';
+          window.location.href = '../src/pages/SigninPage.html';
           return;
         }
         
@@ -1613,7 +1613,7 @@
         if (!authManager.isAdmin()) {
           console.warn('⚠️ [Admin.html] Not admin (role:', user?.role, '), redirecting to home');
           alert('Bạn không có quyền truy cập trang này! (Role: ' + user?.role + ')');
-          window.location.href = '/src/pages/HomePage.html';
+          window.location.href = '../src/pages/HomePage.html';
           return;
         }
         
@@ -1627,7 +1627,7 @@
       } catch (error) {
         console.error('❌ [Admin.html] Initialization error:', error);
         alert('Lỗi khởi tạo! Vui lòng thử lại.');
-        window.location.href = '/src/pages/SigninPage.html';
+        window.location.href = '../src/pages/SigninPage.html';
       }
     })();
   </script>
@@ -1680,7 +1680,7 @@
   <!-- Admin Dashboard -->
   <!-- Admin Dashboard Initialization -->
   <script type="module">
-    import { AdminDashboardController } from '/dist/src/modules/admin/AdminDashboardController.js';
+    import { AdminDashboardController } from '../src/modules/admin/AdminDashboardController.js';
     
     // Initialize Dashboard Controller when DOM is ready
     function initDashboardController() {

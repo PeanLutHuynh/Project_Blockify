@@ -45,7 +45,7 @@ export async function initializeApp(): Promise<void> {
                        currentPath.includes('EmailVerified');
     
     if (authManager.isAuthenticated() && authManager.isAdmin() && !isAdminPage && !isAuthPage) {
-      window.location.href = '/src/pages/Admin.html';
+      window.location.href = '/pages/Admin.html';
       return;
     }
 

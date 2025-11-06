@@ -259,13 +259,13 @@ export class AuthManager {
   public requireAdmin(): void {
     if (!this.isAuthenticated()) {
       console.warn('[AuthManager] Not authenticated, redirecting to signin');
-      window.location.href = '/src/pages/SigninPage.html';
+      window.location.href = '/pages/SigninPage.html';
       return;
     }
 
     if (!this.isAdmin()) {
       console.warn('[AuthManager] Not admin, redirecting to home');
-      window.location.href = '/src/pages/HomePage.html';
+      window.location.href = '/pages/HomePage.html';
       return;
     }
 
@@ -279,7 +279,7 @@ export class AuthManager {
   public requireAuth(): void {
     if (!this.isAuthenticated()) {
       console.warn('[AuthManager] Not authenticated, redirecting to signin');
-      window.location.href = '/src/pages/SigninPage.html';
+      window.location.href = '/pages/SigninPage.html';
     }
   }
 }
