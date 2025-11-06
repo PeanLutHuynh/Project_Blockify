@@ -165,8 +165,7 @@ body, html {
 .input-icon {
   position: absolute;
   left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
+  top:10px;
   z-index: 5;
   width: 24px;
   height: 24px;
@@ -331,8 +330,7 @@ body, html {
     flex-direction: column;
   }
   .left-section {
-    width: 100%;
-    height: 130px;
+    display: none;
   }
   .brand-text {
     top: 15px;
@@ -348,7 +346,11 @@ body, html {
   }
   .deco-bottom-1,
   .deco-bottom-2,
-  .deco-bottom-3 {
-    display: none;
+  .deco-bottom-3,
+  .deco-1,
+  .deco-2, 
+  .deco-3,
+  .deco-4 {
+      display: none;
   }
 }

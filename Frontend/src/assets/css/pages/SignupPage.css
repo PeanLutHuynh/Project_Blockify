@@ -373,14 +373,9 @@ body, html {
   .signin-page {
       flex-direction: column;
   }
-
-  .welcome-title{
-    display: none;
-  }
   
   .left-section {
-      width: 100%;
-      height: 150px;
+      display: none;
   }
   
   .brand-text {
@@ -397,8 +392,6 @@ body, html {
       font-size: 36px;
       margin-top: 20px;
   }
-
-  
   .deco-bottom-1,
   .deco-bottom-2,
   .deco-bottom-3,
@@ -431,9 +424,9 @@ body, html {
 /* --- Icon bên trong input --- */
 .input-icon {
   position: absolute;
-  top: 70%;
+ top:52px;
   left: 12px;
-  transform: translateY(-50%);
+  
   color: #888;
   font-size: 16px;
   pointer-events: none;

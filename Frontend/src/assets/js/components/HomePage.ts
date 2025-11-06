@@ -657,7 +657,7 @@ async function renderProductsToGrid(products: any[]) {
     const heartClass = isInWishlist ? 'fas fa-heart icon-heart liked' : 'far fa-heart icon-heart';
     
     return `
-      <div class="col-6 col-md-3">
+      <div class="col-12  col-md-6 col-xl-4 col-xxl-3 mb-4">
         <div class="product-card position-relative" data-product-slug="${slug}" style="cursor: pointer;">
           <i class="${heartClass}" data-product-id="${product.id}"></i>
           <div class="product-image">
@@ -669,13 +669,14 @@ async function renderProductsToGrid(products: any[]) {
             <span><i class="fas fa-star text-warning"></i> ${rating}</span>
           </div>
           <div class="divider"></div>
-          <div class="product-title" style="height:40px;">${product.name}</div>
+          <div class="product-title" style="height:60px;">${product.name}</div>
           <div class="product-price">${formattedPrice} VNĐ</div>
           <button class="btn-cart" data-product-id="${product.id}">Thêm vào giỏ</button>
         </div>
       </div>
     `;
   }).join('');
+
 
   // Add click handlers with better logging
   const cards = mainList.querySelectorAll('.product-card');
