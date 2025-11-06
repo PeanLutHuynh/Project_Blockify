@@ -351,6 +351,7 @@ export class ModernAuthController {
       const form = button.closest('form');
       if (form?.id === 'signup-form') {
         button.innerHTML = 'Đăng ký';
+        
       } else if (form?.id === 'signin-form') {
         button.innerHTML = 'Đăng nhập';
       }

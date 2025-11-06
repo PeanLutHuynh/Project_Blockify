@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -68,80 +67,130 @@
     <main class="main container-fluid">
       <!-- Dashboard -->
       <section id="dashboard" class="section active">
-        <div class="bar-blue"><h4 class="mb-0"> <i class="bi bi-speedometer2 me-2"></i>Bảng điều khiển</h4></div>
-        <!-- Metrics Cards -->
-        <div class="metrics-grid row g-3 mb-4">
-          <div class="metric-card col-12 ">
-            <div class="title">Tổng bán</div>
-            <div class="value">—</div>
-          </div>
-          <div class="metric-card col-12 ">
-            <div class="title">Sản phẩm mới</div>
-            <div class="value">30</div>
-          </div>
-          <div class="metric-card col-12 ">
-            <div class="title">Khách hàng mới</div>
-            <div class="value">310</div>
-          </div>
-          <div class="metric-card col-12">
-            <div class="title">Tồn kho</div>
-            <div class="value">—</div>
-          </div>
-        </div>
-        <!-- Dashboard Content -->
-        <div class="dashboard-content row g-3">
-          <!-- Chart Panel -->
-          <div class="chart-panel col-12 col-lg-8">
-            <div class="chart-header d-flex gap-3 mb-3">
-              <div class="chart-tab">Doanh thu tháng</div>
-              <div class="chart-tab inactive">Doanh thu ngày</div>
+        <div class="bar-blue mb-4"><h4 class="mb-0"> <i class="bi bi-speedometer2 me-2"></i>Bảng điều khiển</h4></div>
+        <div class="main-content">
+        
+  
+          <!-- Content Area -->
+          <div class="content-area">
+              <!-- Statistics Cards -->
+              <div class="row mb-4"> 
+                <div class="col-lg-3 col-md-6 mb-4"> 
+                    <div class="stat-card"> 
+                        <div class="stat-icon" style="background: rgb(0, 140, 255);"> 
+                            <i class="fas fa-coins text-white"></i> 
+                            <!-- Hoặc: fa-money-bill-wave, fa-hand-holding-usd, fa-wallet -->
+                        </div> 
+                        <div class="stat-label">Tổng doanh thu</div> 
+                        <div class="stat-value">0 VNĐ</div> 
+                        <div class="stat-change up"> 
+                            <i class="fas fa-arrow-up"></i> +0% so với tháng trước 
+                        </div> 
+                    </div> 
+                </div> 
+                
+                <div class="col-lg-3 col-md-6 mb-4"> 
+                    <div class="stat-card"> 
+                        <div class="stat-icon" style="background: rgb(255, 227, 68)"> 
+                            <i class="fas fa-shopping-bag"></i> 
+                            <!-- Hoặc: fa-receipt, fa-file-invoice-dollar, fa-clipboard-list -->
+                        </div> 
+                        <div class="stat-label">Đơn hàng</div> 
+                        <div class="stat-value">0</div> 
+                        <div class="stat-change up"> 
+                            <i class="fas fa-arrow-up"></i> +0% so với tháng trước 
+                        </div> 
+                    </div> 
+                </div> 
+                
+                <div class="col-lg-3 col-md-6 mb-4"> 
+                    <div class="stat-card"> 
+                        <div class="stat-icon" style="background: rgb(255, 72, 72)"> 
+                            <i class="fas fa-user-friends"></i> 
+                            <!-- Hoặc: fa-users-cog, fa-id-card, fa-address-book -->
+                        </div> 
+                        <div class="stat-label">Khách hàng</div> 
+                        <div class="stat-value">0</div> 
+                        <div class="stat-change up"> 
+                            <i class="fas fa-arrow-up"></i> +0% so với tháng trước 
+                        </div> 
+                    </div> 
+                </div> 
+                
+                <div class="col-lg-3 col-md-6 mb-4"> 
+                    <div class="stat-card"> 
+                        <div class="stat-icon" style="background: rgb(62, 255, 62);"> 
+                            <i class="fas fa-cubes"></i> 
+                            <!-- Hoặc: fa-boxes, fa-inventory, fa-warehouse -->
+                        </div> 
+                        <div class="stat-label">Sản phẩm</div> 
+                        <div class="stat-value">0</div> 
+                        <div class="stat-change down"> 
+                            <i class="fas fa-arrow-down"></i> -0% so với tháng trước 
+                        </div> 
+                    </div> 
+                </div> 
             </div>
-            <div class="chart-container">
-              <div class="chart-line"></div>
-              <div class="chart-points">
-                <div class="chart-point" style="height: 20px;"></div>
-                <div class="chart-point" style="height: 35px;"></div>
-                <div class="chart-point" style="height: 28px;"></div>
-                <div class="chart-point" style="height: 45px;"></div>
-                <div class="chart-point" style="height: 52px;"></div>
-                <div class="chart-point" style="height: 38px;"></div>
-                <div class="chart-point" style="height: 65px;"></div>
-                <div class="chart-point" style="height: 58px;"></div>
-                <div class="chart-point" style="height: 72px;"></div>
-                <div class="chart-point" style="height: 45px;"></div>
-                <div class="chart-point" style="height: 80px;"></div>
-                <div class="chart-point" style="height: 85px;"></div>
+  
+              <!-- Charts and Recent Orders -->
+              <div class="row">
+                  <div class="col-lg-8 mb-4">
+                      <div class="content-card">
+                          <div class="card-header-custom">
+                              <h5 class="card-title">Biểu đồ doanh thu</h5>
+                              <button class="btn-primary-custom">
+                                  <i class="fas fa-download"></i> Xuất báo cáo
+                              </button>
+                          </div>
+                          <div class="chart-placeholder">
+                              <i class="fas fa-chart-area" style="font-size: 3rem; margin-right: 1rem;"></i>
+                              <span>Biểu đồ doanh thu theo thời gian</span>
+                          </div>
+                      </div>
+                  </div>
+  
+                  <div class="col-lg-4 mb-4">
+                      <div class="content-card">
+                          <div class="card-header-custom">
+                              <h5 class="card-title">Sản phẩm bán chạy</h5>
+                          </div>
+                          <div class="product-item">
+                              <div class="product-emoji">📱</div>
+                              <div class="product-info">
+                                  <div class="product-name">Tên sản phẩm</div>
+                                  <div class="product-stats">Đã bán: 0 sản phẩm</div>
+                              </div>
+                              <div class="product-revenue">0 VNĐ</div>
+                          </div>
+                          <div class="product-item">
+                              <div class="product-emoji">💻</div>
+                              <div class="product-info">
+                                  <div class="product-name">Tên sản phẩm</div>
+                                  <div class="product-stats">Đã bán: 0 sản phẩm</div>
+                              </div>
+                              <div class="product-revenue">0 VNĐ</div>
+                          </div>
+                          <div class="product-item">
+                              <div class="product-emoji">🎧</div>
+                              <div class="product-info">
+                                  <div class="product-name">Tên sản phẩm</div>
+                                  <div class="product-stats">Đã bán: 0 sản phẩm</div>
+                              </div>
+                              <div class="product-revenue">0 VNĐ</div>
+                          </div>
+                          <div class="product-item">
+                              <div class="product-emoji">⌚</div>
+                              <div class="product-info">
+                                  <div class="product-name">Tên sản phẩm</div>
+                                  <div class="product-stats">Đã bán: 0 sản phẩm</div>
+                              </div>
+                              <div class="product-revenue">0 VNĐ</div>
+                          </div>
+                      </div>
+                  </div>
               </div>
             </div>
           </div>
-          <!-- Best Selling Products -->
-          <div class="products-panel col-12 ">
-            <div class="panel-title">Sản phẩm bán chạy</div>
-            <div class="product-list">
-              <div class="product-item d-flex align-items-center gap-2">
-                <img class="product-thumb" src="img/Rectangle 108 (1).png" alt="">
-                <div class="product-info">
-                  <div class="product-name">Nhà để xe - 34 xe</div>
-                  <div class="product-price">245.000 VND</div>
-                </div>
-              </div>
-              <div class="product-item d-flex align-items-center gap-2">
-                <img class="product-thumb" src="img/Rectangle 108 (2).png" alt="">
-                <div class="product-info">
-                  <div class="product-name">Xe cảnh sát</div>
-                  <div class="product-price">230.000 VND</div>
-                </div>
-              </div>
-              <div class="product-item d-flex align-items-center gap-2">
-                <img class="product-thumb" src="img/Rectangle 108 (3).png" alt="">
-                <div class="product-info">
-                  <div class="product-name">Xe xây dựng màu vàng</div>
-                  <div class="product-price">199.000 VND</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       <!-- Customer -->
