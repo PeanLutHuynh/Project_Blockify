@@ -44,6 +44,7 @@ export type Middleware = (
   res: HttpResponse,
   next: NextFunction
 ) => void | Promise<void>;
+// Nên để thành hàm, kh tạo type
 
 export type RouteHandler = (
   req: HttpRequest,
