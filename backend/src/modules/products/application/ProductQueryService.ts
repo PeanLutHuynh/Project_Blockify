@@ -284,10 +284,20 @@ export class ProductQueryService {
   }
 
   /**
-   * Get products with pagination and optional category filter
+   * Get products with pagination, filters and sorting
    * For HomePage with filter + pagination functionality
    */
-  async getProducts(categoryId?: number, page: number = 1, limit: number = 12): Promise<{
+  async getProducts(
+    categoryId?: number, 
+    page: number = 1, 
+    limit: number = 12,
+    filters?: {
+      difficultyLevel?: string;
+      priceRange?: string;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+    }
+  ): Promise<{
     data: ProductSearchResult[];
     pagination: {
       page: number;
@@ -326,9 +336,30 @@ export class ProductQueryService {
         query = query.eq('category_id', categoryId);
       }
 
-      // Execute query with pagination
+      // ✅ Add difficulty filter (khớp với Supabase: Easy, Medium, Hard, Expert)
+      if (filters?.difficultyLevel) {
+        query = query.eq('difficulty_level', filters.difficultyLevel);
+      }
+
+      // ✅ Add price range filter
+      if (filters?.priceRange) {
+        const [minPrice, maxPrice] = filters.priceRange.split('-').map(Number);
+        if (minPrice !== undefined) {
+          query = query.gte('price', minPrice);
+        }
+        if (maxPrice !== undefined) {
+          query = query.lte('price', maxPrice);
+        }
+      }
+
+      // ✅ Add sorting
+      const sortBy = filters?.sortBy || 'created_at';
+      const sortOrder = filters?.sortOrder || 'desc';
+      const ascending = sortOrder === 'asc';
+
+      // Execute query with pagination and sorting
       const { data, error, count } = await query
-        .order('created_at', { ascending: false })
+        .order(sortBy, { ascending })
         .range(offset, offset + limit - 1);
 
       if (error) throw error;
