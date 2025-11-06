@@ -8,6 +8,7 @@ import { authService } from '../../../core/services/AuthService.js';
 
 // State management for pagination and filtering
 let currentCategoryId: number | undefined = undefined;
+// @ts-ignore - Used in filter functions
 let currentFilterMode: 'all' | 'new' | 'bestseller' = 'all';
 const wishlistService = new WishlistService();
 
@@ -487,6 +488,159 @@ function setupProductFilterButtons() {
   });
 
   console.log('✅ Product filter buttons setup complete');
+  
+  // ✅ Setup filter dropdowns (Khoảng giá, Độ khó, Sắp xếp theo)
+  setupFilterDropdowns();
+  
+  // ✅ Setup filter toggle button
+  setupFilterToggle();
+}
+
+/**
+ * ✅ Setup filter panel toggle
+ */
+function setupFilterToggle() {
+  const filterToggleBtn = document.getElementById('filter-toggle');
+  const filterPanel = document.getElementById('filter-panel');
+  
+  if (!filterToggleBtn || !filterPanel) {
+    console.warn('⚠️ Filter toggle button or panel not found');
+    return;
+  }
+  
+  // Hide filter panel by default
+  filterPanel.style.display = 'none';
+  
+  filterToggleBtn.addEventListener('click', () => {
+    if (filterPanel.style.display === 'none') {
+      filterPanel.style.display = 'block';
+      filterToggleBtn.textContent = 'Ẩn bộ lọc';
+      filterToggleBtn.classList.add('active');
+    } else {
+      filterPanel.style.display = 'none';
+      filterToggleBtn.textContent = 'Bộ lọc';
+      filterToggleBtn.classList.remove('active');
+    }
+  });
+  
+  console.log('✅ Filter toggle setup complete');
+}
+
+/**
+ * ✅ Setup filter dropdowns for price range, difficulty, and sorting
+ */
+function setupFilterDropdowns() {
+  const priceFilter = document.querySelector('select[name="price-range"]') as HTMLSelectElement;
+  const difficultyFilter = document.querySelector('select[name="difficulty"]') as HTMLSelectElement;
+  const sortFilter = document.querySelector('select[name="sort"]') as HTMLSelectElement;
+  
+  // Find the apply button inside filter panel
+  const filterPanel = document.getElementById('filter-panel');
+  const applyFiltersBtn = filterPanel?.querySelector('.btn-primary') as HTMLButtonElement;
+  
+  if (!applyFiltersBtn) {
+    console.error('❌ Apply filters button not found!');
+    return;
+  }
+  
+  console.log('✅ Apply button found:', applyFiltersBtn);
+  
+  applyFiltersBtn.addEventListener('click', async () => {
+    console.log('🔧 Applying filters...');
+    
+    const priceRange = priceFilter?.value || '';
+    const difficulty = difficultyFilter?.value || '';
+    const sort = sortFilter?.value || '';
+    
+    console.log('📋 Filter values:', { priceRange, difficulty, sort });
+    
+    // Reset filter mode and category
+    currentFilterMode = 'all';
+    currentCategoryId = undefined;
+    resetFilterButtons();
+    clearCategorySelection();
+    
+    // Apply filters with current settings
+    await applyAdvancedFilters(priceRange, difficulty, sort);
+  });
+  
+  console.log('✅ Filter dropdowns setup complete');
+}
+
+/**
+ * ✅ Apply advanced filters (price, difficulty, sorting)
+ */
+async function applyAdvancedFilters(priceRange: string, difficulty: string, sort: string) {
+  try {
+    const mainList = document.getElementById('main-product-list');
+    if (!mainList) {
+      console.error('❌ Main product list container not found');
+      return;
+    }
+
+    // Show loading
+    mainList.innerHTML = '<div class="col-12 text-center py-5"><i class="fas fa-spinner fa-spin fa-3x text-primary"></i></div>';
+
+    // Build query parameters
+    const params = new URLSearchParams({
+      page: '1',
+      limit: '12'
+    });
+    
+    // Add difficulty filter (khớp với Supabase: Easy, Medium, Hard, Expert)
+    if (difficulty && difficulty !== '') {
+      params.append('difficulty_level', difficulty);
+    }
+    
+    // Add price range filter
+    if (priceRange && priceRange !== '') {
+      params.append('price_range', priceRange);
+    }
+    
+    // Add sorting
+    if (sort && sort !== '') {
+      const [sortBy, sortOrder] = sort.split('-');
+      params.append('sortBy', sortBy);
+      params.append('sortOrder', sortOrder);
+    }
+
+    const url = `http://127.0.0.1:3001/api/v1/products/?${params.toString()}`;
+    console.log('🔗 Fetching filtered products from:', url);
+
+    // Fetch products
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Filter API Response:', result);
+
+    if (result.success && result.data) {
+      // Render products
+      renderProductsToGrid(result.data);
+
+      // Hide pagination for filtered results
+      const paginationContainer = document.getElementById('pagination-container');
+      if (paginationContainer) {
+        paginationContainer.innerHTML = '';
+      }
+    } else {
+      mainList.innerHTML = `
+        <div class="col-12 text-center py-5">
+          <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+          <h5>Không tìm thấy sản phẩm phù hợp với bộ lọc</h5>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('❌ Apply filters error:', error);
+    const mainList = document.getElementById('main-product-list');
+    if (mainList) {
+      mainList.innerHTML = '<div class="col-12"><p class="text-center py-5 text-danger">Có lỗi xảy ra khi lọc sản phẩm</p></div>';
+    }
+  }
 }
 
 /**
