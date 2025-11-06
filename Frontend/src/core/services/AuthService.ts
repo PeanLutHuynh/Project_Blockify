@@ -291,19 +291,33 @@ export class AuthService {
 
   /**
    * Sign out user using Supabase Auth
+   * CRITICAL: Clear all caches and state to prevent session persistence
    */
   async signOut(): Promise<void> {
-    // Sign out from Supabase
-    await supabaseService.signOut();
+    console.log('[AuthService] Starting sign out process...');
+    
+    // Sign out from Supabase first
+    try {
+      await supabaseService.signOut();
+      console.log('[AuthService] Supabase sign out successful');
+    } catch (error) {
+      console.error('[AuthService] Supabase sign out error:', error);
+    }
     
     // Clear local state
     this.currentUser = null;
+    
+    // Clear all storage keys
     localStorage.removeItem(this.AUTH_TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
-    sessionStorage.removeItem(this.SESSION_CACHE_KEY); // Clear session cache
+    localStorage.removeItem('session_user_cache'); // Legacy key
+    sessionStorage.removeItem(this.SESSION_CACHE_KEY);
+    sessionStorage.clear(); // Clear all session data to be safe
+    
+    // Clear HTTP client auth token
     httpClient.clearAuthToken();
     
-    console.log('[AuthService] All caches cleared on sign out');
+    console.log('[AuthService] All caches, tokens, and session data cleared');
   }
 
   /**
@@ -436,10 +450,22 @@ export class AuthService {
   /**
    * Load user from storage on initialization
    * OPTIMIZED: Try sessionStorage first (faster), fallback to localStorage
+   * CRITICAL: Only load if BOTH userData AND token exist
    */
   private loadUserFromStorage(): void {
     try {
       console.log('🔍 [AuthService] Loading user from storage...');
+      
+      const token = localStorage.getItem(this.AUTH_TOKEN_KEY);
+      
+      // CRITICAL: If no token, clear everything and don't load user
+      if (!token) {
+        console.warn('[AuthService] No token found, clearing stale user data');
+        localStorage.removeItem(this.USER_KEY);
+        sessionStorage.removeItem(this.SESSION_CACHE_KEY);
+        this.currentUser = null;
+        return;
+      }
       
       // Try sessionStorage first (instant)
       let userData = sessionStorage.getItem(this.SESSION_CACHE_KEY);
@@ -450,14 +476,12 @@ export class AuthService {
         userData = localStorage.getItem(this.USER_KEY);
       }
       
-      const token = localStorage.getItem(this.AUTH_TOKEN_KEY);
-      
       console.log('[AuthService] USER_KEY:', this.USER_KEY);
       console.log('[AuthService] AUTH_TOKEN_KEY:', this.AUTH_TOKEN_KEY);
       console.log('[AuthService] userData from:', source);
-      console.log('[AuthService] token exists:', !!token);
+      console.log('[AuthService] token exists:', true);
 
-      if (userData && token) {
+      if (userData) {
         const parsedData = JSON.parse(userData);
         this.currentUser = User.fromApiResponse(parsedData);
         httpClient.setAuthToken(token);
@@ -470,7 +494,9 @@ export class AuthService {
 
         console.log(`[AuthService] User loaded from ${source}:`, this.currentUser?.id);
       } else {
-        console.warn('[AuthService] Missing userData or token');
+        console.warn('[AuthService] No user data found despite having token, clearing token');
+        localStorage.removeItem(this.AUTH_TOKEN_KEY);
+        this.currentUser = null;
       }
     } catch (error) {
       console.error("Error loading user from storage:", error);

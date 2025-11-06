@@ -7,6 +7,7 @@
 import { authService } from './AuthService.js';
 import { User } from '../models/User.js';
 import { supabaseService } from '../api/supabaseClient.js';
+import { httpClient } from '../api/FetchHttpClient.js';
 
 type AuthStateListener = (user: User | null) => void;
 
@@ -86,6 +87,7 @@ export class AuthManager {
   /**
    * Sync auth state with backend
    * OPTIMIZED: Silent background sync, only notify if changed
+   * CRITICAL: Clear ALL state if no valid Supabase session
    */
   private async syncAuthState(): Promise<void> {
     try {
@@ -94,10 +96,20 @@ export class AuthManager {
       
       if (!sessionData?.session) {
         console.log('[AuthManager] No Supabase session found');
+        
+        // CRITICAL: Clear ALL local state immediately
         if (this.currentUser) {
-          // Clear stale local state
-          await authService.signOut();
+          console.log('[AuthManager] Clearing stale user data');
           this.currentUser = null;
+          
+          // Clear all storage
+          localStorage.removeItem('user');
+          localStorage.removeItem('blockify_auth_token');
+          localStorage.removeItem('session_user_cache');
+          sessionStorage.removeItem('session_user_cache');
+          sessionStorage.clear();
+          
+          httpClient.clearAuthToken();
           this.notifyListeners();
         }
         return;
@@ -181,15 +193,24 @@ export class AuthManager {
 
   /**
    * Check if user is authenticated
+   * CRITICAL: Verify user object has valid data, not just exists
    */
   public isAuthenticated(): boolean {
-    return !!this.currentUser && authService.isAuthenticated();
+    const hasUser = !!this.currentUser;
+    const hasValidData = this.currentUser?.id && this.currentUser?.email;
+    const hasAuthService = authService.isAuthenticated();
+    
+    return hasUser && !!hasValidData && hasAuthService;
   }
 
   /**
    * Check if current user is admin
+   * CRITICAL: Only return true if user is authenticated AND is admin
    */
   public isAdmin(): boolean {
+    if (!this.isAuthenticated()) {
+      return false;
+    }
     return this.currentUser?.isAdmin() ?? false;
   }
 
@@ -224,12 +245,30 @@ export class AuthManager {
 
   /**
    * Sign out user
+   * CRITICAL: Clear all caches and state to prevent session persistence
    */
   public async signOut(): Promise<void> {
     console.log('[AuthManager] Signing out...');
+    
+    // Clear AuthService state (includes localStorage and sessionStorage)
     await authService.signOut();
+    
+    // Clear local AuthManager state
     this.currentUser = null;
+    
+    // Notify all listeners (including navbar)
     this.notifyListeners();
+    
+    // Force clear any remaining storage items
+    localStorage.removeItem('user');
+    localStorage.removeItem('session_user_cache');
+    sessionStorage.removeItem('session_user_cache');
+    sessionStorage.clear(); // Clear all session data
+    
+    console.log('[AuthManager] All caches and session data cleared');
+    
+    // Redirect to signin page after logout
+    window.location.href = '/pages/SigninPage.html';
   }
 
   /**

@@ -36,6 +36,7 @@ export async function initializeApp(): Promise<void> {
     await authManager.initialize();
 
     // STEP 4: Check admin redirect (instant from cache)
+    // IMPORTANT: Only redirect if actually authenticated, not just from stale cache
     const currentPath = window.location.pathname;
     const isAdminPage = currentPath.includes('Admin.html');
     const isAuthPage = currentPath.includes('Signin') || 
@@ -44,7 +45,12 @@ export async function initializeApp(): Promise<void> {
                        currentPath.includes('VerifyEmail') ||
                        currentPath.includes('EmailVerified');
     
-    if (authManager.isAuthenticated() && authManager.isAdmin() && !isAdminPage && !isAuthPage) {
+    // Extra check: Verify user object exists and has valid data
+    const user = authManager.getUser();
+    const hasValidSession = user && user.id && user.email;
+    
+    if (hasValidSession && authManager.isAdmin() && !isAdminPage && !isAuthPage) {
+      console.log('[Init] Admin user detected, redirecting to admin panel...');
       window.location.href = '/pages/Admin.html';
       return;
     }

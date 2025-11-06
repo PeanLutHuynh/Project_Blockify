@@ -275,12 +275,19 @@ export class OrderController {
 
   /**
    * Show Buy Now indicator
+   * FIXED: Check if indicator already exists to prevent duplicates
    */
   private showBuyNowIndicator(): void {
     const orderSummaryCard = document.querySelector('.order-summary');
     if (orderSummaryCard) {
+      // Check if indicator already exists
+      const existingIndicator = orderSummaryCard.querySelector('.buy-now-indicator');
+      if (existingIndicator) {
+        return; // Don't create duplicate
+      }
+
       const indicator = document.createElement('div');
-      indicator.className = 'alert alert-info mb-3';
+      indicator.className = 'alert alert-info mb-3 buy-now-indicator'; // Add unique class
       indicator.innerHTML = `
         <div class="d-flex align-items-center">
           <i class="bi bi-lightning-charge-fill me-2"></i>
