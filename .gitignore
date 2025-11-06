@@ -8,3 +8,4 @@ logs/
 # TypeScript compiled output
 Frontend/dist/
 backend/dist/
+.vercel
