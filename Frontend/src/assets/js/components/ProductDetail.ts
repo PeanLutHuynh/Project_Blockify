@@ -392,8 +392,8 @@ async function loadRecommendedProducts(currentProductId?: number): Promise<void>
           <div class="product-image">
             <img src="${product.imageUrl}" 
                  alt="${product.name}"
-                 onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;color:#999;\'><i class=\'fas fa-image\' style=\'font-size:40px;\'></i></div>'">
-          </div>
+                 onerror="this.style.display='none'; 
+                 this.parentElement.innerHTML = '<div style=\'display:flex;align-items:center;justify-content:center;height:100%;color:#999;\'><i class=\'fas fa-image\' style=\'font-size:40px;\'></i></div>';">
           <div class="product-stats">
             <div class="stat-item">
               <i class="fas fa-user-friends"></i>
