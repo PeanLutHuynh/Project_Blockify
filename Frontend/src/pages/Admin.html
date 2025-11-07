@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -11,6 +12,9 @@
   
   <!-- Supabase JS SDK từ CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Chart.js for Dashboard -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <!-- Header -->
@@ -67,130 +71,254 @@
     <main class="main container-fluid">
       <!-- Dashboard -->
       <section id="dashboard" class="section active">
-        <div class="bar-blue mb-4"><h4 class="mb-0"> <i class="bi bi-speedometer2 me-2"></i>Bảng điều khiển</h4></div>
-        <div class="main-content">
+        <div class="bar-blue"><h4 class="mb-0"> <i class="bi bi-speedometer2 me-2"></i>Bảng điều khiển</h4></div>
         
-  
-          <!-- Content Area -->
-          <div class="content-area">
-              <!-- Statistics Cards -->
-              <div class="row mb-4"> 
-                <div class="col-lg-3 col-md-6 mb-4"> 
-                    <div class="stat-card"> 
-                        <div class="stat-icon" style="background: rgb(0, 140, 255);"> 
-                            <i class="fas fa-coins text-white"></i> 
-                            <!-- Hoặc: fa-money-bill-wave, fa-hand-holding-usd, fa-wallet -->
-                        </div> 
-                        <div class="stat-label">Tổng doanh thu</div> 
-                        <div class="stat-value">0 VNĐ</div> 
-                        <div class="stat-change up"> 
-                            <i class="fas fa-arrow-up"></i> +0% so với tháng trước 
-                        </div> 
-                    </div> 
-                </div> 
-                
-                <div class="col-lg-3 col-md-6 mb-4"> 
-                    <div class="stat-card"> 
-                        <div class="stat-icon" style="background: rgb(255, 227, 68)"> 
-                            <i class="fas fa-shopping-bag"></i> 
-                            <!-- Hoặc: fa-receipt, fa-file-invoice-dollar, fa-clipboard-list -->
-                        </div> 
-                        <div class="stat-label">Đơn hàng</div> 
-                        <div class="stat-value">0</div> 
-                        <div class="stat-change up"> 
-                            <i class="fas fa-arrow-up"></i> +0% so với tháng trước 
-                        </div> 
-                    </div> 
-                </div> 
-                
-                <div class="col-lg-3 col-md-6 mb-4"> 
-                    <div class="stat-card"> 
-                        <div class="stat-icon" style="background: rgb(255, 72, 72)"> 
-                            <i class="fas fa-user-friends"></i> 
-                            <!-- Hoặc: fa-users-cog, fa-id-card, fa-address-book -->
-                        </div> 
-                        <div class="stat-label">Khách hàng</div> 
-                        <div class="stat-value">0</div> 
-                        <div class="stat-change up"> 
-                            <i class="fas fa-arrow-up"></i> +0% so với tháng trước 
-                        </div> 
-                    </div> 
-                </div> 
-                
-                <div class="col-lg-3 col-md-6 mb-4"> 
-                    <div class="stat-card"> 
-                        <div class="stat-icon" style="background: rgb(62, 255, 62);"> 
-                            <i class="fas fa-cubes"></i> 
-                            <!-- Hoặc: fa-boxes, fa-inventory, fa-warehouse -->
-                        </div> 
-                        <div class="stat-label">Sản phẩm</div> 
-                        <div class="stat-value">0</div> 
-                        <div class="stat-change down"> 
-                            <i class="fas fa-arrow-down"></i> -0% so với tháng trước 
-                        </div> 
-                    </div> 
-                </div> 
-            </div>
-  
-              <!-- Charts and Recent Orders -->
-              <div class="row">
-                  <div class="col-lg-8 mb-4">
-                      <div class="content-card">
-                          <div class="card-header-custom">
-                              <h5 class="card-title">Biểu đồ doanh thu</h5>
-                              <button class="btn-primary-custom">
-                                  <i class="fas fa-download"></i> Xuất báo cáo
-                              </button>
-                          </div>
-                          <div class="chart-placeholder">
-                              <i class="fas fa-chart-area" style="font-size: 3rem; margin-right: 1rem;"></i>
-                              <span>Biểu đồ doanh thu theo thời gian</span>
-                          </div>
-                      </div>
-                  </div>
-  
-                  <div class="col-lg-4 mb-4">
-                      <div class="content-card">
-                          <div class="card-header-custom">
-                              <h5 class="card-title">Sản phẩm bán chạy</h5>
-                          </div>
-                          <div class="product-item">
-                              <div class="product-emoji">📱</div>
-                              <div class="product-info">
-                                  <div class="product-name">Tên sản phẩm</div>
-                                  <div class="product-stats">Đã bán: 0 sản phẩm</div>
-                              </div>
-                              <div class="product-revenue">0 VNĐ</div>
-                          </div>
-                          <div class="product-item">
-                              <div class="product-emoji">💻</div>
-                              <div class="product-info">
-                                  <div class="product-name">Tên sản phẩm</div>
-                                  <div class="product-stats">Đã bán: 0 sản phẩm</div>
-                              </div>
-                              <div class="product-revenue">0 VNĐ</div>
-                          </div>
-                          <div class="product-item">
-                              <div class="product-emoji">🎧</div>
-                              <div class="product-info">
-                                  <div class="product-name">Tên sản phẩm</div>
-                                  <div class="product-stats">Đã bán: 0 sản phẩm</div>
-                              </div>
-                              <div class="product-revenue">0 VNĐ</div>
-                          </div>
-                          <div class="product-item">
-                              <div class="product-emoji">⌚</div>
-                              <div class="product-info">
-                                  <div class="product-name">Tên sản phẩm</div>
-                                  <div class="product-stats">Đã bán: 0 sản phẩm</div>
-                              </div>
-                              <div class="product-revenue">0 VNĐ</div>
-                          </div>
-                      </div>
-                  </div>
+        <!-- Dashboard Content -->
+        <div id="dashboardContent">
+          <!-- Date Range Filter -->
+          <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-md-3">
+                  <label class="form-label fw-semibold">Từ ngày</label>
+                  <input type="date" class="form-control" id="dashboardStartDate">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label fw-semibold">Đến ngày</label>
+                  <input type="date" class="form-control" id="dashboardEndDate">
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label fw-semibold">Nhóm theo</label>
+                  <select class="form-select" id="dashboardGroupBy">
+                    <option value="day">Ngày</option>
+                    <option value="month" selected>Tháng</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold d-block">&nbsp;</label>
+                  <button class="btn btn-primary me-2" id="applyDashboardFilter">
+                    <i class="bi bi-funnel me-1"></i>Áp dụng
+                  </button>
+                  <button class="btn btn-outline-secondary" id="resetDashboardFilter">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i>Đặt lại
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+
+          <!-- Overview Cards -->
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-md-4">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <h6 class="text-muted mb-2">Tổng doanh thu</h6>
+                      <h3 class="fw-bold mb-0" id="totalRevenue">—</h3>
+                      <small class="text-success" id="revenueChange">—</small>
+                    </div>
+                    <div class="icon-box bg-primary bg-opacity-10 p-3 rounded">
+                      <i class="bi bi-cash-stack text-primary fs-4"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <h6 class="text-muted mb-2">Đơn hàng thành công</h6>
+                      <h3 class="fw-bold mb-0" id="successOrders">—</h3>
+                      <small class="text-muted" id="successRate">—</small>
+                    </div>
+                    <div class="icon-box bg-success bg-opacity-10 p-3 rounded">
+                      <i class="bi bi-check-circle text-success fs-4"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <h6 class="text-muted mb-2">Tỷ lệ chuyển đổi</h6>
+                      <h3 class="fw-bold mb-0" id="conversionRate">—</h3>
+                      <small class="text-muted" id="conversionDetail">—</small>
+                    </div>
+                    <div class="icon-box bg-warning bg-opacity-10 p-3 rounded">
+                      <i class="bi bi-graph-up-arrow text-warning fs-4"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Charts Row -->
+          <div class="row g-3 mb-4">
+            <!-- Revenue Chart -->
+            <div class="col-12 col-lg-8">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">
+                      <i class="bi bi-bar-chart-line me-2"></i>Báo cáo doanh thu
+                    </h5>
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button type="button" class="btn btn-outline-primary active" id="chartTypeDay" data-type="day">
+                        Theo ngày
+                      </button>
+                      <button type="button" class="btn btn-outline-primary" id="chartTypeMonth" data-type="month">
+                        Theo tháng
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <canvas id="revenueChart" style="max-height: 350px;"></canvas>
+                  <div id="revenueChartLoader" class="text-center py-5 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Stats Chart -->
+            <div class="col-12 col-lg-4">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom">
+                  <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-pie-chart me-2"></i>Trạng thái đơn hàng
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <canvas id="orderStatsChart" style="max-height: 350px;"></canvas>
+                  <div id="orderStatsLoader" class="text-center py-5 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Row -->
+          <div class="row g-3">
+            <!-- Popular Categories -->
+            <div class="col-12 col-lg-6">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom">
+                  <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-fire me-2"></i>Danh mục bán chạy
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                      <thead>
+                        <tr>
+                          <th>Danh mục</th>
+                          <th class="text-end">Sản phẩm</th>
+                          <th class="text-end">Doanh số</th>
+                          <th class="text-end">Doanh thu</th>
+                        </tr>
+                      </thead>
+                      <tbody id="popularCategoriesTable">
+                        <tr>
+                          <td colspan="4" class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                              <span class="visually-hidden">Đang tải...</span>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conversion Details -->
+            <div class="col-12 col-lg-6">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom">
+                  <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-graph-up me-2"></i>Chi tiết chuyển đổi
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <div id="conversionDetails">
+                    <div class="mb-4">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Tổng người dùng</span>
+                        <strong id="totalUsers">—</strong>
+                      </div>
+                      <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-info" id="totalUsersBar" style="width: 100%"></div>
+                      </div>
+                    </div>
+
+                    <div class="mb-4">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Người dùng có đơn hàng</span>
+                        <strong id="usersWithOrders">—</strong>
+                      </div>
+                      <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-warning" id="usersWithOrdersBar" style="width: 0%"></div>
+                      </div>
+                    </div>
+
+                    <div class="mb-4">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Người dùng có giỏ hàng</span>
+                        <strong id="usersWithCarts">—</strong>
+                      </div>
+                      <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success" id="usersWithCartsBar" style="width: 0%"></div>
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Tổng đơn hàng</span>
+                        <strong id="totalOrdersConv">—</strong>
+                      </div>
+                      <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-primary" id="totalOrdersBar" style="width: 0%"></div>
+                      </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row text-center mt-4">
+                      <div class="col-6">
+                        <h6 class="text-muted mb-2">Tỷ lệ đặt hàng</h6>
+                        <h4 class="fw-bold text-primary" id="orderConversionRate">—</h4>
+                        <small class="text-muted">User → Order</small>
+                      </div>
+                      <div class="col-6">
+                        <h6 class="text-muted mb-2">Tỷ lệ chuyển đổi giỏ</h6>
+                        <h4 class="fw-bold text-success" id="cartConversionRate">—</h4>
+                        <small class="text-muted">Cart → Order</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- Customer -->
@@ -198,26 +326,63 @@
         <div class="bar-blue">
           <h4 class="mb-0"><i class="bi bi-people-fill me-2"></i>Quản lý Khách hàng</h4>
         </div>
-        <div class="card">
+        
+        <!-- Statistics Cards -->
+        <div id="user-statistics"></div>
+
+        <div class="card border-0 shadow-sm">
           <div class="card-body">
-            <div class="toolbar d-flex gap-2 mb-3">
-              <input class="search form-control" placeholder="Tìm kiếm khách hàng">
+            <!-- Toolbar -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-8">
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search text-muted"></i>
+                  </span>
+                  <input 
+                    type="text" 
+                    class="form-control border-start-0" 
+                    id="user-search-input"
+                    placeholder="Tìm kiếm theo họ tên..."
+                  >
+                </div>
+              </div>
+              <div class="col-md-4">
+                <select class="form-select" id="user-status-filter">
+                  <option value="all">Tất cả trạng thái</option>
+                  <option value="active">Đang hoạt động</option>
+                  <option value="inactive">Bị khóa</option>
+                </select>
+              </div>
             </div>
+
+            <!-- Table -->
             <div class="table-responsive">
-              <table class="table table-bordered table-hover align-middle">
-                <thead>
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
                   <tr>
-                    <th style="width:40px;"><input type="checkbox"></th>
-                    <th>Tên</th>
+                    <th>Họ tên</th>
                     <th>Email</th>
                     <th>Số điện thoại</th>
+                    <th>Giới tính</th>
+                    <th>Sinh nhật</th>
                     <th>Trạng thái</th>
-                    <th>Hành động</th>
                   </tr>
                 </thead>
-                <tbody id="customerList"></tbody>
+                <tbody id="users-table-body">
+                  <tr>
+                    <td colspan="7" class="text-center py-5">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </div>
+
+            <!-- Pagination -->
+            <div id="user-pagination" class="mt-3"></div>
           </div>
         </div>
       </section>
@@ -424,6 +589,7 @@
                         <th width="200">Slug</th>
                         <th>Mô Tả</th>
                         <th width="120">Số Sản Phẩm</th>
+                        <th width="120">Trạng Thái</th>
                         <th width="150">Thao Tác</th>
                       </tr>
                     </thead>
@@ -1146,16 +1312,19 @@
           <div class="modal-body">
             <div class="mb-3">
               <label class="form-label">Tên Danh Mục <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" name="category_name" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Slug <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" name="category_slug" required>
-              <small class="text-muted">VD: lego-city, lego-technic (chữ thường, không dấu, dùng dấu gạch ngang)</small>
+              <input type="text" class="form-control" name="category_name" id="categoryName" required>
+              <input type="hidden" name="category_slug" id="categorySlug">
             </div>
             <div class="mb-3">
               <label class="form-label">Mô Tả</label>
               <textarea class="form-control" name="description" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Trạng Thái</label>
+              <select class="form-select" name="is_active" id="categoryActive">
+                <option value="true">Kích hoạt</option>
+                <option value="false">Không kích hoạt</option>
+              </select>
             </div>
           </div>
           <div class="modal-footer">
@@ -1185,15 +1354,18 @@
             <div class="mb-3">
               <label class="form-label">Tên Danh Mục <span class="text-danger">*</span></label>
               <input type="text" class="form-control" name="category_name" id="editCategoryName" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Slug <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" name="category_slug" id="editCategorySlug" required>
-              <small class="text-muted">VD: lego-city, lego-technic (chữ thường, không dấu, dùng dấu gạch ngang)</small>
+              <input type="hidden" name="category_slug" id="editCategorySlug">
             </div>
             <div class="mb-3">
               <label class="form-label">Mô Tả</label>
               <textarea class="form-control" name="description" id="editCategoryDescription" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Trạng Thái</label>
+              <select class="form-select" name="is_active" id="editCategoryActive">
+                <option value="true">Kích hoạt</option>
+                <option value="false">Không kích hoạt</option>
+              </select>
             </div>
           </div>
           <div class="modal-footer">
@@ -1409,6 +1581,57 @@
   <!-- Load Bootstrap JS first -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   
+  <!-- 🔐 ADMIN GUARD: Verify admin access before loading anything -->
+  <script type="module">
+    import { authManager } from '/dist/src/core/init.js';
+    import { loadConfig } from '/dist/src/core/config/env.js';
+    import { supabaseService } from '/dist/src/core/api/supabaseClient.js';
+    
+    (async () => {
+      console.log('🔐 [Admin.html] Verifying admin access...');
+      
+      try {
+        // 1. Load config first
+        await loadConfig();
+        
+        // 2. Initialize Supabase
+        await supabaseService.initialize();
+        
+        // 3. Initialize auth manager
+        await authManager.initialize();
+        
+        // 4. Check if user is admin
+        if (!authManager.isAuthenticated()) {
+          console.warn('⚠️ [Admin.html] Not authenticated, redirecting to signin');
+          window.location.href = '/src/pages/SigninPage.html';
+          return;
+        }
+        
+        const user = authManager.getUser();
+        console.log('👤 [Admin.html] Current user:', user?.email, 'Role:', user?.role);
+        
+        if (!authManager.isAdmin()) {
+          console.warn('⚠️ [Admin.html] Not admin (role:', user?.role, '), redirecting to home');
+          alert('Bạn không có quyền truy cập trang này! (Role: ' + user?.role + ')');
+          window.location.href = '/src/pages/HomePage.html';
+          return;
+        }
+        
+        console.log('✅ [Admin.html] Admin access granted');
+        
+        // Display admin name
+        const adminNameEl = document.getElementById('adminName');
+        if (adminNameEl && user) {
+          adminNameEl.textContent = user.getDisplayName();
+        }
+      } catch (error) {
+        console.error('❌ [Admin.html] Initialization error:', error);
+        alert('Lỗi khởi tạo! Vui lòng thử lại.');
+        window.location.href = '/src/pages/SigninPage.html';
+      }
+    })();
+  </script>
+  
   <!-- Tải cấu hình môi trường trước -->
   <script type="module" src="/dist/src/core/config/env.js"></script>
   <script type="module" src="/dist/src/assets/js/components/Admin.js"></script>
@@ -1429,6 +1652,10 @@
     // Initialize Admin Category Controller
     const adminCategoryController = new AdminCategoryController();
     window.adminCategoryController = adminCategoryController;
+    
+    // Load categories immediately after initialization
+    console.log('🏗️ AdminCategoryController initialized, loading categories...');
+    adminCategoryController.loadCategories();
   </script>
 
   <!-- Admin Order Management -->
@@ -1439,8 +1666,80 @@
     const adminOrderController = new AdminOrderController();
     window.adminOrderController = adminOrderController;
   </script>
+
+  <!-- Admin User Management -->
+  <script type="module">
+    import { AdminUserController } from '/dist/src/modules/admin/AdminUserController.js';
+    
+    // Initialize Admin User Controller
+    const adminUserController = new AdminUserController();
+    window.adminUserController = adminUserController;
+    console.log('👥 AdminUserController initialized');
+  </script>
+
+  <!-- Admin Dashboard -->
+  <!-- Admin Dashboard Initialization -->
+  <script type="module">
+    import { AdminDashboardController } from '/dist/src/modules/admin/AdminDashboardController.js';
+    
+    // Initialize Dashboard Controller when DOM is ready
+    function initDashboardController() {
+      try {
+        console.log('📊 Initializing AdminDashboardController...');
+        const adminDashboardController = new AdminDashboardController();
+        window.adminDashboardController = adminDashboardController;
+        console.log('✅ AdminDashboardController initialized successfully');
+      } catch (error) {
+        console.error('❌ Error initializing dashboard controller:', error);
+      }
+    }
+    
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initDashboardController);
+    } else {
+      // DOM is already loaded
+      initDashboardController();
+    }
+  </script>
   
-  <!-- ORDER MANAGEMENT INITIALIZATION -->
+  <!-- USER MANAGEMENT INITIALIZATION -->
+  <script>
+    // Initialize Admin User Controller when ready
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait for controller to be ready
+      const waitForUserController = setInterval(() => {
+        if (window.adminUserController) {
+          clearInterval(waitForUserController);
+          initializeUserSection();
+        }
+      }, 100);
+    });
+    
+    function initializeUserSection() {      
+      // Check if customer section is active on page load
+      const customerSection = document.getElementById('customer');
+      if (customerSection && customerSection.classList.contains('active')) {
+        window.adminUserController.checkAndLoadData();
+      }
+      
+      // Load users when switching to customer section
+      document.querySelectorAll('.menu li').forEach(item => {
+        item.addEventListener('click', () => {
+          const target = item.getAttribute('data-target');
+          if (target === 'customer') {
+            console.log('👥 Switched to customer tab, loading data...');
+            // Wait a bit for section to be active
+            setTimeout(() => {
+              window.adminUserController.checkAndLoadData();
+            }, 100);
+          }
+        });
+      });
+      
+    }
+  </script>
+  
   <script>
      // Initialize Admin Order Controller when ready
      document.addEventListener('DOMContentLoaded', () => {
@@ -1459,11 +1758,7 @@
        // Setup order filters first
        setupOrderFilters();
        
-       // LUÔN load orders khi page load (không phụ thuộc vào class active)
-       // Điều này đảm bảo data luôn sẵn sàng, giống như trước khi thêm Product Management
-       window.adminOrderController.loadOrders();
-       console.log('📦 Loading orders (always on page load)');
-       
+       window.adminOrderController.loadOrders();       
        // Load lại orders khi switching to order section (để refresh data nếu cần)
        document.querySelectorAll('.menu li').forEach(item => {
          item.addEventListener('click', () => {
@@ -2127,6 +2422,47 @@
       });
     });
   </script>
+
+  <!-- Dashboard Custom Styles -->
+  <style>
+    .icon-box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+    }
+
+    .btn-group-sm .btn {
+      font-size: 0.875rem;
+      padding: 0.375rem 0.75rem;
+    }
+
+    #dashboardContent .table th {
+      font-weight: 600;
+      color: #6c757d;
+      font-size: 0.875rem;
+    }
+
+    #dashboardContent .progress {
+      border-radius: 10px;
+      background-color: #e9ecef;
+    }
+
+    #dashboardContent .progress-bar {
+      border-radius: 10px;
+      transition: width 0.6s ease;
+    }
+
+    #dashboardContent .card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    #dashboardContent .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+  </style>
 </body>
 
 </html>

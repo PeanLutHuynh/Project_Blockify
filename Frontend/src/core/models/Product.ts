@@ -102,6 +102,10 @@ export class Product extends BaseProduct {
   private _rating: number;
   private _pieceCount: number;
   private _salePrice?: number;
+  // --- ADD fields for snake_case support ---
+  public difficulty_level?: string;
+  public difficult_level?: string;
+  public difficulty?: string;
   constructor(
     id: string,
     name: string,
