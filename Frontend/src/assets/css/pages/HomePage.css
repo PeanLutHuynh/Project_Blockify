@@ -417,12 +417,17 @@ html { scroll-behavior: smooth; }
   border: 1px solid #ddd;
   border-radius: 6px;
   overflow: hidden;
-  width: 100%; 
-  max-width: 700px; 
+  width: 100%;
+  max-width: 700px;
   font-family: Arial, sans-serif;
   background: #ffffff;
   transition: all 0.3s ease;
   cursor: pointer;
+}
+
+.voucher:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .voucher-left {
@@ -448,9 +453,20 @@ html { scroll-behavior: smooth; }
 .voucher-img {
   width: 80px;
   height: 80px;
-  background: #ccc; 
+  background: #ccc;
   border-radius: 4px;
+  overflow: hidden; /* Quan trọng: cắt ảnh vượt khung */
 }
+
+.voucher-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Giữ tỉ lệ ảnh, cắt phần thừa */
+  display: block;
+  border: solid 2px white;
+
+}
+
 .voucher-right {
   flex: 1;
   padding: 10px 16px;
