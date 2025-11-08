@@ -20,6 +20,7 @@ export interface OrderResponseDTO {
   payment_status: string;
   notes?: string;
   ordered_at: string;
+  shipping_start_date?: string;
   items: OrderItemResponseDTO[];
 }
 

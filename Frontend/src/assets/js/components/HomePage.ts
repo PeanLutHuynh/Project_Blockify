@@ -6,6 +6,17 @@ import { productService } from '../../../core/services/ProductService.js';
 import { WishlistService } from '../../../core/services/WishlistService.js';
 import { authService } from '../../../core/services/AuthService.js';
 
+// Helper to get API base URL
+const getApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:3001';
+    }
+  }
+  return 'https://blockify-backend.onrender.com';
+};
+
 // State management for pagination and filtering
 let currentCategoryId: number | undefined = undefined;
 // @ts-ignore - Used in filter functions
@@ -612,7 +623,7 @@ async function applyAdvancedFilters(priceRange: string, difficulty: string, sort
       params.append('sortOrder', sortOrder);
     }
 
-    const url = `http://127.0.0.1:3001/api/v1/products/?${params.toString()}`;
+    const url = `${getApiBaseUrl()}/api/v1/products/?${params.toString()}`;
     console.log('🔗 Fetching filtered products from:', url);
 
     // Fetch products

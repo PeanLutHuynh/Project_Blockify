@@ -87,6 +87,11 @@ export class ModernAuthController {
         } else {
           this.redirectAfterAuth();
         }
+      } else {
+        // Check if account is blocked
+        if (result.redirectTo === '/pages/AccountBlocked.html') {
+          window.location.href = result.redirectTo;
+        }
       }
 
       return result;

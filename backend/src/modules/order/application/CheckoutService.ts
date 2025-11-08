@@ -89,7 +89,14 @@ export class CheckoutService {
       // subtotal = tổng sale_price
       // discount_amount = tổng price gốc - tổng sale_price
       // total_amount = subtotal + shipping_fee
-      const shippingFee = dto.shipping_fee || (dto.shipping_method === "fast" ? 30000 : 15000);
+      // Free ship cho đơn từ 500k trở lên
+      let shippingFee = 0;
+      if (subtotal >= 500000) {
+        shippingFee = 0; // Miễn phí ship cho đơn >= 500k
+        logger.info(`Free shipping applied for order >= 500,000 VND`, { subtotal });
+      } else {
+        shippingFee = dto.shipping_fee || (dto.shipping_method === "fast" ? 30000 : 15000);
+      }
       const discountAmount = originalTotal - subtotal;
       const totalAmount = subtotal + shippingFee;
 
@@ -331,6 +338,7 @@ export class CheckoutService {
       payment_status: order.paymentStatus,
       notes: order.notes,
       ordered_at: order.orderedAt?.toISOString() || new Date().toISOString(),
+      shipping_start_date: (order as any).shippingStartDate?.toISOString(),
       items: order.items.map((item: OrderItem) => ({
         order_item_id: item.orderItemId!,
         product_id: item.productId,
@@ -365,7 +373,7 @@ export class CheckoutService {
 
   /**
    * Update payment status
-   * ✅ Xóa cart items khi payment_status = 'paid' cho non-COD orders
+   * Xóa cart items khi payment_status = 'paid' cho non-COD orders
    */
   async updatePaymentStatus(
     orderId: number,

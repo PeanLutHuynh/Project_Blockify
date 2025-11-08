@@ -1568,6 +1568,11 @@ export class AccountController {
           <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
             <div class="text-muted small">
               <div><i class="bi bi-calendar me-2"></i>Ngày đặt: ${formattedDate}</div>
+              ${order.status === 'Đang giao' ? `
+                <div class="mt-1 text-primary">
+                  <i class="bi bi-truck me-2"></i>${orderTrackingService.getDeliveryDateText(order)}
+                </div>
+              ` : ''}
               <div class="mt-1"><i class="bi bi-credit-card me-2"></i>${orderTrackingService.getPaymentMethodText(order.payment_method)}</div>
             </div>
             <div class="text-end">

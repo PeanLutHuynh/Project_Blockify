@@ -27,6 +27,7 @@ interface AuthResponse {
     username: string;
     avatarUrl?: string;
     authUid: string;
+    is_active?: boolean;
   };
   token?: string;
   errors?: string[];
@@ -122,6 +123,16 @@ export class AuthService {
         response.data?.user &&
         response.data?.token
       ) {
+        // Check if account is active before allowing login
+        if (response.data.user.is_active === false) {
+          console.log('❌ Account is deactivated');
+          return {
+            success: false,
+            message: 'Tài khoản đã bị khóa',
+            redirectTo: '/pages/AccountBlocked.html'
+          };
+        }
+
         this.handleAuthSuccess(response.data.user, response.data.token);
         
         // Then try to sync Supabase session (optional, backend already verified)

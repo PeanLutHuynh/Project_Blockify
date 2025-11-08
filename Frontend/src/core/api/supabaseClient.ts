@@ -221,6 +221,17 @@ class SupabaseService {
     const { data } = await this.getSession();
     return !!data.session;
   }
+
+  /**
+   * Send password reset email
+   */
+  async resetPasswordForEmail(email: string, redirectTo?: string) {
+    const defaultRedirect = `${window.location.origin}/pages/SigninPage.html`;
+    
+    return await this.getClient().auth.resetPasswordForEmail(email, {
+      redirectTo: redirectTo || defaultRedirect
+    });
+  }
 }
 
 // Export singleton instance

@@ -39,6 +39,8 @@ export interface Order {
   ordered_at: string;
   created_at?: string;
   updated_at?: string;
+  estimated_delivery_date?: string;
+  shipping_start_date?: string; // Thời điểm chuyển sang "Đang giao" từ order_status_history
   items?: OrderItem[];
 }
 
@@ -219,6 +221,50 @@ class OrderTrackingService {
       'vnpay': 'VNPay'
     };
     return methodTexts[method] || method;
+  }
+
+  /**
+   * Calculate estimated delivery date based on shipping start date
+   * Sử dụng shipping_start_date từ order_status_history thay vì ordered_at
+   * Đơn giao thường: +3-5 ngày từ ngày bắt đầu giao
+   * Đơn giao nhanh: +1-2 ngày từ ngày bắt đầu giao
+   */
+  calculateEstimatedDeliveryDate(order: Order): string {
+    // Ưu tiên sử dụng shipping_start_date, fallback về ordered_at
+    const baseDate = order.shipping_start_date 
+      ? new Date(order.shipping_start_date) 
+      : new Date(order.ordered_at);
+    
+    const shippingMethod = order.shipping_method || 'standard';
+    
+    // Số ngày giao hàng dự kiến
+    const daysToDeliver = shippingMethod === 'fast' ? 2 : 4;
+    
+    // Tính ngày giao dự kiến
+    const estimatedDate = new Date(baseDate);
+    estimatedDate.setDate(estimatedDate.getDate() + daysToDeliver);
+    
+    return estimatedDate.toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  }
+
+  /**
+   * Get delivery date display text for order
+   */
+  getDeliveryDateText(order: Order): string {
+    if (order.status === 'Đang giao') {
+      if (order.estimated_delivery_date) {
+        return `Dự kiến: ${this.formatDate(order.estimated_delivery_date)}`;
+      }
+      return `Dự kiến: ${this.calculateEstimatedDeliveryDate(order)}`;
+    }
+    if (order.status === 'Đã giao') {
+      return `Đã giao: ${this.formatDate(order.updated_at || order.ordered_at)}`;
+    }
+    return '';
   }
 }
 

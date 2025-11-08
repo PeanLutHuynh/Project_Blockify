@@ -99,13 +99,20 @@ function initializeCartPage() {
       if(Number.isNaN(idx) || !items[idx]) return;
       if(target && target.classList.contains('btn-plus')){
         items[idx].qty += 1;
-        saveCart(items); render();
+        saveCart(items);
+        // Only update quantity display, not full render
+        updateItemQuantityDisplay(row, items[idx]);
+        updateGrandTotal();
       } else if(target && target.classList.contains('btn-minus')){
         items[idx].qty = Math.max(1, (Number(items[idx].qty)||1) - 1);
-        saveCart(items); render();
+        saveCart(items);
+        // Only update quantity display, not full render
+        updateItemQuantityDisplay(row, items[idx]);
+        updateGrandTotal();
       } else if(target && target.classList.contains('btn-remove')){
         items.splice(idx,1);
-        saveCart(items); render();
+        saveCart(items); 
+        render(); // Full render needed when removing items
       }
     });
 
@@ -118,7 +125,10 @@ function initializeCartPage() {
       let qty = Number((target as HTMLInputElement).value);
       if(!Number.isFinite(qty) || qty < 1) qty = 1;
       items[idx].qty = qty;
-      saveCart(items); render();
+      saveCart(items);
+      // Only update quantity display, not full render
+      updateItemQuantityDisplay(row!, items[idx]);
+      updateGrandTotal();
     });
 
     // Handle row checkbox toggle
@@ -130,7 +140,10 @@ function initializeCartPage() {
       const items = loadCart();
       if(Number.isNaN(idx) || !items[idx]) return;
       items[idx].selected = (target as HTMLInputElement).checked;
-      saveCart(items); render();
+      saveCart(items);
+      // Only update total and select-all state
+      updateGrandTotal();
+      updateSelectAllState();
     });
   }
 
@@ -162,5 +175,51 @@ function initializeCartPage() {
       } catch(_) {}
       window.location.href = 'OrderPage.html';
     });
+  }
+}
+
+/**
+ * Update only the quantity display for a specific item
+ * Avoids full re-render which would reset checkbox states
+ */
+function updateItemQuantityDisplay(row: HTMLElement, item: CartItem): void {
+  // Update quantity input
+  const qtyInput = row.querySelector('.qty-input') as HTMLInputElement;
+  if (qtyInput) {
+    qtyInput.value = String(item.qty);
+  }
+
+  // Update total price for this item
+  const priceEl = row.querySelector('.price');
+  if (priceEl) {
+    const totalPrice = formatVND(item.price * item.qty);
+    priceEl.innerHTML = `${totalPrice} <i class="fas fa-trash ms-2 text-muted btn-remove" role="button"></i>`;
+  }
+}
+
+/**
+ * Update grand total without re-rendering
+ */
+function updateGrandTotal(): void {
+  const totalEl = document.getElementById('grand-total');
+  if (!totalEl) return;
+
+  const items = loadCart();
+  const grand = items.filter((it: CartItem) => it.selected !== false)
+    .reduce((s: number, it: CartItem) => s + (Number(it.price)||0) * (Number(it.qty)||0), 0);
+  totalEl.textContent = formatVND(grand);
+}
+
+/**
+ * Update select-all checkbox state without re-rendering
+ */
+function updateSelectAllState(): void {
+  const items = loadCart();
+  const allSelected = items.every((it: CartItem) => it.selected !== false);
+  const noneSelected = items.every((it: CartItem) => it.selected === false);
+  const sa = document.getElementById('select-all') as HTMLInputElement | null;
+  if(sa){
+    sa.checked = allSelected && !noneSelected;
+    sa.indeterminate = !allSelected && !noneSelected;
   }
 }

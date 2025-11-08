@@ -182,8 +182,32 @@ export class OrderRepository implements IOrderRepository {
     const orders = await Promise.all(
       data.map(async (orderData: any) => {
         const items = await this.getOrderItems(orderData.order_id);
+        
+        // Get shipping start date from order_status_history
+        let shippingStartDate: Date | null = null;
+        if (orderData.status === 'Đang giao' || orderData.status === 'Đã giao') {
+          const { data: historyData } = await supabaseAdmin
+            .from("order_status_history")
+            .select("created_at")
+            .eq("order_id", orderData.order_id)
+            .eq("new_status", "Đang giao")
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .single();
+          
+          if (historyData) {
+            shippingStartDate = new Date(historyData.created_at);
+          }
+        }
+        
         const order = this.mapToEntity(orderData);
         order.setItems(items);
+        
+        // Add shipping start date as a property
+        if (shippingStartDate) {
+          (order as any).shippingStartDate = shippingStartDate;
+        }
+        
         return order;
       })
     );
