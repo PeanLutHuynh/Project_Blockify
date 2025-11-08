@@ -873,7 +873,8 @@ export class ProductImageRepository
     if (entity.imageUrl !== undefined) mapped.image_url = entity.imageUrl;
     if (entity.altText !== undefined) mapped.alt_text = entity.altText;
     if (entity.isPrimary !== undefined) mapped.is_primary = entity.isPrimary;
-    if (entity.sortOrder !== undefined) mapped.sort_order = entity.sortOrder;
+    // Explicitly set sort_order to 0 if not provided
+    mapped.sort_order = entity.sortOrder !== undefined ? entity.sortOrder : 0;
     if (entity.altImg1 !== undefined) mapped.alt_img1 = entity.altImg1;
     if (entity.altImg2 !== undefined) mapped.alt_img2 = entity.altImg2;
     if (entity.altImg3 !== undefined) mapped.alt_img3 = entity.altImg3;

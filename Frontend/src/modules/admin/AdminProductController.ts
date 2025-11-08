@@ -1095,12 +1095,12 @@ export class AdminProductController {
       const productId = createResponse.data.product_id;
       console.log('✅ Product created with ID:', productId);
       
-      // Step 3: Upload images with product_id
+      // Step 3: Upload images with product_id (one by one)
       const imageInputs = document.querySelectorAll('.product-image-input') as NodeListOf<HTMLInputElement>;
       const token = localStorage.getItem('blockify_auth_token');
       let uploadedCount = 0;
       
-      console.log('� Step 2: Uploading images...');
+      console.log('🖼️ Step 2: Uploading images...');
       
       for (let index = 0; index < imageInputs.length; index++) {
         const input = imageInputs[index];
@@ -1294,7 +1294,8 @@ export class AdminProductController {
 
       console.log('📦 Product update data:', productData);
 
-      // Step 2: Update product info
+      // Step 2: Update product info first
+      console.log('🔄 Step 1: Updating product...');
       const updateResponse = await httpClient.put(`/api/admin/products/${productId}`, productData);
 
       if (!updateResponse.success) {
@@ -1305,82 +1306,46 @@ export class AdminProductController {
 
       console.log('✅ Product info updated');
 
-      // Step 3: Handle image replacements (DELETE old + INSERT new)
-      console.log('📤 Step 2: Checking for new images...');
+      // Step 3: Handle image uploads (if any new images)
+      console.log('🖼️ Step 2: Checking for new images...');
       const imageInputs = document.querySelectorAll('.edit-product-image-input') as NodeListOf<HTMLInputElement>;
       const token = localStorage.getItem('blockify_auth_token');
-      let imagesChanged = false;
-      
-      // Get current product to find existing image IDs
-      const currentProduct = await httpClient.get(`/api/admin/products/${productId}`);
-      const existingImages = currentProduct.data?.product_images || currentProduct.data?.images || [];
+      let uploadedCount = 0;
       
       for (let index = 0; index < imageInputs.length; index++) {
         const input = imageInputs[index];
         const file = input.files?.[0];
         
         if (file) {
-          imagesChanged = true;
-          console.log(`📤 Processing image ${index}...`);
+          console.log(`📤 Uploading image ${index}...`);
           
-          // Step 3a: DELETE old image at this position (if exists)
-          const oldImage = existingImages[index];
-          if (oldImage && oldImage.image_id) {
-            console.log(`🗑️ Deleting old image ID: ${oldImage.image_id}`);
-            try {
-              const deleteResponse = await fetch(`http://localhost:3001/api/admin/products/images/${oldImage.image_id}`, {
-                method: 'DELETE',
-                headers: {
-                  'Authorization': `Bearer ${token}`,
-                  'Content-Type': 'application/json'
-                }
-              });
-              
-              const deleteResult = await deleteResponse.json();
-              if (deleteResult.success) {
-                console.log(`✅ Old image deleted from Storage & DB`);
-              } else {
-                console.warn(`⚠️ Failed to delete old image:`, deleteResult.error);
-              }
-            } catch (err) {
-              console.error(`❌ Error deleting old image:`, err);
-            }
-          }
-          
-          // Step 3b: INSERT new image (upload to Storage + save to DB)
-          console.log(`📤 Uploading new image ${index}...`);
           const formData = new FormData();
           formData.append('image', file);
           formData.append('productName', productName);
           formData.append('categoryId', categoryId.toString());
           formData.append('imageIndex', index.toString());
 
-          try {
-            const uploadResponse = await fetch(`http://localhost:3001/api/admin/products/${productId}/images`, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${token}`
-              },
-              body: formData
-            });
+          const uploadResponse = await fetch(`http://localhost:3001/api/admin/products/${productId}/images`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: formData
+          });
 
-            const uploadResult = await uploadResponse.json();
-            
-            if (uploadResult.success) {
-              console.log(`✅ New image ${index} uploaded & saved`);
-            } else {
-              console.error(`❌ Failed to upload image ${index}:`, uploadResult.error);
-              this.showError(`Không thể upload ảnh ${index + 1}`);
-            }
-          } catch (err) {
-            console.error(`❌ Error uploading image ${index}:`, err);
-            this.showError(`Lỗi khi upload ảnh ${index + 1}`);
+          const result = await uploadResponse.json();
+          
+          if (result.success) {
+            uploadedCount++;
+            console.log(`✅ Image ${index} uploaded successfully`);
+          } else {
+            console.error(`❌ Failed to upload image ${index}:`, result.error);
           }
         }
       }
       
-      if (imagesChanged) {
-        console.log('✅ Images updated successfully');
+      if (uploadedCount > 0) {
+        console.log(`✅ Uploaded ${uploadedCount} images`);
       } else {
         console.log('ℹ️ No new images to upload');
       }
