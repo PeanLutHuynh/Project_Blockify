@@ -17,6 +17,7 @@ export class CartItem {
   private _quantity: number;
   private _stockQuantity: number;
   private _minStockLevel: number;
+  private _selected: boolean; // For cart UI checkbox state
 
   constructor(data: {
     productId: number;
@@ -28,6 +29,7 @@ export class CartItem {
     quantity: number;
     stockQuantity: number;
     minStockLevel: number;
+    selected?: boolean; // Optional, defaults to true
   }) {
     this._productId = data.productId;
     this._productName = data.productName;
@@ -38,6 +40,7 @@ export class CartItem {
     this._quantity = data.quantity;
     this._stockQuantity = data.stockQuantity;
     this._minStockLevel = data.minStockLevel;
+    this._selected = data.selected !== undefined ? data.selected : true; // Default to selected
   }
 
   // Getters
@@ -50,6 +53,10 @@ export class CartItem {
   get quantity(): number { return this._quantity; }
   get stockQuantity(): number { return this._stockQuantity; }
   get minStockLevel(): number { return this._minStockLevel; }
+  get selected(): boolean { return this._selected; }
+
+  // Setters
+  set selected(value: boolean) { this._selected = value; }
 
   // Business logic methods
   

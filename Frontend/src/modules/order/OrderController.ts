@@ -3,6 +3,7 @@ import { AuthService } from "../../core/services/AuthService.js";
 import { PaymentProofService } from "../../core/services/PaymentProofService.js";
 import { PaymentQR } from "../../core/models/PaymentQR.js";
 import { cartService } from "../../core/services/CartService.js";
+import { CartItem } from "../../core/models/Cart.js";
 
 /**
  * Order Controller - Frontend MVC
@@ -558,8 +559,22 @@ export class OrderController {
 
   /**
    * Get selected shipping fee
+   * Free ship for orders >= 500,000 VND (based on subtotal after discount)
    */
   private getSelectedShippingFee(): number {
+    // Calculate subtotal (giá sau giảm) from cart items
+    const cartItems = cartService.getItems();
+    const subtotal = cartItems.reduce((sum: number, item: CartItem) => {
+      const price = item.salePrice || item.price;
+      return sum + (price * item.quantity);
+    }, 0);
+    
+    // Free ship cho đơn >= 500k
+    if (subtotal >= 500000) {
+      return 0;
+    }
+    
+    // Normal shipping fees
     const method = this.getSelectedShippingMethod();
     return method === "fast" ? 30000 : 15000;
   }

@@ -80,6 +80,10 @@
       "destination": "/pages/ForgotPassword.html"
     },
     {
+      "source": "/ResetPassword.html",
+      "destination": "/pages/ResetPassword.html"
+    },
+    {
       "source": "/AccountBlocked.html",
       "destination": "/pages/AccountBlocked.html"
     }

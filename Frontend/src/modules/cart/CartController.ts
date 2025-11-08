@@ -140,8 +140,15 @@ export class CartController {
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.classList.add('item-checkbox');
-      checkbox.checked = true;
-      checkbox.addEventListener('change', () => this.handleItemCheckChange());
+      checkbox.checked = item.selected; // ← Use item's selected state
+      checkbox.addEventListener('change', (e) => {
+        // Update item's selected state
+        item.selected = (e.target as HTMLInputElement).checked;
+        // Save to localStorage
+        cartService.getCart().saveToLocalStorage('blockify_cart');
+        // Update UI
+        this.handleItemCheckChange();
+      });
       checkboxCell.appendChild(checkbox);
     }
     row.appendChild(checkboxCell);
@@ -228,9 +235,21 @@ export class CartController {
    * Handle select all checkbox
    */
   private handleSelectAll(): void {
-    const checkboxes = document.querySelectorAll('.item-checkbox') as NodeListOf<HTMLInputElement>;
     const isChecked = this.selectAllCheckbox?.checked || false;
+    const items = cartService.getItems();
 
+    // Update all items' selected state
+    items.forEach(item => {
+      if (!item.isSoldOut()) {
+        item.selected = isChecked;
+      }
+    });
+
+    // Save to localStorage
+    cartService.getCart().saveToLocalStorage('blockify_cart');
+
+    // Update UI checkboxes
+    const checkboxes = document.querySelectorAll('.item-checkbox') as NodeListOf<HTMLInputElement>;
     checkboxes.forEach(checkbox => {
       checkbox.checked = isChecked;
     });
@@ -356,21 +375,9 @@ export class CartController {
    * Get selected items
    */
   private getSelectedItems(): CartItem[] {
-    const checkboxes = document.querySelectorAll('.item-checkbox:checked') as NodeListOf<HTMLInputElement>;
-    const selectedItems: CartItem[] = [];
-
-    checkboxes.forEach(checkbox => {
-      const row = checkbox.closest('tr');
-      if (row) {
-        const productId = parseInt(row.dataset.productId || '0');
-        const item = cartService.getCart().getItem(productId);
-        if (item) {
-          selectedItems.push(item);
-        }
-      }
-    });
-
-    return selectedItems;
+    // Get all items from cart and filter by selected flag
+    const items = cartService.getItems();
+    return items.filter(item => item.selected && !item.isSoldOut());
   }
 
   /**

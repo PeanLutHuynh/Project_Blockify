@@ -61,7 +61,9 @@ function initializeOrderPage() {
     `).join('');
     
     const subtotal = items.reduce((s,it)=> s + (Number(it.price)||0) * (Number(it.qty)||0), 0);
-    const shipping = subtotal > 0 ? 15000 : 0;
+    
+    // Free ship cho đơn >= 500k (tính theo giá sau giảm)
+    const shipping = subtotal >= 500000 ? 0 : 15000;
     
     const subtotalEl = document.getElementById('subtotal');
     const shippingEl = document.getElementById('shipping');

@@ -224,12 +224,24 @@ class SupabaseService {
 
   /**
    * Send password reset email
+   * Link có thời gian sống 1 giờ (Supabase default)
+   * Chỉ có thể dùng 1 lần, sau khi đổi pass thì link cũ sẽ invalid
    */
   async resetPasswordForEmail(email: string, redirectTo?: string) {
-    const defaultRedirect = `${window.location.origin}/pages/SigninPage.html`;
+    const defaultRedirect = `${window.location.origin}/pages/ResetPassword.html`;
     
     return await this.getClient().auth.resetPasswordForEmail(email, {
       redirectTo: redirectTo || defaultRedirect
+    });
+  }
+
+  /**
+   * Update user password (for password reset flow)
+   * Yêu cầu user phải có valid reset token (từ email link)
+   */
+  async updatePassword(newPassword: string) {
+    return await this.getClient().auth.updateUser({
+      password: newPassword
     });
   }
 }

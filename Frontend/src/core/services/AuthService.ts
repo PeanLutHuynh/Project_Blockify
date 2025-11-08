@@ -626,6 +626,14 @@ export class AuthService {
               
               // Backend structure: { success: true, data: { user, token }, message }
               if (oauthResponse.success && oauthResponse.data?.user && oauthResponse.data?.token) {
+                // Check if account is active
+                if (oauthResponse.data.user.is_active === false) {
+                  console.log('❌ Google OAuth: Account is deactivated');
+                  await supabaseService.signOut();
+                  window.location.href = '/pages/AccountBlocked.html';
+                  return;
+                }
+                
                 this.handleAuthSuccess(oauthResponse.data.user, oauthResponse.data.token);
                 console.log('Google OAuth: User authenticated:', oauthResponse.data.user.email);
                 console.log('Google OAuth: User role:', oauthResponse.data.user.role);
@@ -647,6 +655,14 @@ export class AuthService {
                   }
                 }
               } else {
+                // Check if account is blocked
+                if (oauthResponse.message === 'ACCOUNT_BLOCKED') {
+                  console.log('❌ Google OAuth: Account is blocked');
+                  await supabaseService.signOut();
+                  window.location.href = '/pages/AccountBlocked.html';
+                  return;
+                }
+                
                 console.error('OAuth authentication failed:', oauthResponse);
               }
             } catch (error) {

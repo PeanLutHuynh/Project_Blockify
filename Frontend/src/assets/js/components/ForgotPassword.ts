@@ -1,4 +1,5 @@
 import { supabaseService } from '../../../core/api/supabaseClient.js';
+import { loadConfig } from '../../../core/config/env.js';
 
 /**
  * ForgotPasswordController
@@ -10,7 +11,28 @@ class ForgotPasswordController {
   private emailInput: HTMLInputElement | null = null;
 
   constructor() {
-    this.initializeForm();
+    this.initializeSupabase();
+  }
+
+  /**
+   * Initialize Supabase client
+   */
+  private async initializeSupabase(): Promise<void> {
+    try {
+      // Load ENV first
+      await loadConfig();
+      console.log('✅ ENV loaded for ForgotPassword');
+      
+      // Initialize Supabase client
+      await supabaseService.initializeAsync();
+      console.log('✅ Supabase initialized for ForgotPassword');
+      
+      // Then initialize form
+      this.initializeForm();
+    } catch (error) {
+      console.error('❌ Failed to initialize:', error);
+      this.showError('Không thể kết nối đến hệ thống. Vui lòng thử lại sau.');
+    }
   }
 
   /**
