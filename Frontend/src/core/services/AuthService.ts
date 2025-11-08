@@ -166,6 +166,16 @@ export class AuthService {
           redirectTo: '/pages/HomePage.html'
         };
       } else {
+        // Check if account is blocked
+        if (response.message === 'ACCOUNT_BLOCKED') {
+          console.log('❌ Account is blocked');
+          return {
+            success: false,
+            message: 'Tài khoản đã bị khóa. Vui lòng liên hệ hỗ trợ.',
+            redirectTo: '/pages/AccountBlocked.html'
+          };
+        }
+        
         console.error('❌ Backend authentication failed:', response);
         return {
           success: false,
@@ -393,6 +403,16 @@ export class AuthService {
 
       // Backend structure: { success: true, data: { user, token }, message }
       if (response.success && response.data?.user && response.data?.token) {
+        // Check if account is active
+        if (response.data.user.is_active === false) {
+          console.log('❌ Account is deactivated');
+          return {
+            success: false,
+            message: 'Tài khoản đã bị khóa. Vui lòng liên hệ hỗ trợ.',
+            redirectTo: '/pages/AccountBlocked.html'
+          };
+        }
+        
         this.handleAuthSuccess(response.data.user, response.data.token);
 
         return {
@@ -403,6 +423,16 @@ export class AuthService {
           redirectTo: "/pages/HomePage.html",
         };
       } else {
+        // Check if account is blocked
+        if (response.message === 'ACCOUNT_BLOCKED') {
+          console.log('❌ Account is blocked');
+          return {
+            success: false,
+            message: 'Tài khoản đã bị khóa. Vui lòng liên hệ hỗ trợ.',
+            redirectTo: '/pages/AccountBlocked.html'
+          };
+        }
+        
         return {
           success: false,
           message: response.message || response.data?.message || "Google authentication failed",

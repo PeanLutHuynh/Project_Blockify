@@ -74,6 +74,14 @@
     {
       "source": "/Coin.html",
       "destination": "/pages/Coin.html"
+    },
+    {
+      "source": "/ForgotPassword.html",
+      "destination": "/pages/ForgotPassword.html"
+    },
+    {
+      "source": "/AccountBlocked.html",
+      "destination": "/pages/AccountBlocked.html"
     }
   ],
   "headers": [

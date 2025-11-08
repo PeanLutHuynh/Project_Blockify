@@ -86,18 +86,20 @@ export class CheckoutService {
       });
 
       // 4. Calculate totals
-      // subtotal = tổng sale_price
+      // subtotal = tổng sale_price (giá sau giảm)
       // discount_amount = tổng price gốc - tổng sale_price
       // total_amount = subtotal + shipping_fee
-      // Free ship cho đơn từ 500k trở lên
+      // Free ship cho đơn từ 500k trở lên (tính theo subtotal = giá sau giảm)
+      const discountAmount = originalTotal - subtotal;
+      
       let shippingFee = 0;
       if (subtotal >= 500000) {
-        shippingFee = 0; // Miễn phí ship cho đơn >= 500k
-        logger.info(`Free shipping applied for order >= 500,000 VND`, { subtotal });
+        shippingFee = 0; // Miễn phí ship cho đơn >= 500k (sau giảm)
+        logger.info(`Free shipping applied for order >= 500,000 VND (after discount)`, { subtotal });
       } else {
         shippingFee = dto.shipping_fee || (dto.shipping_method === "fast" ? 30000 : 15000);
       }
-      const discountAmount = originalTotal - subtotal;
+      
       const totalAmount = subtotal + shippingFee;
 
       // 5. Generate order number

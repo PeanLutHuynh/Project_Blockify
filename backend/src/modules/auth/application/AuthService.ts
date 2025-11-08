@@ -273,9 +273,10 @@ export class AuthService {
         }
       }
 
-      // Check if user is active
+      // Check if user is active (redirect to AccountBlocked page on frontend)
       if (!user.isActive) {
-        return AuthResponse.failure("Account is deactivated");
+        // Return failure with specific message for blocked accounts
+        return AuthResponse.failure("ACCOUNT_BLOCKED");
       }
 
       const token = this.generateToken(user);
@@ -341,6 +342,12 @@ export class AuthService {
         if (existingAdmin) {
           console.log('👑 [GoogleAuth] Processing admin authentication...');
           
+          // Check if admin account is active
+          if (!existingAdmin.isActive) {
+            console.log('❌ [GoogleAuth] Admin account is deactivated');
+            return AuthResponse.failure("ACCOUNT_BLOCKED");
+          }
+          
           // Ensure user_metadata.role is set to 'admin' in Supabase Auth
           const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
             command.authUid,
@@ -391,6 +398,13 @@ export class AuthService {
 
       if (user) {
         console.log('✅ [GoogleAuth] User found in database:', user.id);
+        
+        // Check if user account is active
+        if (!user.isActive) {
+          console.log('❌ [GoogleAuth] User account is deactivated');
+          return AuthResponse.failure("ACCOUNT_BLOCKED");
+        }
+        
         console.log('📸 [GoogleAuth] User current avatar:', user.avatarUrl);
         console.log('📸 [GoogleAuth] Google OAuth avatar:', command.avatarUrl);
         
