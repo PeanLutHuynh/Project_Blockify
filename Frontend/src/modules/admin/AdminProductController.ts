@@ -1230,7 +1230,23 @@ export class AdminProductController {
             const preview = document.getElementById(`edit-preview-${index}`);
             if (preview) {
               console.log(`✏️ Setting image ${index}:`, img.image_url);
-              preview.innerHTML = `<img src="${img.image_url}" alt="Image ${index + 1}" style="max-width: 100%; max-height: 150px; object-fit: cover; border-radius: 4px;">`;
+              preview.innerHTML = `
+                <div style="position: relative; display: inline-block;">
+                  <img src="${img.image_url}" alt="Image ${index + 1}" style="max-width: 100%; max-height: 150px; object-fit: cover; border-radius: 4px;" data-image-url="${img.image_url}">
+                  <button type="button" class="btn btn-danger btn-sm remove-image-btn" data-index="${index}" data-prefix="edit-preview" 
+                    style="position: absolute; top: 5px; right: 5px; width: 24px; height: 24px; padding: 0; border-radius: 50%; font-size: 12px; line-height: 1;">
+                    ×
+                  </button>
+                </div>
+              `;
+              
+              // Add click handler for remove button
+              const removeBtn = preview.querySelector('.remove-image-btn');
+              if (removeBtn) {
+                removeBtn.addEventListener('click', async () => {
+                  await this.deleteImageFromStorage(img.image_url, index);
+                });
+              }
             } else {
               console.warn(`⚠️ Preview element not found: edit-preview-${index}`);
             }
@@ -1492,12 +1508,25 @@ export class AdminProductController {
       reader.onload = (e) => {
         const localImageUrl = e.target?.result as string;
         
-        // Show preview with local Data URL
+        // Show preview with local Data URL and delete button
         if (previewDiv && localImageUrl) {
           previewDiv.innerHTML = `
-            <img src="${localImageUrl}" alt="Image ${index + 1}" style="max-width: 100%; max-height: 150px; object-fit: cover; border-radius: 4px;" data-local-preview="true">
-            <div class="mt-1 small text-info">📸 Preview</div>
+            <div style="position: relative; display: inline-block;">
+              <img src="${localImageUrl}" alt="Image ${index + 1}" style="max-width: 100%; max-height: 150px; object-fit: cover; border-radius: 4px;" data-local-preview="true">
+              <button type="button" class="btn btn-danger btn-sm remove-image-btn" data-index="${index}" data-prefix="${previewPrefix}" 
+                style="position: absolute; top: 5px; right: 5px; width: 24px; height: 24px; padding: 0; border-radius: 50%; font-size: 12px; line-height: 1;">
+                ×
+              </button>
+            </div>
           `;
+          
+          // Add click handler for remove button
+          const removeBtn = previewDiv.querySelector('.remove-image-btn');
+          if (removeBtn) {
+            removeBtn.addEventListener('click', () => {
+              this.removeImagePreview(index, previewPrefix);
+            });
+          }
         }
         
         console.log(`✅ Preview image ${index} loaded`);
@@ -1519,6 +1548,80 @@ export class AdminProductController {
       if (previewDiv) {
         previewDiv.innerHTML = '<div class="text-danger small">❌ Lỗi</div>';
       }
+    }
+  }
+
+  /**
+   * Remove image preview and clear file input
+   */
+  private removeImagePreview(index: number, previewPrefix: string): void {
+    try {
+      // Clear preview
+      const previewDiv = document.getElementById(`${previewPrefix}-${index}`);
+      if (previewDiv) {
+        previewDiv.innerHTML = '';
+      }
+
+      // Clear file input - Find the correct input based on prefix
+      const inputClass = previewPrefix === 'preview' ? 'product-image-input' : 'edit-product-image-input';
+      const fileInputs = document.querySelectorAll(`.${inputClass}`);
+      
+      fileInputs.forEach((input: any) => {
+        if (input.dataset.index === String(index)) {
+          input.value = ''; // Clear the file input
+          console.log(`🗑️ Cleared image ${index} (${previewPrefix})`);
+        }
+      });
+    } catch (error: any) {
+      console.error('❌ Error removing image preview:', error);
+    }
+  }
+
+  /**
+   * Delete image from Supabase Storage and update database
+   */
+  private async deleteImageFromStorage(imageUrl: string, imageIndex: number): Promise<void> {
+    try {
+      if (!confirm('Bạn có chắc chắn muốn xóa ảnh này khỏi Storage?')) {
+        return;
+      }
+
+      console.log(`🗑️ Deleting image ${imageIndex} from Storage:`, imageUrl);
+
+      const productId = parseInt((document.getElementById('editProductId') as HTMLInputElement)?.value);
+      if (!productId) {
+        throw new Error('Product ID not found');
+      }
+
+      // Call backend API to delete image using httpClient
+      const response = await httpClient.delete(
+        `/api/admin/products/${productId}/images/${imageIndex}`
+      );
+
+      if (!response.success) {
+        throw new Error(response.message || 'Không thể xóa ảnh');
+      }
+
+      console.log(`✅ Image ${imageIndex} deleted from Storage successfully`);
+      
+      // Clear preview after successful deletion
+      const previewDiv = document.getElementById(`edit-preview-${imageIndex}`);
+      if (previewDiv) {
+        previewDiv.innerHTML = '';
+      }
+
+      // Clear file input
+      const fileInputs = document.querySelectorAll('.edit-product-image-input');
+      fileInputs.forEach((input: any) => {
+        if (input.dataset.index === String(imageIndex)) {
+          input.value = '';
+        }
+      });
+
+      alert('✅ Đã xóa ảnh khỏi Storage thành công!');
+    } catch (error: any) {
+      console.error('❌ Error deleting image:', error);
+      alert(`❌ Lỗi xóa ảnh: ${error.message}`);
     }
   }
 

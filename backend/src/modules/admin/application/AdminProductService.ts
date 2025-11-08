@@ -41,13 +41,15 @@ export class AdminProductService {
    */
   private flattenProductImages(productImagesRows: any[]): any[] {
     const allImages: any[] = [];
+    // Cache-busting timestamp - force browser reload on image changes
+    const cacheBreaker = Date.now();
     
     (productImagesRows || []).forEach((imgRow: any, rowIndex: number) => {
       // Main image (image_url)
       if (imgRow.image_url) {
         allImages.push({
           image_id: imgRow.image_id,
-          image_url: imgRow.image_url,
+          image_url: this.addCacheBuster(imgRow.image_url, cacheBreaker),
           is_primary: imgRow.is_primary || rowIndex === 0,
           sort_order: imgRow.sort_order || (rowIndex * 4),
         });
@@ -57,7 +59,7 @@ export class AdminProductService {
       if (imgRow.alt_img1) {
         allImages.push({
           image_id: `${imgRow.image_id}_alt1`,
-          image_url: imgRow.alt_img1,
+          image_url: this.addCacheBuster(imgRow.alt_img1, cacheBreaker),
           is_primary: false,
           sort_order: imgRow.sort_order || (rowIndex * 4 + 1),
         });
@@ -65,7 +67,7 @@ export class AdminProductService {
       if (imgRow.alt_img2) {
         allImages.push({
           image_id: `${imgRow.image_id}_alt2`,
-          image_url: imgRow.alt_img2,
+          image_url: this.addCacheBuster(imgRow.alt_img2, cacheBreaker),
           is_primary: false,
           sort_order: imgRow.sort_order || (rowIndex * 4 + 2),
         });
@@ -73,7 +75,7 @@ export class AdminProductService {
       if (imgRow.alt_img3) {
         allImages.push({
           image_id: `${imgRow.image_id}_alt3`,
-          image_url: imgRow.alt_img3,
+          image_url: this.addCacheBuster(imgRow.alt_img3, cacheBreaker),
           is_primary: false,
           sort_order: imgRow.sort_order || (rowIndex * 4 + 3),
         });
@@ -1120,6 +1122,30 @@ export class AdminProductService {
           console.log(`🗑️ [PRE-UPLOAD] Deleting old image from Storage: ${oldImageUrl}`);
           await this.deleteImageFromStorage(oldImageUrl);
           console.log('✅ [PRE-UPLOAD] Old image deleted from Storage');
+          
+          // IMPORTANT: Also remove the URL from database (set to NULL)
+          console.log(`🗑️ [PRE-UPLOAD] Removing image URL from database at index ${imageIndex}`);
+          
+          if (imageIndex === 0) {
+            // Cannot set image_url to NULL (it's NOT NULL constraint)
+            console.log('⚠️ Cannot set image_url to NULL (NOT NULL constraint)');
+          } else {
+            // Use Supabase directly to set NULL value
+            const columnName = imageIndex === 1 ? 'alt_img1' 
+                             : imageIndex === 2 ? 'alt_img2' 
+                             : 'alt_img3';
+            
+            const { error } = await supabaseAdmin
+              .from('product_images')
+              .update({ [columnName]: null })
+              .eq('image_id', existingImage.imageId);
+            
+            if (error) {
+              console.error(`❌ Failed to set ${columnName} to NULL:`, error);
+            } else {
+              console.log(`✅ [PRE-UPLOAD] Set ${columnName} to NULL in database`);
+            }
+          }
         } catch (error) {
           console.error('⚠️ [PRE-UPLOAD] Failed to delete old image from Storage:', error);
           // Continue anyway - we still want to upload new image
@@ -1312,16 +1338,39 @@ export class AdminProductService {
   /**
    * Extract storage path from Supabase public URL
    * Example: https://xxx.supabase.co/storage/v1/object/public/product-img/Train/Product/image.webp
-   * Returns: Train/Product/image.webp
+   * Returns: Train/Product/image.webp (decoded)
    */
   private extractStoragePath(url: string): string | null {
     try {
       const match = url.match(/\/product-img\/(.+)$/);
-      return match ? match[1] : null;
+      if (!match) return null;
+      
+      // IMPORTANT: Decode URL to handle spaces and special characters
+      // URL in DB: "Hospital/LEGO%20Emergency%20Ambulance/image0.webp"
+      // Storage expects: "Hospital/LEGO Emergency Ambulance/image0.webp"
+      const encodedPath = match[1];
+      const decodedPath = decodeURIComponent(encodedPath);
+      
+      console.log(`🔍 [extractStoragePath] Encoded: ${encodedPath}`);
+      console.log(`🔍 [extractStoragePath] Decoded: ${decodedPath}`);
+      
+      return decodedPath;
     } catch (error) {
       logger.error('Error extracting storage path:', error);
       return null;
     }
+  }
+
+  /**
+   * Add cache-busting query parameter to image URL
+   * Forces browser to reload image when it changes
+   */
+  private addCacheBuster(imageUrl: string, timestamp: number): string {
+    if (!imageUrl) return imageUrl;
+    
+    // Check if URL already has query params
+    const separator = imageUrl.includes('?') ? '&' : '?';
+    return `${imageUrl}${separator}v=${timestamp}`;
   }
 
   /**

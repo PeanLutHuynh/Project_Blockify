@@ -840,4 +840,40 @@ export class AdminProductController {
       this.sendError(res, 400, error.message || 'Bad request');
     }
   }
+
+  /**
+   * Delete product image by product ID and image index
+   */
+  async deleteProductImageByIndex(
+    req: AdminRequest,
+    res: HttpResponse
+  ): Promise<void> {
+    try {
+      const adminId = await this.getAdminId(req);
+      if (!adminId) {
+        this.sendError(res, 401, 'Unauthorized');
+        return;
+      }
+
+      // Extract productId and imageIndex from URL
+      const urlParts = req.url?.split('/') || [];
+      const productId = parseInt(urlParts[urlParts.indexOf('products') + 1]);
+      const imageIndex = parseInt(urlParts[urlParts.length - 1]);
+
+      if (isNaN(productId) || isNaN(imageIndex)) {
+        this.sendError(res, 400, 'Invalid product ID or image index');
+        return;
+      }
+
+      console.log(`🗑️ [Controller] Deleting image ${imageIndex} for product ${productId}`);
+
+      // Call service to delete image from storage
+      await this.productService.deleteOldImageBeforeUpload(productId, imageIndex);
+
+      this.sendSuccess(res, 'Image deleted from storage successfully');
+    } catch (error: any) {
+      logger.error('Delete product image by index error:', error);
+      this.sendError(res, 400, error.message || 'Bad request');
+    }
+  }
 }

@@ -138,6 +138,11 @@ export function registerAdminProductRoutes(router: any): void {
     await adminProductController.deleteProductImage(req, res, imageId);
   });
 
+  // Delete product image by product ID and image index
+  router.delete("/api/admin/products/:productId/images/:imageIndex", authenticateToken, async (req: HttpRequest, res: HttpResponse) => {
+    await adminProductController.deleteProductImageByIndex(req, res);
+  });
+
   // ========================================
   // Category Routes
   // ========================================
