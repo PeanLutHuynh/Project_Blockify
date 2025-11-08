@@ -27,6 +27,18 @@ export class AdminProductController {
     this.setupSortHandlers();
     // Load categories for dropdowns
     this.loadCategories();
+    // Listen for category updates from AdminCategoryController
+    this.setupCategoryUpdateListener();
+  }
+
+  /**
+   * Setup listener for category updates
+   */
+  private setupCategoryUpdateListener(): void {
+    window.addEventListener('categoriesUpdated', () => {
+      console.log('📁 Categories updated event received, reloading categories...');
+      this.loadCategories();
+    });
   }
 
   /**
