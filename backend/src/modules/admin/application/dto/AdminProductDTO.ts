@@ -46,6 +46,7 @@ export interface UpdateProductDTO {
   is_featured?: boolean;
   is_new?: boolean;
   is_bestseller?: boolean;
+  images?: CreateProductImageDTO[]; // Add support for updating images
 }
 
 /**
