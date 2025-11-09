@@ -72,15 +72,27 @@ body, * {
   
   /* Hero Section */
   .hero {
-    background-color: #000;
-    color: white;
+    position: relative;
+    width: 100%;
     height: 90vh; /* chiếm 90% chiều cao màn hình */
-    width: 100%;  /* full chiều rộng */
+    overflow: hidden; /* cắt phần video vượt ra ngoài */
+    background-color: black;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden; /* tránh ảnh bị tràn */
-    position: relative;
+  }
+
+  .hero video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover; /* Giúp video phủ kín khung mà không bị viền đen */
+    z-index: 0;
   }
   
   .hero-slider {
@@ -406,7 +418,7 @@ body, * {
     height: 20%;
   }
   .hero{
-    height:300px;
+    height:200px;
     
   }
   .text-img-p{
