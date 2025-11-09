@@ -178,7 +178,8 @@ export class CartItem {
       salePrice: this._salePrice,
       quantity: this._quantity,
       stockQuantity: this._stockQuantity,
-      minStockLevel: this._minStockLevel
+      minStockLevel: this._minStockLevel,
+      selected: this._selected // Save selected state
     };
   }
 
@@ -195,7 +196,8 @@ export class CartItem {
       salePrice: data.salePrice,
       quantity: data.quantity,
       stockQuantity: data.stockQuantity,
-      minStockLevel: data.minStockLevel
+      minStockLevel: data.minStockLevel,
+      selected: data.selected // Restore selected state
     });
   }
 }

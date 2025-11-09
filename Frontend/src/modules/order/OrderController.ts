@@ -341,7 +341,7 @@ export class OrderController {
     // Calculate discount amount
     const discountAmount = originalTotal - subtotal;
 
-    const shippingFee = this.getSelectedShippingFee();
+    const shippingFee = this.getSelectedShippingFee(subtotal); // Pass subtotal sau giảm giá
     const grandTotal = subtotal + shippingFee;
 
     // Update UI
@@ -508,7 +508,7 @@ export class OrderController {
       return sum + (price * item.quantity);
     }, 0);
 
-    const shippingFee = this.getSelectedShippingFee();
+    const shippingFee = this.getSelectedShippingFee(subtotal); // Pass subtotal sau giảm giá
     const total = subtotal + shippingFee;
 
     return {
@@ -561,15 +561,22 @@ export class OrderController {
    * Get selected shipping fee
    * Free ship for orders >= 500,000 VND (based on subtotal after discount)
    */
-  private getSelectedShippingFee(): number {
-    // Calculate subtotal (giá sau giảm) from cart items
-    const cartItems = cartService.getItems();
-    const subtotal = cartItems.reduce((sum: number, item: CartItem) => {
-      const price = item.salePrice || item.price;
-      return sum + (price * item.quantity);
-    }, 0);
+  private getSelectedShippingFee(subtotalAfterDiscount?: number): number {
+    let subtotal: number;
     
-    // Free ship cho đơn >= 500k
+    if (subtotalAfterDiscount !== undefined) {
+      // Use provided subtotal (after discount)
+      subtotal = subtotalAfterDiscount;
+    } else {
+      // Calculate subtotal (giá sau giảm) from cart items
+      const cartItems = cartService.getItems();
+      subtotal = cartItems.reduce((sum: number, item: CartItem) => {
+        const price = item.salePrice || item.price;
+        return sum + (price * item.quantity);
+      }, 0);
+    }
+    
+    // Free ship cho đơn >= 500k (tính theo subtotal sau giảm giá)
     if (subtotal >= 500000) {
       return 0;
     }
