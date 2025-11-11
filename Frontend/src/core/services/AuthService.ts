@@ -372,7 +372,7 @@ export class AuthService {
         };
       }
       
-      return { success: true, message: "Redirecting to Google..." };
+      return { success: true, message: "Đang chuyển hướng đến Google..." };
     } catch (error) {
       console.error("Google auth error:", error);
       return {

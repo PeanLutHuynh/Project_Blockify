@@ -22,6 +22,15 @@ function normalizeDifficulty(value: any): string | undefined {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+function resolveProductDifficulty(product: any): string | undefined {
+  return (
+    normalizeDifficulty(product?.difficultyLevel) ||
+    normalizeDifficulty(product?.difficulty_level) ||
+    normalizeDifficulty(product?.difficult_level) ||
+    normalizeDifficulty(product?.difficulty)
+  );
+}
+
 function scrollProducts(direction: 'left' | 'right'): void {
   const container = document.getElementById('productScroll');
   const scrollAmount = 260;
@@ -377,13 +386,14 @@ async function loadRecommendedProducts(currentProductId?: number): Promise<void>
       const formattedPrice = price.toLocaleString('vi-VN');
       const rating = product.rating || 4.5;
       const pieceCount = product.pieceCount || 120;
-      
-      // Check if product is in wishlist
       const productId = parseInt(product.id);
       const isInWishlist = wishlistProductIds.includes(productId);
       const heartClass = isInWishlist ? 'fas fa-heart' : 'far fa-heart';
       const heartStyle = isInWishlist ? 'color: rgb(232, 0, 0);' : '';
       
+      // Lấy đúng giá trị ĐỘ KHÓ cho từng sản phẩm
+      const difficulty = resolveProductDifficulty(product) || '—';
+
       return `
         <div class="product-card" data-slug="${product.slug}" style="cursor: pointer;">
           <div class="heart-icon" data-product-id="${productId}" style="${heartStyle}">
@@ -396,8 +406,8 @@ async function loadRecommendedProducts(currentProductId?: number): Promise<void>
           </div>
           <div class="product-stats">
             <div class="stat-item">
-              <i class="fas fa-user-friends"></i>
-              <span>8+</span>
+              <i class="fas fa-cube"></i>
+              <span>${difficulty}</span>
             </div>
             <div class="stat-item">
               <i class="fas fa-cube"></i>
@@ -557,12 +567,7 @@ function renderProductDetail(product: any): void {
   // Update difficulty display instead of age
   const pdAge = document.getElementById('pd-age');
   if (pdAge) {
-    const difficulty =
-      normalizeDifficulty(product.difficulty_level) ||
-      normalizeDifficulty(product.difficult_level) ||
-      normalizeDifficulty(product.difficultyLevel) ||
-      normalizeDifficulty(product.difficulty) ||
-      'Medium';
+    const difficulty = resolveProductDifficulty(product) || 'Medium';
     pdAge.textContent = ` ${difficulty}`;
   }
 
@@ -575,12 +580,7 @@ function renderProductDetail(product: any): void {
   // Update stats
   const pdStats = document.getElementById('pd-stats');
   if (pdStats) {
-    const difficulty =
-      normalizeDifficulty(product.difficulty_level) ||
-      normalizeDifficulty(product.difficult_level) ||
-      normalizeDifficulty(product.difficultyLevel) ||
-      normalizeDifficulty(product.difficulty) ||
-      'Medium';
+    const difficulty = resolveProductDifficulty(product) || 'Medium';
     
     pdStats.innerHTML = `
       <span class="stats-item"><i class="fa-solid fa-fire"></i> ${difficulty}</span>

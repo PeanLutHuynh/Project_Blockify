@@ -443,13 +443,40 @@ export class AdminOrderController {
                   <div class="card">
                     <div class="card-body">
                       <h6 class="card-title text-primary">Lịch sử trạng thái</h6>
-                      ${order.order_status_history?.map((history: any) => `
-                        <div class="border-bottom pb-2 mb-2">
-                          <small class="text-muted">${new Date(history.created_at).toLocaleString("vi-VN")}</small>
-                          <p class="mb-0"><strong>${history.old_status}</strong> → <strong>${history.new_status}</strong></p>
-                          ${history.note ? `<p class="mb-0 text-muted"><em>${history.note}</em></p>` : ''}
-                        </div>
-                      `).join("") || "<p>Chưa có lịch sử</p>"}
+                      ${(() => {
+                        const history = order.order_status_history || [];
+                        
+                        if (history.length === 0) {
+                          return "<p>Chưa có lịch sử</p>";
+                        }
+                        
+                        let html = '';
+                        
+                        // Process each history item
+                        history.forEach((h: any) => {
+                          // For the first transition (NULL → Đang xử lý), only show "Đang xử lý"
+                          if (h.old_status === null) {
+                            html += `
+                              <div class="border-bottom pb-2 mb-2">
+                                <small class="text-muted">${new Date(h.created_at).toLocaleString("vi-VN")}</small>
+                                <p class="mb-0"><strong>${h.new_status}</strong></p>
+                                <p class="mb-0 text-muted"><em>Đơn hàng được tạo</em></p>
+                              </div>
+                            `;
+                          } else {
+                            // For subsequent transitions, show old_status → new_status
+                            html += `
+                              <div class="border-bottom pb-2 mb-2">
+                                <small class="text-muted">${new Date(h.created_at).toLocaleString("vi-VN")}</small>
+                                <p class="mb-0"><strong>${h.old_status}</strong> → <strong>${h.new_status}</strong></p>
+                                ${h.note ? `<p class="mb-0 text-muted"><em>${h.note}</em></p>` : ''}
+                              </div>
+                            `;
+                          }
+                        });
+                        
+                        return html;
+                      })()}
                     </div>
                   </div>
                 </div>

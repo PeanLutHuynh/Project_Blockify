@@ -41,13 +41,15 @@ export class AdminProductService {
    */
   private flattenProductImages(productImagesRows: any[]): any[] {
     const allImages: any[] = [];
+    // Cache-busting timestamp - force browser reload on image changes
+    const cacheBreaker = Date.now();
     
     (productImagesRows || []).forEach((imgRow: any, rowIndex: number) => {
       // Main image (image_url)
       if (imgRow.image_url) {
         allImages.push({
           image_id: imgRow.image_id,
-          image_url: imgRow.image_url,
+          image_url: this.addCacheBuster(imgRow.image_url, cacheBreaker),
           is_primary: imgRow.is_primary || rowIndex === 0,
           sort_order: imgRow.sort_order || (rowIndex * 4),
         });
@@ -57,7 +59,7 @@ export class AdminProductService {
       if (imgRow.alt_img1) {
         allImages.push({
           image_id: `${imgRow.image_id}_alt1`,
-          image_url: imgRow.alt_img1,
+          image_url: this.addCacheBuster(imgRow.alt_img1, cacheBreaker),
           is_primary: false,
           sort_order: imgRow.sort_order || (rowIndex * 4 + 1),
         });
@@ -65,7 +67,7 @@ export class AdminProductService {
       if (imgRow.alt_img2) {
         allImages.push({
           image_id: `${imgRow.image_id}_alt2`,
-          image_url: imgRow.alt_img2,
+          image_url: this.addCacheBuster(imgRow.alt_img2, cacheBreaker),
           is_primary: false,
           sort_order: imgRow.sort_order || (rowIndex * 4 + 2),
         });
@@ -73,7 +75,7 @@ export class AdminProductService {
       if (imgRow.alt_img3) {
         allImages.push({
           image_id: `${imgRow.image_id}_alt3`,
-          image_url: imgRow.alt_img3,
+          image_url: this.addCacheBuster(imgRow.alt_img3, cacheBreaker),
           is_primary: false,
           sort_order: imgRow.sort_order || (rowIndex * 4 + 3),
         });
@@ -440,15 +442,18 @@ export class AdminProductService {
       if (dto.images && dto.images.length > 0) {
         const imageUrls = dto.images.map(img => img.image_url);
         
+        // Generate alt_text from product name if not provided
+        const altText = dto.images[0]?.alt_text || dto.product_name;
+        
         // Create single image row with main image + alt images
         // IMPORTANT: DO NOT pass imageId - let database auto-generate it
         product.images = [
           new ProductImage({
             productId: 0, // Will be set after product creation
             imageUrl: imageUrls[0], // Primary image
-            altText: dto.images[0]?.alt_text,
+            altText: altText, // Use product name if alt_text not provided
             isPrimary: true,
-            sortOrder: 0,
+            sortOrder: 0, // Explicitly set to 0
             altImg1: imageUrls[1] || undefined, // Second image
             altImg2: imageUrls[2] || undefined, // Third image
             altImg3: imageUrls[3] || undefined, // Fourth image
@@ -489,6 +494,9 @@ export class AdminProductService {
     adminId: number
   ): Promise<ProductResponseDTO> {
     try {
+      console.log('🔄 [UpdateProduct] Starting update for product ID:', productId);
+      console.log('🔄 [UpdateProduct] DTO:', JSON.stringify(dto, null, 2));
+      
       // Check if product exists
       const existingProduct = await this.productRepo.findById(
         productId.toString()
@@ -505,6 +513,79 @@ export class AdminProductService {
         if (!category) {
           throw new Error('Danh mục không tồn tại');
         }
+      }
+
+      // Handle image updates - delete old images from Storage if new images are provided
+      if (dto.images && dto.images.length > 0) {
+        console.log('🖼️ [UpdateProduct] New images provided, cleaning up old images...');
+        
+        // Get existing images from database
+        const existingImages = await this.imageRepo.findByProductId(productId);
+        console.log(`🖼️ [UpdateProduct] Found ${existingImages.length} existing image records`);
+        
+        // Delete old images from Storage and database
+        for (const img of existingImages) {
+          console.log(`🗑️ [UpdateProduct] Deleting old image: ${img.imageUrl}`);
+          
+          // Extract and delete from Storage
+          const storagePath = this.extractStoragePath(img.imageUrl);
+          if (storagePath) {
+            const { error: storageError } = await supabaseAdmin.storage
+              .from('product-img')
+              .remove([storagePath]);
+            
+            if (storageError) {
+              logger.warn(`⚠️ Failed to delete from Storage: ${storagePath}`, storageError);
+            } else {
+              console.log(`✅ Deleted from Storage: ${storagePath}`);
+            }
+          }
+          
+          // Delete alt images if they exist
+          if (img.altImg1) {
+            const altPath1 = this.extractStoragePath(img.altImg1);
+            if (altPath1) {
+              await supabaseAdmin.storage.from('product-img').remove([altPath1]);
+              console.log(`✅ Deleted alt_img1 from Storage: ${altPath1}`);
+            }
+          }
+          if (img.altImg2) {
+            const altPath2 = this.extractStoragePath(img.altImg2);
+            if (altPath2) {
+              await supabaseAdmin.storage.from('product-img').remove([altPath2]);
+              console.log(`✅ Deleted alt_img2 from Storage: ${altPath2}`);
+            }
+          }
+          if (img.altImg3) {
+            const altPath3 = this.extractStoragePath(img.altImg3);
+            if (altPath3) {
+              await supabaseAdmin.storage.from('product-img').remove([altPath3]);
+              console.log(`✅ Deleted alt_img3 from Storage: ${altPath3}`);
+            }
+          }
+        }
+        
+        // Delete old image records from database
+        await this.imageRepo.deleteByProductId(productId);
+        console.log('✅ [UpdateProduct] Deleted old image records from database');
+        
+        // Create new image record (single row with 4 image URLs)
+        const imageUrls = dto.images.map(img => img.image_url);
+        const altText = dto.images[0]?.alt_text || dto.product_name || existingProduct.productName;
+        
+        const newImage = new ProductImage({
+          productId: productId,
+          imageUrl: imageUrls[0], // Primary image
+          altText: altText,
+          isPrimary: true,
+          sortOrder: 0, // Explicitly set to 0
+          altImg1: imageUrls[1] || undefined,
+          altImg2: imageUrls[2] || undefined,
+          altImg3: imageUrls[3] || undefined,
+        });
+        
+        await this.imageRepo.create(newImage);
+        console.log('✅ [UpdateProduct] Created new image record with all 4 images in one row');
       }
 
       // Update product entity
@@ -548,6 +629,8 @@ export class AdminProductService {
         productUpdate
       );
 
+      console.log('✅ [UpdateProduct] Product updated successfully');
+
       // Log action
       await this.logAction(adminId, 'UPDATE', {
         product_id: productId,
@@ -556,6 +639,7 @@ export class AdminProductService {
 
       return await this.toProductResponse(updatedProduct);
     } catch (error) {
+      console.error('❌ [UpdateProduct] Error:', error);
       logger.error('Error updating product:', error);
       throw error;
     }
@@ -1001,6 +1085,174 @@ export class AdminProductService {
   }
 
   /**
+   * Add or update product image (smart logic for 1 row with 4 columns)
+   * - If imageIndex = 0: Create new row or update image_url
+   * - If imageIndex = 1-3: Update alt_img1, alt_img2, alt_img3
+   */
+  /**
+   * Delete old image from Storage BEFORE uploading new one
+   * This prevents accidentally deleting the new image when filenames are same
+   */
+  async deleteOldImageBeforeUpload(productId: number, imageIndex: number): Promise<void> {
+    try {
+      // Get existing image row for this product
+      const existingImages = await this.imageRepo.findByProductId(productId);
+      
+      if (existingImages.length === 0) {
+        console.log('ℹ️ No existing images to delete');
+        return;
+      }
+
+      const existingImage = existingImages[0];
+      let oldImageUrl: string | undefined;
+      
+      if (imageIndex === 0) {
+        oldImageUrl = existingImage.imageUrl;
+      } else if (imageIndex === 1) {
+        oldImageUrl = existingImage.altImg1 || undefined;
+      } else if (imageIndex === 2) {
+        oldImageUrl = existingImage.altImg2 || undefined;
+      } else if (imageIndex === 3) {
+        oldImageUrl = existingImage.altImg3 || undefined;
+      }
+      
+      // Delete old image from Storage if exists
+      if (oldImageUrl) {
+        try {
+          console.log(`🗑️ [PRE-UPLOAD] Deleting old image from Storage: ${oldImageUrl}`);
+          await this.deleteImageFromStorage(oldImageUrl);
+          console.log('✅ [PRE-UPLOAD] Old image deleted from Storage');
+          
+          // IMPORTANT: Also remove the URL from database (set to NULL)
+          console.log(`🗑️ [PRE-UPLOAD] Removing image URL from database at index ${imageIndex}`);
+          
+          if (imageIndex === 0) {
+            // Cannot set image_url to NULL (it's NOT NULL constraint)
+            console.log('⚠️ Cannot set image_url to NULL (NOT NULL constraint)');
+          } else {
+            // Use Supabase directly to set NULL value
+            const columnName = imageIndex === 1 ? 'alt_img1' 
+                             : imageIndex === 2 ? 'alt_img2' 
+                             : 'alt_img3';
+            
+            const { error } = await supabaseAdmin
+              .from('product_images')
+              .update({ [columnName]: null })
+              .eq('image_id', existingImage.imageId);
+            
+            if (error) {
+              console.error(`❌ Failed to set ${columnName} to NULL:`, error);
+            } else {
+              console.log(`✅ [PRE-UPLOAD] Set ${columnName} to NULL in database`);
+            }
+          }
+        } catch (error) {
+          console.error('⚠️ [PRE-UPLOAD] Failed to delete old image from Storage:', error);
+          // Continue anyway - we still want to upload new image
+        }
+      } else {
+        console.log(`ℹ️ [PRE-UPLOAD] No old image to delete at index ${imageIndex} (column was empty)`);
+      }
+    } catch (error) {
+      logger.error('Error in deleteOldImageBeforeUpload:', error);
+      // Don't throw - we still want to continue with upload
+    }
+  }
+
+  async addOrUpdateProductImage(
+    productId: number,
+    imageUrl: string,
+    imageIndex: number,
+    productName: string,
+    adminId: number
+  ): Promise<void> {
+    try {
+      console.log(`🖼️ [Service] addOrUpdateProductImage - Product: ${productId}, Index: ${imageIndex}`);
+      
+      // Check if product exists
+      const product = await this.productRepo.findById(productId.toString());
+      if (!product) {
+        throw new Error('Sản phẩm không tồn tại');
+      }
+
+      // Get existing image row for this product
+      const existingImages = await this.imageRepo.findByProductId(productId);
+      console.log(`📊 Found ${existingImages.length} existing image rows`);
+
+      if (existingImages.length === 0) {
+        // No image row exists - create new one
+        console.log('✨ Creating new image row');
+        
+        // IMPORTANT: image_url (primary image) is required (NOT NULL in database)
+        // If uploading non-primary image first (index 1-3), use it as primary temporarily
+        const newImage = new ProductImage({
+          productId,
+          imageUrl: imageUrl, // Always use the uploaded image as primary
+          altText: productName,
+          isPrimary: true,
+          sortOrder: 0,
+          // Only set alt_imgX if this is NOT the primary image
+          // This avoids duplication: if index=1, image goes to both image_url AND alt_img1
+          altImg1: imageIndex === 1 ? imageUrl : undefined,
+          altImg2: imageIndex === 2 ? imageUrl : undefined,
+          altImg3: imageIndex === 3 ? imageUrl : undefined,
+        });
+        
+        if (imageIndex !== 0) {
+          console.log(`⚠️ Creating row with image at index ${imageIndex} (also set as primary)`);
+        }
+        
+        await this.imageRepo.create(newImage);
+        console.log(`✅ Created new image row`);
+      } else {
+        // Image row exists - update the appropriate column
+        const existingImage = existingImages[0]; // Take first row
+        console.log(`🔄 Updating existing image row ID: ${existingImage.imageId}`);
+        
+        // NOTE: Old image has been deleted in deleteOldImageBeforeUpload()
+        // No need to delete here to avoid deleting the new image
+        
+        const updateData: Partial<ProductImage> = {};
+        
+        if (imageIndex === 0) {
+          updateData.imageUrl = imageUrl;
+          console.log('  - Updating image_url (main image)');
+        } else if (imageIndex === 1) {
+          updateData.altImg1 = imageUrl;
+          console.log('  - Updating alt_img1');
+        } else if (imageIndex === 2) {
+          updateData.altImg2 = imageUrl;
+          console.log('  - Updating alt_img2');
+        } else if (imageIndex === 3) {
+          updateData.altImg3 = imageUrl;
+          console.log('  - Updating alt_img3');
+        }
+        
+        // Also update alt_text if it's empty
+        if (!existingImage.altText) {
+          updateData.altText = productName;
+        }
+        
+        await this.imageRepo.update(existingImage.imageId!.toString(), updateData);
+        console.log('✅ Updated existing image row with new URL');
+      }
+
+      // Log action
+      await this.logAction(adminId, 'UPDATE', {
+        product_id: productId,
+        image_index: imageIndex,
+        image_url: imageUrl,
+      });
+      
+      console.log(`✅ [Service] Image ${imageIndex} processed successfully`);
+    } catch (error) {
+      console.error('❌ [Service] Error in addOrUpdateProductImage:', error);
+      logger.error('Error adding/updating product image:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Delete product image
    */
   async deleteProductImage(imageId: number, adminId: number): Promise<void> {
@@ -1052,18 +1304,73 @@ export class AdminProductService {
   }
 
   /**
+   * Delete image from Supabase Storage by URL
+   * Helper method to delete old images when updating
+   */
+  private async deleteImageFromStorage(imageUrl: string): Promise<void> {
+    try {
+      // Extract Storage path from URL
+      const storagePath = this.extractStoragePath(imageUrl);
+      
+      if (!storagePath) {
+        logger.warn('⚠️ Could not extract storage path from URL:', imageUrl);
+        return;
+      }
+
+      console.log(`🗑️ Deleting from Storage: ${storagePath}`);
+      
+      const { error: storageError } = await supabaseAdmin.storage
+        .from('product-img')
+        .remove([storagePath]);
+
+      if (storageError) {
+        logger.error('❌ Failed to delete from Storage:', storageError);
+        throw storageError;
+      }
+      
+      console.log('✅ Deleted from Storage successfully');
+    } catch (error) {
+      logger.error('Error deleting image from storage:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Extract storage path from Supabase public URL
    * Example: https://xxx.supabase.co/storage/v1/object/public/product-img/Train/Product/image.webp
-   * Returns: Train/Product/image.webp
+   * Returns: Train/Product/image.webp (decoded)
    */
   private extractStoragePath(url: string): string | null {
     try {
       const match = url.match(/\/product-img\/(.+)$/);
-      return match ? match[1] : null;
+      if (!match) return null;
+      
+      // IMPORTANT: Decode URL to handle spaces and special characters
+      // URL in DB: "Hospital/LEGO%20Emergency%20Ambulance/image0.webp"
+      // Storage expects: "Hospital/LEGO Emergency Ambulance/image0.webp"
+      const encodedPath = match[1];
+      const decodedPath = decodeURIComponent(encodedPath);
+      
+      console.log(`🔍 [extractStoragePath] Encoded: ${encodedPath}`);
+      console.log(`🔍 [extractStoragePath] Decoded: ${decodedPath}`);
+      
+      return decodedPath;
     } catch (error) {
       logger.error('Error extracting storage path:', error);
       return null;
     }
+  }
+
+  /**
+   * Add cache-busting query parameter to image URL
+   * Forces browser to reload image when it changes
+   */
+  private addCacheBuster(imageUrl: string, timestamp: number): string {
+    if (!imageUrl) return imageUrl;
+    
+    // Check if URL already has query params
+    const separator = imageUrl.includes('?') ? '&' : '?';
+    return `${imageUrl}${separator}v=${timestamp}`;
   }
 
   /**

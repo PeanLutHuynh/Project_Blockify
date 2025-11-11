@@ -573,6 +573,18 @@ function setupFilterDropdowns() {
     
     console.log('📋 Filter values:', { priceRange, difficulty, sort });
     
+    // Check if all filters are empty
+    if (!priceRange && !difficulty && !sort) {
+      console.log('📂 All filters empty, showing all products');
+      // Reset to show all products (like clicking "Danh mục")
+      currentFilterMode = 'all';
+      currentCategoryId = undefined;
+      resetFilterButtons();
+      clearCategorySelection();
+      await loadProductsFromAPI(undefined, 1);
+      return;
+    }
+    
     // Reset filter mode and category
     currentFilterMode = 'all';
     currentCategoryId = undefined;

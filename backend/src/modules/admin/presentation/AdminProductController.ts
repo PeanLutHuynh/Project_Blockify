@@ -768,8 +768,9 @@ export class AdminProductController {
 
       console.log(`✅ Category lookup: ID ${product.category_id} → name "${categoryName}"`);
 
-      // Get optional metadata from request body
-      const imageIndex = req.body?.imageIndex || req.body?.image_index;
+      // Get imageIndex from request body
+      const imageIndexStr = req.body?.imageIndex || req.body?.image_index;
+      const imageIndex = imageIndexStr ? parseInt(imageIndexStr) : 0;
 
       console.log('📋 Upload metadata:', { 
         categoryName, 
@@ -777,25 +778,28 @@ export class AdminProductController {
         imageIndex 
       });
 
+      // IMPORTANT: Delete old image BEFORE uploading new one
+      // This prevents deleting the new image when old and new have same filename
+      await this.productService.deleteOldImageBeforeUpload(id, imageIndex);
+
       // Upload to Supabase Storage
       const imageUrl = await this.productService.uploadProductImage(
         fileData.buffer,
         fileData.mimetype,
         categoryName,
         product.product_name,
-        imageIndex ? parseInt(imageIndex) : undefined
+        imageIndex
       );
 
       console.log('✅ Image uploaded:', imageUrl);
+      console.log(`📸 Image index: ${imageIndex}`);
 
-      // Add image record to database
-      await this.productService.addProductImages(
+      // Add/update image in database (smart logic to use 1 row with 4 columns)
+      await this.productService.addOrUpdateProductImage(
         id,
-        [{
-          image_url: imageUrl,
-          is_primary: false,
-          sort_order: imageIndex ? parseInt(imageIndex) : 999
-        }],
+        imageUrl,
+        imageIndex,
+        product.product_name,
         adminId
       );
 
@@ -833,6 +837,42 @@ export class AdminProductController {
       this.sendSuccess(res, 'Image deleted successfully');
     } catch (error: any) {
       logger.error('Delete product image error:', error);
+      this.sendError(res, 400, error.message || 'Bad request');
+    }
+  }
+
+  /**
+   * Delete product image by product ID and image index
+   */
+  async deleteProductImageByIndex(
+    req: AdminRequest,
+    res: HttpResponse
+  ): Promise<void> {
+    try {
+      const adminId = await this.getAdminId(req);
+      if (!adminId) {
+        this.sendError(res, 401, 'Unauthorized');
+        return;
+      }
+
+      // Extract productId and imageIndex from URL
+      const urlParts = req.url?.split('/') || [];
+      const productId = parseInt(urlParts[urlParts.indexOf('products') + 1]);
+      const imageIndex = parseInt(urlParts[urlParts.length - 1]);
+
+      if (isNaN(productId) || isNaN(imageIndex)) {
+        this.sendError(res, 400, 'Invalid product ID or image index');
+        return;
+      }
+
+      console.log(`🗑️ [Controller] Deleting image ${imageIndex} for product ${productId}`);
+
+      // Call service to delete image from storage
+      await this.productService.deleteOldImageBeforeUpload(productId, imageIndex);
+
+      this.sendSuccess(res, 'Image deleted from storage successfully');
+    } catch (error: any) {
+      logger.error('Delete product image by index error:', error);
       this.sendError(res, 400, error.message || 'Bad request');
     }
   }

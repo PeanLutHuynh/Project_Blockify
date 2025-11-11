@@ -345,6 +345,9 @@ export class AdminCategoryController {
 
       // Reload categories
       await this.loadCategories();
+      
+      // Notify other controllers (e.g., AdminProductController) to reload categories
+      window.dispatchEvent(new CustomEvent('categoriesUpdated'));
     } catch (error: any) {
       console.error('❌ Error adding category:', error);
       this.showError(error.message || error.error || 'Không thể thêm danh mục');
@@ -462,6 +465,9 @@ export class AdminCategoryController {
 
       // Reload categories
       await this.loadCategories();
+      
+      // Notify other controllers (e.g., AdminProductController) to reload categories
+      window.dispatchEvent(new CustomEvent('categoriesUpdated'));
     } catch (error: any) {
       console.error('❌ Error updating category:', error);
       this.showError(error.message || error.error || 'Không thể cập nhật danh mục');
@@ -484,6 +490,9 @@ export class AdminCategoryController {
       if (response.success) {
         this.showSuccess('Xóa danh mục thành công!');
         await this.loadCategories();
+        
+        // Notify other controllers (e.g., AdminProductController) to reload categories
+        window.dispatchEvent(new CustomEvent('categoriesUpdated'));
       } else {
         this.showError('Không thể xóa danh mục: ' + (response.message || 'Unknown error'));
       }
