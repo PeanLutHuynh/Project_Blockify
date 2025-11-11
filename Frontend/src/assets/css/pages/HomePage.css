@@ -567,7 +567,7 @@ html { scroll-behavior: smooth; }
     padding: 10px;
   }
   .banner img {
-    height: 250px; /* Chiều cao lớn hơn khi ở tablet/desktop */
+    height: 250px; 
   }
 
   .view-btn {
