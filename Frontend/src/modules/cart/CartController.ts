@@ -19,18 +19,13 @@ export class CartController {
     this.init();
   }
 
-  /**
-   * Initialize controller
-   */
   private init(): void {
     this.initializeElements();
     this.attachEventListeners();
     this.renderCart();
   }
 
-  /**
-   * Initialize DOM elements
-   */
+
   private initializeElements(): void {
     this.cartTableBody = document.getElementById('cart-table-body');
     this.totalCostElement = document.getElementById('total-cost');

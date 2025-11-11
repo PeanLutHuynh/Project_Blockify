@@ -1,0 +1,88 @@
+.reset-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 2rem;
+  }
+
+  .reset-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .reset-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .reset-header i {
+    font-size: 3rem;
+    color: #0096F4;
+    margin-bottom: 1rem;
+  }
+
+  .reset-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+
+  .reset-header p {
+    color: #666;
+    font-size: 0.95rem;
+  }
+
+  .btn-reset {
+    width: 100%;
+    padding: 12px;
+    background: #0096F4;
+    border-radius: 50px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+
+  .btn-reset:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-reset:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .back-to-signin {
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+
+  .back-to-signin a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .back-to-signin a:hover {
+    text-decoration: underline;
+  }
+
+  .success-message {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .error-message {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }

@@ -26,23 +26,23 @@ export async function initializeApp(): Promise<void> {
   try {
     // Step 1: Wait for configuration to load
     await waitForConfig();
-    console.log('✅ Configuration loaded');
+    console.log(' Configuration loaded');
     
     // Step 2: Initialize Supabase client (async - wait for CDN SDK to load)
     if (ENV.SUPABASE_URL && ENV.SUPABASE_ANON_KEY) {
       const supabaseInitialized = await supabaseService.initializeAsync();
       if (supabaseInitialized) {
-        console.log('✅ Supabase client initialized');
+        console.log(' Supabase client initialized');
       } else {
-        console.error('❌ Failed to initialize Supabase client');
+        console.error('Failed to initialize Supabase client');
       }
     } else {
-      console.warn('⚠️ Supabase configuration missing, auth features may not work');
+      console.warn('Supabase configuration missing, auth features may not work');
     }
     
     // Step 3: Initialize auth state listener
     authService.initializeAuthListener();
-    console.log('✅ Auth state listener initialized');
+    console.log('Auth state listener initialized');
     
     // Step 4: Load cart from backend if user is logged in
     await cartService.loadFromBackend();
@@ -53,9 +53,9 @@ export async function initializeApp(): Promise<void> {
     // Step 6: Auth listener will automatically handle session detection and user sync
     // No need to manually check session here
     
-    console.log('✅ Blockify frontend initialized successfully');
+    console.log('Blockify frontend initialized successfully');
   } catch (error) {
-    console.error('❌ Failed to initialize app:', error);
+    console.error(' Failed to initialize app:', error);
   }
 }
 
@@ -79,10 +79,10 @@ export function initializeOnReady(callback?: () => void | Promise<void>): void {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
       await initializeApp();
-      await callback?.(); // ✅ MUST AWAIT ASYNC CALLBACK
+      await callback?.(); //  MUST AWAIT ASYNC CALLBACK
     });
   } else {
-    initializeApp().then(async () => await callback?.()); // ✅ MUST AWAIT ASYNC CALLBACK
+    initializeApp().then(async () => await callback?.()); // MUST AWAIT ASYNC CALLBACK
   }
 }
 
