@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Global Auth Manager
  * Centralizes authentication state management across the entire application
  * Ensures user is loaded once at startup and provides global access
@@ -268,7 +268,7 @@ export class AuthManager {
     console.log('[AuthManager] All caches and session data cleared');
     
     // Redirect to signin page after logout
-    window.location.href = '/pages/SigninPage.html';
+    window.location.href = './SigninPage.html';
   }
 
   /**
@@ -298,13 +298,13 @@ export class AuthManager {
   public requireAdmin(): void {
     if (!this.isAuthenticated()) {
       console.warn('[AuthManager] Not authenticated, redirecting to signin');
-      window.location.href = '/pages/SigninPage.html';
+      window.location.href = './SigninPage.html';
       return;
     }
 
     if (!this.isAdmin()) {
       console.warn('[AuthManager] Not admin, redirecting to home');
-      window.location.href = '/pages/HomePage.html';
+      window.location.href = './HomePage.html';
       return;
     }
 
@@ -318,7 +318,7 @@ export class AuthManager {
   public requireAuth(): void {
     if (!this.isAuthenticated()) {
       console.warn('[AuthManager] Not authenticated, redirecting to signin');
-      window.location.href = '/pages/SigninPage.html';
+      window.location.href = './SigninPage.html';
     }
   }
 }

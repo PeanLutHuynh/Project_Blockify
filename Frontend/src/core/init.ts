@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Global Initialization Script
  * ULTRA-OPTIMIZED: Instant navbar render, zero delay
  * Render first, verify later
@@ -51,7 +51,7 @@ export async function initializeApp(): Promise<void> {
     
     if (hasValidSession && authManager.isAdmin() && !isAdminPage && !isAuthPage) {
       console.log('[Init] Admin user detected, redirecting to admin panel...');
-      window.location.href = '/pages/Admin.html';
+      window.location.href = './Admin.html';
       return;
     }
 

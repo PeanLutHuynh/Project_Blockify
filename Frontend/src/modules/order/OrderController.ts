@@ -1,4 +1,4 @@
-import { OrderService } from "../../core/services/OrderService.js";
+﻿import { OrderService } from "../../core/services/OrderService.js";
 import { AuthService } from "../../core/services/AuthService.js";
 import { PaymentProofService } from "../../core/services/PaymentProofService.js";
 import { PaymentQR } from "../../core/models/PaymentQR.js";
@@ -52,7 +52,7 @@ export class OrderController {
       if (!this.userId) {
         console.error('❌ [OrderController] No user ID found - redirecting to sign in');
         alert("Vui lòng đăng nhập để tiếp tục");
-        window.location.href = "/pages/SigninPage.html";
+        window.location.href = "./SigninPage.html";
         return;
       }
 
@@ -443,7 +443,7 @@ export class OrderController {
       alert(`Đặt hàng thành công! Mã đơn hàng: ${order.orderNumber}`);
 
       // Redirect to order confirmation page
-      window.location.href = `/pages/OrderConfirmation.html?orderNumber=${order.orderNumber}`;
+      window.location.href = `./OrderConfirmation.html?orderNumber=${order.orderNumber}`;
     } catch (error: any) {
       console.error("Checkout failed:", error);
       alert(`Đặt hàng thất bại: ${error.message}`);
@@ -1270,7 +1270,7 @@ export class OrderController {
             clearInterval(timerInterval);
             bsModal.hide();
             modal.remove();
-            window.location.href = '/pages/OrderPage.html';
+            window.location.href = './OrderPage.html';
           }
         });
       }
@@ -1317,7 +1317,7 @@ export class OrderController {
           setTimeout(() => {
             bsModal.hide();
             modal.remove();
-            window.location.href = `/pages/OrderConfirmation.html?orderNumber=${orderNumber}`;
+            window.location.href = `./OrderConfirmation.html?orderNumber=${orderNumber}`;
           }, 2000);
         },
         () => {
@@ -1340,7 +1340,7 @@ export class OrderController {
           if (cancelBtn) {
             cancelBtn.textContent = 'Xem đơn hàng';
             (cancelBtn as HTMLButtonElement).onclick = () => {
-              window.location.href = '/pages/Account.html?tab=orders';
+              window.location.href = './Account.html?tab=orders';
             };
           }
         },

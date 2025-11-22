@@ -1,4 +1,4 @@
-import { initializeOnReady } from '../../../core/config/init.js';
+﻿import { initializeOnReady } from '../../../core/config/init.js';
 import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
 import { initializeSearch } from '../../../shared/components/SearchInit.js';
 import { productService } from '../../../core/services/ProductService.js';
@@ -41,7 +41,7 @@ async function toggleHeart(heart: HTMLElement): Promise<void> {
   // Check if user is logged in
   if (!authService.isAuthenticated()) {
     alert('Vui lòng đăng nhập để thêm vào wishlist');
-    window.location.href = '/pages/SigninPage.html';
+    window.location.href = './SigninPage.html';
     return;
   }
 
@@ -291,7 +291,7 @@ async function handleBuyNow(): Promise<void> {
     sessionStorage.setItem('checkoutSource', 'buyNow'); // Mark as direct buy
     
     // Redirect to order page
-    window.location.href = '/pages/OrderPage.html';
+    window.location.href = './OrderPage.html';
     
   } catch (error) {
     console.error('❌ [ProductDetail] Error in Buy Now:', error);
@@ -436,7 +436,7 @@ async function loadRecommendedProducts(currentProductId?: number): Promise<void>
           // Check if user is logged in
           if (!authService.isAuthenticated()) {
             alert('Vui lòng đăng nhập để thêm vào wishlist');
-            window.location.href = '/pages/SigninPage.html';
+            window.location.href = './SigninPage.html';
             return;
           }
           
@@ -481,7 +481,7 @@ async function loadRecommendedProducts(currentProductId?: number): Promise<void>
         const slug = card.getAttribute('data-slug');
         if (slug) {
           console.log(`🔗 Navigating to product: ${slug}`);
-          window.location.href = `/pages/ProductDetail.html?slug=${slug}`;
+          window.location.href = `./ProductDetail.html?slug=${slug}`;
         }
       });
     });

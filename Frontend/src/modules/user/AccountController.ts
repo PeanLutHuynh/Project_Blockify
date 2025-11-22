@@ -1,4 +1,4 @@
-import { authService } from '../../core/services/AuthService.js';
+﻿import { authService } from '../../core/services/AuthService.js';
 import { httpClient } from '../../core/api/FetchHttpClient.js';
 import { User } from '../../core/models/User.js';
 import userProfileService, { UserAddress } from './UserProfileService.js';
@@ -1396,7 +1396,7 @@ export class AccountController {
         alert(message);
 
         // Redirect to cart page
-        window.location.href = '/pages/CartPage.html';
+        window.location.href = './CartPage.html';
       } else {
         alert('Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại sau.');
       }
@@ -1820,7 +1820,7 @@ export class AccountController {
     console.log(`🔍 [viewProductDetail] Navigating to product detail - slug: ${slug}, id: ${productId}`);
     
     if (slug && slug !== 'undefined' && slug.trim() !== '') {
-      window.location.href = `/pages/ProductDetail.html?slug=${encodeURIComponent(slug)}`;
+      window.location.href = `./ProductDetail.html?slug=${encodeURIComponent(slug)}`;
     } else {
       console.error('❌ [viewProductDetail] Invalid slug, using product ID fallback');
       alert('Không thể mở chi tiết sản phẩm - thiếu thông tin slug');

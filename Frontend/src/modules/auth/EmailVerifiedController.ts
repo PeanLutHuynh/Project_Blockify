@@ -1,4 +1,4 @@
-/**
+﻿/**
  * EmailVerifiedController
  * Handles email verification success/error display
  * Following MVC pattern per rule.md
@@ -81,7 +81,7 @@ export class EmailVerifiedController {
         if (this.countdownInterval) {
           clearInterval(this.countdownInterval);
         }
-        window.location.href = '/pages/SigninPage.html';
+        window.location.href = './SigninPage.html';
       }
     }, 1000);
     

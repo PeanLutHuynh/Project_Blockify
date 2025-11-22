@@ -1,4 +1,4 @@
-import { supabaseService } from "../../core/api/supabaseClient.js";
+﻿import { supabaseService } from "../../core/api/supabaseClient.js";
 import { AdminService } from "./AdminService.js";
 import { ENV } from "../../core/config/env.js";
 
@@ -42,7 +42,7 @@ export class AdminController {
       
       if (!token) {
         console.log('❌ No auth token found, redirecting to login');
-        window.location.href = "/pages/SigninPage.html";
+        window.location.href = "./SigninPage.html";
         return;
       }
 
@@ -52,7 +52,7 @@ export class AdminController {
       
       if (!payload) {
         console.log('❌ Invalid token, redirecting to login');
-        window.location.href = "/pages/SigninPage.html";
+        window.location.href = "./SigninPage.html";
         return;
       }
 
@@ -60,7 +60,7 @@ export class AdminController {
       if (payload.role !== "admin") {
         console.log('❌ Not an admin (role:', payload.role, '), redirecting to HomePage');
         alert("Access denied. Admin privileges required.");
-        window.location.href = "/pages/HomePage.html";
+        window.location.href = "./HomePage.html";
         return;
       }
 
@@ -79,7 +79,7 @@ export class AdminController {
       if (!adminCheck.isAdmin) {
         console.log('❌ Admin not found in database');
         alert("Admin record not found in database.");
-        window.location.href = "/pages/HomePage.html";
+        window.location.href = "./HomePage.html";
         return;
       }
 
@@ -87,7 +87,7 @@ export class AdminController {
         console.log('❌ Admin account inactive');
         alert("Your admin account is inactive.");
         await supabaseService.signOut();
-        window.location.href = "/pages/SigninPage.html";
+        window.location.href = "./SigninPage.html";
         return;
       }
 
@@ -194,7 +194,7 @@ export class AdminController {
       localStorage.removeItem(ENV.USER_STORAGE_KEY);
 
       // Redirect to login page
-      window.location.href = "/pages/SigninPage.html";
+      window.location.href = "./SigninPage.html";
     } catch (error) {
       console.error("Logout error:", error);
       alert("Failed to logout");
@@ -231,7 +231,7 @@ export class AdminController {
   static async redirectIfAdmin(): Promise<void> {
     const isAdmin = await AdminController.isAdmin();
     if (isAdmin) {
-      window.location.href = "/pages/Admin.html";
+      window.location.href = "./Admin.html";
     }
   }
 }

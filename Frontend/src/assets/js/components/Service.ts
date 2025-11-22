@@ -1,4 +1,4 @@
-import { initializeOnReady } from '../../../core/config/init.js';
+﻿import { initializeOnReady } from '../../../core/config/init.js';
 import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
 import { initializeSearch } from '../../../shared/components/SearchInit.js';
 import { categoryService } from '../../../core/services/CategoryService.js';
@@ -154,7 +154,7 @@ function renderProducts(products: any[]) {
       
       const slug = card.getAttribute('data-slug');
       if (slug) {
-        window.location.href = `/pages/ProductDetail.html?slug=${slug}`;
+        window.location.href = `./ProductDetail.html?slug=${slug}`;
       }
     });
   });

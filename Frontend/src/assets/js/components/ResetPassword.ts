@@ -1,4 +1,4 @@
-import { supabaseService } from '../../../core/api/supabaseClient.js';
+﻿import { supabaseService } from '../../../core/api/supabaseClient.js';
 import { loadConfig } from '../../../core/config/env.js';
 
 /**
@@ -63,7 +63,7 @@ class ResetPasswordController {
         // Show error and redirect to forgot password page
         this.showError('Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu link mới.');
         setTimeout(() => {
-          window.location.href = '/pages/ForgotPassword.html';
+          window.location.href = './ForgotPassword.html';
         }, 3000);
         
         return false;
@@ -77,7 +77,7 @@ class ResetPasswordController {
       // Show error and redirect to forgot password page
       this.showError('Có lỗi xảy ra. Đang chuyển hướng đến trang quên mật khẩu...');
       setTimeout(() => {
-        window.location.href = '/pages/ForgotPassword.html';
+        window.location.href = './ForgotPassword.html';
       }, 3000);
       
       return false;

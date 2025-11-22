@@ -1,4 +1,4 @@
-import { httpClient } from "../api/FetchHttpClient.js";
+﻿import { httpClient } from "../api/FetchHttpClient.js";
 import { supabaseService } from "../api/supabaseClient.js";
 import { User } from "../models/User.js";
 import { ENV } from "../config/env.js";
@@ -630,7 +630,7 @@ export class AuthService {
                 if (oauthResponse.data.user.is_active === false) {
                   console.log('❌ Google OAuth: Account is deactivated');
                   await supabaseService.signOut();
-                  window.location.href = '/pages/AccountBlocked.html';
+                  window.location.href = './AccountBlocked.html';
                   return;
                 }
                 
@@ -644,14 +644,14 @@ export class AuthService {
                   console.log('Google OAuth: Admin detected, redirecting to Admin panel...');
                   // Check if we're not already on admin page
                   if (!window.location.pathname.includes('Admin.html')) {
-                    window.location.href = '/pages/Admin.html';
+                    window.location.href = './Admin.html';
                   }
                 } else {
                   console.log('Google OAuth: Regular user, redirecting to Home page...');
                   // Check if we're on auth callback or signin page
                   if (window.location.pathname.includes('AuthCallback.html') || 
                       window.location.pathname.includes('Signin')) {
-                    window.location.href = '/pages/HomePage.html';
+                    window.location.href = './HomePage.html';
                   }
                 }
               } else {
@@ -659,7 +659,7 @@ export class AuthService {
                 if (oauthResponse.message === 'ACCOUNT_BLOCKED') {
                   console.log('❌ Google OAuth: Account is blocked');
                   await supabaseService.signOut();
-                  window.location.href = '/pages/AccountBlocked.html';
+                  window.location.href = './AccountBlocked.html';
                   return;
                 }
                 

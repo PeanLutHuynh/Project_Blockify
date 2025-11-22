@@ -165,7 +165,7 @@ class SupabaseService {
    * Redirects to AuthCallback page which will handle session detection
    */
   async signInWithGoogle(redirectTo?: string) {
-    const defaultRedirect = `${window.location.origin}/pages/AuthCallback.html`;
+    const defaultRedirect = `${window.location.origin}/src/pages/AuthCallback.html`;
     
     return await this.getClient().auth.signInWithOAuth({
       provider: 'google',
@@ -228,7 +228,7 @@ class SupabaseService {
    * Chỉ có thể dùng 1 lần, sau khi đổi pass thì link cũ sẽ invalid
    */
   async resetPasswordForEmail(email: string, redirectTo?: string) {
-    const defaultRedirect = `${window.location.origin}/pages/ResetPassword.html`;
+    const defaultRedirect = `${window.location.origin}/src/pages/ResetPassword.html`;
     
     return await this.getClient().auth.resetPasswordForEmail(email, {
       redirectTo: redirectTo || defaultRedirect

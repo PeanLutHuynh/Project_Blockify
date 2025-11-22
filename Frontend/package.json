@@ -4,12 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build:ts": "tsc --project tsconfig.json",
-    "copy:html": "npx cpx2 \"src/pages/**/*.html\" dist/pages",
-    "copy:public": "npx cpx2 \"public/**/*\" dist/public",
-    "copy:assets": "npx cpx2 \"src/assets/**/*\" dist/assets",
-    "build": "npm run build:ts && npm run copy:html && npm run copy:public && npm run copy:assets",
-    "vercel-build": "npm run build",
+    "build": "tsc",
     "build:watch": "tsc --watch",
     "dev": "concurrently \"tsc --watch\" \"npx http-server . -p 3002 -c-1 --cors -o /src/pages/HomePage.html\"",
     "serve": "npx http-server . -p 3002 -c-1 --cors -o /src/pages/HomePage.html",
@@ -23,7 +18,6 @@
   },
   "devDependencies": {
     "@types/node": "^24.5.2",
-    "cpx2": "^8.0.0",
     "http-server": "^14.1.1",
     "typescript": "^5.9.2"
   }

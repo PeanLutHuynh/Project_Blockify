@@ -1,4 +1,4 @@
-import { initializeOnReady } from '../../../core/config/init.js';
+﻿import { initializeOnReady } from '../../../core/config/init.js';
 import { initializeNavbarAuth } from '../../../shared/components/NavbarAuth.js';
 import { initializeSearch } from '../../../shared/components/SearchInit.js';
 import { categoryService } from '../../../core/services/CategoryService.js';
@@ -378,7 +378,7 @@ async function loadRecommendedProductsForSection() {
         const slug = card.getAttribute('data-product-slug');
         if (slug) {
           console.log(`🔗 Navigating to ProductDetail: ${slug}`);
-          window.location.href = `/pages/ProductDetail.html?slug=${slug}`;
+          window.location.href = `./ProductDetail.html?slug=${slug}`;
         }
       }
     });
@@ -951,7 +951,7 @@ async function renderProductsToGrid(products: any[]) {
         // Check if user is logged in
         if (!authService.isAuthenticated()) {
           alert('Vui lòng đăng nhập để thêm vào wishlist');
-          window.location.href = '/pages/SigninPage.html';
+          window.location.href = './SigninPage.html';
           return;
         }
         
@@ -1001,7 +1001,7 @@ async function renderProductsToGrid(products: any[]) {
       
       if (slug) {
         console.log(`✅ Navigating to: /pages/ProductDetail.html?slug=${slug}`);
-        window.location.href = `/pages/ProductDetail.html?slug=${slug}`;
+        window.location.href = `./ProductDetail.html?slug=${slug}`;
       } else {
         console.error('❌ No slug found for card');
       }

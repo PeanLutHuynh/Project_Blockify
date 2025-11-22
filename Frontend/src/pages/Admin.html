@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
@@ -34,7 +34,7 @@
     <!-- Sidebar -->
     <aside class="sidebar d-flex flex-column">
       <div class="user d-flex align-items-center gap-2 mb-3">
-        <img src="../public/images/Group 40.png" alt="avatar">
+        <img src="../../public/images/Group 40.png" alt="avatar">
         <div class="name">QTLHH</div>
       </div>
       <ul class="menu nav flex-column">
@@ -1583,9 +1583,9 @@
   
   <!-- 🔐 ADMIN GUARD: Verify admin access before loading anything -->
   <script type="module">
-    import { authManager } from '../src/core/init.js';
-    import { loadConfig } from '../src/core/config/env.js';
-    import { supabaseService } from '../src/core/api/supabaseClient.js';
+    import { authManager } from '../../dist/src/core/init.js';
+    import { loadConfig } from '../../dist/src/core/config/env.js';
+    import { supabaseService } from '../../dist/src/core/api/supabaseClient.js';
 
     (async () => {
       console.log('🔐 [Admin.html] Verifying admin access...');
@@ -1633,12 +1633,12 @@
   </script>
   
   <!-- Tải cấu hình môi trường trước -->
-  <script type="module" src="../src/core/config/env.js"></script>
-  <script type="module" src="../src/assets/js/components/Admin.js"></script>
+  <script type="module" src="../../dist/src/core/config/env.js"></script>
+  <script type="module" src="../../dist/src/assets/js/components/Admin.js"></script>
   
   <!-- Admin Product Management -->
   <script type="module">
-    import { AdminProductController } from '../src/modules/admin/AdminProductController.js';
+    import { AdminProductController } from '../../dist/src/modules/admin/AdminProductController.js';
     
     // Initialize Admin Product Controller
     const adminProductController = new AdminProductController();
@@ -1647,7 +1647,7 @@
 
   <!-- Admin Category Management -->
   <script type="module">
-    import { AdminCategoryController } from '../src/modules/admin/AdminCategoryController.js';
+    import { AdminCategoryController } from '../../dist/src/modules/admin/AdminCategoryController.js';
     
     // Initialize Admin Category Controller
     const adminCategoryController = new AdminCategoryController();
@@ -1660,7 +1660,7 @@
 
   <!-- Admin Order Management -->
   <script type="module">
-    import { AdminOrderController } from '../src/modules/admin/AdminOrderController.js';
+    import { AdminOrderController } from '../../dist/src/modules/admin/AdminOrderController.js';
     
     // Initialize Admin Order Controller
     const adminOrderController = new AdminOrderController();
@@ -1669,7 +1669,7 @@
 
   <!-- Admin User Management -->
   <script type="module">
-    import { AdminUserController } from '../src/modules/admin/AdminUserController.js';
+    import { AdminUserController } from '../../dist/src/modules/admin/AdminUserController.js';
     
     // Initialize Admin User Controller
     const adminUserController = new AdminUserController();
@@ -1680,7 +1680,7 @@
   <!-- Admin Dashboard -->
   <!-- Admin Dashboard Initialization -->
   <script type="module">
-    import { AdminDashboardController } from '../src/modules/admin/AdminDashboardController.js';
+    import { AdminDashboardController } from '../../dist/src/modules/admin/AdminDashboardController.js';
     
     // Initialize Dashboard Controller when DOM is ready
     function initDashboardController() {

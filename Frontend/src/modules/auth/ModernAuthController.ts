@@ -1,4 +1,4 @@
-import { authService } from '../../core/services/AuthService.js';
+﻿import { authService } from '../../core/services/AuthService.js';
 import { User } from '../../core/models/User.js';
 
 export class ModernAuthController {
@@ -260,21 +260,21 @@ export class ModernAuthController {
       window.location.href = redirectUrl;
       return;
     }
-    window.location.href = '/pages/HomePage.html';
+    window.location.href = './HomePage.html';
   }
 
   /**
    * Redirect to sign in page
    */
   private redirectToSignIn(): void {
-    window.location.href = '/pages/SigninPage.html';
+    window.location.href = './SigninPage.html';
   }
 
   /**
    * Redirect to email verification page
    */
   private redirectToVerifyEmail(email: string): void {
-    window.location.href = `/pages/VerifyEmail.html?email=${encodeURIComponent(email)}&from=signup`;
+    window.location.href = `./VerifyEmail.html?email=${encodeURIComponent(email)}&from=signup`;
   }
 
   /**

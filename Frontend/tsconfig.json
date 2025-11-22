@@ -7,16 +7,16 @@
     "skipLibCheck": true,
 
     /* Module Resolution - Output to dist/ folder */
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
     "outDir": "./dist",
     "rootDir": ".",
-    "declaration": false,
-    "sourceMap": false,
-    "baseUrl": ".",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
 
     /* Linting */
     "strict": true,

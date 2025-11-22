@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CartController - MVC Controller for Cart Page
  * Following rule.md: MVC + OOP architecture
  */
@@ -363,7 +363,7 @@ export class CartController {
     sessionStorage.setItem('checkoutItems', JSON.stringify(selectedItemsData));
 
     // Redirect to order page
-    window.location.href = '/pages/OrderPage.html';
+    window.location.href = './OrderPage.html';
   }
 
   /**
